@@ -23,6 +23,7 @@ public class Client implements UserDetails {
     private String id;
     private String firstName;
     private String lastName;
+    private String name = lastName + firstName;
     private String gender;
     private String email;
     private String password;
