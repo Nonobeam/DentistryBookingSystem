@@ -1,9 +1,9 @@
 package com.example.DentistryManagement.controller;
 
 
-import com.example.DentistryManagement.core.mail.Mail;
+import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.service.MailService;
+import com.example.DentistryManagement.service.NotificationService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +24,7 @@ public class UserController {
 
     private final UserService userService;
 
-    private final MailService mailService;
+    private final NotificationService notificationService;
     @Operation(summary = "All users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -37,8 +37,8 @@ public class UserController {
     }
 
     @PostMapping("/sendMail/{mail}")
-    public String sendMail(@PathVariable String mail, @RequestBody Mail mailStructure){
-        mailService.sendMail(mail, mailStructure);
+    public String sendMail(@PathVariable String mail, @RequestBody Notification notificationStructure){
+        notificationService.sendMail(mail, notificationStructure);
 
         return "Successfully";
     }
