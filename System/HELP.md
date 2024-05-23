@@ -29,8 +29,7 @@ After working for a long time, some conflict may come up, try to use git fetch a
 ```git checkout -b your-branch-name```
 2. Make sure you are in your branch <br>
 ```git status```
-<br>This is a very powerful command, if you have time I recommend you to read this.
-<br>
+<br>This is a very powerful command, if you have time I recommend you to read this<br>
 ```git status --help```
 <br> If the status telling you that you are in the your-branch-name that means you right. If not try to change branch <br>
 ```git checkout your-branch-name```
