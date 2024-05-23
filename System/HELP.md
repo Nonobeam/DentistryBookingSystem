@@ -27,19 +27,16 @@ After working for a long time, some conflict may come up, try to use git fetch a
 
 1. Create your own branch <br> 
 ```git checkout -b your-branch-name```
-2. Make sure you are in your branch.
-<br>
+2. Make sure you are in your branch<br>
 ```git status```
-<br>This is a very powerful command, if you have time I recommend you to read this.
-<br>
+<br>This is a very powerful command, if you have time I recommend you to read this<br>
 ```git status --help```
 <br> If the status telling you that you are in the your-branch-name that means you right. If not try to change branch <br>
 ```git checkout your-branch-name```
-3. Now, you can add your changes into the commit message.
-<br>
+3. Now, you can add your changes into the commit message<br>
 ```git add . ```<br>
 ```git commit -m "Description of your changes"```
-4. Push your changes into your branch <br>
+4. Push your changes into your branch<br>
 ```git push origin your-branch-name```
 
 
