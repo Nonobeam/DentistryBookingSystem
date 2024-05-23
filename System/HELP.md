@@ -27,8 +27,7 @@ After working for a long time, some conflict may come up, try to use git fetch a
 
 1. Create your own branch <br> 
 ```git checkout -b your-branch-name```
-2. Make sure you are in your branch.
-<br>
+2. Make sure you are in your branch <br>
 ```git status```
 <br>This is a very powerful command, if you have time I recommend you to read this.
 <br>
