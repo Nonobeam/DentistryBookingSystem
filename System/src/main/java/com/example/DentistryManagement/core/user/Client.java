@@ -37,7 +37,7 @@ public class Client implements UserDetails {
 
     @Override
     public String getUsername() {
-        return lastName + firstName; // Example: Nguyen + A
+        return lastName + " " + firstName; // Example: Nguyen + A
     }
 
     @Override
