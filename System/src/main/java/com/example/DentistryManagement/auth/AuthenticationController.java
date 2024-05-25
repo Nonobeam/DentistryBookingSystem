@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.auth;
 
 
+import com.example.DentistryManagement.core.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,8 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.ok(authenticationService.register(request));
+        Role role = Role.DENTIST;
+        return ResponseEntity.ok(authenticationService.register(request, role));
     }
 
     @PostMapping("/authenticate")

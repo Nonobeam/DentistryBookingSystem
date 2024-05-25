@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433;database=DentistryBookingSystem;encrypt=false
+    url: jdbc:sqlserver://localhost:1433;database=SunflowerDentistry;encrypt=false
     username: sa
     password: 123
   jpa:
@@ -11,8 +11,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: phucnhse183026@fpt.edu.vn
-    password: yjyufsdhiuwxndkj
+    username: dentistrysunflower@gmail.com
+    password: hjmewqpnqgnobvcq
     properties:
       mail:
         smtp:
