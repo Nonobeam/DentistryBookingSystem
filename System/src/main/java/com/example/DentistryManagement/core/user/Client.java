@@ -15,18 +15,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "Client")
+@Table(name = "[User]")
 @Entity
 public class Client implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private String userID;
     private String firstName;
     private String lastName;
-    private String gender;
-    private String email;
-    private String password;
     private String phone;
+    private String password;
+    private String mail;
+    private String name;
     @Enumerated(EnumType.STRING)
     private Role role;
 

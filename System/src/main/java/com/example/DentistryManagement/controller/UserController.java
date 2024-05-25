@@ -39,7 +39,6 @@ public class UserController {
     @PostMapping("/sendMail/{mail}")
     public String sendMail(@PathVariable String mail, @RequestBody Notification notificationStructure){
         notificationService.sendMail(mail, notificationStructure);
-
         return "Successfully";
     }
 }

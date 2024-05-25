@@ -19,9 +19,9 @@ public class NotificationService {
     public void sendMail(String mail, Notification notificationStructure) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(fromMail);
+        simpleMailMessage.setTo(mail);
         simpleMailMessage.setSubject(notificationStructure.getSubject());
         simpleMailMessage.setText(notificationStructure.getMessage());
-        simpleMailMessage.setTo(mail);
 
         mailSender.send(simpleMailMessage);
     }

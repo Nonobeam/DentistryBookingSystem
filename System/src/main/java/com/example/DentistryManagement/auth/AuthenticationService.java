@@ -23,11 +23,15 @@ public class AuthenticationService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request, Role role) {
         var player = Client.builder()
-                .name(request.getName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.CUSTOMER)
+                .mail(request.getMail())
+                .name(request.getLastName() + " " + request.getFirstName())
+                .role(role)
                 .build();
         userRepository.save(player);
         var jwtToken = jwtService.generateToken(player);
