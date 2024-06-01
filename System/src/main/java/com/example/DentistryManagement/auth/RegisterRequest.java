@@ -22,4 +22,5 @@ public class RegisterRequest {
     private String mail;
     private String name;
     private Role role;
+    private int status;
 }

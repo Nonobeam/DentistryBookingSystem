@@ -1,12 +1,11 @@
 package com.example.DentistryManagement.core.dentistry;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.DentistryManagement.core.user.Client;
+import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,7 +16,9 @@ import java.time.LocalTime;
 @Entity
 public class Schedule {
     @Id
+    private UUID scheduleID;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
+    private UUID dentistID;
 }

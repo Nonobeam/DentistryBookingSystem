@@ -29,6 +29,7 @@ public class Client implements UserDetails {
     private String name;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private int status;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
