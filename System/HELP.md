@@ -37,7 +37,7 @@ After working for a long time, some conflict may come up, try to use git fetch a
    ```git add . ```<br>
    ```git commit -m "Description of your changes"```
 4. Push your changes into your branch<br>
-   ```git push origin your-branch-name```
+   ```git push origin your-branch-name``` 
 
 
 

@@ -32,6 +32,7 @@ public class AuthenticationService {
                 .mail(request.getMail())
                 .name(request.getLastName() + " " + request.getFirstName())
                 .role(role)
+                .status(1)
                 .build();
         userRepository.save(player);
         var jwtToken = jwtService.generateToken(player);

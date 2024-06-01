@@ -25,3 +25,7 @@ server:
 
 secret_key:
   hs256: b1b61a49c7ad56cc29e71343a2fbbed93e0d459c3ac7949dd39f401236fd87d9
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
