@@ -1,12 +1,10 @@
 package com.example.DentistryManagement.core.user;
 
+import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -16,46 +14,17 @@ import java.util.List;
 @Builder
 @Table(name = "Manager")
 @Entity
-public class Manager implements UserDetails {
+public class Manager{
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String gender;
-    private String email;
-    private String password;
-    private String phone;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "managerId")
+    private String managerId;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+    @OneToOne
+    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    private Client client;
 
-    @Override
-    public String getUsername() {
-        return lastName + " " + firstName; // Example: Nguyen + A
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager")
+    private List<Clinic> clinicList;
 }

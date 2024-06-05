@@ -1,12 +1,11 @@
 package com.example.DentistryManagement.core.user;
 
+import com.example.DentistryManagement.core.dentistry.*;
+import com.example.DentistryManagement.core.mail.Notification;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -17,46 +16,34 @@ import java.util.List;
 @Builder
 @Table(name = "Dentist")
 @Entity
-public class Dentist implements UserDetails {
+public class Dentist {
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String gender;
-    private String email;
-    private String password;
-    private String phone;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "dentistId")
+    private String dentistId;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+    @OneToOne
+    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    private Client client;
 
-    @Override
-    public String getUsername() {
-        return lastName + " " + firstName; // Example: Nguyen + A
-    }
+    @ManyToOne
+    @JoinColumn(name = "staffId_fk", nullable = false, referencedColumnName = "staffId")
+    private Staff staffSupervisor;
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    @ManyToOne
+    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
+    private Clinic clinicForDentist;
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    @ManyToOne
+    @JoinColumn(name = "dentistSchedule_fk", referencedColumnName = "dentistScheduleId")
+    private DentistSchedule dentistSchedule;
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistAppointment")
+    private List<Appointment> dentistAppointmentList;
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistService")
+    private List<DentistService> dentistServiceList;
+
+
 }

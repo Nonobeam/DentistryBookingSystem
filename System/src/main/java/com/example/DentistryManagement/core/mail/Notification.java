@@ -1,15 +1,29 @@
 package com.example.DentistryManagement.core.mail;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.example.DentistryManagement.core.user.Client;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "Appointment")
+@Entity
 public class Notification {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "notificationId")
+    private String notificationId;
+    private String message;
+    private LocalDateTime createTime;
+    private int status;
 
-    @Getter
-    @Setter
-    public class Mail {
-        private String subject;
-        private String message;
-    }
+    @ManyToOne
+    @JoinColumn(name = "client_fk", referencedColumnName = "clientId")
+    private Client clientNotification;
 
 }

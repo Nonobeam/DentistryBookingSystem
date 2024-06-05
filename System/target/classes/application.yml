@@ -1,27 +1,38 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433;database=DentistryBookingSystem;encrypt=false
-    username: sa
-    password: 123
+    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+    username: root
+    password: Haha123456
   jpa:
     hibernate:
-      naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
   mail:
     host: smtp.gmail.com
     port: 587
-    username: phucnhse183026@fpt.edu.vn
-    password: yjyufsdhiuwxndkj
+    username: dentistrysunflower@gmail.com
+    password: hjmewqpnqgnobvcq
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+  cloud:
+    gcp:
+      sql:
+        database-name: DentistryManagementSystem
+        instance-connection-name: red-carver-425403-d9:us-central1:dentistrymanagement
 
 server:
   port: 8080
 
 secret_key:
   hs256: b1b61a49c7ad56cc29e71343a2fbbed93e0d459c3ac7949dd39f401236fd87d9
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000

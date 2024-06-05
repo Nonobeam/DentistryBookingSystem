@@ -1,12 +1,12 @@
 package com.example.DentistryManagement.core.user;
 
+import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.mail.Notification;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -16,46 +16,24 @@ import java.util.List;
 @Builder
 @Table(name = "Staff")
 @Entity
-public class Staff implements UserDetails {
+public class Staff{
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String gender;
-    private String email;
-    private String password;
-    private String phone;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "staffId")
+    private String staffId;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+    @OneToOne
+    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    private Client client;
 
-    @Override
-    public String getUsername() {
-        return lastName + firstName; // Example: Nguyen + A
-    }
+    @ManyToOne
+    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
+    private Clinic clinicForStaff;
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staffAppointment")
+    private List<Appointment> staffAppointmentList;
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staffSupervisor")
+    private List<Dentist> dentistSupervisedList;
 }
