@@ -1,13 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:sqlserver://localhost:1433;database=SunflowerDentistry;encrypt=false
-    username: sa
-    password: 123
-  jpa:
-    hibernate:
-      naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   mail:
     host: smtp.gmail.com
     port: 587
