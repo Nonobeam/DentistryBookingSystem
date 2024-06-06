@@ -1,3 +1,4 @@
+
 package com.example.DentistryManagement.controller;
 
 
@@ -5,7 +6,10 @@ import com.example.DentistryManagement.core.dentistry.Schedule;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
+<<<<<<< HEAD
+=======
 import com.example.DentistryManagement.service.DentistService;
+>>>>>>> main
 import com.example.DentistryManagement.service.NotificationService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +33,10 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+<<<<<<< HEAD
+=======
     private final DentistService dentistService;
+>>>>>>> main
     private final NotificationService notificationService;
 
     @Operation(summary = "All users")
@@ -71,4 +78,8 @@ public class UserController {
         return "Successfully";
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main
