@@ -1,6 +1,7 @@
 
 package com.example.DentistryManagement.repository;
 
+import com.example.DentistryManagement.core.dentistry.Schedule;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

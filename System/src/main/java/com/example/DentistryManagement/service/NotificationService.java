@@ -20,6 +20,11 @@ public class NotificationService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(fromMail);
         simpleMailMessage.setTo(mail);
+<<<<<<< HEAD
+=======
+        simpleMailMessage.setSubject(notificationStructure.getSubject());
+        simpleMailMessage.setText(notificationStructure.getMessage());
+>>>>>>> main
 
         mailSender.send(simpleMailMessage);
     }
