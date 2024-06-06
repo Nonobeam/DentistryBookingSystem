@@ -29,7 +29,7 @@ public class DentistSchedule {
 
 
     @ManyToOne
-    @JoinColumn(name = "dentist_id_fk", referencedColumnName = "dentist_id_fk")
+    @JoinColumn(name = "dentist_id_fk", referencedColumnName = "dentist_id")
     private Dentist dentist;
 
     @ManyToOne
