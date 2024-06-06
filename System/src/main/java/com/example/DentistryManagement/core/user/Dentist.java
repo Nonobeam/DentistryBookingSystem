@@ -20,7 +20,7 @@ import java.util.List;
 public class Dentist {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "dentistId", columnDefinition = "uniqueidentifier")
+    @Column(name = "dentist_id", columnDefinition = "uniqueidentifier")
     private String dentistId;
 
     @OneToOne
@@ -36,10 +36,8 @@ public class Dentist {
     @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
     private Clinic clinicForDentist;
 
-    @ManyToOne
-    @JoinColumn(name = "dentistScheduleId_fk", referencedColumnName = "dentistScheduleId")
-    private DentistSchedule dentistSchedule;
-
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
+    private List<DentistSchedule> scheduleList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistService")
     private List<DentistService> dentistServiceList;
