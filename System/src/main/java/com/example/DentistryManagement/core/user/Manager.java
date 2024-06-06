@@ -17,12 +17,12 @@ import java.util.List;
 public class Manager{
     @Id
     @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "managerId")
+    @Column(name = "managerId", columnDefinition = "uniqueidentifier")
     private String managerId;
 
     @OneToOne
-    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    @MapsId
+    @JoinColumn(name = "managerId", referencedColumnName = "clientId")
     private Client client;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager")

@@ -27,7 +27,7 @@ public class DentistSchedule {
     private LocalDate dateWork;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistSchedule")
-    private List<DentistSchedule> dentistScheduleList;
+    private List<Dentist> dentistScheduleList;
 
     @ManyToOne
     @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")

@@ -19,12 +19,12 @@ import java.util.List;
 public class Dentist {
     @Id
     @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "dentistId")
+    @Column(name = "dentistId", columnDefinition = "uniqueidentifier")
     private String dentistId;
 
     @OneToOne
-    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    @MapsId
+    @JoinColumn(name = "dentistId", referencedColumnName = "clientId")
     private Client client;
 
     @ManyToOne
@@ -36,14 +36,14 @@ public class Dentist {
     private Clinic clinicForDentist;
 
     @ManyToOne
-    @JoinColumn(name = "dentistSchedule_fk", referencedColumnName = "dentistScheduleId")
+    @JoinColumn(name = "dentistScheduleId_fk", referencedColumnName = "dentistScheduleId")
     private DentistSchedule dentistSchedule;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistAppointment")
-    private List<Appointment> dentistAppointmentList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistService")
     private List<DentistService> dentistServiceList;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistAppointment")
+    private List<Appointment> dentistAppointmentList;
 
 }

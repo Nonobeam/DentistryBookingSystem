@@ -48,13 +48,15 @@ public class Client implements UserDetails {
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientDependent")
-    private List<Optional> dependentList;
+    private List<Dependent> dependentList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientNotification")
     private List<Notification> notificationList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientAppointment")
     private List<Appointment> clientAppointmentList;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

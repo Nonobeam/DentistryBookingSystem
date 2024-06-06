@@ -19,12 +19,12 @@ import java.util.List;
 public class Staff{
     @Id
     @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "staffId")
+    @Column(name = "staffId", columnDefinition = "uniqueidentifier")
     private String staffId;
 
     @OneToOne
-    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
+    @MapsId
+    @JoinColumn(name = "staffId", referencedColumnName = "clientId")
     private Client client;
 
     @ManyToOne

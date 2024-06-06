@@ -19,7 +19,7 @@ import java.util.List;
 public class Timeslot {
     @Id
     @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timeSlotId")
     private int timeSlotId;
     @NotBlank(message = "Start time must not be blank")
