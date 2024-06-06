@@ -2,6 +2,7 @@ package com.example.DentistryManagement.core.dentistry;
 
 import com.example.DentistryManagement.core.user.Dentist;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @Entity
 public class DentistSchedule {
     @Id
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "dentistScheduleId")
     private String scheduleId;

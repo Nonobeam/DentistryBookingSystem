@@ -2,6 +2,7 @@ package com.example.DentistryManagement.core.user;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Entity
 public class Manager{
     @Id
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "managerId", columnDefinition = "uniqueidentifier")
     private String managerId;
 

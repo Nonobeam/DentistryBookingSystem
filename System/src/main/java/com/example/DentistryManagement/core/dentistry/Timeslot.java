@@ -2,6 +2,7 @@ package com.example.DentistryManagement.core.dentistry;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -18,7 +19,7 @@ import java.util.List;
 @Table(name = "Timeslot")
 public class Timeslot {
     @Id
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timeSlotId")
     private int timeSlotId;

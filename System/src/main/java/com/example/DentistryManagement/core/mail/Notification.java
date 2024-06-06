@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.core.mail;
 
 import com.example.DentistryManagement.core.user.Client;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 public class Notification {
     @Id
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "notificationId")
     private String notificationId;
