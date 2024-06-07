@@ -1,16 +1,11 @@
 package com.example.DentistryManagement.core.dentistry;
 
 import com.example.DentistryManagement.core.user.Dentist;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -25,7 +20,7 @@ public class DentistSchedule {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "scheduleID")
     private String scheduleID;
-    private LocalDate dateWork;
+    private LocalDate workDate;
 
 
     @ManyToOne
@@ -38,12 +33,12 @@ public class DentistSchedule {
 
     @ManyToOne
     @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
-    private Timeslot timeslot;
+    private TimeSlot timeslot;
 
     @ManyToOne
     @JoinColumn(name = "serviceID", nullable = false, referencedColumnName = "serviceID")
-    private DentistryService service;
+    private Service service;
 
-    @Column(name = "available", nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;
 }

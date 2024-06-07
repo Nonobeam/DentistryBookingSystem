@@ -4,9 +4,9 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -26,6 +26,7 @@ public class Appointment {
     private String appointmentID;
     private int status;
     private LocalDate date;
+    @Size(max = 251, message = "Over the character limit")
     private String feedback;
 
     @ManyToOne
@@ -41,12 +42,16 @@ public class Appointment {
     private Dependent dependent;
 
     @ManyToOne
+    @JoinColumn(name = "timeSlotID",nullable = false, referencedColumnName = "timeSlotID")
+    private TimeSlot timeSlot;
+
+    @ManyToOne
     @JoinColumn(name = "dentistID",nullable = false, referencedColumnName = "dentistID")
     private Dentist dentist;
 
     @ManyToOne
     @JoinColumn(name = "serviceID",nullable = false, referencedColumnName = "serviceID")
-    private DentistryService service;
+    private Service service;
 
     @ManyToOne
     @JoinColumn(name = "clinicID",nullable = false, referencedColumnName = "clinicID")

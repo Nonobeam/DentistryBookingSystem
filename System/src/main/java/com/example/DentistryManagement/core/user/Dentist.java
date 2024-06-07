@@ -2,7 +2,6 @@ package com.example.DentistryManagement.core.user;
 
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,9 +35,15 @@ public class Dentist {
     private List<DentistSchedule> dentistScheduleList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
-    private List<DentistService> dentistServiceList;
+    private List<Notification> notificationList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
     private List<Appointment> appointmentList;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "DentistService",
+            joinColumns = @JoinColumn(name = "dentistID", referencedColumnName = "dentistID"),
+            inverseJoinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"))
+    private List<Service> serviceList;
 
 }

@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.core.mail;
 
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Appointment")
+@Table(name = "Notification")
 @Entity
 public class Notification {
     @Id
@@ -25,7 +26,7 @@ public class Notification {
     private int status;
 
     @ManyToOne
-    @JoinColumn(name = "userID", referencedColumnName = "userID")
-    private Client user;
+    @JoinColumn(name = "dentistID", referencedColumnName = "dentistID")
+    private Dentist dentist;
 
 }

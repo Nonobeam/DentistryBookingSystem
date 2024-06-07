@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.core.dentistry;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "Service")
 @Entity
-public class DentistryService {
+public class Service {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,14 +30,14 @@ public class DentistryService {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
     private List<DentistSchedule> dentistScheduleList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
-    private List<DentistService> dentistServiceList;
-
     //This is the ServiceClinic table
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ServiceClinic",
             joinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"),
             inverseJoinColumns = @JoinColumn(name = "clinicID", referencedColumnName = "clinicID"))
     private List<Clinic> clinicList;
+
+    @ManyToMany(mappedBy = "serviceList")
+    private List<Dentist> dentistList;
 
 }

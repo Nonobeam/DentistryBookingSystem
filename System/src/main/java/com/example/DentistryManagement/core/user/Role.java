@@ -27,7 +27,15 @@ public enum Role {
                    WRITE
             )
     ),
-    OWNER(
+    STAFF(
+            Set.of(
+            READ,
+            WRITE,
+            UPDATE,
+            DELETE
+            )
+    ),
+    MANAGER(
             Set.of(
                     READ,
                     WRITE,
