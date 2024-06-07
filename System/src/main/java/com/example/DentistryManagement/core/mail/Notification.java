@@ -18,14 +18,14 @@ public class Notification {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "notificationId")
-    private String notificationId;
+    @Column(name = "notificationID")
+    private String notificationID;
     private String message;
     private LocalDateTime createTime;
     private int status;
 
     @ManyToOne
-    @JoinColumn(name = "client_fk", referencedColumnName = "clientId")
-    private Client clientNotification;
+    @JoinColumn(name = "userID", referencedColumnName = "userID")
+    private Client user;
 
 }

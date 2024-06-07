@@ -20,14 +20,15 @@ public class DentistService {
      @Id
      @JsonProperty(access = JsonProperty.Access.READ_ONLY)
      @GeneratedValue(strategy = GenerationType.IDENTITY)
-     private int dentistServiceId;
+     @Column(name = "dentistServiceID")
+     private int dentistServiceID;
 
      @ManyToOne
-     @JoinColumn(name = "dentistId_fk", referencedColumnName = "dentistId")
-     private Dentist dentistService;
+     @JoinColumn(name = "dentistID", referencedColumnName = "dentistID")
+     private Dentist dentist;
 
      @ManyToOne
-     @JoinColumn(name = "serviceId_fk", referencedColumnName = "serviceId")
-     private DentistryService serviceDentist;
+     @JoinColumn(name = "serviceID", referencedColumnName = "serviceID")
+     private DentistryService service;
 
 }

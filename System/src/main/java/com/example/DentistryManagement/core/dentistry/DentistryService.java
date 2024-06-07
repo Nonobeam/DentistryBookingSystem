@@ -20,24 +20,24 @@ public class DentistryService {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "serviceId")
-    private String serviceId;
+    @Column(name = "serviceID")
+    private String serviceID;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceAppointment")
-    private List<Appointment> serviceAppointmentList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
+    private List<Appointment> appointmentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceDentistSchedule")
-    private List<DentistSchedule> serviceDentistScheduleList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
+    private List<DentistSchedule> dentistScheduleList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceDentist")
-    private List<DentistService> serviceDentistList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
+    private List<DentistService> dentistServiceList;
 
     //This is the ServiceClinic table
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ServiceClinic",
-            joinColumns = @JoinColumn(name = "serviceId_fk", referencedColumnName = "serviceId"),
-            inverseJoinColumns = @JoinColumn(name = "clinicId_fk", referencedColumnName = "clinicId"))
+            joinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"),
+            inverseJoinColumns = @JoinColumn(name = "clinicID", referencedColumnName = "clinicID"))
     private List<Clinic> clinicList;
 
 }

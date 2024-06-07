@@ -22,34 +22,34 @@ public class Appointment {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "appointmentId")
-    private String appointmentId;
+    @Column(name = "appointmentID")
+    private String appointmentID;
     private int status;
     private LocalDate date;
     private String feedback;
 
     @ManyToOne
-    @JoinColumn(name = "staffId_fk", referencedColumnName = "staffId")
-    private Staff staffAppointment;
+    @JoinColumn(name = "staffID", referencedColumnName = "staffID")
+    private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "clientId_fk",nullable = false, referencedColumnName = "clientId")
-    private Client clientAppointment;
+    @JoinColumn(name = "customerID",nullable = false, referencedColumnName = "userID")
+    private Client user;
 
     @ManyToOne
-    @JoinColumn(name = "dependentId_fk", referencedColumnName = "dependentId")
-    private Dependent dependentAppointment;
+    @JoinColumn(name = "dependentID", referencedColumnName = "dependentID")
+    private Dependent dependent;
 
     @ManyToOne
-    @JoinColumn(name = "dentistId_fk",nullable = false, referencedColumnName = "dentistId")
-    private Dentist dentistAppointment;
+    @JoinColumn(name = "dentistID",nullable = false, referencedColumnName = "dentistID")
+    private Dentist dentist;
 
     @ManyToOne
-    @JoinColumn(name = "serviceId_fk",nullable = false, referencedColumnName = "serviceId")
-    private DentistryService serviceAppointment;
+    @JoinColumn(name = "serviceID",nullable = false, referencedColumnName = "serviceID")
+    private DentistryService service;
 
     @ManyToOne
-    @JoinColumn(name = "clinicId_fk",nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicAppointment;
+    @JoinColumn(name = "clinicID",nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
 }

@@ -18,13 +18,13 @@ import java.util.List;
 public class Manager{
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "managerId", columnDefinition = "uniqueidentifier")
+    @Column(name = "managerID", columnDefinition = "uniqueidentifier")
     private String managerId;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "managerId", referencedColumnName = "clientId")
-    private Client client;
+    @JoinColumn(name = "managerID", referencedColumnName = "userID")
+    private Client user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager")
     private List<Clinic> clinicList;

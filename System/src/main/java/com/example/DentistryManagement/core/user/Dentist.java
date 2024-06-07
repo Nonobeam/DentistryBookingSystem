@@ -20,29 +20,25 @@ import java.util.List;
 public class Dentist {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "dentist_id", columnDefinition = "uniqueidentifier")
-    private String dentistId;
+    @Column(name = "dentistID", columnDefinition = "uniqueidentifier")
+    private String dentistID;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "dentistId", referencedColumnName = "clientId")
-    private Client client;
+    @JoinColumn(name = "dentistID", referencedColumnName = "userID")
+    private Client user;
 
     @ManyToOne
-    @JoinColumn(name = "staffId_fk", nullable = false, referencedColumnName = "staffId")
-    private Staff staffSupervisor;
-
-    @ManyToOne
-    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicForDentist;
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
-    private List<DentistSchedule> scheduleList;
+    private List<DentistSchedule> dentistScheduleList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistService")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
     private List<DentistService> dentistServiceList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistAppointment")
-    private List<Appointment> dentistAppointmentList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
+    private List<Appointment> appointmentList;
 
 }

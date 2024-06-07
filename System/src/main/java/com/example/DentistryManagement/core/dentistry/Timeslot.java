@@ -21,15 +21,15 @@ public class Timeslot {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "timeSlotId")
-    private int timeSlotId;
+    @Column(name = "timeSlotID")
+    private int timeSlotID;
     @NotBlank(message = "Start time must not be blank")
     private LocalTime startTime;
 
     @ManyToOne
-    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicTimeSlot;
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "timeSlotDentistSchedule")
-    private List<DentistSchedule> timeSlotDentistScheduleList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistSchedule")
+    private List<DentistSchedule> dentistScheduleList;
 }

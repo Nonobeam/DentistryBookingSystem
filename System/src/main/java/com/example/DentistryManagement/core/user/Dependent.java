@@ -22,8 +22,8 @@ public class Dependent {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "dependentId")
-    private String dependentId;
+    @Column(name = "dependentID")
+    private String dependentID;
     @NotBlank(message = "Firstname must not be empty")
     private String firstName;
     @NotBlank(message = "Lastname must not be empty")
@@ -31,9 +31,9 @@ public class Dependent {
     private LocalDate birthday;
 
     @ManyToOne
-    @JoinColumn(name = "clientId_fk", nullable = false, referencedColumnName = "clientId")
-    private Client clientDependent;
+    @JoinColumn(name = "customerID", nullable = false, referencedColumnName = "userID")
+    private Client user;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dependentAppointment")
-    private List<Appointment> dependentAppointmentList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dependent")
+    private List<Appointment> dependentList;
 }

@@ -3,7 +3,6 @@ package com.example.DentistryManagement.core.user;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,21 +19,19 @@ import java.util.List;
 public class Staff{
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "staffId", columnDefinition = "uniqueidentifier")
-    private String staffId;
+    @Column(name = "staffID", columnDefinition = "uniqueidentifier")
+    private String staffID;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "staffId", referencedColumnName = "clientId")
-    private Client client;
+    @JoinColumn(name = "staffID", referencedColumnName = "userID")
+    private Client user;
 
     @ManyToOne
-    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicForStaff;
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staffAppointment")
-    private List<Appointment> staffAppointmentList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staff")
+    private List<Appointment> appointmentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staffSupervisor")
-    private List<Dentist> dentistSupervisedList;
 }
