@@ -47,6 +47,7 @@ public class Client implements UserDetails {
     private Role role;
     private String birthday;
     private int status;
+    private String name;
 
 
 

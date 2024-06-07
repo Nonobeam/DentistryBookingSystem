@@ -30,6 +30,4 @@ public class Timeslot {
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistSchedule")
-    private List<DentistSchedule> dentistScheduleList;
 }
