@@ -2,12 +2,15 @@ package com.example.DentistryManagement.core.user;
 
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,35 +31,40 @@ public class Client implements UserDetails {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "clientId")
-    private String id;
+    @Column(name = "userID")
+    private String userID;
     @NotBlank(message = "Firstname must not be empty")
     private String firstName;
     @NotBlank(message = "Lastname must not be empty")
     private String lastName;
     @NotBlank(message = "Phone number must not be empty")
     @Pattern(regexp = "\\+?[0-9]+", message = "Invalid phone number format")
+    @Size(min = 10, max = 11, message = "Phone number cannot exceed 11 characters")
     private String phone;
     @NotBlank(message = "Email must not be empty")
+    @Email(message = "Invalid email format")
     private String mail;
     @NotBlank(message = "Password must not be empty")
-    private String name;
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
+            message = "Password must be at least 8 characters and contain at least one uppercase letter and one special character")
     private String password;
-    private String birthday;
-    private int status;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private String birthday;
+    private int status;
+    private String name;
 
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientDependent")
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Dependent> dependentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientNotification")
-    private List<Notification> notificationList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Appointment> appointmentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientAppointment")
-    private List<Appointment> clientAppointmentList;
-
+    //manager only baby
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Clinic> clinicList;
 
 
     @Override

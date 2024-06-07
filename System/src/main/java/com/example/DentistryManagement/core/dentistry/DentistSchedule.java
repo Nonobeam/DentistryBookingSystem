@@ -1,16 +1,11 @@
 package com.example.DentistryManagement.core.dentistry;
 
 import com.example.DentistryManagement.core.user.Dentist;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,25 +18,27 @@ public class DentistSchedule {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "dentistScheduleId")
-    private String scheduleId;
-    private LocalDate dateWork;
+    @Column(name = "scheduleID")
+    private String scheduleID;
+    private LocalDate workDate;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistSchedule")
-    private List<Dentist> dentistScheduleList;
 
     @ManyToOne
-    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicDentistSchedule;
+    @JoinColumn(name = "dentistID", referencedColumnName = "dentistID")
+    private Dentist dentist;
 
     @ManyToOne
-    @JoinColumn(name = "timeSlotId_fk", nullable = false, referencedColumnName = "timeSlotId")
-    private Timeslot timeSlotDentistSchedule;
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
     @ManyToOne
-    @JoinColumn(name = "serviceId_fk", nullable = false, referencedColumnName = "serviceId")
-    private DentistryService serviceDentistSchedule;
+    @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
+    private TimeSlot timeslot;
 
-    @Column(name = "available", nullable = false, columnDefinition = "INT DEFAULT 1")
+    @ManyToOne
+    @JoinColumn(name = "serviceID", nullable = false, referencedColumnName = "serviceID")
+    private Service service;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;
 }

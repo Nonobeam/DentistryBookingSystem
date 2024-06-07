@@ -2,7 +2,6 @@ package com.example.DentistryManagement.core.user;
 
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,31 +19,31 @@ import java.util.List;
 public class Dentist {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "dentistId", columnDefinition = "uniqueidentifier")
-    private String dentistId;
+    @Column(name = "dentistID", columnDefinition = "uniqueidentifier")
+    private String dentistID;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "dentistId", referencedColumnName = "clientId")
-    private Client client;
+    @JoinColumn(name = "dentistID", referencedColumnName = "userID")
+    private Client user;
 
     @ManyToOne
-    @JoinColumn(name = "staffId_fk", nullable = false, referencedColumnName = "staffId")
-    private Staff staffSupervisor;
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    private Clinic clinic;
 
-    @ManyToOne
-    @JoinColumn(name = "clinicId_fk", nullable = false, referencedColumnName = "clinicId")
-    private Clinic clinicForDentist;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
+    private List<DentistSchedule> dentistScheduleList;
 
-    @ManyToOne
-    @JoinColumn(name = "dentistScheduleId_fk", referencedColumnName = "dentistScheduleId")
-    private DentistSchedule dentistSchedule;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
+    private List<Notification> notificationList;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
+    private List<Appointment> appointmentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistService")
-    private List<DentistService> dentistServiceList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentistAppointment")
-    private List<Appointment> dentistAppointmentList;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "DentistService",
+            joinColumns = @JoinColumn(name = "dentistID", referencedColumnName = "dentistID"),
+            inverseJoinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"))
+    private List<Service> serviceList;
 
 }

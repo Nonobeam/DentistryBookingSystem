@@ -1,16 +1,9 @@
 package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.core.dentistry.Schedule;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.ScheduleRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
