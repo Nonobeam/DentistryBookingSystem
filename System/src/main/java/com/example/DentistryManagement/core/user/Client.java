@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,6 +37,7 @@ public class Client implements UserDetails {
     private String lastName;
     @NotBlank(message = "Phone number must not be empty")
     @Pattern(regexp = "\\+?[0-9]+", message = "Invalid phone number format")
+    @Size(max = 11, message = "Phone number cannot exceed 11 characters")
     private String phone;
     @NotBlank(message = "Email must not be empty")
     private String mail;
