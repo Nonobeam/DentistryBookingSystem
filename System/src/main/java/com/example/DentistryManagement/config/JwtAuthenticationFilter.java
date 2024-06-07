@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.config;
 
+import com.example.DentistryManagement.service.JwtService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

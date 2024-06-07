@@ -1,7 +1,9 @@
 
-package com.example.DentistryManagement.auth;
+package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.config.JwtService;
+import com.example.DentistryManagement.auth.AuthenticationRequest;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.repository.UserRepository;

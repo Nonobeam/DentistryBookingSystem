@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.config;
+package com.example.DentistryManagement.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

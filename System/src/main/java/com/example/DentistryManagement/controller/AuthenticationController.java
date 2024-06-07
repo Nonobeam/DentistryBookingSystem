@@ -1,6 +1,10 @@
-package com.example.DentistryManagement.auth;
+package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.auth.AuthenticationRequest;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.service.AuthenticationService;
+import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
