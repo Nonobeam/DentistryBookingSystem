@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<Client, String> {
 
     Optional<Client> findByName(String name);
-    Optional<Client> findByRole(String role);
+    boolean existsByPhoneOrMail(String phone, String mail);
 //    List<Client> findClientByRoleAAndStatus(@Param("status") int status, @Param("role") Role role);
 }

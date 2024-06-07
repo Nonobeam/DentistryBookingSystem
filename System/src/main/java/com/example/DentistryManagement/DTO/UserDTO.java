@@ -1,6 +1,4 @@
-
-package com.example.DentistryManagement.auth;
-
+package com.example.DentistryManagement.DTO;
 
 import com.example.DentistryManagement.core.user.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,19 +8,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class RegisterRequest {
-
+@Getter
+@Setter
+public class UserDTO {
+    private String userID;
     @NotBlank(message = "Firstname must not be empty")
     private String firstName;
     @NotBlank(message = "Lastname must not be empty")
@@ -34,16 +28,8 @@ public class RegisterRequest {
     @NotBlank(message = "Email must not be empty")
     @Email(message = "Invalid email format")
     private String mail;
-    @NotBlank(message = "Password must not be empty")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
-            message = "Password must be at least 8 characters and contain at least one uppercase letter and one special character")
-    private String password;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDate birthday;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private int status;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String name;
 }

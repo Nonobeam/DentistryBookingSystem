@@ -15,4 +15,8 @@ public class UserService {
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
+
+    public boolean existsByPhoneOOrMail(String phone, String mail) {
+        return userRepository.existsByPhoneOrMail(phone, mail);
+    }
 }
