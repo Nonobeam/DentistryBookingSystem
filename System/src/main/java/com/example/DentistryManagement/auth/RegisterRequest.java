@@ -1,6 +1,4 @@
-
 package com.example.DentistryManagement.auth;
-
 
 import com.example.DentistryManagement.core.user.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,19 +8,17 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
-@Builder
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RegisterRequest {
-
     @NotBlank(message = "Firstname must not be empty")
     private String firstName;
     @NotBlank(message = "Lastname must not be empty")
@@ -44,6 +40,5 @@ public class RegisterRequest {
     private LocalDate birthday;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int status;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String name;
 }

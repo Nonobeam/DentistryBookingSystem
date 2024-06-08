@@ -74,9 +74,10 @@ public class Client implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    // Identity unique user
     @Override
     public String getUsername() {
-        return lastName + " " + firstName; // Example: Nguyen + A
+        return mail;
     }
 
     @Override

@@ -25,12 +25,12 @@ public class JwtService {
     private String SECRET_KEY;
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    public String extractPlayerName(String token) {
+    public String extractMail(String token) {
         try {
             return extractClaim(token, Claims::getSubject);
         } catch (Exception e) {
-            logger.error("Error while extracting player name from token: {}", e.getMessage());
-            throw new RuntimeException("Error while extracting player name from token", e);
+            logger.error("Error while extracting user mail from token: {}", e.getMessage());
+            throw new RuntimeException("Error while extracting user mail from token", e);
         }
     }
 
@@ -72,8 +72,8 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
-            final String userName = extractPlayerName(token);
-            return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+            final String mail = extractMail(token);
+            return mail.equals(userDetails.getUsername()) && !isTokenExpired(token);
         } catch (Exception e) {
             logger.error("Error while validating token: {}", e.getMessage());
             throw new RuntimeException("Error while validating token", e);

@@ -5,7 +5,12 @@ import com.example.DentistryManagement.core.mail.Notification;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+import org.eclipse.angus.mail.imap.protocol.UIDSet;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 

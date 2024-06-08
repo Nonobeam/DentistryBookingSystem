@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/player")
+@RequestMapping("/api/v1/dentisty/user")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
