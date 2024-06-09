@@ -66,21 +66,22 @@ public class AuthenticationService {
                 .build();
     }
     public boolean isUserAuthorized(Authentication authentication, String userId, Role userRole) {
-        if (authentication != null && authentication.isAuthenticated()) {
+        try {
+            if (authentication != null && authentication.isAuthenticated()) {
+                String authenticatedUserId = authentication.getName();
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-            String authenticatedUserId = authentication.getName();
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                boolean hasUserRole = authorities.stream()
+                        .anyMatch(authority -> authority.getAuthority().equals(userRole.name()));
 
-
-            boolean hasUserRole = authorities.stream()
-                    .anyMatch(authority -> authority.getAuthority().equals(userRole.name()));
-
-            boolean isUserIdMatched = authenticatedUserId.equals(userId);
-            // Trả về true nếu vai trò và ID của người dùng khớp với yêu cầu
-            return hasUserRole && isUserIdMatched;
+                boolean isUserIdMatched = authenticatedUserId.equals(userId);
+                return hasUserRole && isUserIdMatched;
+            }
+            return false;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ
+            e.printStackTrace();
+            return false;
         }
-        // Trả về false nếu người dùng chưa xác thực
-        return false;
     }
-
 }
