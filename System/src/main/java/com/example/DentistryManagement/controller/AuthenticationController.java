@@ -3,8 +3,8 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.auth.AuthenticationRequest;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
-import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.core.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,23 +21,39 @@ public class AuthenticationController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
-    ) {
-        Role role = Role.DENTIST;
-        return ResponseEntity.ok(authenticationService.register(request, role));
+    private AuthenticationResponse register(RegisterRequest request, Role role) {
+        return authenticationService.register(request, role);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> customerRegister(
+            @RequestBody RegisterRequest request
+    ) {
+        Role role = Role.CUSTOMER;
+        return ResponseEntity.ok(register(request, role));
+    }
+
+    @PostMapping("/staffs-register/{role}")
+    public ResponseEntity<AuthenticationResponse> dentistRegister(
+            @PathVariable Role role,
+            @RequestBody RegisterRequest request
+    ) {
+        return ResponseEntity.ok(register(request, role));
+    }
+
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
         AuthenticationResponse response = authenticationService.authenticate(request);
 
-        // Log response details
-        logger.info("Authentication response: {}", response.getToken());
+        if (response == null) {
+            logger.error("Response is missing");
+        } else {
+            // Log response details
+            logger.info("Authentication response: {}", response.getToken());
+        }
+
 
         return ResponseEntity.ok(response);
     }

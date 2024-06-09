@@ -27,18 +27,30 @@ public class AuthenticationService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     public AuthenticationResponse register(RegisterRequest request, Role role) {
-        var player = Client.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .phone(request.getPhone())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .mail(request.getMail())
-                .name(request.getLastName() + " " + request.getFirstName())
-                .role(role)
-                .status(1)
-                .build();
-        userRepository.save(player);
-        var jwtToken = jwtService.generateToken(player);
+
+        if (userRepository.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
+            throw new Error("Phone or mail is already existed");
+        }
+
+        Client user;
+        try {
+            user = Client.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .phone(request.getPhone())
+                    .mail(request.getMail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(role)
+                    .birthday(request.getBirthday())
+                    .status(1)
+                    .name(request.getLastName() + " " + request.getFirstName())
+                    .build();
+        } catch (Exception e) {
+            logger.error(e.toString());
+            throw new Error("Some thing when wrong while creating a new user, please check your input field");
+        }
+        userRepository.save(user);
+        var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
@@ -47,13 +59,23 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getName(),
+                        request.getMail(),
                         request.getPassword()
                 )
         );
-        var player = userRepository.findByName(request.getName())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(player);
+        Client user = null;
+        try {
+            user = userRepository.findByMail(request.getMail())
+                    .orElseThrow();
+        } catch (Exception e) {
+            logger.error(e.toString());
+            if (user == null) {
+                throw new Error("Cannot find the user with mail" + request.getMail());
+            } else {
+                throw new Error("Some unexpected problem has been happened");
+            }
+        }
+        var jwtToken = jwtService.generateToken(user);
 
         logger.info("Token in service: " + jwtToken);
 

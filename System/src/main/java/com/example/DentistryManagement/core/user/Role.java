@@ -14,7 +14,6 @@ import static com.example.DentistryManagement.core.user.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {
-    GUEST(Collections.emptySet()),
     CUSTOMER(
             Set.of(
                     READ,

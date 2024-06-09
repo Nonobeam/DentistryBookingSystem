@@ -10,27 +10,23 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
-public class SecurityConfiguration {
+public class SecurityConfig{
 
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/**",
-            "/api/v1/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -50,19 +46,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         HttpSecurity httpSecurity = http
-                .cors(withDefaults())
                 // Disable CSRF
                 .csrf(AbstractHttpConfigurer::disable)
                 // Authorize any request
-                .authorizeHttpRequests(req -> req
-                        .requestMatchers(WHITE_LIST_URL)
-                        .permitAll()
-//                        .requestMatchers(GET, "/api/v1/**").hasAnyAuthority(ADMIN_READ.name())
-//                        .requestMatchers(POST, "/api/v1/**").hasAnyAuthority(ADMIN_CREATE.name())
-//                        .requestMatchers(PUT, "/api/v1/**").hasAnyAuthority(ADMIN_UPDATE.name())
-//                        .requestMatchers(DELETE, "/api/v1/**").hasAnyAuthority(ADMIN_DELETE.name())
-                        .anyRequest()
-                        .authenticated()
+                .authorizeHttpRequests(req ->
+                        req.requestMatchers(WHITE_LIST_URL)
+                                .permitAll()
+                                .requestMatchers("api/v1/dentistry/**").hasAnyRole("CUSTOMER", "DENTIST", "STAFF", "MANAGER", "ADMIN")
+                                .anyRequest()
+                                .authenticated()
                 )
                 // Make session as STATELESS
                 .sessionManagement(session -> session
@@ -72,7 +64,7 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider)
                 // Add JWT authentication filter before specified authentication filter class
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+        return httpSecurity.build();
     }
 }
 

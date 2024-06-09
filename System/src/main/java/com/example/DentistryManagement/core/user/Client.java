@@ -16,6 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -48,9 +49,10 @@ public class Client implements UserDetails {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
             message = "Password must be at least 8 characters and contain at least one uppercase letter and one special character")
     private String password;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String birthday;
+    private LocalDate birthday;
     private int status;
     private String name;
 
@@ -72,9 +74,10 @@ public class Client implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    // Identity unique user
     @Override
     public String getUsername() {
-        return lastName + " " + firstName; // Example: Nguyen + A
+        return mail;
     }
 
     @Override
