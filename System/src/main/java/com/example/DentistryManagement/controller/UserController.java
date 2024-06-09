@@ -66,6 +66,4 @@ public class UserController {
         notificationService.sendMail(mail, notificationStructure);
         return "Successfully";
     }
-
-
 }
