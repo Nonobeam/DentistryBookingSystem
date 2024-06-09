@@ -1,14 +1,8 @@
 spring:
   datasource:
-<<<<<<< HEAD
     url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&socketFactory=com.google.cloud.sql.mysql.SocketFactory
     username: root
     password: Haha123456
-=======
-    url: jdbc:sqlserver://localhost:1433;database=SunflowerDentistry;encrypt=false
-    username: sa
-    password: 123
->>>>>>> main
   jpa:
     hibernate:
       ddl-auto: update

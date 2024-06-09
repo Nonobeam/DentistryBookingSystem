@@ -31,6 +31,10 @@ public class Dentist {
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
+    @ManyToOne
+    @JoinColumn(name = "staffID", nullable = false, referencedColumnName = "staffID")
+    private Staff staff;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
     private List<DentistSchedule> dentistScheduleList;
 

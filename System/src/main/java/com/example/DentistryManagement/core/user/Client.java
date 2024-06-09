@@ -16,6 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class Client implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String birthday;
+    private LocalDate birthday;
     private int status;
     private String name;
 
@@ -66,6 +67,13 @@ public class Client implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Clinic> clinicList;
 
+    @OneToOne
+    @JoinColumn(name = "userID", referencedColumnName = "dentistID")
+    private Client dentist;
+
+    @OneToOne
+    @JoinColumn(name = "userID", referencedColumnName = "staffID")
+    private Client staff;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
