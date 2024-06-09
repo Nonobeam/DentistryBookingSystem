@@ -1,5 +1,4 @@
 spring:
-<<<<<<< HEAD
   datasource:
     url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&socketFactory=com.google.cloud.sql.mysql.SocketFactory
     username: root
@@ -11,8 +10,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-=======
->>>>>>> main
   mail:
     host: smtp.gmail.com
     port: 587
@@ -38,8 +35,4 @@ secret_key:
 
 app:
   cors:
-<<<<<<< HEAD
     allowed-origins: http://localhost:3000
-=======
-    allowed-origins: http://localhost:3000
->>>>>>> main
