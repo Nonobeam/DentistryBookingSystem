@@ -49,6 +49,7 @@ public class Client implements UserDetails {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
             message = "Password must be at least 8 characters and contain at least one uppercase letter and one special character")
     private String password;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDate birthday;
@@ -67,22 +68,16 @@ public class Client implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Clinic> clinicList;
 
-    @OneToOne
-    @JoinColumn(name = "userID", referencedColumnName = "dentistID")
-    private Client dentist;
-
-    @OneToOne
-    @JoinColumn(name = "userID", referencedColumnName = "staffID")
-    private Client staff;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    // Identity unique user
     @Override
     public String getUsername() {
-        return lastName + " " + firstName; // Example: Nguyen + A
+        return mail;
     }
 
     @Override

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping("/api/v1/player")
+@RequestMapping("/api/v1/dentisty/user")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -67,6 +67,4 @@ public class UserController {
         notificationService.sendMail(mail, notificationStructure);
         return "Successfully";
     }
-
-
 }
