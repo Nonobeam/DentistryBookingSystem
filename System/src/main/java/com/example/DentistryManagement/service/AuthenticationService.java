@@ -43,13 +43,11 @@ public class AuthenticationService {
                     .role(role)
                     .birthday(request.getBirthday())
                     .status(1)
-                    .name(request.getLastName() + " " + request.getFirstName())
                     .build();
         } catch (Exception e) {
             logger.error(e.toString());
             throw new Error("Some thing when wrong while creating a new user, please check your input field");
         }
-        userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -76,7 +74,6 @@ public class AuthenticationService {
             }
         }
         var jwtToken = jwtService.generateToken(user);
-
         logger.info("Token in service: " + jwtToken);
 
         return AuthenticationResponse.builder()

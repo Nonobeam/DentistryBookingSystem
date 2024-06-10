@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.config;
 
+import com.example.DentistryManagement.core.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.example.DentistryManagement.core.user.Permission.READ;
+import static com.example.DentistryManagement.core.user.Permission.WRITE;
+import static com.example.DentistryManagement.core.user.Role.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 
@@ -52,7 +56,9 @@ public class SecurityConfig{
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
-                                .requestMatchers("api/v1/dentistry/**").hasAnyRole("CUSTOMER", "DENTIST", "STAFF", "MANAGER", "ADMIN")
+//                                .requestMatchers("/user/**").permitAll()
+                                .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), MANAGER.name(), CUSTOMER.name())
+                                .requestMatchers(GET, "/user/**").hasAnyAuthority(READ.name(), WRITE.name())
                                 .anyRequest()
                                 .authenticated()
                 )

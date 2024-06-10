@@ -34,11 +34,7 @@ public class RegisterRequest {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
             message = "Password must be at least 8 characters and contain at least one uppercase letter and one special character")
     private String password;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Enumerated(EnumType.STRING)
-    private Role role;
     private LocalDate birthday;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int status;
-    private String name;
 }
