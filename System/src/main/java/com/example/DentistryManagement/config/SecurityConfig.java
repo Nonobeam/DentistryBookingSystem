@@ -56,8 +56,11 @@ public class SecurityConfig{
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
-                                .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), MANAGER.name(), CUSTOMER.name())
-                                .requestMatchers(GET, "/user/**").hasAnyAuthority(READ.name(), WRITE.name())
+                                .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), MANAGER.name(), CUSTOMER.name(), STAFF.name(), DENTIST.name())
+                                .requestMatchers(GET, "/user/**").hasAnyAuthority(READ.name())
+                                .requestMatchers("/manager/**").hasRole(MANAGER.name())
+                                .requestMatchers(PUT, "/manager/**").hasRole(MANAGER.name())
+                                .requestMatchers(POST, "/manager/**").hasAuthority(WRITE.name())
                                 .anyRequest()
                                 .authenticated()
                 )
