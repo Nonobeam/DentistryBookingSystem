@@ -43,6 +43,7 @@ public class Clinic {
     private Time breakStartTime;
     @NotBlank(message = "Break end time must not be empty")
     private Time breakEndTime;
+    private int status;
 
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false, referencedColumnName = "userID")

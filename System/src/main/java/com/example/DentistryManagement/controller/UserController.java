@@ -19,7 +19,6 @@ import java.util.List;
 
 @RequestMapping("/user")
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "User API")
 public class UserController {
@@ -37,6 +36,17 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<List<Client>> findAllUsers() {
         return ResponseEntity.ok(userService.findAllUsers());
+    }
+
+    @Operation(summary = "Find a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    @GetMapping("/all/{userID}")
+    public ResponseEntity<Client> findUser(@PathVariable String userID) {
+        return ResponseEntity.ok(userService.findUserByID(userID));
     }
 
 //    @Operation(summary = "All dentists follow status")
