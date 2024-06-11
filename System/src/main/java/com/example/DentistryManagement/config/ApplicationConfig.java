@@ -26,7 +26,7 @@ public class ApplicationConfig{
     @Bean
     public UserDetailsService userDetailsService() {
         return username ->  userRepository.findByMail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with mail"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with mail" + username));
     }
 
     @Bean

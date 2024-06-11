@@ -49,6 +49,7 @@ public class AuthenticationService {
             throw new Error("Some thing when wrong while creating a new user, please check your input field");
         }
         var jwtToken = jwtService.generateToken(user);
+        userRepository.save(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
@@ -67,14 +68,21 @@ public class AuthenticationService {
                     .orElseThrow();
         } catch (Exception e) {
             logger.error(e.toString());
+
             if (user == null) {
                 throw new Error("Cannot find the user with mail" + request.getMail());
             } else {
                 throw new Error("Some unexpected problem has been happened");
             }
         }
+
+        System.out.println("User" + user);
         var jwtToken = jwtService.generateToken(user);
         logger.info("Token in service: " + jwtToken);
+
+        if (jwtToken == null) {
+            System.out.printf("Token is null");
+        }
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
