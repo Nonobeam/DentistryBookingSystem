@@ -56,10 +56,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Extract the username from the JWT token using a service
         mail = jwtService.extractMail(jwt);
 
+        System.out.println("JWT extracted: " + jwt);
+        System.out.println("Mail extracted: " + mail);
+
         // If the username is not null and there is no authentication in the current SecurityContext
         if (mail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             // Get UserDetails from the database using the username
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(mail);
+
+            System.out.println("User details loaded: " + userDetails.getUsername());
+            System.out.println("Authorities: " + userDetails.getAuthorities());
 
             // Check if the JWT token is valid for the UserDetails
             if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -75,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 // Set the authentication token in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("Authentication successful for user " + mail);
+                System.out.println("Authentication successful for user " + mail + " " + userDetails.getAuthorities());
             } else {
                 System.out.println("Invalid token for user " + mail);
             }

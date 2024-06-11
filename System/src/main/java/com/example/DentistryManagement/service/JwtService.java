@@ -73,6 +73,12 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             final String mail = extractMail(token);
+            if (mail.equals(userDetails.getUsername()) && !isTokenExpired(token)){
+                System.out.printf("Validate success");
+            } else {
+                System.out.printf("Validate fail");
+            }
+            System.out.println(mail.equals(userDetails.getUsername()) && !isTokenExpired(token));
             return mail.equals(userDetails.getUsername()) && !isTokenExpired(token);
         } catch (Exception e) {
             logger.error("Error while validating token: {}", e.getMessage());

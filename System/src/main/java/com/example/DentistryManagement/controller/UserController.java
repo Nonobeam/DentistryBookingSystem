@@ -16,9 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
-@RequestMapping("/api/v1/dentisty/user")
+@RequestMapping("/user")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @GetMapping("/all")
-    public ResponseEntity<Optional<List<Client>>> findAllUsers() {
+    public ResponseEntity<List<Client>> findAllUsers() {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 

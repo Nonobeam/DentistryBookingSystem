@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -54,7 +55,6 @@ public class Client implements UserDetails {
     private Role role;
     private LocalDate birthday;
     private int status;
-    private String name;
 
 
 
@@ -71,7 +71,7 @@ public class Client implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return role.getAuthorities();
     }
 
     // Identity unique user
