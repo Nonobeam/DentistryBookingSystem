@@ -1,11 +1,12 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.UserAppoint;
+import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
-import com.example.DentistryManagement.dto.UserAppoint;
-import com.example.DentistryManagement.dto.userdto;
+
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.NotificationService;
 import com.example.DentistryManagement.service.UserService;
@@ -44,7 +45,7 @@ public class StaffController {
 
     })
     @GetMapping("/den")
-    public ResponseEntity<Optional<List<userdto>>> findDentistManage() {
+    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -56,9 +57,9 @@ public class StaffController {
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
                     // Chuyển đổi danh sách Client sang danh sách ClientDTO
-                    List<userdto> clientDTOs = clientsOptional.get().stream()
+                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
                             .map(client -> {
-                                userdto clientDTO = new userdto();
+                                UserDTO clientDTO = new UserDTO();
                                 clientDTO.setFirstName(client.getFirstName());
                                 clientDTO.setPhone(client.getPhone());
                                 clientDTO.setMail(client.getMail());
@@ -92,7 +93,7 @@ public class StaffController {
 
     })
     @GetMapping("/cus")
-    public ResponseEntity<Optional<List<userdto>>> findAllCusManage() {
+    public ResponseEntity<Optional<List<UserDTO>>> findAllCusManage() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -103,9 +104,9 @@ public class StaffController {
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
 
-                    List<userdto> clientDTOs = clientsOptional.get().stream()
+                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
                             .map(client -> {
-                                userdto clientDTO = new userdto();
+                                UserDTO clientDTO = new UserDTO();
                                 clientDTO.setFirstName(client.getFirstName());
                                 clientDTO.setPhone(client.getPhone());
                                 clientDTO.setMail(client.getMail());
@@ -168,7 +169,7 @@ public class StaffController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                userdto userDTO =new userdto();
+                UserDTO userDTO =new UserDTO();
                 Client client= userService.userInfo(id);
                 userDTO.setFirstName(client.getFirstName());
                 userDTO.setPhone(client.getPhone());
@@ -203,7 +204,7 @@ public class StaffController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                userdto userDTO =new userdto();
+                UserDTO userDTO =new UserDTO();
                 Client client= userService.userInfo(id);
                 userDTO.setFirstName(client.getFirstName());
                 userDTO.setPhone(client.getPhone());

@@ -1,7 +1,6 @@
 package com.example.DentistryManagement.DTO;
 
 import com.example.DentistryManagement.core.user.Role;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;

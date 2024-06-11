@@ -57,7 +57,6 @@ public class Client implements UserDetails {
     private int status;
 
 
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Dependent> dependentList;
 
@@ -68,6 +67,13 @@ public class Client implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Clinic> clinicList;
 
+    @OneToOne
+    @JoinColumn(name = "userID", referencedColumnName = "dentistID")
+    private Client dentist;
+
+    @OneToOne
+    @JoinColumn(name = "userID", referencedColumnName = "staffID")
+    private Client staff;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
