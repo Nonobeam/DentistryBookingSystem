@@ -41,6 +41,10 @@ public interface UserRepository extends JpaRepository<Client, String> {
     @Query("SELECT c FROM Client c, Staff d " +
             "WHERE c.role = 'STAFF' AND c.staff.userID = d.staffID AND d.clinic.user.userID=:managerID")
     Optional<List<Client>> getStaffByManager(String managerID);
+
+    boolean findClientByMailOrPhone(String mail, String phone);
+
+
 //crud user
    // @Transactional
     //Client updateClientBy(Client client);

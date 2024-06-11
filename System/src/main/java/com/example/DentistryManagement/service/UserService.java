@@ -56,4 +56,62 @@ public class UserService {
     }
 
 
+    public Optional<List<Client>> findAllCus() {
+        try {
+            return userRepository.getClientsByRole(Role.CUSTOMER);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Client>> findAllStaff() {
+        try {
+            return userRepository.getClientsByRole(Role.STAFF);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Client>> findAllManager() {
+        try {
+            return userRepository.getClientsByRole(Role.MANAGER);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+    public Client createNewUser(Client newClient) {
+        try {
+            // Perform necessary validation and business logic here
+            Client savedClient = userRepository.save(newClient);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public boolean isPresent(Client createdClient) {
+        try {
+            return userRepository.findClientByMailOrPhone(createdClient.getMail(),createdClient.getPhone());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Client>> findAllDenByClinic(String userId) {
+        try {
+            return userRepository.getDentistByManager(userId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Client>> findAllStaffByClinic(String userId) {
+        try {
+            return userRepository.getStaffByManager(userId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
 }
