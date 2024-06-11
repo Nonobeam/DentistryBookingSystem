@@ -1,11 +1,14 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +18,13 @@ public class UserService {
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
-
+    public Optional<List<Client>> findAllDen() {
+        try {
+            return userRepository.getClientsByRole(Role.DENTIST);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
     public boolean existsByPhoneOOrMail(String phone, String mail) {
         return userRepository.existsByPhoneOrMail(phone, mail);
     }
