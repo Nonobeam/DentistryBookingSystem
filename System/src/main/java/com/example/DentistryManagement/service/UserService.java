@@ -114,4 +114,35 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
     }
+
+    public boolean isPresentUser(String id) {
+        try {
+            Optional<Client> savedClient = userRepository.findById(id);
+            if(savedClient.isEmpty()) return false;
+            else return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+    }
+
+    public Client updateUser(Client newClient) {
+        try {
+            // Perform necessary validation and business logic here
+            return userRepository.updateClient(newClient.getUserID(),newClient.getPassword(),newClient.getRole());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+    }
+    public Client updateUserStatus(String id){
+        try {
+            // Perform necessary validation and business logic here
+            return userRepository.updateClientByStatus(id);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+
+    }
 }

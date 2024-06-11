@@ -1,11 +1,13 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.dto.UserAppoint;
 import com.example.DentistryManagement.dto.userdto;
 import com.example.DentistryManagement.service.AppointmentService;
+import com.example.DentistryManagement.service.NotificationService;
 import com.example.DentistryManagement.service.UserService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class StaffController {
     private final UserService userService;
     private final AppointmentService appointmentService;
+    private final NotificationService notificationService;
     private final AuthenticationService authenticationService;
     @Operation(summary = "Staff")
     @ApiResponses(value = {
@@ -56,7 +59,6 @@ public class StaffController {
                     List<userdto> clientDTOs = clientsOptional.get().stream()
                             .map(client -> {
                                 userdto clientDTO = new userdto();
-                                clientDTO.setUserID(client.getUserID());
                                 clientDTO.setFirstName(client.getFirstName());
                                 clientDTO.setPhone(client.getPhone());
                                 clientDTO.setMail(client.getMail());
@@ -104,7 +106,6 @@ public class StaffController {
                     List<userdto> clientDTOs = clientsOptional.get().stream()
                             .map(client -> {
                                 userdto clientDTO = new userdto();
-                                clientDTO.setUserID(client.getUserID());
                                 clientDTO.setFirstName(client.getFirstName());
                                 clientDTO.setPhone(client.getPhone());
                                 clientDTO.setMail(client.getMail());
@@ -169,7 +170,6 @@ public class StaffController {
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
                 userdto userDTO =new userdto();
                 Client client= userService.userInfo(id);
-                userDTO.setUserID(client.getUserID());
                 userDTO.setFirstName(client.getFirstName());
                 userDTO.setPhone(client.getPhone());
                 userDTO.setMail(client.getMail());
@@ -205,7 +205,6 @@ public class StaffController {
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
                 userdto userDTO =new userdto();
                 Client client= userService.userInfo(id);
-                userDTO.setUserID(client.getUserID());
                 userDTO.setFirstName(client.getFirstName());
                 userDTO.setPhone(client.getPhone());
                 userDTO.setMail(client.getMail());
@@ -217,6 +216,32 @@ public class StaffController {
                 userAppoint.setUserDTO(userDTO);
                 userAppoint.setAppointment(appointment);
                 return ResponseEntity.ok(userAppoint);
+            } else {
+                //không có quyền, lỗi 403
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }  } catch (Exception e) {
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
+
+    })
+    @GetMapping()
+    public ResponseEntity<?> receiveNotification() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
+                String userid = authentication.getName();
+                Optional<List<Notification>> notice = notificationService.reiveNoti(userid) ;
+
+                return ResponseEntity.ok(notice);
             } else {
                 //không có quyền, lỗi 403
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

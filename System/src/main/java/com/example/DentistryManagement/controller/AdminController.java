@@ -28,7 +28,7 @@ public class AdminController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
-    @Operation(summary = "Clinic user")
+    @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -51,7 +51,7 @@ public class AdminController {
         }
     }
 
-    @Operation(summary = "Clinic user")
+    @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -80,7 +80,7 @@ public class AdminController {
         }
     }
 
-    @Operation(summary = "Clinic user")
+    @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -109,7 +109,7 @@ public class AdminController {
         }
     }
 
-    @Operation(summary = "Clinic user")
+    @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -138,26 +138,66 @@ public class AdminController {
         }
     }
 
-    @Operation(summary = "Clinic user")
+//    @Operation(summary = "Admin")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+////    @PostMapping("/newplayer")
+//    public ResponseEntity<?> newUser(Client newClient) {
+//        try {
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("An error occurred while creating the user.");
+//        }
+//    }
+    @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/newplayer")
-    public ResponseEntity<?> newUser(Client newClient) {
+    @PostMapping("/updateplayer")
+    public ResponseEntity<?> updateUser(Client newClient) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
                 String userId = authentication.getName();
 
-                if (!userService.isPresent(newClient)) {
-                    Client createdClient = userService.createNewUser(newClient);
+                if (userService.isPresentUser(newClient.getUserID())) {
+
+                    Client createdClient = userService.updateUser(newClient);
                     return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be created.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be update.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while creating the user.");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
+
+                if (userService.isPresentUser(id)) {
+
+                    Client deleteUser = userService.updateUserStatus(id);
+                    return ResponseEntity.status(HttpStatus.CREATED).body(deleteUser);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

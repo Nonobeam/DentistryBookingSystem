@@ -27,6 +27,7 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.staffID =: userid")
     Optional<List<Client>> getCustomersByStaff(String userid);
 
+    @Query("SELECT c from Client c,Dentist  d where c.role= :DENTIST AND c.userID=d.dentistID AND d.staff.staffID= :staffId")
     Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserID(Role DENTIST, String staffId);
 
     //boss/adminlist
@@ -46,7 +47,11 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
 
 //crud user
-   // @Transactional
-    //Client updateClientBy(Client client);
+   @Transactional
+    @Query("update Client set status = 0 where userID = : userid")
+    Client updateClient(String userid, String password,Role rol);
 
+    @Transactional
+    @Query("update Client set password =: password, role =: rol where userID = : userid")
+    Client updateClientByStatus(String userid);
 }
