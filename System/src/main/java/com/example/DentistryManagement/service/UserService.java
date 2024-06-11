@@ -1,34 +1,23 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
-    public Optional<List<Client>> findAllUsers() {
-        try {
-            return Optional.of(userRepository.findAll());
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
-        }
+    public List<Client> findAllUsers() {
+        return userRepository.findAll();
     }
 
-    public Optional<List<Client>> findAllDen() {
-        try {
-            return userRepository.getClientsByRole(Role.DENTIST);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-        }
+    public boolean existsByPhoneOOrMail(String phone, String mail) {
+        return userRepository.existsByPhoneOrMail(phone, mail);
     }
 
     public Optional<List<Client>> findDenByStaff(String userId) {

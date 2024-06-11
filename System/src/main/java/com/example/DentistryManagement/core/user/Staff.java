@@ -34,7 +34,4 @@ public class Staff{
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "staff")
     private List<Appointment> appointmentList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "staff")
-    private List<Dentist> dentistList;
-
 }

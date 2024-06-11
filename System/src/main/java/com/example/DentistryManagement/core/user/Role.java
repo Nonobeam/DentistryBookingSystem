@@ -14,7 +14,6 @@ import static com.example.DentistryManagement.core.user.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {
-    GUEST(Collections.emptySet()),
     CUSTOMER(
             Set.of(
                     READ,
@@ -61,6 +60,7 @@ public enum Role {
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
                 .collect(Collectors.toList());
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
+        System.out.println("Authorities for role " + this.name() + ": " + authorities);
         return authorities;
     }
 }

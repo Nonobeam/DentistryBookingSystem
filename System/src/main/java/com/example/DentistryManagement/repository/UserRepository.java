@@ -2,14 +2,8 @@
 package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +11,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<Client, String> {
 
-
-    Optional<Client> findByName(String name);
-    Optional<Client> findByRole(String role);
+    Optional<Client> findByMail(String mail);
+    boolean existsByPhoneOrMail(String phone, String mail);
 //    List<Client> findClientByRoleAAndStatus(@Param("status") int status, @Param("role") Role role);
     Client getClientsByUserID(String userId);
     @Query("SELECT c FROM Client c, Staff s " +
@@ -45,7 +38,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     boolean findClientByMailOrPhone(String mail, String phone);
 
-
 //crud user
    @Transactional
     @Query("update Client set status = 0 where userID = : userid")
@@ -54,4 +46,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
     @Transactional
     @Query("update Client set password =: password, role =: rol where userID = : userid")
     Client updateClientByStatus(String userid);
+
+    List<Client> findAll();
 }

@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Extract the Authorization header from the HTTP request
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userName;
+        final String mail;
 
         // Check if the Authorization header is missing or doesn't start with "Bearer"
         // If so, pass the request and response to the next filter in the chain
@@ -54,12 +54,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7); // Remove "Bearer " from the beginning
 
         // Extract the username from the JWT token using a service
-        userName = jwtService.extractPlayerName(jwt);
+        mail = jwtService.extractMail(jwt);
+
+        System.out.println("JWT extracted: " + jwt);
+        System.out.println("Mail extracted: " + mail);
 
         // If the username is not null and there is no authentication in the current SecurityContext
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if (mail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             // Get UserDetails from the database using the username
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(mail);
+
+            System.out.println("User details loaded: " + userDetails.getUsername());
+            System.out.println("Authorities: " + userDetails.getAuthorities());
 
             // Check if the JWT token is valid for the UserDetails
             if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -75,7 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 // Set the authentication token in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("Authentication successful for user " + mail + " " + userDetails.getAuthorities());
+            } else {
+                System.out.println("Invalid token for user " + mail);
             }
+        } else {
+            System.out.println("User name is null or authentication is already set");
         }
         // Continue with the filter chain
         filterChain.doFilter(request, response);
