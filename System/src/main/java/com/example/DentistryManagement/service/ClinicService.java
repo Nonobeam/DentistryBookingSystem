@@ -16,4 +16,12 @@ public class ClinicService {
     public Clinic findClinicByID(String clinicID) {
         return clinicRepository.findByClinicID(clinicID);
     }
+
+//    public Optional<List<Clinic>> findClinicByManager(String userId) {
+//        try {
+//            return clinicRepository.getClinicsByUser(userId);
+//        } catch (DataAccessException e) {
+//            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
+//        }
+//    }
 }

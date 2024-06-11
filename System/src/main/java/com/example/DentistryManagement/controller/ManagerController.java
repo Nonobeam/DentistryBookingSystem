@@ -4,6 +4,8 @@ import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Role;
+import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ClinicService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,4 +77,92 @@ public class ManagerController {
             return ResponseEntity.notFound().build();
         }
     }
+
+//    @Operation(summary = "Clinic user")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/denlist")
+//    public ResponseEntity<Optional<List<Client>>> denList() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//            if (authenticationService.isUserAuthorized(authentication, "userId", Role.MANAGER)) {
+//                String userId = authentication.getName();
+//                Optional<List<Client>> clients = userService.findAllDenByClinic(userId);
+//                if (clients.isPresent() && clients.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clients);
+//            } else {
+//                // lỗi 403
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
+//
+//    @Operation(summary = "Clinic user")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/stafflist")
+//    public ResponseEntity<Optional<List<Client>>> staffList() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//            if (authenticationService.isUserAuthorized(authentication, "userId", Role.MANAGER)) {
+//                String userId = authentication.getName();
+//                Optional<List<Client>> clients = userService.findAllStaffByClinic(userId);
+//                if (clients.isPresent() && clients.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clients);
+//            } else {
+//                // lỗi 403
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
+//
+//    @Operation(summary = "Clinic ")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/cliniclist")
+//    public ResponseEntity<Optional<List<Clinic>>> clinicList() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//            if (authenticationService.isUserAuthorized(authentication, "userId", Role.MANAGER)) {
+//                String userId = authentication.getName();
+//                Optional<List<Clinic>> clinics = clinicService.findClinicByManager(userId);
+//                if (clinics.isPresent() && clinics.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clinics);
+//            } else {
+//                // lỗi 403
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
+
 }

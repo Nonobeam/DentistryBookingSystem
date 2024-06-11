@@ -1,15 +1,23 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.repository.NotificationRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-@Service
-public class NotificationService {
+import java.util.List;
+import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
+public class NotificationService {
+    private final NotificationRepository notificationRepository;
     @Autowired
     private JavaMailSender mailSender;
 
@@ -23,5 +31,13 @@ public class NotificationService {
         simpleMailMessage.setText(notificationStructure.getMessage());
 
         mailSender.send(simpleMailMessage);
+    }
+
+    public Optional<List<Notification>> reiveNoti(String userId) {
+        try {
+            return notificationRepository.getNotificationByDentist(userId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
+        }
     }
 }

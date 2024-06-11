@@ -12,8 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -87,5 +91,25 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    public boolean isUserAuthorized(Authentication authentication, String userId, Role userRole) {
+        try {
+            if (authentication != null && authentication.isAuthenticated()) {
+                String authenticatedUserId = authentication.getName();
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+                boolean hasUserRole = authorities.stream()
+                        .anyMatch(authority -> authority.getAuthority().equals(userRole.name()));
+
+                boolean isUserIdMatched = authenticatedUserId.equals(userId);
+                return hasUserRole && isUserIdMatched;
+            }
+            return false;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ
+            e.printStackTrace();
+            return false;
+        }
     }
 }
