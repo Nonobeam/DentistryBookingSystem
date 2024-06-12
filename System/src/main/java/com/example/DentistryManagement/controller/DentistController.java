@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.UserAppoint;
+import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
@@ -12,15 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -148,10 +145,10 @@ public class DentistController {
                 userDTO.setLastName(client.getLastName());
                 userDTO.setBirthday(client.getBirthday());
                 Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,mail);
-                UserAppoint userAppoint= new UserAppoint();
-                userAppoint.setUserDTO(userDTO);
-                userAppoint.setAppointment(appointment);
-                return ResponseEntity.ok(userAppoint);
+                UserAppointDTO userAppointDTO = new UserAppointDTO();
+                userAppointDTO.setUserDTO(userDTO);
+                userAppointDTO.setAppointment(appointment);
+                return ResponseEntity.ok(userAppointDTO);
              } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

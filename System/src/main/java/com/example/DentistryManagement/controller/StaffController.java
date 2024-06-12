@@ -1,11 +1,10 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.UserAppoint;
+import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.NotificationService;
@@ -164,10 +163,10 @@ public class StaffController {
                 userDTO.setBirthday(client.getBirthday());
 
                 Optional<List<Appointment>> appointment=appointmentService.dentistAppointment(id);
-                UserAppoint userAppoint= new UserAppoint();
-                userAppoint.setUserDTO(userDTO);
-                userAppoint.setAppointment(appointment);
-                return ResponseEntity.ok(userAppoint);
+                UserAppointDTO userAppointDTO = new UserAppointDTO();
+                userAppointDTO.setUserDTO(userDTO);
+                userAppointDTO.setAppointment(appointment);
+                return ResponseEntity.ok(userAppointDTO);
              } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -194,10 +193,10 @@ public class StaffController {
                 userDTO.setLastName(client.getLastName());
                 userDTO.setBirthday(client.getBirthday());
                 Optional<List<Appointment>> appointment=appointmentService.customerAppointment(id,mail);
-                UserAppoint userAppoint= new UserAppoint();
-                userAppoint.setUserDTO(userDTO);
-                userAppoint.setAppointment(appointment);
-                return ResponseEntity.ok(userAppoint);
+                UserAppointDTO userAppointDTO = new UserAppointDTO();
+                userAppointDTO.setUserDTO(userDTO);
+                userAppointDTO.setAppointment(appointment);
+                return ResponseEntity.ok(userAppointDTO);
              } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

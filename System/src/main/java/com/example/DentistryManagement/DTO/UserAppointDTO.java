@@ -11,7 +11,7 @@ import java.util.Optional;
 @Data
 @Getter
 @Setter
-public class UserAppoint {
+public class UserAppointDTO {
     private UserDTO userDTO;
     private Optional<List<Appointment>>  appointment;
 }

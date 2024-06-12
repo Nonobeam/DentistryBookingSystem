@@ -94,6 +94,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/available-service")
+    public ResponseEntity<List<Service>> getAvailableServices(
+            @RequestParam LocalDate bookDate,
+            @RequestParam Clinic clinic) {
+
+        Optional<List<Service>> dentistService = dentistScheduleService
+                .getServiceNotFull(bookDate, clinic);
+
+        return dentistService
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
 
     @GetMapping("/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
@@ -119,6 +131,7 @@ public class UserController {
     })
     @PostMapping("/make-booking")
     public ResponseEntity<Appointment> makeBooking( @RequestBody DentistSchedule dentistSchedule) {
+        try {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String mail= authentication.getName();
         Client client = userService.findClientByMail(mail);
@@ -137,6 +150,11 @@ public class UserController {
         newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
 
         return ResponseEntity.ok(newAppointment);
+        } catch (Error e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 
