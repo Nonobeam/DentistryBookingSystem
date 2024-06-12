@@ -39,7 +39,7 @@ public class AdminController {
     public ResponseEntity<Optional<List<Client>>> denList() {
         try {
 
-            Optional<List<Client>> clients = userService.findAllDen();
+            Optional<List<Client>> clients = userService.findAllDentist();
             if (clients.isPresent() && clients.get().isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

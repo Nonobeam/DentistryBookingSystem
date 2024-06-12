@@ -52,7 +52,7 @@ public class StaffController {
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
                 String userId = authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findDenByStaff(userId);
+                Optional<List<Client>> clientsOptional = userService.findDentistByStaff(userId);
 
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
@@ -99,7 +99,7 @@ public class StaffController {
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
                 String userId = authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findCusinClinic(userId);
+                Optional<List<Client>> clientsOptional = userService.findCustomerinClinic(userId);
 
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {

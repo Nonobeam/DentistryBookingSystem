@@ -18,7 +18,7 @@ public class UserService {
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
-    public Optional<List<Client>> findAllDen() {
+    public Optional<List<Client>> findAllDentist() {
         try {
             return userRepository.getClientsByRole(Role.DENTIST);
         } catch (DataAccessException e) {
@@ -29,7 +29,7 @@ public class UserService {
         return userRepository.existsByPhoneOrMail(phone, mail);
     }
 
-    public Optional<List<Client>> findDenByStaff(String userId) {
+    public Optional<List<Client>> findDentistByStaff(String userId) {
         try {
             return userRepository.getClientsByRoleAndDentist_Staff_UserID(Role.DENTIST, userId);
         } catch (DataAccessException e) {
@@ -37,7 +37,7 @@ public class UserService {
         }
     }
 
-    public Optional<List<Client>> findCusinClinic(String userId) {
+    public Optional<List<Client>> findCustomerinClinic(String userId) {
         try {
             return userRepository.getCustomersByStaff(userId);
         } catch (DataAccessException e) {
@@ -54,7 +54,7 @@ public class UserService {
     }
 
 
-    public Optional<List<Client>> findAllCus() {
+    public Optional<List<Client>> findAllCustomer() {
         try {
             return userRepository.getClientsByRole(Role.CUSTOMER);
         } catch (DataAccessException e) {
