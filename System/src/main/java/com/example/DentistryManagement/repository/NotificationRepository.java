@@ -12,5 +12,5 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
 
-    Optional<List<Notification>> getNotificationByDentist_StaffStaffID(String staffid);
+    Optional<List<Notification>> getNotificationByDentist_StaffUserMail(String staffmail);
 }

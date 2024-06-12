@@ -5,6 +5,8 @@ import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,20 +28,20 @@ public class UserService {
         }
     }
     public boolean existsByPhoneOOrMail(String phone, String mail) {
-        return userRepository.existsByPhoneOrMail(phone, mail);
+        return userRepository.existsByPhoneOrMailAndStatus(phone, mail,1);
     }
 
-    public Optional<List<Client>> findDentistByStaff(String userId) {
+    public Optional<List<Client>> findDentistByStaff(String mail) {
         try {
-            return userRepository.getClientsByRoleAndDentist_Staff_UserID(Role.DENTIST, userId);
+            return userRepository.getClientsByRoleAndDentist_StaffMail(Role.DENTIST, mail);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
         }
     }
 
-    public Optional<List<Client>> findCustomerinClinic(String userId) {
+    public Optional<List<Client>> findCustomerinClinic(String mailstaff) {
         try {
-            return userRepository.getCustomersByStaff(userId);
+            return userRepository.getCustomersByStaff(mailstaff);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
         }
@@ -136,6 +138,25 @@ public class UserService {
         try {
             // Perform necessary validation and business logic here
             return Optional.of(userRepository.save(client));
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+
+    }
+    public String mailExtract() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            return authentication.getName();
+        }catch (Exception e){
+            throw new RuntimeException("Error occurred while extracting mail: " + e.getMessage(), e);
+        }
+
+    }
+    public Client findClientByMail(String mail){
+        try {
+            // Perform necessary validation and business logic here
+            return userRepository.findClientByMail(mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);

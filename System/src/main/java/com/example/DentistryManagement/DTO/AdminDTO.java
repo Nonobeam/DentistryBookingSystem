@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 
-public class User_admindto {
+public class AdminDTO {
     private String firstName;
     private String lastName;
     private String phone;

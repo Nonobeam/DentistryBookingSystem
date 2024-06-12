@@ -33,10 +33,7 @@ public class JwtService {
             throw new RuntimeException("Error while extracting user mail from token", e);
         }
     }
-    public String extractUserId(String token) {
-        Claims claims = extractAllClaims(token);
-        return claims.get("userId", String.class);
-    }
+
     // Claim is a pair of value (a name of value AND the value) inside te Payload of JSON
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         try {

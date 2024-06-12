@@ -19,9 +19,10 @@ import java.util.List;
 public class TimeSlot {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "timeSlotID")
-    private int timeSlotID;
+    private String timeSlotID;
+    private int slotNumber;
     @NotBlank(message = "Start time must not be blank")
     private LocalTime startTime;
 

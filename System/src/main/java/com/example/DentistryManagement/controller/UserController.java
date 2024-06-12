@@ -2,20 +2,26 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
+import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.service.DentistService;
-import com.example.DentistryManagement.service.NotificationService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/user")
 @RestController
@@ -26,7 +32,9 @@ public class UserController {
 
     private final UserService userService;
     private final DentistService dentistService;
+    private final DentistScheduleService dentistScheduleService;
     private final NotificationService notificationService;
+    private final AppointmentService appointmentService;
 
     @Operation(summary = "All users")
     @ApiResponses(value = {
@@ -66,4 +74,72 @@ public class UserController {
         notificationService.sendMail(mail, notificationStructure);
         return "Successfully";
     }
+
+
+    @Operation(summary = "Customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/{status}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
+
+        try {
+            appointment.setStatus(status);
+            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/available-schedules")
+    public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
+            @RequestParam LocalDate bookDate,
+            @RequestParam Clinic clinic,
+            @RequestParam Service service) {
+
+        Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
+                .getByWorkDateAndServiceAndAvailableAndClinic(bookDate, service, 1, clinic);
+
+        return dentistScheduleList
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+
+    @Operation(summary = "Booking")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PostMapping("/make-booking")
+    public ResponseEntity<Appointment> makeBooking( @RequestBody DentistSchedule dentistSchedule) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String mail= authentication.getName();
+        Client client = userService.findClientByMail(mail);
+        if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
+            throw new Error("Over booking in today!");
+        }
+
+        if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
+            throw new Error("Over appointment in this date!");
+        }
+        Appointment newAppointment = new Appointment();
+        newAppointment.setUser(client);
+        newAppointment.setService(dentistSchedule.getService());
+        newAppointment.setClinic(dentistSchedule.getClinic());
+        newAppointment.setDate(dentistSchedule.getWorkDate());
+        newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
+
+        return ResponseEntity.ok(newAppointment);
+    }
+
+
+
+
 }
