@@ -33,7 +33,7 @@ public interface UserRepository extends JpaRepository<Client, String> {
     Optional<List<Client>> getClientsByRole(Role role);
 
 
-    //Managerlist
+    //Managerlistit
     @Query("SELECT c FROM Client c , Dentist d " +
             "WHERE c.role = 'DENTIST' AND c.dentist.userID = d.dentistID and d.clinic.user.userID = :managerID")
     Optional<List<Client>> getDentistByManager(String managerID);
@@ -45,12 +45,5 @@ public interface UserRepository extends JpaRepository<Client, String> {
     boolean findClientByMailOrPhone(String mail, String phone);
 
 
-    //crud user
-    @Transactional
-    @Query("update Client set status = 0 where userID = : userid")
-    Client updateClientByStatus(String userid);
 
-    @Transactional
-    @Query("update Client set password =: password, role =: rol where userID = : userid")
-    Client updateClient(String userid, String password,Role rol);
 }

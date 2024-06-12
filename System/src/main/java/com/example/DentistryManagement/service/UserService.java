@@ -113,11 +113,10 @@ public class UserService {
         }
     }
 
-    public boolean isPresentUser(String id) {
+    public Optional<Client> isPresentUser(String id) {
         try {
-            Optional<Client> savedClient = userRepository.findById(id);
-            if(savedClient.isEmpty()) return false;
-            else return true;
+            return userRepository.findById(id);
+
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
@@ -127,16 +126,16 @@ public class UserService {
     public Client updateUser(Client newClient) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.updateClient(newClient.getUserID(),newClient.getPassword(),newClient.getRole());
+            return userRepository.save(newClient);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+            throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
     }
-    public Client updateUserStatus(String id){
+    public Optional<Client> updateUserStatus(Client client){
         try {
             // Perform necessary validation and business logic here
-            return userRepository.updateClientByStatus(id);
+            return Optional.of(userRepository.save(client));
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);

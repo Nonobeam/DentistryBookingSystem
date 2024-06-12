@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ClinicRepository extends JpaRepository<Clinic, String> {
 
-    @Query("SELECT c from Clinic c where c.user.userID =: managerid")
     Optional<List<Clinic>> getClinicsByUser(String managerid);
+
 }

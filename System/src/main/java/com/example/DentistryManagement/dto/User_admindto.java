@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.dto;
+package com.example.DentistryManagement.DTO;
 
 import lombok.Data;
 import lombok.Getter;

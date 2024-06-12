@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +30,31 @@ public class AppointmentService {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
     }
+    public Optional<List<Appointment>> cusAppointfollowden(String cusid, String dentist) {
+        try {
+            return appointmentRepository.getAppointmentByCustomerIdAndClinic(cusid, dentist);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
+        }
+    }
 
     public Optional<List<Appointment>> denAppoint(String id) {
+        try {
+            return appointmentRepository.getAppointmentByDentistDentistIDOrderByDateAsc(id);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Appointment>> findAppointByDen(String id) {
+        try {
+            return appointmentRepository.getAppointmentByDentistDentistIDAndDate(id, LocalDate.now());
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
+        }
+    }
+
+    public Optional<List<Appointment>> findAllAppointByDen(String id) {
         try {
             return appointmentRepository.getAppointmentByDentistDentistIDOrderByDateAsc(id);
         } catch (DataAccessException e) {

@@ -169,7 +169,7 @@ public class AdminController {
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
                 String userId = authentication.getName();
 
-                if (userService.isPresentUser(newClient.getUserID())) {
+                if (userService.isPresentUser(newClient.getUserID()) !=null) {
 
                     Client createdClient = userService.updateUser(newClient);
                     return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
@@ -192,10 +192,15 @@ public class AdminController {
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
 
-                if (userService.isPresentUser(id)) {
+                if (userService.isPresentUser(id) != null) {
+                    Optional<Client> c = userService.isPresentUser(id);
+                    if (c.isPresent()) {
+                        Client client = c.get();
+                        client.setStatus(0);
+                        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserStatus(client));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();                    }
 
-                    Client deleteUser = userService.updateUserStatus(id);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(deleteUser);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
                 }
