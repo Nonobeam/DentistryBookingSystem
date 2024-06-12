@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface ClinicRepository extends JpaRepository<Clinic, String> {
 
     Optional<List<Clinic>> getClinicsByUser_UserID(String managerid);
-
+    Clinic findClinicByClinicID(String clinicid);
 }

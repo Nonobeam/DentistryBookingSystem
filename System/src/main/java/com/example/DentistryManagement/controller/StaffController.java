@@ -121,88 +121,88 @@ public class StaffController {
         }
     }
 
-//    @Operation(summary = "Staff")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Error")
-//
-//    })
-//    @GetMapping("/appointment-history")
-//    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            String mail= authentication.getName();
-//            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
-//         } catch (Exception e) {
-//        // Xử lý ngoại lệ
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
 
-//    @Operation(summary = "Staff")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Error")
-//
-//    })
-//    @GetMapping("/dentist/{id}")
-//    public ResponseEntity<?> findAllDenByStaff(@PathVariable("id") String id) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//
-//                UserDTO userDTO =new UserDTO();
-//                Client client= userService.userInfo(id);
-//                userDTO.setFirstName(client.getFirstName());
-//                userDTO.setPhone(client.getPhone());
-//                userDTO.setMail(client.getMail());
-//                userDTO.setLastName(client.getLastName());
-//                userDTO.setBirthday(client.getBirthday());
-//
-//                Optional<List<Appointment>> appointment=appointmentService.dentistAppointment(id);
-//                UserAppoint userAppoint= new UserAppoint();
-//                userAppoint.setUserDTO(userDTO);
-//                userAppoint.setAppointment(appointment);
-//                return ResponseEntity.ok(userAppoint);
-//             } catch (Exception e) {
-//            // Xử lý ngoại lệ
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-//    @Operation(summary = "Staff")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Error")
-//
-//    })
-//    @GetMapping("/customer/{id}")
-//    public ResponseEntity<?> findAllCusByStaff(@PathVariable("id") String id) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            String mail= authentication.getName();
-//                UserDTO userDTO =new UserDTO();
-//                Client client= userService.userInfo(id);
-//                userDTO.setFirstName(client.getFirstName());
-//                userDTO.setPhone(client.getPhone());
-//                userDTO.setMail(client.getMail());
-//                userDTO.setLastName(client.getLastName());
-//                userDTO.setBirthday(client.getBirthday());
-//                Optional<List<Appointment>> appointment=appointmentService.customerAppointment(id,mail);
-//                UserAppoint userAppoint= new UserAppoint();
-//                userAppoint.setUserDTO(userDTO);
-//                userAppoint.setAppointment(appointment);
-//                return ResponseEntity.ok(userAppoint);
-//             } catch (Exception e) {
-//            // Xử lý ngoại lệ
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    })
+    @GetMapping("/appointment-history")
+    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
+         } catch (Exception e) {
+        // Xử lý ngoại lệ
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
+
+    })
+    @GetMapping("/dentist/{id}")
+    public ResponseEntity<?> findAllDenByStaff(@PathVariable("id") String id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+
+                UserDTO userDTO =new UserDTO();
+                Client client= userService.userInfo(id);
+                userDTO.setFirstName(client.getFirstName());
+                userDTO.setPhone(client.getPhone());
+                userDTO.setMail(client.getMail());
+                userDTO.setLastName(client.getLastName());
+                userDTO.setBirthday(client.getBirthday());
+
+                Optional<List<Appointment>> appointment=appointmentService.dentistAppointment(id);
+                UserAppoint userAppoint= new UserAppoint();
+                userAppoint.setUserDTO(userDTO);
+                userAppoint.setAppointment(appointment);
+                return ResponseEntity.ok(userAppoint);
+             } catch (Exception e) {
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
+
+    })
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<?> findAllCusByStaff(@PathVariable("id") String id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+                UserDTO userDTO =new UserDTO();
+                Client client= userService.userInfo(id);
+                userDTO.setFirstName(client.getFirstName());
+                userDTO.setPhone(client.getPhone());
+                userDTO.setMail(client.getMail());
+                userDTO.setLastName(client.getLastName());
+                userDTO.setBirthday(client.getBirthday());
+                Optional<List<Appointment>> appointment=appointmentService.customerAppointment(id,mail);
+                UserAppoint userAppoint= new UserAppoint();
+                userAppoint.setUserDTO(userDTO);
+                userAppoint.setAppointment(appointment);
+                return ResponseEntity.ok(userAppoint);
+             } catch (Exception e) {
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
