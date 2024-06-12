@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.UserAppoint;
+import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.mail.Notification;
@@ -178,10 +178,10 @@ public class StaffController {
                 userDTO.setBirthday(client.getBirthday());
 
                 Optional<List<Appointment>> appointment=appointmentService.denAppoint(id);
-                UserAppoint userAppoint= new UserAppoint();
-                userAppoint.setUserDTO(userDTO);
-                userAppoint.setAppointment(appointment);
-                return ResponseEntity.ok(userAppoint);
+                UserAppointDTO userAppointDTO = new UserAppointDTO();
+                userAppointDTO.setUserDTO(userDTO);
+                userAppointDTO.setAppointment(appointment);
+                return ResponseEntity.ok(userAppointDTO);
             } else {
                 //không có quyền, lỗi 403
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -213,10 +213,10 @@ public class StaffController {
                 userDTO.setBirthday(client.getBirthday());
                 String userId = authentication.getName();
                 Optional<List<Appointment>> appointment=appointmentService.cusAppoint(id,userId);
-                UserAppoint userAppoint= new UserAppoint();
-                userAppoint.setUserDTO(userDTO);
-                userAppoint.setAppointment(appointment);
-                return ResponseEntity.ok(userAppoint);
+                UserAppointDTO userAppointDTO = new UserAppointDTO();
+                userAppointDTO.setUserDTO(userDTO);
+                userAppointDTO.setAppointment(appointment);
+                return ResponseEntity.ok(userAppointDTO);
             } else {
                 //không có quyền, lỗi 403
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

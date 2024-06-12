@@ -1,4 +1,3 @@
-
 package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.user.Client;
@@ -35,8 +34,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 //    @Query("SELECT c from Client c,Dentist  d where c.role= :DENTIST AND c.userID=d.dentistID AND d.staff.staffID= :staffId")
 //    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserID(Role DENTIST, String staffId);
 //
-//    //boss/adminlist
-//    Optional<List<Client>> getClientsByRole(Role role);
 //
 //
 //    //Managerlist
