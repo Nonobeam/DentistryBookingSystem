@@ -4,7 +4,7 @@
     <data-source source="LOCAL" name="DentistryManagementSystem@104.155.188.47" uuid="c763f1b2-14fe-438d-8a64-84f821629bd2">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://104.155.188.47:3306/DentistryManagementSystem</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
@@ -19,7 +19,7 @@
       <synchronize>true</synchronize>
       <imported>true</imported>
       <remarks>$PROJECT_DIR$/src/main/resources/application.yml</remarks>
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
