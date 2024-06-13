@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
-    @Query("select n from Notification n where n.dentist.staff.staffID =:staffid")
-    Optional<List<Notification>> getNotificationByDentist(String staffid);
+
+    Optional<List<Notification>> getNotificationByDentist_StaffUserMail(String staffmail);
 }

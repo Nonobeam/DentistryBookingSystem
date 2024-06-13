@@ -33,11 +33,19 @@ public class NotificationService {
         mailSender.send(simpleMailMessage);
     }
 
-    public Optional<List<Notification>> reiveNoti(String userId) {
+    public Optional<List<Notification>> receiveNotice(String staffmail) {
         try {
-            return notificationRepository.getNotificationByDentist(userId);
+            return notificationRepository.getNotificationByDentist_StaffUserMail(staffmail);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
+        }
+    }
+
+    public Notification insertNotification(Notification notification) {
+        try {
+            return notificationRepository.save(notification);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while create notification: " + e.getMessage(), e);
         }
     }
 }

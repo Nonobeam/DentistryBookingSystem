@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.service.AuthenticationService;
@@ -35,11 +36,11 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/denlist")
-    public ResponseEntity<Optional<List<Client>>> denList() {
+    @PostMapping("/dentistList")
+    public ResponseEntity<Optional<List<Client>>> dentistList() {
         try {
 
-            Optional<List<Client>> clients = userService.findAllDen();
+            Optional<List<Client>> clients = userService.findAllDentist();
             if (clients.isPresent() && clients.get().isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
@@ -58,14 +59,14 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/cuslist")
-    public ResponseEntity<Optional<List<Client>>> cusList() {
+    @PostMapping("/customerList")
+    public ResponseEntity<Optional<List<Client>>> customerList() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
                 String userId = authentication.getName();
-                Optional<List<Client>> clients = userService.findAllCus();
+                Optional<List<Client>> clients = userService.findAllCustomer();
                 if (clients.isPresent() && clients.get().isEmpty()) {
                     return ResponseEntity.noContent().build();
                 }
@@ -87,22 +88,16 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/stafflist")
+    @PostMapping("/staffList")
     public ResponseEntity<Optional<List<Client>>> staffList() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
-                String userId = authentication.getName();
                 Optional<List<Client>> clients = userService.findAllStaff();
                 if (clients.isPresent() && clients.get().isEmpty()) {
                     return ResponseEntity.noContent().build();
                 }
                 return ResponseEntity.ok(clients);
-            } else {
-                // lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Optional.empty());
@@ -116,22 +111,18 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/managerlist")
+    @PostMapping("/managerList")
     public ResponseEntity<Optional<List<Client>>> managerList() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
-                String userId = authentication.getName();
+
                 Optional<List<Client>> clients = userService.findAllManager();
                 if (clients.isPresent() && clients.get().isEmpty()) {
                     return ResponseEntity.noContent().build();
                 }
                 return ResponseEntity.ok(clients);
-            } else {
-                // lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Optional.empty());
@@ -161,24 +152,20 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/updateplayer")
+    @PostMapping("/updateuser")
     public ResponseEntity<?> updateUser(Client newClient) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
-                String userId = authentication.getName();
 
-                if (userService.isPresentUser(newClient.getUserID())) {
+                if (userService.isPresentUser(newClient.getUserID()) !=null) {
 
                     Client createdClient = userService.updateUser(newClient);
                     return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be update.");
                 }
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while creating the user.");
@@ -188,25 +175,27 @@ public class AdminController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
+                if (userService.isPresentUser(id) != null) {
+                    Optional<Client> c = userService.isPresentUser(id);
+                    if (c.isPresent()) {
+                        Client client = c.get();
+                        client.setStatus(0);
+                        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserStatus(client));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();                    }
 
-                if (userService.isPresentUser(id)) {
-
-                    Client deleteUser = userService.updateUserStatus(id);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(deleteUser);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
                 }
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while creating the user.");
         }
     }
+
+
 
 
 }

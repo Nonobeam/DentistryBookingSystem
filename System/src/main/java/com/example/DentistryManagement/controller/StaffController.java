@@ -5,7 +5,6 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.NotificationService;
@@ -44,15 +43,14 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/den")
+    @GetMapping("/dentist")
     public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                String userId = authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findDenByStaff(userId);
+                String mail = authentication.getName();
+                Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
 
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
@@ -71,10 +69,7 @@ public class StaffController {
                             .collect(Collectors.toList());
 
                     return ResponseEntity.ok(Optional.of(clientDTOs));
-                } else {
-                    // lỗi 403
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
+
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
@@ -92,14 +87,12 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/cus")
+    @GetMapping("/customer")
     public ResponseEntity<Optional<List<UserDTO>>> findAllCusManage() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                String userId = authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findCusinClinic(userId);
+            String mail= authentication.getName();
+                Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
 
                 // Kiểm tra nếu danh sách clients không rỗng và tồn tại
                 if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
@@ -117,10 +110,7 @@ public class StaffController {
                             .collect(Collectors.toList());
 
                     return ResponseEntity.ok(Optional.of(clientDTOs));
-                } else {
-                    // lỗi 403
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
+
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
@@ -138,93 +128,92 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/appointhist")
-    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentManage() {
+    @GetMapping("/appointment-history")
+    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
         try {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-            String userId = authentication.getName();
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(userId));
-        } else {
-            //không có quyền, lỗi 403
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }  } catch (Exception e) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
+         } catch (Exception e) {
         // Xử lý ngoại lệ
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-    }
-
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/den/{id}")
-    public ResponseEntity<?> findAllDenByStaff(@PathVariable("id") String id) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                UserDTO userDTO =new UserDTO();
-                Client client= userService.userInfo(id);
-                userDTO.setFirstName(client.getFirstName());
-                userDTO.setPhone(client.getPhone());
-                userDTO.setMail(client.getMail());
-                userDTO.setLastName(client.getLastName());
-                userDTO.setBirthday(client.getBirthday());
-
-                Optional<List<Appointment>> appointment=appointmentService.denAppoint(id);
-                UserAppointDTO userAppointDTO = new UserAppointDTO();
-                userAppointDTO.setUserDTO(userDTO);
-                userAppointDTO.setAppointment(appointment);
-                return ResponseEntity.ok(userAppointDTO);
-            } else {
-                //không có quyền, lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }  } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
 
-    })
-    @GetMapping("/cus/{id}")
-    public ResponseEntity<?> findAllCusByStaff(@PathVariable("id") String id) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    @Operation(summary = "Staff")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Error")
+//
+//    })
+//    @GetMapping("/dentist/{id}")
+//    public ResponseEntity<?> findAllDenByStaff(@PathVariable("id") String id) {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//
+//                UserDTO userDTO =new UserDTO();
+//                Client client= userService.userInfo(id);
+//                userDTO.setFirstName(client.getFirstName());
+//                userDTO.setPhone(client.getPhone());
+//                userDTO.setMail(client.getMail());
+//                userDTO.setLastName(client.getLastName());
+//                userDTO.setBirthday(client.getBirthday());
+//
+//                Optional<List<Appointment>> appointment=appointmentService.dentistAppointment(id);
+//                Optional<List<Appointment>> appointment=appointmentService.denAppoint(id);
+//                UserAppointDTO userAppointDTO = new UserAppointDTO();
+//                userAppointDTO.setUserDTO(userDTO);
+//                userAppointDTO.setAppointment(appointment);
+//        } catch (Exception e) {
+//
+//            } else {
+//
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }  catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                UserDTO userDTO =new UserDTO();
-                Client client= userService.userInfo(id);
-                userDTO.setFirstName(client.getFirstName());
-                userDTO.setPhone(client.getPhone());
-                userDTO.setMail(client.getMail());
-                userDTO.setLastName(client.getLastName());
-                userDTO.setBirthday(client.getBirthday());
-                String userId = authentication.getName();
-                Optional<List<Appointment>> appointment=appointmentService.cusAppoint(id,userId);
-                UserAppointDTO userAppointDTO = new UserAppointDTO();
-                userAppointDTO.setUserDTO(userDTO);
-                userAppointDTO.setAppointment(appointment);
-                return ResponseEntity.ok(userAppointDTO);
-            } else {
-                //không có quyền, lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }  } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+//    @Operation(summary = "Staff")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Error")
+//
+//    })
+//    @GetMapping("/customer/{id}")
+//    public ResponseEntity<?> findAllCusByStaff(@PathVariable("id") String id) {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String mail= authentication.getName();
+//                UserDTO userDTO =new UserDTO();
+//                Client client= userService.userInfo(id);
+//                userDTO.setFirstName(client.getFirstName());
+//                userDTO.setPhone(client.getPhone());
+//                userDTO.setMail(client.getMail());
+//                userDTO.setLastName(client.getLastName());
+//                userDTO.setBirthday(client.getBirthday());
+//                Optional<List<Appointment>> appointment=appointmentService.customerAppointment(id,mail);
+//                String userId = authentication.getName();
+//                Optional<List<Appointment>> appointment=appointmentService.cusAppoint(id,userId);
+//                UserAppointDTO userAppointDTO = new UserAppointDTO();
+//                userAppointDTO.setUserDTO(userDTO);
+//                userAppointDTO.setAppointment(appointment);
+//                return ResponseEntity.ok(userAppointDTO);
+//             } catch (Exception e) {
+//            } else {
+//                //không có quyền, lỗi 403
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }  } catch (Exception e) {
+//            // Xử lý ngoại lệ
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -237,19 +226,31 @@ public class StaffController {
     public ResponseEntity<?> receiveNotification() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.STAFF)) {
-                String userid = authentication.getName();
-                Optional<List<Notification>> notice = notificationService.reiveNoti(userid) ;
+            String mail= authentication.getName();
+                Optional<List<Notification>> notice = notificationService.receiveNotice(mail) ;
 
                 return ResponseEntity.ok(notice);
-            } else {
-                //không có quyền, lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }  } catch (Exception e) {
+             } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/{status}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
 
+        try {
+            appointment.setStatus(status);
+            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

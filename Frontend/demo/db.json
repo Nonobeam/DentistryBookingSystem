@@ -1,0 +1,7 @@
+{
+    "patients": [
+      { "id": 1, "name": "Vo Ngoc Bao Thu", "dob": "2004-01-01" },
+      { "id": 2, "name": "ABC EFG", "dob": "1990-01-01" }
+    ]
+  }
+  
