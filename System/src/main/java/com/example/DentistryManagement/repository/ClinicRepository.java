@@ -11,10 +11,7 @@ public interface ClinicRepository extends JpaRepository<Clinic, String> {
     Clinic findByClinicID(String clinicID);
     String findByAddressAndStatus(String address, int status);
 
-<<<<<<< HEAD
-    Optional<List<Clinic>> getClinicsByUser_UserID(String managerid);
-    Clinic findClinicByClinicID(String clinicid);
-=======
-    Optional<List<Clinic>> getClinicByUser(Client user);
->>>>>>> main
+//    Optional<List<Clinic>> getClinicsByUser_UserID(String managerid);
+//    Clinic findClinicByClinicID(String clinicid);
+//    Optional<List<Clinic>> getClinicByUser(Client user);
 }
