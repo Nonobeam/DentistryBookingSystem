@@ -21,7 +21,7 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByWorkDateAndServiceAndAvailableAndClinic(workDate, service, available, clinic);
     }
 
-    public Optional<List<com.example.DentistryManagement.core.dentistry.Service>> getServiceNotFull(LocalDate bookDate, Clinic clinic) {
-        return clinicService.getServiceNotNullByDate(bookDate, clinic);
-    }
+//    public Optional<List<com.example.DentistryManagement.core.dentistry.Service>> getServiceNotFull(LocalDate bookDate, Clinic clinic) {
+//        return clinicService.getServiceNotNullByDate(bookDate, clinic);
+//    }
 }

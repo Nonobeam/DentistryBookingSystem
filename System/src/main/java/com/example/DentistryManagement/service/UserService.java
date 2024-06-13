@@ -32,7 +32,7 @@ public class UserService {
         return userRepository.findByUserID(id);
     }
     public Client findUserByIDAndRole(String id, Role role) {
-        return userRepository.findByUserIDAAndRole(id, role);
+        return userRepository.findByUserIDAndRole(id, role);
     }
 
     public boolean existsByPhoneOOrMail(String phone, String mail) {

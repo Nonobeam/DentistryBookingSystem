@@ -104,18 +104,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/available-service")
-    public ResponseEntity<List<Service>> getAvailableServices(
-            @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic) {
-
-        Optional<List<Service>> dentistService = dentistScheduleService
-                .getServiceNotFull(bookDate, clinic);
-
-        return dentistService
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
-    }
+//    @GetMapping("/available-service")
+//    public ResponseEntity<List<Service>> getAvailableServices(
+//            @RequestParam LocalDate bookDate,
+//            @RequestParam Clinic clinic) {
+//
+//        Optional<List<Service>> dentistService = dentistScheduleService
+//                .getServiceNotFull(bookDate, clinic);
+//
+//        return dentistService
+//                .map(ResponseEntity::ok)
+//                .orElseGet(() -> ResponseEntity.noContent().build());
+//    }
 
     @GetMapping("/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(

@@ -43,7 +43,37 @@ After working for a long time, some conflict may come up, try to use git fetch a
 1. Docker run mysql imag
 ```docker run --name mydb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mypassword -e MYSQL_DATABASE=mydb -e MYSQL_USER=myuser -e MYSQL_PASSWORD=mypassword -d mysql:latest```
 
+### Resolve conflict
 
+# First Problem
+You guys may face some issues while merge or checkout branch, below is some typical way to fix that. For more detail, please read git document
+1. Untracked <br>
+   ```git reset --hard origin/phucdev```
+2. Unstaged <br>
+   ```git rm --cached {file-direct-link}``` <br>
+   After that commit all and push into your branch.
+3. Have a check again to find out there are any others error <br>
+   ```git status```
+
+# Merging
+At this stage, I hope your branch didn't face any problem <br>
+1. Download, pull, clone the source code in main branch <br>
+   ```git clone https://github.com/Nonobeam/DentistryBookingSystem.git``` <br>
+2. Move to your branch <br>
+   ```git checkout {your-branch-name}``` <br>
+3. Do merge with main <br>
+   ```git merge main```  <br>
+   At this step there, there may some warning about which file can auto-merge, which files don't so that just choose your fav App to solve the conflict <br>
+4. Open your fav Code editor / Ide
+5. The conflict code may have format <br>
+```
+Your branch <<<<<
+======== 
+>>>>> main
+```
+6. Choose which line of code to keep and then delete those above
+7. Commit all the change to your branch
+8. Git push change to your branch
 
 
 
