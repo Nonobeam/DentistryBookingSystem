@@ -12,7 +12,7 @@ The Dentistry Booking System is a comprehensive platform designed to streamline 
 ## Links
 - **SRS (Software Requirement Specification):** [SRS Document](https://docs.google.com/document/d/1-woQEySvFkJJ0rmm1Cmxhae86M1NNkhjnNEuN7u8aA4/edit?fbclid=IwAR2SaQ50oZuIRd5BgTc7FbD5_yG3FheTy1XL4ngi1sNnOGhl9CWxLJNXj3k)
 - **Diagram:** [System Diagram](https://app.diagrams.net/#G1-5mSVBvoR6uAEzkfXT2RGAQlZQ2oUZC8#%7B%22pageId%22%3A%22lsPBUERqXHNC8R6fdQQM%22%7D)
-- **Frontend (Vercel):** [Live Frontend](https://dentistry-booking-system.vercel.app/)
+- **Frontend (Vercel):** [Live Frontend](https://dentistry-booking-system-4jgo.vercel.app)
 
 ## Roles
 - **Bao Thu** (Backend) - [GitHub Profile](https://github.com/Rvt129)

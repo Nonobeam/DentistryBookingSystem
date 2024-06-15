@@ -183,6 +183,14 @@ public class UserService {
         }
 
     }
+
+    public boolean checkExistPhoneAndMail(String phone, String mail) {
+        try {
+            return userRepository.existsByPhoneOrMail(phone, mail);
+        } catch (Error e) {
+            throw new Error(e.getMessage());
+        }
+    }
 //    public Optional<List<Client>> findDenByStaff(String userId) {
 //        try {
 //            return userRepository.getClientsByRoleAndDentist_Staff_UserID(Role.DENTIST, userId);
