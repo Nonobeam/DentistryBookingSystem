@@ -1,5 +1,7 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
@@ -28,6 +30,7 @@ import java.util.Optional;
 public class AdminController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
+    private final UserMapping userMapping;
 
     @Operation(summary = "Admin")
     @ApiResponses(value = {
@@ -152,19 +155,16 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/updateuser")
-    public ResponseEntity<?> updateUser(Client newClient) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updateduser) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-                if (userService.isPresentUser(newClient.getUserID()) !=null) {
-
-                    Client createdClient = userService.updateUser(newClient);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be update.");
-                }
+            if (userService.isPresentUser(id) !=null) {
+                Client client = userMapping.mapUser(updateduser);
+                userService.updateUser(client);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be update.");
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -176,18 +176,19 @@ public class AdminController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-                if (userService.isPresentUser(id) != null) {
-                    Optional<Client> c = userService.isPresentUser(id);
-                    if (c.isPresent()) {
-                        Client client = c.get();
-                        client.setStatus(0);
-                        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserStatus(client));
-                    } else {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();                    }
-
+            if (userService.isPresentUser(id) != null) {
+                Optional<Client> c = userService.isPresentUser(id);
+                if (c.isPresent()) {
+                    Client client = c.get();
+                    client.setStatus(0);
+                    userService.updateUserStatus(client);
+                    return ResponseEntity.ok().build();
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
-                }
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();                    }
+
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

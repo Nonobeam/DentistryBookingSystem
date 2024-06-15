@@ -3,10 +3,12 @@ package com.example.DentistryManagement.service;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
+import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +19,8 @@ public class PasswordResetTokenService {
 
     private final PasswordResetTokenRepository tokenRepository;
     private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
     @Value("${spring.mail.username}")
     private String fromMail;
 
@@ -32,11 +36,18 @@ public class PasswordResetTokenService {
     public String validatePasswordResetToken(String token) {
         PasswordResetToken passToken = tokenRepository.findByToken(token);
         if (passToken == null || isTokenExpired(passToken)) {
-            return "invalidToken";
+            return "invalid";
         }
         return null;
     }
 
+    public void resetPassword(String token, String password){
+        PasswordResetToken passToken = tokenRepository.findByToken(token);
+        Client user = passToken.getUser();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        tokenRepository.delete(passToken); // Invalidate the used token
+    }
     public void sendPasswordResetEmail(String mail, String token) {
         String url = "http://localhost:8080/changePassword/" + token;
         SimpleMailMessage resetMessage = new SimpleMailMessage();
