@@ -5,8 +5,11 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
+import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,11 +20,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequestMapping("/user")
 @RestController
@@ -34,6 +39,10 @@ public class UserController {
     private final DentistScheduleService dentistScheduleService;
     private final NotificationService notificationService;
     private final AppointmentService appointmentService;
+    private final PasswordResetTokenService tokenService;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Operation(summary = "All users")
     @ApiResponses(value = {
@@ -166,7 +175,31 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
+        Client user = userRepository.findByMail(mail).orElse(null);
+        if (user != null) {
+            String token = UUID.randomUUID().toString();
+            tokenService.createPasswordResetTokenForUser(user, token);
+            tokenService.sendPasswordResetEmail(mail, token);
+        }
+        return ResponseEntity.ok("Password reset link has been sent to your email");
+    }
 
+    @PostMapping("/resetPassword/{token}")
+    public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestParam("password") String password) {
+        String validationResult = tokenService.validatePasswordResetToken(token);
+        if (validationResult != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+        }
+        PasswordResetToken passToken = tokenRepository.findByToken(token);
+        Client user = passToken.getUser();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        tokenRepository.delete(passToken); // Invalidate the used token
+
+        return ResponseEntity.ok("Password has been reset successfully");
+    }
 
 
 
