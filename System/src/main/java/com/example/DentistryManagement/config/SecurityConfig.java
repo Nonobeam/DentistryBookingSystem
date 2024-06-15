@@ -14,8 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import static com.example.DentistryManagement.core.user.Permission.READ;
-import static com.example.DentistryManagement.core.user.Permission.WRITE;
+import static com.example.DentistryManagement.core.user.Permission.*;
 import static com.example.DentistryManagement.core.user.Role.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -62,7 +61,7 @@ public class SecurityConfig{
                                 .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), MANAGER.name(), CUSTOMER.name(), STAFF.name(), DENTIST.name())
                                 .requestMatchers(GET, "/user/**").hasAnyAuthority(READ.name())
                                 .requestMatchers("/manager/**").hasRole(MANAGER.name())
-                                .requestMatchers(PUT, "/manager/**").hasRole(MANAGER.name())
+                                .requestMatchers(PUT, "/manager/**").hasAuthority(UPDATE.name())
                                 .requestMatchers(POST, "/manager/**").hasAuthority(WRITE.name())
                                 .anyRequest()
                                 .authenticated()

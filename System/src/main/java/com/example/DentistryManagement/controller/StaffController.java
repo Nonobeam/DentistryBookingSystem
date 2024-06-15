@@ -35,90 +35,90 @@ public class StaffController {
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private final AuthenticationService authenticationService;
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/dentist")
-    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
-        try {
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-                String mail = authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
-
-                // Kiểm tra nếu danh sách clients không rỗng và tồn tại
-                if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-                    // Chuyển đổi danh sách Client sang danh sách ClientDTO
-                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
-                            .map(client -> {
-                                UserDTO clientDTO = new UserDTO();
-                                clientDTO.setFirstName(client.getFirstName());
-                                clientDTO.setPhone(client.getPhone());
-                                clientDTO.setMail(client.getMail());
-                                clientDTO.setLastName(client.getLastName());
-                                clientDTO.setBirthday(client.getBirthday());
-
-                                return clientDTO;
-                            })
-                            .collect(Collectors.toList());
-
-                    return ResponseEntity.ok(Optional.of(clientDTOs));
-
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/customer")
-    public ResponseEntity<Optional<List<UserDTO>>> findAllCusManage() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-                Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
-
-                // Kiểm tra nếu danh sách clients không rỗng và tồn tại
-                if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-
-                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
-                            .map(client -> {
-                                UserDTO clientDTO = new UserDTO();
-                                clientDTO.setFirstName(client.getFirstName());
-                                clientDTO.setPhone(client.getPhone());
-                                clientDTO.setMail(client.getMail());
-                                clientDTO.setLastName(client.getLastName());
-                                clientDTO.setBirthday(client.getBirthday());
-                                return clientDTO;
-                            })
-                            .collect(Collectors.toList());
-
-                    return ResponseEntity.ok(Optional.of(clientDTOs));
-
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+//    @Operation(summary = "Staff")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Error")
+//
+//    })
+//    @GetMapping("/dentist")
+//    public ResponseEntity<Optional<List<UserDTO>>> findDentistManager() {
+//        try {
+//
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//                String mail = authentication.getName();
+//                Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
+//
+//                // Kiểm tra nếu danh sách clients không rỗng và tồn tại
+//                if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
+//                    // Chuyển đổi danh sách Client sang danh sách ClientDTO
+//                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
+//                            .map(client -> {
+//                                UserDTO clientDTO = new UserDTO();
+//                                clientDTO.setFirstName(client.getFirstName());
+//                                clientDTO.setPhone(client.getPhone());
+//                                clientDTO.setMail(client.getMail());
+//                                clientDTO.setLastName(client.getLastName());
+//                                clientDTO.setBirthday(client.getBirthday());
+//
+//                                return clientDTO;
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    return ResponseEntity.ok(Optional.of(clientDTOs));
+//
+//            } else {
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            // Xử lý ngoại lệ
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+//
+//    @Operation(summary = "Staff")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Error")
+//
+//    })
+//    @GetMapping("/customer")
+//    public ResponseEntity<Optional<List<UserDTO>>> findAllCusManage() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String mail= authentication.getName();
+//                Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
+//
+//                // Kiểm tra nếu danh sách clients không rỗng và tồn tại
+//                if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
+//
+//                    List<UserDTO> clientDTOs = clientsOptional.get().stream()
+//                            .map(client -> {
+//                                UserDTO clientDTO = new UserDTO();
+//                                clientDTO.setFirstName(client.getFirstName());
+//                                clientDTO.setPhone(client.getPhone());
+//                                clientDTO.setMail(client.getMail());
+//                                clientDTO.setLastName(client.getLastName());
+//                                clientDTO.setBirthday(client.getBirthday());
+//                                return clientDTO;
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    return ResponseEntity.ok(Optional.of(clientDTOs));
+//
+//            } else {
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            // Xử lý ngoại lệ
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
     @Operation(summary = "Staff")
     @ApiResponses(value = {

@@ -5,6 +5,7 @@ import com.example.DentistryManagement.repository.ClinicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +30,16 @@ public class ClinicService {
         return clinicRepository.findByClinicID(clinicID);
     }
 
-//    public Optional<List<Clinic>> findClinicByManager(String userId) {
-//        try {
-//            return clinicRepository.getClinicsByUser(userId);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
-//        }
-//    }
+    public List<Clinic> findAllClinics() {
+        int status = 1;
+        List<Clinic> clinics = clinicRepository.findClinicByStatus(status);
+
+        if (clinics.isEmpty()) {
+            throw new Error("Cannot find any clinic.");
+        } else {
+            return clinics;
+        }
+    }
+
+
 }

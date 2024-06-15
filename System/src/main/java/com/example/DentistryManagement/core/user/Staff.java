@@ -3,6 +3,7 @@ package com.example.DentistryManagement.core.user;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.mail.Notification;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,16 +25,18 @@ public class Staff{
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "staffID", referencedColumnName = "userID")
+    @JoinColumn(name = "staffID")
     private Client user;
 
     @ManyToOne
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "staff")
     private List<Dentist> dentistList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "staff")
     private List<Appointment> appointmentList;
 

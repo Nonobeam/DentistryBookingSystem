@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.core.dentistry;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,7 @@ public class TimeSlot {
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "timeSlot")
     private List<Appointment> appointmentList;
 }

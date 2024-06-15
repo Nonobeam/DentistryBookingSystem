@@ -32,105 +32,105 @@ public class AdminController {
     private final AuthenticationService authenticationService;
     private final UserMapping userMapping;
 
-    @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/dentistList")
-    public ResponseEntity<Optional<List<Client>>> dentistList() {
-        try {
+//    @Operation(summary = "Admin")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/dentistList")
+//    public ResponseEntity<Optional<List<Client>>> dentistList() {
+//        try {
+//
+//            Optional<List<Client>> clients = userService.findAllDentists();
+//            if (clients.isPresent() && clients.get().isEmpty()) {
+//                return ResponseEntity.noContent().build();
+//            }
+//            return ResponseEntity.ok(clients);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
 
-            Optional<List<Client>> clients = userService.findAllDentist();
-            if (clients.isPresent() && clients.get().isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(clients);
+//    @Operation(summary = "Admin")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/customerList")
+//    public ResponseEntity<List<Client>> customerList() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
+//                String userId = authentication.getName();
+//                List<Client> clients = userService.findAllCustomer();
+//                if (clients.isPresent() && clients.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clients);
+//            } else {
+//                // lỗi 403
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Optional.empty());
-        }
-    }
+//    @Operation(summary = "Admin")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/staffList")
+//    public ResponseEntity<Optional<List<Client>>> staffList() {
+//        try {
+//
+//                Optional<List<Client>> clients = userService.findAllStaffs();
+//                if (clients.isPresent() && clients.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clients);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
 
-    @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/customerList")
-    public ResponseEntity<Optional<List<Client>>> customerList() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authenticationService.isUserAuthorized(authentication, "userId", Role.ADMIN)) {
-                String userId = authentication.getName();
-                Optional<List<Client>> clients = userService.findAllCustomer();
-                if (clients.isPresent() && clients.get().isEmpty()) {
-                    return ResponseEntity.noContent().build();
-                }
-                return ResponseEntity.ok(clients);
-            } else {
-                // lỗi 403
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Optional.empty());
-        }
-    }
-
-    @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/staffList")
-    public ResponseEntity<Optional<List<Client>>> staffList() {
-        try {
-
-                Optional<List<Client>> clients = userService.findAllStaff();
-                if (clients.isPresent() && clients.get().isEmpty()) {
-                    return ResponseEntity.noContent().build();
-                }
-                return ResponseEntity.ok(clients);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Optional.empty());
-        }
-    }
-
-    @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/managerList")
-    public ResponseEntity<Optional<List<Client>>> managerList() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-                Optional<List<Client>> clients = userService.findAllManager();
-                if (clients.isPresent() && clients.get().isEmpty()) {
-                    return ResponseEntity.noContent().build();
-                }
-                return ResponseEntity.ok(clients);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Optional.empty());
-        }
-    }
+//    @Operation(summary = "Admin")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @PostMapping("/managerList")
+//    public ResponseEntity<Optional<List<Client>>> managerList() {
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//
+//                List<Client> clients = userService.findAllManagers();
+//                if (clients.isPresent() && clients.get().isEmpty()) {
+//                    return ResponseEntity.noContent().build();
+//                }
+//                return ResponseEntity.ok(clients);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Optional.empty());
+//        }
+//    }
 
 //    @Operation(summary = "Admin")
 //    @ApiResponses(value = {

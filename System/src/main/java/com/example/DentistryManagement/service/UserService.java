@@ -20,9 +20,26 @@ public class UserService {
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
-    public Optional<List<Client>> findAllDentist() {
+
+    public List<Client> findAllDentists() {
         try {
-            return userRepository.getClientsByRole(Role.DENTIST);
+            return userRepository.findClientsByRole(Role.DENTIST);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Client> findAllStaffs() {
+        try {
+            return userRepository.findClientsByRole(Role.STAFF);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Client> findAllManagers() {
+        try {
+            return userRepository.findClientsByRole(Role.MANAGER);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
@@ -35,38 +52,22 @@ public class UserService {
         return userRepository.findByUserIDAndRole(id, role);
     }
 
-    public boolean existsByPhoneOOrMail(String phone, String mail) {
+    public boolean existsByPhoneOrMail(String phone, String mail) {
         return userRepository.existsByPhoneOrMailAndStatus(phone, mail,1);
-    }
-
-    public Optional<List<Client>> findDentistByStaff(String mail) {
-        try {
-            return userRepository.getClientsByRoleAndDentist_StaffMail(Role.DENTIST, mail);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Client>> findCustomerInClinic(String mailstaff) {
-        try {
-            return userRepository.getCustomersByStaff(mailstaff);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
-        }
     }
 
     public Client userInfo(String id) {
         try {
-            return userRepository.getClientsByUserID(id);
+            return userRepository.findClientsByUserID(id);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching user information: " + e.getMessage(), e);
         }
     }
 
 
-    public Optional<List<Client>> findAllCustomer() {
+    public List<Client> findAllCustomer() {
         try {
-            return userRepository.getClientsByRole(Role.CUSTOMER);
+            return userRepository.findClientsByRole(Role.CUSTOMER);
         } catch (Error error) {
             throw new RuntimeException("Error" + error.getMessage());
         }
@@ -74,30 +75,6 @@ public class UserService {
 
     public Client save(Client client) {
         return userRepository.save(client);
-    }
-    public Optional<List<Client>> getAllDentists() {
-        Role role = Role.DENTIST;
-        try {
-            return userRepository.findClientByRole(role);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Client>> findAllStaff() {
-        try {
-            return userRepository.getClientsByRole(Role.STAFF);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Client>> findAllManager() {
-        try {
-            return userRepository.getClientsByRole(Role.MANAGER);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-        }
     }
     public Client createNewUser(Client newClient) {
         try {
@@ -116,22 +93,6 @@ public class UserService {
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Client>> findAllDenByClinic(String userId) {
-        try {
-            return userRepository.getDentistByManager(userId);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Client>> findAllStaffByClinic(String userId) {
-        try {
-            return userRepository.getStaffByManager(userId);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
     }
 
@@ -191,117 +152,4 @@ public class UserService {
             throw new Error(e.getMessage());
         }
     }
-//    public Optional<List<Client>> findDenByStaff(String userId) {
-//        try {
-//            return userRepository.getClientsByRoleAndDentist_Staff_UserID(Role.DENTIST, userId);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Optional<List<Client>> findCusinClinic(String userId) {
-//        try {
-//            return userRepository.getCustomersByStaff(userId);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Client userInfo(String id) {
-//        try {
-//            return userRepository.getClientsByUserID(id);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching user information: " + e.getMessage(), e);
-//        }
-//    }
-//
-//
-//    public Optional<List<Client>> findAllCus() {
-//        try {
-//            return userRepository.getClientsByRole(Role.CUSTOMER);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Optional<List<Client>> findAllStaff() {
-//        try {
-//            return userRepository.getClientsByRole(Role.STAFF);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Optional<List<Client>> findAllManager() {
-//        try {
-//            return userRepository.getClientsByRole(Role.MANAGER);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-//        }
-//    }
-//    public Client createNewUser(Client newClient) {
-//        try {
-//            // Perform necessary validation and business logic here
-//            Client savedClient = userRepository.save(newClient);
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-//        }
-//        return null;
-//    }
-//
-//    public boolean isPresent(Client createdClient) {
-//        try {
-//            return userRepository.findClientByMailOrPhone(createdClient.getMail(),createdClient.getPhone());
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Optional<List<Client>> findAllDenByClinic(String userId) {
-//        try {
-//            return userRepository.getDentistByManager(userId);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Optional<List<Client>> findAllStaffByClinic(String userId) {
-//        try {
-//            return userRepository.getStaffByManager(userId);
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public boolean isPresentUser(String id) {
-//        try {
-//            Optional<Client> savedClient = userRepository.findById(id);
-//            if(savedClient.isEmpty()) return false;
-//            else return true;
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    public Client updateUser(Client newClient) {
-//        try {
-//            // Perform necessary validation and business logic here
-//            return userRepository.updateClient(newClient.getUserID(),newClient.getPassword(),newClient.getRole());
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-//        }
-//    }
-//    public Client updateUserStatus(String id){
-//        try {
-//            // Perform necessary validation and business logic here
-//            return userRepository.updateClientByStatus(id);
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-//        }
-//    }
 }
