@@ -16,7 +16,8 @@ import AppointmentsPage from './admin/pages/DashBoard/components/ApointmenPage/A
 import { TimeTable } from './admin/pages/DashBoard/components/Timetable/Timetable';
 import Profile from './admin/pages/DashBoard/components/Profile/Profile';
 import EditForm from './admin/pages/DashBoard/components/EditForm/EditForm';
-import AdminHomePage from './admin/pages/DashBoard/components/AdminHomePage';
+import AdminHomePage from './admin/pages/DashBoard/components/AdminHomePage/AdminHomePage';
+
 
 const App = () => {
   return (
