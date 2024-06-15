@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.core.dentistry;
 
 import com.example.DentistryManagement.core.user.Dentist;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,9 +25,11 @@ public class Service {
     private String serviceID;
     private String name;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
     private List<Appointment> appointmentList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
     private List<DentistSchedule> dentistScheduleList;
 

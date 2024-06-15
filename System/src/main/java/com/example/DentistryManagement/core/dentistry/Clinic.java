@@ -3,6 +3,7 @@ package com.example.DentistryManagement.core.dentistry;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -49,18 +50,23 @@ public class Clinic {
     @JoinColumn(name = "userID", nullable = false, referencedColumnName = "userID")
     private Client user;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<Staff> staffList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<Dentist> dentistList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<TimeSlot> timeSlotList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<Appointment> appointmentList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<DentistSchedule> dentistScheduleList;
 

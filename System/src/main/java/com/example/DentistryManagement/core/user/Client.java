@@ -3,7 +3,6 @@ package com.example.DentistryManagement.core.user;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
-import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,14 +13,11 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -57,14 +53,15 @@ public class Client implements UserDetails {
     private LocalDate birthday;
     private int status;
 
-
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Dependent> dependentList;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Appointment> appointmentList;
 
-    //manager only baby
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Clinic> clinicList;
 
@@ -72,13 +69,15 @@ public class Client implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private PasswordResetToken passwordResetToken;
 
-    @OneToOne
-    @JoinColumn(name = "userID", referencedColumnName = "dentistID")
-    private Client dentist;
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Dentist dentist;
 
-    @OneToOne
-    @JoinColumn(name = "userID", referencedColumnName = "staffID")
-    private Client staff;
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Staff staff;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
