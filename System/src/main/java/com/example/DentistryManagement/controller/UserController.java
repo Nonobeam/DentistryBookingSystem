@@ -189,15 +189,10 @@ public class UserController {
     @PostMapping("/resetPassword/{token}")
     public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestParam("password") String password) {
         String validationResult = tokenService.validatePasswordResetToken(token);
-        if (validationResult != null) {
+        if (validationResult.equalsIgnoreCase("invalid")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
-        PasswordResetToken passToken = tokenRepository.findByToken(token);
-        Client user = passToken.getUser();
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
-        tokenRepository.delete(passToken); // Invalidate the used token
-
+        tokenService.resetPassword(token, password);
         return ResponseEntity.ok("Password has been reset successfully");
     }
 
