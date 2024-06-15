@@ -193,6 +193,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
         tokenService.resetPassword(token, password);
+        if (validationResult != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+        }
+        PasswordResetToken passToken = tokenRepository.findByToken(token);
+        Client user = passToken.getUser();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        tokenRepository.delete(passToken); // Invalidate the used token
+
         return ResponseEntity.ok("Password has been reset successfully");
     }
 

@@ -48,7 +48,6 @@ public class PasswordResetTokenService {
         userRepository.save(user);
         tokenRepository.delete(passToken); // Invalidate the used token
     }
-
     public void sendPasswordResetEmail(String mail, String token) {
         String url = "http://localhost:8080/changePassword/" + token;
         SimpleMailMessage resetMessage = new SimpleMailMessage();
@@ -67,6 +66,4 @@ public class PasswordResetTokenService {
     private boolean isTokenExpired(PasswordResetToken passToken) {
         return passToken.getExpiryTime().isBefore(LocalDateTime.now());
     }
-
-
 }
