@@ -37,7 +37,7 @@ public class DentistSchedule {
 
     @ManyToOne
     @JoinColumn(name = "serviceID", nullable = false, referencedColumnName = "serviceID")
-    private Service service;
+    private Services services;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;

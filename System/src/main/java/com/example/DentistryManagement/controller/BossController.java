@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.core.dentistry.Service;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.repository.ServiceRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +25,7 @@ public class BossController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PostMapping("/service/add")
-    public ResponseEntity<Service> addNewService(@RequestBody Service service) {
-        return ResponseEntity.ok(serviceRepository.save(service));
+    public ResponseEntity<Services> addNewService(@RequestBody Services services) {
+        return ResponseEntity.ok(serviceRepository.save(services));
     }
 }

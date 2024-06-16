@@ -4,11 +4,9 @@ import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
-import com.example.DentistryManagement.service.AuthenticationService;
-import com.example.DentistryManagement.service.ClinicService;
-import com.example.DentistryManagement.service.DentistService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,9 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
-@RequestMapping("/manager")
+@RequestMapping("/api/v1/manager")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Manager API")
@@ -28,6 +25,26 @@ public class ManagerController {
     private final UserService userService;
     private final DentistService dentistService;
     private final ClinicService clinicService;
+    private final StaffService staffService;
+
+    @Operation(summary = "Find dentist by staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    @GetMapping("/{staffID}/all-dentists")
+    public ResponseEntity<List<Dentist>> getDentistByStaff(@PathVariable String staffID) {
+        List<Dentist> dentists;
+        Staff staff;
+        try {
+            staff = staffService.findStaffById(staffID);
+            dentists = dentistService.findDentistByStaff(staff);
+            return ResponseEntity.ok(dentists);
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
+        }
+    }
 
     @Operation(summary = "Edit users")
     @ApiResponses(value = {
@@ -81,6 +98,30 @@ public class ManagerController {
         }
     }
 
+
+    @Operation(summary = "Set dentist for staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/set-staff/{staffID}/{dentistID}")
+    public ResponseEntity<Dentist> updateStaffForDentist(@PathVariable String dentistID, @PathVariable String staffID) {
+        Staff staff;
+        Dentist dentist;
+        try {
+            staff = staffService.findStaffById(staffID);
+            dentist = dentistService.findDentistByID(dentistID);
+
+            return ResponseEntity.ok(dentistService.updateStaffForDentist(staff, dentist));
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
+        }
+    }
+
+
+
     @Operation(summary = "All Dentists")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -96,6 +137,7 @@ public class ManagerController {
             throw new Error("Error while getting dentists " + error);
         }
     }
+
 
     @Operation(summary = "All Staffs")
     @ApiResponses(value = {

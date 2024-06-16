@@ -71,5 +71,5 @@ public class Clinic {
     private List<DentistSchedule> dentistScheduleList;
 
     @ManyToMany(mappedBy = "clinicList")
-    private List<Service> serviceList;
+    private List<Services> servicesList;
 }

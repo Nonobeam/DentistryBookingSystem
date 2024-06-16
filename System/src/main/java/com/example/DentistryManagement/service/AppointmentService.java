@@ -21,8 +21,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
-private  final StaffRepository userRepository;
-private final ClinicRepository clinicRepository;
+    private  final StaffRepository userRepository;
+    private final ClinicRepository clinicRepository;
     public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
         try {
             Staff staffclient = userRepository.findStaffByUserMail(staffmail);
