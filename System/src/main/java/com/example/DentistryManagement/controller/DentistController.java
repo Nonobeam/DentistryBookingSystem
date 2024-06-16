@@ -51,7 +51,7 @@ public class DentistController {
                 List<AppointmentDTO> applist = appointlist.get().stream()
                         .map(appointmentriu -> {
                             AppointmentDTO appointment = new AppointmentDTO();
-                            appointment.setService(appointmentriu.getService());
+                            appointment.setServices(appointmentriu.getServices());
                             appointment.setStatus(appointmentriu.getStatus());
                             appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                             if (appointmentriu.getStaff()!=null){

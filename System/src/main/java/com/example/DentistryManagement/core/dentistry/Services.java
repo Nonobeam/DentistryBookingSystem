@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "Service")
 @Entity
-public class Service {
+public class Services {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,13 +26,14 @@ public class Service {
     private String name;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "services")
     private List<Appointment> appointmentList;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "service")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "services")
     private List<DentistSchedule> dentistScheduleList;
 
+    @JsonIgnore
     //This is the ServiceClinic table
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ServiceClinic",
@@ -40,7 +41,8 @@ public class Service {
             inverseJoinColumns = @JoinColumn(name = "clinicID", referencedColumnName = "clinicID"))
     private List<Clinic> clinicList;
 
-    @ManyToMany(mappedBy = "serviceList")
+    @JsonIgnore
+    @ManyToMany(mappedBy = "servicesList")
     private List<Dentist> dentistList;
 
 }

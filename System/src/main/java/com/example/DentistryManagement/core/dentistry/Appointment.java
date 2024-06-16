@@ -51,7 +51,7 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "serviceID",nullable = false, referencedColumnName = "serviceID")
-    private Service service;
+    private Services services;
 
     @ManyToOne
     @JoinColumn(name = "clinicID",nullable = false, referencedColumnName = "clinicID")

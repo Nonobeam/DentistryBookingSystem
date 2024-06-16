@@ -52,6 +52,6 @@ public class Dentist {
     @JoinTable(name = "DentistService",
             joinColumns = @JoinColumn(name = "dentistID", referencedColumnName = "dentistID"),
             inverseJoinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"))
-    private List<Service> serviceList;
+    private List<Services> servicesList;
 
 }

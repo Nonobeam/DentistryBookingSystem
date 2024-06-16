@@ -2,12 +2,10 @@
 package com.example.DentistryManagement.controller;
 
 
-import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
@@ -130,10 +128,10 @@ public class UserController {
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
             @RequestParam LocalDate bookDate,
             @RequestParam Clinic clinic,
-            @RequestParam Service service) {
+            @RequestParam Services services) {
 
         Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(bookDate, service, 1, clinic);
+                .getByWorkDateAndServiceAndAvailableAndClinic(bookDate, services, 1, clinic);
 
         return dentistScheduleList
                 .map(ResponseEntity::ok)
@@ -151,24 +149,24 @@ public class UserController {
     @PostMapping("/make-booking")
     public ResponseEntity<Appointment> makeBooking( @RequestBody DentistSchedule dentistSchedule) {
         try {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String mail= authentication.getName();
-        Client client = userService.findClientByMail(mail);
-        if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
-            throw new Error("Over booking in today!");
-        }
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+            Client client = userService.findClientByMail(mail);
+            if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
+                throw new Error("Over booking in today!");
+            }
 
-        if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
-            throw new Error("Over appointment in this date!");
-        }
-        Appointment newAppointment = new Appointment();
-        newAppointment.setUser(client);
-        newAppointment.setService(dentistSchedule.getService());
-        newAppointment.setClinic(dentistSchedule.getClinic());
-        newAppointment.setDate(dentistSchedule.getWorkDate());
-        newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
+            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
+                throw new Error("Over appointment in this date!");
+            }
+            Appointment newAppointment = new Appointment();
+            newAppointment.setUser(client);
+            newAppointment.setServices(dentistSchedule.getServices());
+            newAppointment.setClinic(dentistSchedule.getClinic());
+            newAppointment.setDate(dentistSchedule.getWorkDate());
+            newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
 
-        return ResponseEntity.ok(newAppointment);
+            return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
