@@ -25,7 +25,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@Tag(name = "User API")
+@Tag(name = "Staff API")
 public class StaffController {
     private final UserService userService;
     private final AppointmentService appointmentService;

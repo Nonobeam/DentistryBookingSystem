@@ -26,7 +26,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@Tag(name = "User API")
+@Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
     private final AuthenticationService authenticationService;

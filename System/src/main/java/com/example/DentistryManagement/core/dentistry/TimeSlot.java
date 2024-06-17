@@ -28,6 +28,7 @@ public class TimeSlot {
     private LocalTime startTime;
 
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;

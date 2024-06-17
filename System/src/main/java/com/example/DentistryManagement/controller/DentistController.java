@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@Tag(name = "User API")
+@Tag(name = "Dentist API")
 public class DentistController {
     private final DentistService dentistService;
     private final UserService userService;
