@@ -17,12 +17,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DentistScheduleService {
     private final DentistScheduleRepository dentistScheduleRepository;
-    private final ServiceRepository clinicService;
+    private final ServiceRepository serviceRepository;
     public Optional<List<DentistSchedule>> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, Services service, int available, Clinic clinic) {
         return dentistScheduleRepository.findByWorkDateAndServicesAndAvailableAndClinic(workDate, service, available, clinic);
     }
 
-//    public Optional<List<com.example.DentistryManagement.core.dentistry.Service>> getServiceNotFull(LocalDate bookDate, Clinic clinic) {
-//        return clinicService.getServiceNotNullByDate(bookDate, clinic);
-//    }
+    public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
+        try{
+            return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
+        }catch (Error e){
+            throw e;
+        }
+    }
 }

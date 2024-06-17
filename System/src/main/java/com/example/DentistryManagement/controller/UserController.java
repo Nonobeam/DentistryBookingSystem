@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Provider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class UserController {
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final ClinicService clinicService;
 
     @Operation(summary = "All users")
     @ApiResponses(value = {
@@ -111,18 +113,39 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-//    @GetMapping("/available-service")
-//    public ResponseEntity<List<Service>> getAvailableServices(
-//            @RequestParam LocalDate bookDate,
-//            @RequestParam Clinic clinic) {
-//
-//        Optional<List<Service>> dentistService = dentistScheduleService
-//                .getServiceNotFull(bookDate, clinic);
-//
-//        return dentistService
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.noContent().build());
-//    }
+
+    @GetMapping("/available-service")
+    public ResponseEntity<List<Services>> getAvailableServices(
+            @RequestParam LocalDate bookDate,
+            @RequestParam Clinic clinic) {
+
+        List<Services> dentistService;
+        try {
+            dentistService = dentistScheduleService
+                    .getServiceNotNullByDate(bookDate, clinic);
+            return ResponseEntity.ok(dentistService);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "All Clinics")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+
+    @GetMapping("/all-clinic")
+    public ResponseEntity<List<Clinic>> getAllClinics() {
+        try {
+            return ResponseEntity.ok(clinicService.findAllClinics());
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
+        }
+    }
 
     @GetMapping("/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
@@ -139,6 +162,7 @@ public class UserController {
     }
 
 
+
     @Operation(summary = "Booking")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -153,11 +177,11 @@ public class UserController {
             String mail= authentication.getName();
             Client client = userService.findClientByMail(mail);
             if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
-                throw new Error("Over booking in today!");
+                throw new Error("Over booked for today!");
             }
 
             if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
-                throw new Error("Over appointment in this date!");
+                throw new Error("Full appointment for this date!");
             }
             Appointment newAppointment = new Appointment();
             newAppointment.setUser(client);
