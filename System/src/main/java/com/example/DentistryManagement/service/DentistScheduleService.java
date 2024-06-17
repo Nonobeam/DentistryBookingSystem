@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +35,7 @@ public class DentistScheduleService {
             throw e;
         }
     }
+
 
     public void deleteDentistSchedule(String dentistID, LocalDate workDate) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
@@ -64,5 +64,10 @@ public class DentistScheduleService {
             date = date.plusDays(1);
         }
         dentistScheduleRepository.saveAll(schedules);
+    }
+
+    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule) {
+        dentistSchedule.setAvailable(0);
+        return dentistScheduleRepository.save(dentistSchedule);
     }
 }

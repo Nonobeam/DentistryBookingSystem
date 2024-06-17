@@ -54,7 +54,7 @@ public class ManagerController {
     })
     @PutMapping("/edit/{userID}")
     public ResponseEntity<Client> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        Client updateUser = userService.findUserByID(userID);
+        Client updateUser = userService.findUserById(userID);
 
         if(updateUser != null) {
 
@@ -64,7 +64,7 @@ public class ManagerController {
             updateUser.setMail(userDTO.getMail());
             updateUser.setBirthday(userDTO.getBirthday());
 
-            userService.save(updateUser);
+            userService.updateUser(updateUser);
             return ResponseEntity.ok(updateUser);
         } else {
             System.out.println("User not fail with userID: " + userID);;
@@ -133,7 +133,8 @@ public class ManagerController {
     @GetMapping("/all-dentist")
     public ResponseEntity<List<Client>> getAllDentists() {
         try {
-            return ResponseEntity.ok(userService.findAllDentists());
+            String mail =userService.mailExtract();
+            return ResponseEntity.ok(userService.findAllDentistByManager(mail));
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -150,7 +151,8 @@ public class ManagerController {
     @GetMapping("/all-staff")
     public ResponseEntity<List<Client>> getAllStaffs() {
         try {
-            return ResponseEntity.ok(userService.findAllStaffs());
+            String mail =userService.mailExtract();
+            return ResponseEntity.ok(userService.findAllStaffByManager(mail));
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -166,7 +168,9 @@ public class ManagerController {
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
-            return ResponseEntity.ok(clinicService.findAllClinics());
+            String mail = userService.mailExtract();
+
+            return ResponseEntity.ok(clinicService.findAllClinicsByManager(mail));
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }

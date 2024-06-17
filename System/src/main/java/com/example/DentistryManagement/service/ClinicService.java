@@ -5,6 +5,7 @@ import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -27,6 +28,21 @@ public class ClinicService {
 //            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
 //        }
 //    }
+public Clinic ClinicConfirm(Clinic clinic) {
+    try {
+        return clinicRepository.save(clinic);
+    } catch (DataAccessException e) {
+        throw new RuntimeException("Error occurred while fetching clinic: " + e.getMessage(), e);
+    }
+}
+    public List<Clinic> findAll() {
+        try {
+            return clinicRepository.findAll();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching clinic: " + e.getMessage(), e);
+        }
+    }
+
 
     public Clinic save(Clinic clinic) {
         return clinicRepository.save(clinic);
@@ -36,7 +52,7 @@ public class ClinicService {
         return clinicRepository.findByClinicID(clinicID);
     }
 
-    public List<Clinic> findAllClinics() {
+    public List<Clinic> findAllClinicsByStatus() {
         int status = 1;
         List<Clinic> clinics = clinicRepository.findClinicByStatus(status);
 
@@ -88,5 +104,9 @@ public class ClinicService {
             currentTime = currentTime.plusMinutes(slotDuration.getMinute());
         }
         return timeSlots;
+    }
+
+    public List<Clinic> findAllClinicsByManager(String mail) {
+    return clinicRepository.findClinicByUserMail(mail);
     }
 }

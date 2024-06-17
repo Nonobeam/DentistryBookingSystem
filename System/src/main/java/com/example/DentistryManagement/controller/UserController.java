@@ -19,9 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Provider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class UserController {
     })
     @GetMapping("/all/{userID}")
     public ResponseEntity<Client> findUser(@PathVariable String userID) {
-        return ResponseEntity.ok(userService.findUserByID(userID));
+        return ResponseEntity.ok(userService.findUserById(userID));
     }
 
 //    @Operation(summary = "All dentists follow status")
@@ -141,7 +141,7 @@ public class UserController {
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
-            return ResponseEntity.ok(clinicService.findAllClinics());
+            return ResponseEntity.ok(clinicService.findAll());
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -189,7 +189,7 @@ public class UserController {
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
-
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
@@ -226,7 +226,11 @@ public class UserController {
 
         return ResponseEntity.ok("Password has been reset successfully");
     }
+    @GetMapping("/booking-page")
+    public void getAvailableClinic(ModelMap modelMap){
+        modelMap.addAttribute("ClinicList", clinicService.findAllClinicsByStatus());
 
+    }
 
 
 }
