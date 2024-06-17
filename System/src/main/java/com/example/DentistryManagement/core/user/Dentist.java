@@ -28,10 +28,12 @@ public class Dentist {
     @JoinColumn(name = "dentistID")
     private Client user;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "staffID", nullable = false, referencedColumnName = "staffID")
     private Staff staff;
