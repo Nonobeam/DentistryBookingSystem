@@ -46,6 +46,7 @@ public class Clinic {
     private Time breakEndTime;
     private int status;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false, referencedColumnName = "userID")
     private Client user;
@@ -70,6 +71,7 @@ public class Clinic {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clinic")
     private List<DentistSchedule> dentistScheduleList;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "clinicList")
     private List<Services> servicesList;
 }

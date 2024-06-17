@@ -50,6 +50,7 @@ public class Dentist {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dentist")
     private List<Appointment> appointmentList;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "DentistService",
             joinColumns = @JoinColumn(name = "dentistID", referencedColumnName = "dentistID"),
