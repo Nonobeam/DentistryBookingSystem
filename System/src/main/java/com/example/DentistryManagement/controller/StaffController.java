@@ -1,9 +1,7 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Services;
-import com.example.DentistryManagement.core.mail.Notification;
 
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.*;
@@ -18,8 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/api/v1/staff")
 @RestController
@@ -30,6 +28,7 @@ public class StaffController {
     private final UserService userService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
+    private final DentistScheduleService dentistScheduleService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
     private final StaffService staffService;
@@ -100,45 +99,43 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
 
+    @Operation(summary = "Set Dentist Schedule")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully set the schedule"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
+    @PostMapping("/set-schedule")
+    public ResponseEntity<?> setDentistSchedule(@RequestParam String dentistID,
+                                                @RequestParam LocalDate startDate,
+                                                @RequestParam LocalDate endDate,
+                                                @RequestParam String timeSlotID,
+                                                @RequestParam String clinicID,
+                                                @RequestParam String serviceID) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail = authentication.getName();
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
+            dentistScheduleService.setDentistSchedule(dentistID, startDate, endDate, timeSlotID, clinicID, serviceID);
+            return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Staff")
+
+    @Operation(summary = "Delete Dentist Schedule")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the schedule"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping()
-    public ResponseEntity<?> receiveNotification() {
+    @DeleteMapping("/delete-schedule")
+    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
+                                                   @RequestParam LocalDate workDate) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail = authentication.getName();
-            Optional<List<Notification>> notice = notificationService.receiveNotice(mail);
-
-            return ResponseEntity.ok(notice);
+            dentistScheduleService.deleteDentistSchedule(dentistID, workDate);
+            return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
