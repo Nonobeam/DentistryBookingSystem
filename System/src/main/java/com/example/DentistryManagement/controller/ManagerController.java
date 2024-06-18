@@ -2,6 +2,8 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
@@ -12,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,28 +27,57 @@ import java.util.List;
 @Tag(name = "Manager API")
 public class ManagerController {
     private final UserService userService;
-    private final DentistService dentistService;
-    private final ClinicService clinicService;
     private final StaffService staffService;
+    private final ClinicService clinicService;
+    private final DentistService dentistService;
+    private final AuthenticationService authenticationService;
+    private final Logger logger = LogManager.getLogger(UserController.class);
 
-    @Operation(summary = "Find dentist by staff")
+
+//---------------------------REGISTER STAFF && DENTIST---------------------------
+@Operation(summary = "Register a new staff member")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully registered"),
+        @ApiResponse(responseCode = "400", description = "Bad request"),
+        @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
+})
+@PostMapping("/register/staff")
+public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody RegisterRequest request,
+                                                            @RequestParam String clinicId) {
+    try {
+        Clinic clinic = clinicService.findClinicByID(clinicId);
+        AuthenticationResponse response = authenticationService.registerStaff(request, clinic);
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(400).body(null);
+    }
+}
+
+
+
+    @Operation(summary = "Register a new dentist")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Successfully registered"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
     })
-    @GetMapping("/{staffID}/all-dentists")
-    public ResponseEntity<List<Dentist>> getDentistByStaff(@PathVariable String staffID) {
-        List<Dentist> dentists;
-        Staff staff;
+    @PostMapping("/register/dentist")
+    public ResponseEntity<AuthenticationResponse> registerDentist(@RequestBody RegisterRequest request,
+                                                                  @RequestParam String clinicId,
+                                                                  @RequestParam String staffId) {
         try {
-            staff = staffService.findStaffById(staffID);
-            dentists = dentistService.findDentistByStaff(staff);
-            return ResponseEntity.ok(dentists);
-        } catch (Error error) {
-            throw new Error("Error while getting dentists " + error);
+            Clinic clinic = clinicService.findClinicByID(clinicId);
+            Staff staff = staffService.findStaffById(staffId);
+            AuthenticationResponse response = authenticationService.registerDentist(request, clinic, staff);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
         }
     }
+
+
+//---------------------------MODIFY CLINIC AND USER---------------------------
+
 
     @Operation(summary = "Edit users")
     @ApiResponses(value = {
@@ -175,5 +208,22 @@ public class ManagerController {
             throw new Error("Error while getting dentists " + error);
         }
     }
-
+    @Operation(summary = "List staff dentist manage")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully registered"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
+    })
+    @GetMapping("/{staffID}/all-dentists")
+    public ResponseEntity<List<Dentist>> getDentistByStaff(@PathVariable String staffID) {
+        List<Dentist> dentists;
+        Staff staff;
+        try {
+            staff = staffService.findStaffById(staffID);
+            dentists = dentistService.findDentistByStaff(staff);
+            return ResponseEntity.ok(dentists);
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
+        }
+    }
 }

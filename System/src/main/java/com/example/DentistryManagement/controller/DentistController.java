@@ -6,6 +6,7 @@ import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,9 +15,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,13 +31,14 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@Tag(name = "User API")
+@Tag(name = "Dentist API")
 public class DentistController {
     private final DentistService dentistService;
     private final UserService userService;
+    private final DentistService dentistService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
-    private final JwtService jwtService;
+
 
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
@@ -80,6 +87,7 @@ public class DentistController {
         }
     }
 
+
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -89,15 +97,21 @@ public class DentistController {
     })
     @PostMapping("/reminder")
     public ResponseEntity<Notification> reminderNotice(@RequestBody Notification notification) {
+        Notification insertedNotification;
         try {
-            String mail = userService.mailExtract();
-            notification.setDentist(userService.findDentistByMail(mail));
-            if (notification != null) {
-                Notification insertedNotification = notificationService.insertNotification(notification);
+            if (notification != null){
+                String mail = userService.mailExtract();
+                notification.setDentist(userService.findDentistByMail(mail));
+                Client client = userService.findClientByMail(mail);
+                LocalDate currentDate = LocalDate.now();
+                LocalTime currentTime = LocalTime.now();
+                notification.setDate(Date.valueOf(currentDate));
+                notification.setTime(Time.valueOf(currentTime));
+                notification.setStatus(0);
 
+                insertedNotification = notificationService.insertNotification(notification);
                 return ResponseEntity.ok(insertedNotification);
-            } else {
-                // lỗi 404
+            }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
@@ -105,7 +119,6 @@ public class DentistController {
                     .body(null);
         }
     }
-
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -211,5 +224,20 @@ public class DentistController {
     }
 
 
-
+    @Operation(summary = "Dentist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/{status}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
+        try {
+            appointment.setStatus(status);
+            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

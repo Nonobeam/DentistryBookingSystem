@@ -25,7 +25,6 @@ import java.util.Optional;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
-    private final AuthenticationService authenticationService;
     private final UserMapping userMapping;
 
     private final ClinicService clinicService;

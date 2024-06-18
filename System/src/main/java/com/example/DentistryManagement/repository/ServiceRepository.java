@@ -18,6 +18,7 @@ public interface ServiceRepository extends JpaRepository<Services, String> {
     List<Services> findAllByServiceIDNotNull();
 
     Services findByServiceID(String serviceID);
+    List<Services> findByClinic(Clinic clinic);
 
 
 }

@@ -1,10 +1,13 @@
 package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +19,11 @@ public interface ClinicRepository extends JpaRepository<Clinic, String> {
 
     List<Clinic> findClinicByStatus(int status);
 List<Clinic> findClinicByUserMail(String mail);
+
+//    Optional<List<Clinic>> getClinicsByUser_UserID(String managerid);
+
+//    @Query(value = "select sc.serviceid from service_clinic sc where sc.clinicid = :clinicId")
+//    List<Services> findServicesByClinicID(@Param("clinicId") String clinicID);
+
+
 }

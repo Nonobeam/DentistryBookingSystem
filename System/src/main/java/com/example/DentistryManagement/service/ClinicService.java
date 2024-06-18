@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
@@ -52,7 +53,7 @@ public Clinic ClinicConfirm(Clinic clinic) {
         return clinicRepository.findByClinicID(clinicID);
     }
 
-    public List<Clinic> findAllClinicsByStatus() {
+    public List<Clinic> findAllClinics() {
         int status = 1;
         List<Clinic> clinics = clinicRepository.findClinicByStatus(status);
 
@@ -64,7 +65,7 @@ public Clinic ClinicConfirm(Clinic clinic) {
     }
 
 
-    public Clinic updateClinicWorkingHours(String clinicId, Time newStartTime, Time newEndTime, Time newStartBreakTime, Time newEndBreakTime) {
+    public Clinic updateClinicWorkingHours(String clinicId, LocalTime newStartTime, LocalTime newEndTime, LocalTime newStartBreakTime, LocalTime newEndBreakTime) {
         Clinic clinic = clinicRepository.findById(clinicId).orElseThrow(() -> new RuntimeException("Clinic not found"));
 
         // Update clinic's working hours
@@ -84,11 +85,11 @@ public Clinic ClinicConfirm(Clinic clinic) {
     private List<TimeSlot> generateTimeSlots(Clinic clinic) {
         List<TimeSlot> timeSlots = new ArrayList<>();
 
-        LocalTime openTime = clinic.getOpenTime().toLocalTime();
-        LocalTime closeTime = clinic.getCloseTime().toLocalTime();
-        LocalTime breakStartTime = clinic.getBreakStartTime().toLocalTime();
-        LocalTime breakEndTime = clinic.getBreakEndTime().toLocalTime();
-        LocalTime slotDuration = clinic.getSlotDuration().toLocalTime();
+        LocalTime openTime = clinic.getOpenTime();
+        LocalTime closeTime = clinic.getCloseTime();
+        LocalTime breakStartTime = clinic.getBreakStartTime();
+        LocalTime breakEndTime = clinic.getBreakEndTime();
+        LocalTime slotDuration = clinic.getSlotDuration();
 
         int slotNumber = 1;
         LocalTime currentTime = openTime;
