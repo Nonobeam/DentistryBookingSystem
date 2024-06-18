@@ -60,6 +60,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
+
     @Operation(summary = "Find a user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -71,27 +72,6 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserByID(userID));
     }
 
-//    @Operation(summary = "All dentists follow status")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found")
-//    })
-//    @GetMapping("/allDentist/{status}")
-//    public ResponseEntity<List<Client>> findAllDentistsByStatus(@PathVariable int status, @PathVariable Role role) {
-//        return ResponseEntity.ok(dentistService.findAllDentistsByStatus(status, role));
-//    }
-
-//    @Operation(summary = "Get schedule for a dentist")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found")
-//    })
-//    @GetMapping("/dentist/schedule/{dentistID}")
-//    public ResponseEntity<Schedule> findAllDentistsByStatus(@PathVariable UUID dentistID, @Param("date")LocalDate date) {
-//        return ResponseEntity.ok(dentistService.getDentistSchedule(dentistID, date));
-//    }
 
     @PostMapping("/sendMail/{mail}")
     public String sendMail(@PathVariable String mail, @RequestBody Notification notificationStructure) {
