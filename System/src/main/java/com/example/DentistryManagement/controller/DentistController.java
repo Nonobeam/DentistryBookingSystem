@@ -34,9 +34,10 @@ import java.util.stream.Collectors;
 @Tag(name = "Dentist API")
 public class DentistController {
     private final UserService userService;
+    private final DentistService dentistService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
-    private final DentistService dentistService;
+
 
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
