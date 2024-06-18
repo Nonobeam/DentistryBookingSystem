@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
@@ -89,4 +90,5 @@ public class ClinicService {
         }
         return timeSlots;
     }
+
 }
