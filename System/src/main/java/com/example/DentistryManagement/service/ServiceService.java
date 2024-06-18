@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Services;
+import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.repository.ServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +15,7 @@ import java.util.List;
 public class ServiceService {
     private static final Logger LOGGER = LogManager.getLogger(ServiceService.class);
     private final ServiceRepository serviceRepository;
+    private final DentistRepository dentistRepository;
 
 //    public List<Services> findAllServices() {
 //        List<Services> services;
@@ -24,6 +26,7 @@ public class ServiceService {
 //            throw new Error("Error while fetch data from JPA");
 //        }
 //    }
+
 
     public Services findServiceByID(String servicesID) {
         Services service;
