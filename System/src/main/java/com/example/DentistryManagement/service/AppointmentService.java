@@ -115,7 +115,7 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
         try {
-            return appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startOfWeek, endOfWeek,1,2);
+            return Optional.ofNullable(appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startOfWeek, endOfWeek, 1, 2));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -135,9 +135,16 @@ public class AppointmentService {
             throw new RuntimeException(e);
         }
     }
-    public Optional<List<Appointment>> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
-        return appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff,1,2);
+    public Map<Dentist, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date,Staff staff) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff,1, 2);
+        Map<Dentist, List<Appointment>> appointmentsByDentist = new HashMap<>();
 
+        for (Appointment appointment : appointments) {
+            Dentist dentist = appointment.getDentist();
+            appointmentsByDentist.computeIfAbsent(dentist, k -> new ArrayList<>()).add(appointment);
+        }
+
+        return appointmentsByDentist;
     }
 
     public Map<Integer, Long> getMonthlyAppointmentsByDentist(int year, int month, LocalDate startDate, LocalDate endDate, Staff staff) {
@@ -171,6 +178,40 @@ public class AppointmentService {
 
             // Tổng hợp số lượng cuộc hẹn trong tháng vào tổng số lượng của năm
             monthlyCounts.forEach((key, value) -> yearlyAppointmentCounts.merge(currentMonth, value, Long::sum));
+        }
+
+        return yearlyAppointmentCounts;
+    }
+    public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date,1, 2);
+        Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
+
+        for (Appointment appointment : appointments) {
+            Clinic clinic = appointment.getClinic();
+            appointmentsByClinic.computeIfAbsent(clinic, k -> new ArrayList<>()).add(appointment);
+        }
+
+        return appointmentsByClinic;
+    }
+
+    // Method to get yearly appointments by clinics
+    public Map<String, Map<Integer, Long>> getAppointmentsByClinicsForYear(int year) {
+        Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
+
+        for (int month = 1; month <= 12; month++) {
+            LocalDate startDate = LocalDate.of(year, month, 1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startDate, endDate, 1, 2);
+            if(!appointments.isEmpty()) {
+                for (Appointment appointment : appointments) {
+                    Clinic clinic = appointment.getClinic();
+                    String clinicid = clinic.getClinicID();
+                    yearlyAppointmentCounts.putIfAbsent(clinicid, new HashMap<>());
+                    Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicid);
+                    monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
+                }
+            }
+
         }
 
         return yearlyAppointmentCounts;

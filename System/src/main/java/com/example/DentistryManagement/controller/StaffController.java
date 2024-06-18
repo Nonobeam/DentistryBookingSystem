@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.DashboardResponse;
 import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
@@ -9,6 +10,7 @@ import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.*;
@@ -397,39 +399,23 @@ public class StaffController {
         }
     }
 
-    @GetMapping("/daily-appointments")
-    public ResponseEntity<Optional<List<Appointment>>> getDailyAppointments(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardResponse> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
         try {
-
-            Staff staff =userService.findStaffByMail(userService.mailExtract());
-            if (staff == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-
-            Optional<List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
-
-            return ResponseEntity.ok(dailyAppointments);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    @GetMapping("/monthly-appointments")
-    public ResponseEntity<Map<Integer, Long>> getMonthlyAppointments(@RequestParam("year") int year) {
-        try {
-            // Lấy thông tin staff từ staffId
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            // Lấy số lượng cuộc hẹn của từng nha sĩ do staff quản lý trong năm
-            Map<Integer, Long> appointmentsByMonth = appointmentService.getAppointmentsByStaffForYear(staff, year);
+            Map<Dentist, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date,staff);
+            Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
 
-            return ResponseEntity.ok(appointmentsByMonth);
+            DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments);
+
+            return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 
 }

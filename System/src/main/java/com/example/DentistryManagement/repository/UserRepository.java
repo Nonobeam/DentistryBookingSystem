@@ -1,14 +1,11 @@
 package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Role;
-import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +40,8 @@ public interface UserRepository extends JpaRepository<Client, String> {
     boolean findClientByMailOrPhone(String mail, String phone);
     Client findClientByMail(String mail);
     boolean existsByPhoneOrMail(String phone, String mail);
-    Optional<List<Client>> searchClientByRoleAndFirstNameOrLastName(Role role,String search,String key);
+    Optional<List<Client>> searchClientByRoleAndFirstNameOrLastName(Role role, String search, String key);
+    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String searchname, String searchlast, String mail);
 
+    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String search1, String search2, String search3);
 }

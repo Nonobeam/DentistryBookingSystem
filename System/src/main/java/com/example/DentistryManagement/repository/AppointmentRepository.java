@@ -3,7 +3,6 @@ package com.example.DentistryManagement.repository;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -28,10 +27,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     Appointment findAppointmentByAppointmentID(String appointmentID);
     Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client client, int status);
 
-    Optional<List<Appointment>> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek,int status,int status2);
+    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2);
 
     Optional<List<Appointment>> searchAppointmentByDateAndUser_FirstNameOrUser_LastNameOrDependent_FirstNameOrDependent_LastName(LocalDate date,String firstname, String lastname,String depenFirst, String depenLast);
-    Optional<List<Appointment>> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff,int status,int status2);
+    List<Appointment> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff, int status, int status2);
     Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff,int status,int status2);
 
+    List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
 }
