@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Services, String> {
 
-    @Query("SELECT s " +
-            "FROM Service s " +
-            "JOIN DentistSchedule ds ON s = ds.service where ds.workDate= :bookDate and ds.available=1 and ds.clinic = :clinic")
-    List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic);
-    List<Services> findAllByServiceIDNotNull();
+//    @Query("SELECT s " +
+//            "FROM Service s " +
+//            "JOIN DentistSchedule ds ON s = ds.service where ds.workDate= :bookDate and ds.available=1 and ds.clinic = :clinic")
+//    List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic);
+//    List<Services> findAllByServiceIDNotNull();
 
     Services findByServiceID(String serviceID);
 
