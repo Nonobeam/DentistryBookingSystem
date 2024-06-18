@@ -60,9 +60,13 @@ public class DentistScheduleService {
             schedule.setClinic(clinic);
             schedule.setServices(services);
             schedules.add(schedule);
-
+            schedule.setAvailable(1);
             date = date.plusDays(1);
         }
         dentistScheduleRepository.saveAll(schedules);
+    }
+
+    public DentistSchedule findByScheduleId(String scheduleId){
+        return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 }
