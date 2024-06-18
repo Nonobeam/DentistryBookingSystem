@@ -20,5 +20,6 @@ public interface ServiceRepository extends JpaRepository<Services, String> {
 
     Services findByServiceID(String serviceID);
 
+//    List<Services> findByDentistID(String dentistID);
 
 }

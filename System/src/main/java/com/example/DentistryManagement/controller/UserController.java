@@ -6,7 +6,6 @@ import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
@@ -25,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Provider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +47,7 @@ public class UserController {
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
     private final Logger LOGGER = LogManager.getLogger(UserController.class);
+    private final ServiceService serviceService;
 
     @Operation(summary = "All users")
     @ApiResponses(value = {
@@ -143,7 +142,6 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
@@ -153,23 +151,39 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{clinicID}")
-    public ResponseEntity<List<Clinic>> getClinic(@PathVariable String clinicID) {
-        try {
-            return ResponseEntity.ok(clinicService.findAllClinics());
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
+//    //Hiện ra các services cho người dùng chọn
+//    @Operation(summary = "Get services of clinic")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+//    @GetMapping("/{clinicID}")
+//    public ResponseEntity<List<Services>> getServiceFromClinic(
+//            @PathVariable String clinicID){
+//        try {
+//            return ResponseEntity.ok(clinicService.getAllServices(clinicID));
+//        } catch (Error error) {
+//            throw new Error("Error while getting services" + error);
+//        }
+//    }
 
+    @Operation(summary = "Show available schedules")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @GetMapping("/{clinicID}/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
-            @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic,
-            @RequestParam Services services) {
+            @RequestParam LocalDate workDate,
+            @PathVariable String clinicID,
+            @RequestParam String servicesId) {
 
         Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(bookDate, services, 1, clinic);
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID);
 
         return dentistScheduleList
                 .map(ResponseEntity::ok)
