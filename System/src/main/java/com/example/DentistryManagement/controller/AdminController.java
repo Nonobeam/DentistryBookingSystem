@@ -2,10 +2,14 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.service.AuthenticationService;
+import com.example.DentistryManagement.service.ClinicService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,8 +33,8 @@ import java.util.Optional;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
-    private final AuthenticationService authenticationService;
     private final UserMapping userMapping;
+
 
 //    @Operation(summary = "Admin")
 //    @ApiResponses(value = {

@@ -21,7 +21,11 @@ public class DentistService {
     private final UserRepository userRepository;
     private final DentistRepository dentistRepository;
 
-    public Optional<List<Client>> getAllDentistsByStatus(int status) {
+    public List<Dentist> findAllDentist() {
+        return dentistRepository.findAll();
+    }
+
+    public Optional<List<Client>> findAllDentistsByStatus(int status) {
         Role role = Role.DENTIST;
         return userRepository.findClientsByRoleAndStatus(role, status);
     }
@@ -56,5 +60,12 @@ public class DentistService {
         }
     }
 
+    public Dentist save(Dentist dentist) {
+        try {
+            return dentistRepository.save(dentist);
+        } catch (Error error) {
+            throw error;
+        }
+    }
 }
        

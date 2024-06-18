@@ -28,6 +28,7 @@ public class AuthenticationController {
         return authenticationService.register(request, role);
     }
 
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> customerRegister(
             @RequestBody RegisterRequest request
@@ -36,13 +37,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(register(request, role));
     }
 
-    @PostMapping("/staffs-register/{role}")
-    public ResponseEntity<AuthenticationResponse> dentistRegister(
-            @PathVariable Role role,
-            @RequestBody RegisterRequest request
-    ) {
-        return ResponseEntity.ok(register(request, role));
-    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
