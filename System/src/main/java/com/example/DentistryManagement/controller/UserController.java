@@ -6,6 +6,8 @@ import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,6 +47,8 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ClinicService clinicService;
+    private final AppointmentRepository appointmentRepository;
+    private final Logger LOGGER = LogManager.getLogger(UserController.class);
 
     @Operation(summary = "All users")
     @ApiResponses(value = {
@@ -143,11 +149,20 @@ public class UserController {
         try {
             return ResponseEntity.ok(clinicService.findAllClinics());
         } catch (Error error) {
-            throw new Error("Error while getting dentists " + error);
+            throw new Error("Error while getting clinic " + error);
         }
     }
 
-    @GetMapping("/available-schedules")
+    @GetMapping("/{clinicID}")
+    public ResponseEntity<List<Clinic>> getClinic(@PathVariable String clinicID) {
+        try {
+            return ResponseEntity.ok(clinicService.findAllClinics());
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
+
+    @GetMapping("/{clinicID}/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
             @RequestParam LocalDate bookDate,
             @RequestParam Clinic clinic,
@@ -162,7 +177,6 @@ public class UserController {
     }
 
 
-
     @Operation(summary = "Booking")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -170,12 +184,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking")
-    public ResponseEntity<Appointment> makeBooking( @RequestBody DentistSchedule dentistSchedule) {
+    @PostMapping("/make-booking/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String mail= authentication.getName();
             Client client = userService.findClientByMail(mail);
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
                 throw new Error("Over booked for today!");
             }
@@ -189,7 +204,10 @@ public class UserController {
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
-
+            newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setStatus(1);
+            dentistSchedule.setAvailable(0);
+            appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
@@ -197,6 +215,31 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+//    @Operation(summary = "Delete appointments")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+//    })
+////    @PutMapping("/delete-booking/{id}")
+////    public ResponseEntity<Appointment> deleteBooking(@PathVariable String appointmentId) {
+////        try {
+////            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+////            DentistSchedule dentistSchedule = dentistScheduleService.getByWorkDateAndServiceAndAvailableAndClinic(appointment.getDate()
+////            ,appointment.getServices(),1,appointment.getClinic());
+////            appointment.setStatus(0);
+////
+////
+////        }catch (Error e){
+////            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+////        }catch(Exception e){
+////            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+////        }
+////
+////    }
+
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
         Client user = userRepository.findByMail(mail).orElse(null);

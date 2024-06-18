@@ -48,7 +48,7 @@ public class ClinicService {
     }
 
 
-    public Clinic updateClinicWorkingHours(String clinicId, Time newStartTime, Time newEndTime, Time newStartBreakTime, Time newEndBreakTime) {
+    public Clinic updateClinicWorkingHours(String clinicId, LocalTime newStartTime, LocalTime newEndTime, LocalTime newStartBreakTime, LocalTime newEndBreakTime) {
         Clinic clinic = clinicRepository.findById(clinicId).orElseThrow(() -> new RuntimeException("Clinic not found"));
 
         // Update clinic's working hours
@@ -68,11 +68,11 @@ public class ClinicService {
     private List<TimeSlot> generateTimeSlots(Clinic clinic) {
         List<TimeSlot> timeSlots = new ArrayList<>();
 
-        LocalTime openTime = clinic.getOpenTime().toLocalTime();
-        LocalTime closeTime = clinic.getCloseTime().toLocalTime();
-        LocalTime breakStartTime = clinic.getBreakStartTime().toLocalTime();
-        LocalTime breakEndTime = clinic.getBreakEndTime().toLocalTime();
-        LocalTime slotDuration = clinic.getSlotDuration().toLocalTime();
+        LocalTime openTime = clinic.getOpenTime();
+        LocalTime closeTime = clinic.getCloseTime();
+        LocalTime breakStartTime = clinic.getBreakStartTime();
+        LocalTime breakEndTime = clinic.getBreakEndTime();
+        LocalTime slotDuration = clinic.getSlotDuration();
 
         int slotNumber = 1;
         LocalTime currentTime = openTime;
