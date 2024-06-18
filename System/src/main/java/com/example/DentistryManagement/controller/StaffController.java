@@ -34,22 +34,22 @@ public class StaffController {
     private final StaffService staffService;
 
 
-    @Operation(summary = "All Services in System")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/all-services")
-    public ResponseEntity<List<Services>> getAllServices() {
-        try {
-            return ResponseEntity.ok(serviceService.findAllServices());
-        } catch (Error error) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+//    @Operation(summary = "All Services in System")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found"),
+//            @ApiResponse(responseCode = "500", description = "Error")
+//
+//    })
+//    @GetMapping("/all-services")
+//    public ResponseEntity<List<Services>> getAllServices() {
+//        try {
+//            return ResponseEntity.ok(serviceService.findAllServices());
+//        } catch (Error error) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
 
     @Operation(summary = "All Services in System")
     @ApiResponses(value = {
