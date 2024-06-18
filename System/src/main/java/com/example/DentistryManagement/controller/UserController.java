@@ -114,21 +114,21 @@ public class UserController {
         }
     }
 
-    @GetMapping("/available-service")
-    public ResponseEntity<List<Services>> getAvailableServices(
-            @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic) {
-
-        List<Services> dentistService;
-        try {
-            dentistService = dentistScheduleService
-                    .getServiceNotNullByDate(bookDate, clinic);
-            return ResponseEntity.ok(dentistService);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+//    @GetMapping("/available-service")
+//    public ResponseEntity<List<Services>> getAvailableServices(
+//            @RequestParam LocalDate bookDate,
+//            @RequestParam Clinic clinic) {
+//
+//        List<Services> dentistService;
+//        try {
+//            dentistService = dentistScheduleService
+//                    .getServiceNotNullByDate(bookDate, clinic);
+//            return ResponseEntity.ok(dentistService);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
     @Operation(summary = "All Clinics")
     @ApiResponses(value = {

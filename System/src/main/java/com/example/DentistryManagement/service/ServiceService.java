@@ -15,15 +15,15 @@ public class ServiceService {
     private static final Logger LOGGER = LogManager.getLogger(ServiceService.class);
     private final ServiceRepository serviceRepository;
 
-    public List<Services> findAllServices() {
-        List<Services> services;
-        try {
-            services = serviceRepository.findAllByServiceIDNotNull();
-            return services;
-        } catch (Error error) {
-            throw new Error("Error while fetch data from JPA");
-        }
-    }
+//    public List<Services> findAllServices() {
+//        List<Services> services;
+//        try {
+//            services = serviceRepository.findAllByServiceIDNotNull();
+//            return services;
+//        } catch (Error error) {
+//            throw new Error("Error while fetch data from JPA");
+//        }
+//    }
 
     public Services findServiceByID(String servicesID) {
         Services service;
