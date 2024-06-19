@@ -29,15 +29,13 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByWorkDateAndServices_ServiceIDAndAvailableAndClinic_ClinicID(workDate, serviceId, available, clinicId);
     }
 
-
-
-//    public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
-//        try{
-//            return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
-//        }catch (Error e){
-//            throw e;
-//        }
-//    }
+    public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
+        try{
+            return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
+        }catch (Error e){
+            throw e;
+        }
+    }
 
     public void deleteDentistSchedule(String dentistID, LocalDate workDate) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
@@ -70,5 +68,10 @@ public class DentistScheduleService {
 
     public DentistSchedule findByScheduleId(String scheduleId){
         return dentistScheduleRepository.findByScheduleID(scheduleId);
+    }
+
+    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule) {
+        dentistSchedule.setAvailable(0);
+        return dentistScheduleRepository.save(dentistSchedule);
     }
 }
