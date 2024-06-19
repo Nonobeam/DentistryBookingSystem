@@ -99,9 +99,11 @@ public class DentistController {
         Notification insertedNotification;
         try {
             if (notification != null){
-                String mail = userService.mailExtract();
-                notification.setDentist(userService.findDentistByMail(mail));
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                String mail = authentication.getName();
                 Client client = userService.findClientByMail(mail);
+                Dentist dentist = dentistService.findDentistByID(client.getUserID());
+                notification.setDentist(dentist);
                 LocalDate currentDate = LocalDate.now();
                 LocalTime currentTime = LocalTime.now();
                 notification.setDate(Date.valueOf(currentDate));
@@ -128,7 +130,8 @@ public class DentistController {
     @PostMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory() {
         try {
-            String mail = userService.mailExtract();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
             Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(mail);
             return ResponseEntity.ok(appointmentlist);
         } catch (Exception e) {
@@ -148,22 +151,21 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-            String mail = userService.mailExtract();
-            UserDTO userDTO = new UserDTO();
-            Client client = userService.userInfo(id);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+            UserDTO userDTO =new UserDTO();
+            Client client= userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment = appointmentService.customerAppointfollowdentist(id, mail);
+            Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,mail);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
             return ResponseEntity.ok(userAppointDTO);
-
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
