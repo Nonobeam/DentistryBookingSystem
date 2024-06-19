@@ -23,6 +23,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,14 +45,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Staff API")
 public class StaffController {
-    // private MailService emailService;
+    private final ClinicService clinicService;
+    private final MailService emailService;
     private final UserService userService;
+    private final StaffService staffService;
+    private final ServiceService serviceService;
+    private final DentistService dentistService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private final DentistScheduleService dentistScheduleService;
-    private final ServiceService serviceService;
-    private final DentistService dentistService;
-    private final StaffService staffService;
+    private final Logger LOGGER = LogManager.getLogger(UserController.class);
+
+
 //---------------------------GET ALL SERVICES, CLINIC IN THE WORKING CLINIC---------------------------
 
 
@@ -70,28 +77,6 @@ public class StaffController {
             Clinic clinic = staff.getClinic();
 
             return ResponseEntity.ok(serviceService.findServicesByClinic(clinic.getClinicID()));
-        } catch (Error error) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    @Operation(summary = "All Services in System")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/set-service/{dentistID}")
-    public ResponseEntity<Dentist> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
-        Dentist dentist;
-        Services service;
-        try {
-            dentist = dentistService.findDentistByID(dentistID);
-            service = serviceService.findServiceByID(serviceID);
-            dentist.getServicesList().add(service);
-
-            return ResponseEntity.ok(dentist);
         } catch (Error error) {
             return ResponseEntity.badRequest().build();
         }
@@ -124,26 +109,47 @@ public class StaffController {
 
 
 //---------------------------MANAGE DENTIST---------------------------
-@Operation(summary = "Staff")
-@ApiResponses(value = {
+
+    @Operation(summary = "All Services in System")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
+
+    })
+    @GetMapping("/set-service/{dentistID}")
+    public ResponseEntity<Dentist> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
+        Dentist dentist;
+        Services service;
+        try {
+            dentist = dentistService.findDentistByID(dentistID);
+            service = serviceService.findServiceByID(serviceID);
+            dentist.getServicesList().add(service);
+
+            return ResponseEntity.ok(dentist);
+        } catch (Error error) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
+    @Operation(summary = "Staff")
+    @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully"),
         @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
         @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "500", description = "Error")
 
-})
-@GetMapping("/dentistList")
-public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
-    try {
+    })
+    @GetMapping("/dentistList")
+    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
+        try {
+            String mail = userService.mailExtract();
+            Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
 
-        String mail = userService.mailExtract();
-
-        Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
-
-        // Kiểm tra nếu danh sách clients không rỗng và tồn tại
-        if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-            // Chuyển đổi danh sách Client sang danh sách ClientDTO
-            List<UserDTO> clientDTOs = clientsOptional.get().stream()
+            if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
+                List<UserDTO> clientDTOs = clientsOptional.get().stream()
                     .map(client -> {
                         UserDTO clientDTO = new UserDTO();
                         clientDTO.setFirstName(client.getFirstName());
@@ -156,16 +162,17 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
                     })
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(Optional.of(clientDTOs));
-
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                return ResponseEntity.ok(Optional.of(clientDTOs));
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    } catch (Exception e) {
-        // Xử lý ngoại lệ
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-}  @Operation(summary = "Staff")
+
+
+    @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -176,9 +183,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
     @GetMapping("/dentist/{id}")
     public ResponseEntity<?> findDentistInformationByStaff(@PathVariable("id") String id) {
         try {
-
-            UserDTO userDTO =new UserDTO();
-            Client client= userService.userInfo(id);
+            UserDTO userDTO = new UserDTO();
+            Client client = userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
@@ -191,10 +197,10 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             userAppointDTO.setAppointment(appointment);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @Operation(summary = "Set Dentist Schedule")
     @ApiResponses(value = {
@@ -234,7 +240,11 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    //---------------------------MANAGE CUSTOMER---------------------------
+
+
+//---------------------------MANAGE CUSTOMER---------------------------
+
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -244,15 +254,12 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
 
     })
     @GetMapping("/customerList")
-    public ResponseEntity<Optional<List<UserDTO>>> findAllCusManage() {
+    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerManage() {
         try {
             String mail = userService.mailExtract();
-
             Optional<List<Client>> clientsOptional = userService.findCustomerinClinic(mail);
 
-            // Kiểm tra nếu danh sách clients không rỗng và tồn tại
             if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
@@ -266,7 +273,6 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
                         .collect(Collectors.toList());
 
                 return ResponseEntity.ok(Optional.of(clientDTOs));
-
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
@@ -275,6 +281,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -305,8 +313,38 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    //---------------------------MANAGE APPOINTMENT---------------------------
-    @Operation(summary = "Staff")
+
+
+//---------------------------MANAGE APPOINTMENT---------------------------
+
+
+    @Operation(summary = "Send mail for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the schedule"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/{notificationID}/send-email")
+    public ResponseEntity<?> sendEmail(@PathVariable String notificationID,
+                                       @RequestParam String mail,
+                                       @RequestParam String subject,
+                                       @RequestParam String text) {
+        Optional<Notification> optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
+        if (optionalNotification.isPresent()) {
+            Notification notification = optionalNotification.get();
+
+            emailService.sendSimpleMessage(mail, subject, text);
+            notification.setStatus(1);
+
+            notificationService.save(notification);
+            return ResponseEntity.ok("Mail send successfully");
+        } else {
+            throw new IllegalArgumentException("Notification not found with ID: " + notificationID);
+        }
+    }
+
+
+    @Operation(summary = "Get all notification in the clinic")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -314,7 +352,6 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-
     @GetMapping()
     public ResponseEntity<?> receiveNotification() {
         try {
@@ -328,6 +365,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -347,11 +386,13 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @GetMapping("/available-service")
     public ResponseEntity<List<Services>> getAvailableServices(
             @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic) {
-
+            @RequestParam Clinic clinic
+    ){
         List<Services> dentistService;
         try {
             dentistService = dentistScheduleService
@@ -361,6 +402,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @Operation(summary = "Show available schedules")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -422,6 +465,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -438,6 +483,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -446,6 +493,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
+
+
     @GetMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
         try {
@@ -457,6 +506,8 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     @GetMapping("/appointment-history/{appointmentid}")
     public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
 
@@ -488,7 +539,7 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
     }
 
     @GetMapping("/dashboard")
-    public ResponseEntity<DashboardResponse> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<DashboardResponse> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
@@ -505,16 +556,4 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-//    @Operation(summary = "Send mail for user")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully deleted the schedule"),
-//            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-//            @ApiResponse(responseCode = "500", description = "Internal server error")
-//    })
-//    @PostMapping("/{dentistID}/send-email")
-//    public String sendEmail(@PathVariable String dentistID, @RequestBody Mail mail) {
-//        emailService.sendSimpleMessage(mail.getTo(), mail.getSubject(), mail.getText());
-//        return "Email sent successfully";
-//    }
 }
