@@ -49,26 +49,26 @@ public class DentistController {
     @PostMapping("/appointment-today")
     public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentList() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
+            String mail = userService.mailExtract();
             Optional<List<Appointment>> appointlist = appointmentService.findAppointByDentist(mail);
             if (appointlist.isPresent() && !appointlist.get().isEmpty()) {
+                // Chuyển đổi danh sách Client sang danh sách ClientDTO
                 List<AppointmentDTO> applist = appointlist.get().stream()
                         .map(appointmentriu -> {
                             AppointmentDTO appointment = new AppointmentDTO();
                             appointment.setServices(appointmentriu.getServices());
                             appointment.setStatus(appointmentriu.getStatus());
                             appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
-                            if (appointmentriu.getStaff()!=null){
-                                if(appointmentriu.getUser() != null){
+                            if (appointmentriu.getStaff() != null) {
+                                if (appointmentriu.getUser() != null) {
                                     appointment.setUser(appointmentriu.getUser());
                                 } else {
                                     appointment.setDependent(appointmentriu.getDependent());
                                 }
-                            }else {
-                                if(appointmentriu.getDependent()!=null){
+                            } else {
+                                if (appointmentriu.getDependent() != null) {
                                     appointment.setDependent(appointmentriu.getDependent());
-                                }else appointment.setUser(appointmentriu.getUser());
+                                } else appointment.setUser(appointmentriu.getUser());
                             }
 
                             return appointment;
@@ -99,11 +99,9 @@ public class DentistController {
         Notification insertedNotification;
         try {
             if (notification != null){
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                String mail= authentication.getName();
+                String mail = userService.mailExtract();
+                notification.setDentist(userService.findDentistByMail(mail));
                 Client client = userService.findClientByMail(mail);
-                Dentist dentist = dentistService.findDentistByID(client.getUserID());
-                notification.setDentist(dentist);
                 LocalDate currentDate = LocalDate.now();
                 LocalTime currentTime = LocalTime.now();
                 notification.setDate(Date.valueOf(currentDate));
@@ -120,8 +118,6 @@ public class DentistController {
                     .body(null);
         }
     }
-
-
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -129,11 +125,10 @@ public class DentistController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/appointment-list")
+    @PostMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
+            String mail = userService.mailExtract();
             Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(mail);
             return ResponseEntity.ok(appointmentlist);
         } catch (Exception e) {
@@ -141,7 +136,6 @@ public class DentistController {
                     .body(null);
         }
     }
-
 
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
@@ -154,49 +148,87 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-                UserDTO userDTO =new UserDTO();
-                Client client= userService.userInfo(id);
-                userDTO.setFirstName(client.getFirstName());
-                userDTO.setPhone(client.getPhone());
-                userDTO.setMail(client.getMail());
-                userDTO.setLastName(client.getLastName());
-                userDTO.setBirthday(client.getBirthday());
-                Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,mail);
-                UserAppointDTO userAppointDTO = new UserAppointDTO();
-                userAppointDTO.setUserDTO(userDTO);
-                userAppointDTO.setAppointment(appointment);
-                return ResponseEntity.ok(userAppointDTO);
-             } catch (Exception e) {
+            String mail = userService.mailExtract();
+            UserDTO userDTO = new UserDTO();
+            Client client = userService.userInfo(id);
+            userDTO.setFirstName(client.getFirstName());
+            userDTO.setPhone(client.getPhone());
+            userDTO.setMail(client.getMail());
+            userDTO.setLastName(client.getLastName());
+            userDTO.setBirthday(client.getBirthday());
+            Optional<List<Appointment>> appointment = appointmentService.customerAppointfollowdentist(id, mail);
+            UserAppointDTO userAppointDTO = new UserAppointDTO();
+            userAppointDTO.setUserDTO(userDTO);
+            userAppointDTO.setAppointment(appointment);
+            return ResponseEntity.ok(userAppointDTO);
+
+        } catch (Exception e) {
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Dentist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
+
+    })
+    @GetMapping("/weekSchedule")
+    public ResponseEntity<Optional<List<Appointment>>> getAppointmentsForDate(
+            @RequestParam String start, @RequestParam String end) {
+        LocalDate startOfWeek = LocalDate.parse(start);
+        LocalDate endOfWeek = LocalDate.parse(end);
+        Optional<List<Appointment>> appointments = appointmentService.getAppointmentsForWeek(startOfWeek, endOfWeek);
+        return ResponseEntity.ok(appointments);
+    }
+
+    @Operation(summary = "Dentist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-history/{appointmentid}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
+
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
+            appointment.setStatus(status);
+            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Dentist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-history/{name}")
+    public ResponseEntity<Optional<List<Appointment>>> setAppointmentStatus(@RequestParam("searchAppointment") LocalDate date, @PathVariable("name") String name) {
+        try {
+            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date,name));
+
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
 
-//    @Operation(summary = "Dentist")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Error")
-//
-//    })
-//    @GetMapping
-//    public ResponseEntity<List<Appointment>> getAppointmentsForDate(
-//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-//    ) {
-//        List<Appointment> appointments = appointmentService.getAppointmentsForDate(date);
-//        return ResponseEntity.ok(appointments);
-//    }
-
-
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully"),
-        @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-        @ApiResponse(responseCode = "404", description = "Not found"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/{status}")
     public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {

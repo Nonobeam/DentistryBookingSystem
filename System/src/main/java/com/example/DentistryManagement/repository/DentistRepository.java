@@ -5,8 +5,11 @@ import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DentistRepository extends JpaRepository<Dentist, String> {
+    Dentist findDentistByUserMail(String mail);
+    Optional<List<Dentist>> findDentistByStaffAndUser_Status(Staff staff, int status);
 
     Dentist findByDentistID(String dentistID);
     List<Dentist> findAllByStaff(Staff staff);
