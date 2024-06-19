@@ -12,7 +12,7 @@ import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 
-import com.example.DentistryManagement.core.mail.Mail;
+//import com.example.DentistryManagement.core.mail.Mail;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Staff API")
 public class StaffController {
-    private MailService emailService;
+    // private MailService emailService;
     private final UserService userService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
@@ -234,7 +234,7 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
+    //---------------------------MANAGE CUSTOMER---------------------------
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -305,7 +305,7 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    //---------------------------MANAGE APPOINTMENT---------------------------
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -361,14 +361,21 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/available-schedules")
+    @Operation(summary = "Show available schedules")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/{clinicID}/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
-            @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic,
-            @RequestParam Services services) {
+            @RequestParam LocalDate workDate,
+            @PathVariable String clinicID,
+            @RequestParam String servicesId) {
 
         Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(bookDate, services, 1, clinic);
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID);
 
         return dentistScheduleList
                 .map(ResponseEntity::ok)
@@ -488,7 +495,7 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            Map<Dentist, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date,staff);
+            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date,staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
 
             DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments);
@@ -499,15 +506,15 @@ public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
         }
     }
 
-    @Operation(summary = "Send mail for user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted the schedule"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/{dentistID}/send-email")
-    public String sendEmail(@PathVariable String dentistID, @RequestBody Mail mail) {
-        emailService.sendSimpleMessage(mail.getTo(), mail.getSubject(), mail.getText());
-        return "Email sent successfully";
-    }
+//    @Operation(summary = "Send mail for user")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully deleted the schedule"),
+//            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+//            @ApiResponse(responseCode = "500", description = "Internal server error")
+//    })
+//    @PostMapping("/{dentistID}/send-email")
+//    public String sendEmail(@PathVariable String dentistID, @RequestBody Mail mail) {
+//        emailService.sendSimpleMessage(mail.getTo(), mail.getSubject(), mail.getText());
+//        return "Email sent successfully";
+//    }
 }

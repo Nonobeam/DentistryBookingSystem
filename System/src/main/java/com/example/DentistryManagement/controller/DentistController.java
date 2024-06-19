@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Dentist API")
 public class DentistController {
-    private final DentistService dentistService;
     private final UserService userService;
     private final DentistService dentistService;
     private final AppointmentService appointmentService;

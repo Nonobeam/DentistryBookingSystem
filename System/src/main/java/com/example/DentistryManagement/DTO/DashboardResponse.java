@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class DashboardResponse {
-    private Map<Dentist, List<Appointment>> dailyAppointments;
+    private Map<String, List<Appointment>> dailyAppointments;
     private Map<Integer, Long> monthlyAppointments;
 
 

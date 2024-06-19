@@ -29,13 +29,7 @@ public class ClinicService {
 //            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
 //        }
 //    }
-public Clinic ClinicConfirm(Clinic clinic) {
-    try {
-        return clinicRepository.save(clinic);
-    } catch (DataAccessException e) {
-        throw new RuntimeException("Error occurred while fetching clinic: " + e.getMessage(), e);
-    }
-}
+
     public List<Clinic> findAll() {
         try {
             return clinicRepository.findAll();

@@ -16,9 +16,7 @@ public interface ServiceRepository extends JpaRepository<Services, String> {
             "JOIN DentistSchedule ds ON s = ds.services where ds.workDate= :bookDate and ds.available=1 and ds.clinic = :clinic")
     List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic);
     List<Services> findAllByServiceIDNotNull();
-
     Services findByServiceID(String serviceID);
-    List<Services> findByClinic(Clinic clinic);
 
 
 }

@@ -135,12 +135,12 @@ public class AppointmentService {
             throw new RuntimeException(e);
         }
     }
-    public Map<Dentist, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date,Staff staff) {
+    public Map<String, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date,Staff staff) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff,1, 2);
-        Map<Dentist, List<Appointment>> appointmentsByDentist = new HashMap<>();
+        Map<String, List<Appointment>> appointmentsByDentist = new HashMap<>();
 
         for (Appointment appointment : appointments) {
-            Dentist dentist = appointment.getDentist();
+            String dentist = appointment.getDentist().getDentistID();
             appointmentsByDentist.computeIfAbsent(dentist, k -> new ArrayList<>()).add(appointment);
         }
 
