@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +29,9 @@ public class DentistScheduleService {
     }
 
     public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
-        try{
+        try {
             return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
-        }catch (Error e){
+        } catch (Error e) {
             throw e;
         }
     }
@@ -66,12 +65,16 @@ public class DentistScheduleService {
         dentistScheduleRepository.saveAll(schedules);
     }
 
-    public DentistSchedule findByScheduleId(String scheduleId){
+    public DentistSchedule findByScheduleId(String scheduleId) {
         return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 
     public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule) {
         dentistSchedule.setAvailable(0);
         return dentistScheduleRepository.save(dentistSchedule);
+    }
+
+    public Optional<List<DentistSchedule>> findDentistScheduleByWorkDateAndTimeSlotAndDentist(TimeSlot timeSlot, LocalDate workDate, Dentist dentist, int status) {
+        return dentistScheduleRepository.findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(timeSlot, workDate, status, dentist);
     }
 }
