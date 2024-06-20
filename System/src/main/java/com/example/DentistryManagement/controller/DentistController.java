@@ -99,9 +99,7 @@ public class DentistController {
         Notification insertedNotification;
         try {
             if (notification != null){
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                String mail = authentication.getName();
-                Client client = userService.findClientByMail(mail);
+                Client client = userService.findClientByMail(userService.mailExtract());
                 Dentist dentist = dentistService.findDentistByID(client.getUserID());
                 notification.setDentist(dentist);
                 LocalDate currentDate = LocalDate.now();

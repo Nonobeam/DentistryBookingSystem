@@ -81,30 +81,6 @@ public class StaffController {
     }
 
 
-    @Operation(summary = "All Dentists manage by a Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/dentist/all")
-    public ResponseEntity<List<Dentist>> getAllDentists() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String mail = authentication.getName();
-
-        Staff staff;
-        List<Dentist> dentists;
-        try {
-            staff = staffService.findStaffByMail(mail);
-            dentists = dentistService.findDentistByStaff(staff);
-            return ResponseEntity.ok(dentists);
-        } catch (Error error) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
 
 //---------------------------MANAGE DENTIST---------------------------
 
@@ -178,7 +154,7 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/dentist/{id}")
+    @GetMapping("/dentistList/{id}")
     public ResponseEntity<?> findDentistInformationByStaff(@PathVariable("id") String id) {
         try {
             UserDTO userDTO = new UserDTO();
