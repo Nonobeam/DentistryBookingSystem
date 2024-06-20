@@ -69,8 +69,8 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 
-    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule) {
-        dentistSchedule.setAvailable(0);
+    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule,int available) {
+        dentistSchedule.setAvailable(available);
         return dentistScheduleRepository.save(dentistSchedule);
     }
 

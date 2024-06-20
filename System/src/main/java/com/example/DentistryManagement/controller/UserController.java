@@ -6,6 +6,7 @@ import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
@@ -118,10 +119,11 @@ public class UserController {
     @GetMapping("/available-service")
     public ResponseEntity<List<Services>> getAvailableServices(
             @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic) {
+            @RequestParam String clinicid) {
 
         List<Services> dentistService;
         try {
+            Clinic clinic = clinicService.findClinicByID(clinicid);
             dentistService = dentistScheduleService
                     .getServiceNotNullByDate(bookDate, clinic);
             return ResponseEntity.ok(dentistService);
@@ -160,13 +162,13 @@ public class UserController {
     public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate,
                                                                            @PathVariable String clinicID) {
         try {
-            HashMap<String,Services> servicesByClinic = new HashMap<>();
+            HashMap<String, Services> servicesByClinic = new HashMap<>();
             Clinic clinic = clinicService.findClinicByID(clinicID);
             List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
             for (DentistSchedule dentistSchedule : dentistScheduleList) {
                 if (dentistSchedule.getWorkDate().equals(workDate)) {
                     if (dentistSchedule.getAvailable() == 1) {
-                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(),dentistSchedule.getServices());
+                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
                     }
                 }
             }
@@ -206,7 +208,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/make-booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId) {
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -225,8 +227,11 @@ public class UserController {
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
             newAppointment.setStatus(1);
-
-            dentistSchedule.setAvailable(0);
+            if (dependentID != null) {
+                Dependent dependent = userService.findDependentByDependentId(dependentID);
+                newAppointment.setDependent(dependent);
+            }
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));

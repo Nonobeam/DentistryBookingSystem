@@ -22,5 +22,5 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
 
     Optional<List<DentistSchedule>> findByWorkDateAndServices(LocalDate workDate, Services service);
 
-    Optional<List<DentistSchedule>> findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(TimeSlot timeSlot, LocalDate date,int available,Dentist dentist);
+    Optional<List<DentistSchedule>> findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(TimeSlot timeSlot, LocalDate date, int available, Dentist dentist);
 }
