@@ -28,6 +28,7 @@ public class Appointment {
     private LocalDate date;
     @Size(max = 251, message = "Over the character limit")
     private String feedback;
+    private String dentistScheduleId;
 
     @ManyToOne
     @JoinColumn(name = "staffID", referencedColumnName = "staffID")
