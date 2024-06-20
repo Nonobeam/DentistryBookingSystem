@@ -14,9 +14,16 @@ The Dentistry Booking System is a comprehensive platform designed to streamline 
 - **Diagram:** [System Diagram](https://app.diagrams.net/#G1-5mSVBvoR6uAEzkfXT2RGAQlZQ2oUZC8#%7B%22pageId%22%3A%22lsPBUERqXHNC8R6fdQQM%22%7D)
 - **Frontend (Vercel):** [Live Frontend](https://dentistry-booking-system-4jgo.vercel.app)
 
+## In case you need your Docker image to run this project
+This below docker image is just for testing Backend in Swagger only, any private Date will not be included inside.
+- **Docker:** [Docker]()
+### Update
+The Docker image link will be updated soon...
+
+
 ## Roles
 - **Bao Thu** (Backend) - [GitHub Profile](https://github.com/Rvt129)
 - **Minh Tuan** (Backend) - [GitHub Profile](https://github.com/Bobjohnd69)
-- **Huu Phuc** - [GitHub Profile](https://github.com/Nonobeam)
-- **Giang Nam** - [GitHub Profile](https://github.com/kinnamss)
-- **Khoa** - [GitHub Profile](https://github.com/khoacutemento)
+- **Huu Phuc** (Backend) - [GitHub Profile](https://github.com/Nonobeam)
+- **Giang Nam** (Frontend) - [GitHub Profile](https://github.com/kinnamss)
+- **Khoa** (Frontend) - [GitHub Profile](https://github.com/khoacutemento)

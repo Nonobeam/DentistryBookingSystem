@@ -30,7 +30,7 @@ public class TimeSlot {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
+    @JoinColumn(name = "clinicID", referencedColumnName = "clinicID")
     private Clinic clinic;
 
     @JsonIgnore

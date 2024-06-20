@@ -34,20 +34,20 @@ public class Clinic {
 
     @NotBlank(message = "Phone number must not be empty")
     @Pattern(regexp = "\\+?[0-9]+", message = "Invalid phone number format")
-    @Size(min = 10, max = 11, message = "Phone number cannot exceed 11 characters")
+    @Size(min = 8, max = 11, message = "Phone number cannot exceed 11 characters")
     private String phone;
     @NotBlank(message = "Address must not be empty")
     private String address;
     @NotBlank(message = "Slot duration must not be empty")
-    private Time slotDuration;
+    private LocalTime slotDuration;
     @NotBlank(message = "Open time must not be empty")
-    private Time openTime;
+    private LocalTime openTime;
     @NotBlank(message = "Close time must not be empty")
-    private Time closeTime;
+    private LocalTime closeTime;
     @NotBlank(message = "Break start time must not be empty")
-    private Time breakStartTime;
+    private LocalTime breakStartTime;
     @NotBlank(message = "Break end time must not be empty")
-    private Time breakEndTime;
+    private LocalTime breakEndTime;
     private int status;
 
     @JsonIgnore

@@ -1,10 +1,12 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -28,6 +30,15 @@ public class ClinicService {
 //        }
 //    }
 
+    public List<Clinic> findAll() {
+        try {
+            return clinicRepository.findAll();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching clinic: " + e.getMessage(), e);
+        }
+    }
+
+
     public Clinic save(Clinic clinic) {
         return clinicRepository.save(clinic);
     }
@@ -48,7 +59,7 @@ public class ClinicService {
     }
 
 
-    public Clinic updateClinicWorkingHours(String clinicId, Time newStartTime, Time newEndTime, Time newStartBreakTime, Time newEndBreakTime) {
+    public Clinic updateClinicWorkingHours(String clinicId, LocalTime newStartTime, LocalTime newEndTime, LocalTime newStartBreakTime, LocalTime newEndBreakTime) {
         Clinic clinic = clinicRepository.findById(clinicId).orElseThrow(() -> new RuntimeException("Clinic not found"));
 
         // Update clinic's working hours
@@ -68,11 +79,11 @@ public class ClinicService {
     private List<TimeSlot> generateTimeSlots(Clinic clinic) {
         List<TimeSlot> timeSlots = new ArrayList<>();
 
-        LocalTime openTime = clinic.getOpenTime().toLocalTime();
-        LocalTime closeTime = clinic.getCloseTime().toLocalTime();
-        LocalTime breakStartTime = clinic.getBreakStartTime().toLocalTime();
-        LocalTime breakEndTime = clinic.getBreakEndTime().toLocalTime();
-        LocalTime slotDuration = clinic.getSlotDuration().toLocalTime();
+        LocalTime openTime = clinic.getOpenTime();
+        LocalTime closeTime = clinic.getCloseTime();
+        LocalTime breakStartTime = clinic.getBreakStartTime();
+        LocalTime breakEndTime = clinic.getBreakEndTime();
+        LocalTime slotDuration = clinic.getSlotDuration();
 
         int slotNumber = 1;
         LocalTime currentTime = openTime;
@@ -88,5 +99,9 @@ public class ClinicService {
             currentTime = currentTime.plusMinutes(slotDuration.getMinute());
         }
         return timeSlots;
+    }
+
+    public List<Clinic> findAllClinicsByManager(String mail) {
+    return clinicRepository.findClinicByUserMail(mail);
     }
 }

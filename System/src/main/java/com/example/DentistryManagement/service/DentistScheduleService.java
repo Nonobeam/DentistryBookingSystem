@@ -25,8 +25,8 @@ public class DentistScheduleService {
     private final DentistRepository dentistRepository;
     private final ClinicRepository clinicRepository;
 
-    public Optional<List<DentistSchedule>> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, Services service, int available, Clinic clinic) {
-        return dentistScheduleRepository.findByWorkDateAndServicesAndAvailableAndClinic(workDate, service, available, clinic);
+    public Optional<List<DentistSchedule>> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
+        return dentistScheduleRepository.findByWorkDateAndServices_ServiceIDAndAvailableAndClinic_ClinicID(workDate, serviceId, available, clinicId);
     }
 
     public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
@@ -60,9 +60,18 @@ public class DentistScheduleService {
             schedule.setClinic(clinic);
             schedule.setServices(services);
             schedules.add(schedule);
-
+            schedule.setAvailable(1);
             date = date.plusDays(1);
         }
         dentistScheduleRepository.saveAll(schedules);
+    }
+
+    public DentistSchedule findByScheduleId(String scheduleId){
+        return dentistScheduleRepository.findByScheduleID(scheduleId);
+    }
+
+    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule) {
+        dentistSchedule.setAvailable(0);
+        return dentistScheduleRepository.save(dentistSchedule);
     }
 }
