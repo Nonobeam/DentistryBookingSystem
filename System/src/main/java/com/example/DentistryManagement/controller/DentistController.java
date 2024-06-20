@@ -149,8 +149,7 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
+
             UserDTO userDTO =new UserDTO();
             Client client= userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
@@ -158,7 +157,7 @@ public class DentistController {
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,mail);
+            Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,userService.mailExtract());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
