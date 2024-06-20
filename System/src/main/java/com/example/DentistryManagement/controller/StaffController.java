@@ -64,9 +64,7 @@ public class StaffController {
     @GetMapping("/all-services")
     public ResponseEntity<List<Services>> getAllServices() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-            Staff staff = staffService.findStaffByMail(mail);
+            Staff staff =userService.findStaffByMail( userService.mailExtract());
             Clinic clinic = staff.getClinic();
 
             return ResponseEntity.ok(serviceService.findServicesByClinic(clinic.getClinicID()));
