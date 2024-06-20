@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.NotificationRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,25 @@ public class NotificationService {
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while create notification: " + e.getMessage(), e);
         }
+    }
+
+    public List<Notification> findNotificationsByDentist(Dentist dentist) {
+        try {
+            return notificationRepository.getNotificationsByDentistAndStatus(dentist, 0);
+        } catch (Error e) {
+            throw e;
+        }
+    }
+
+    public Optional<Notification> findNotificationByIDAndStatus(String notificationID, int status) {
+        try {
+            return notificationRepository.getNotificationByNotificationIDAndStatus(notificationID, status);
+        } catch (Error e) {
+            throw e;
+        }
+    }
+
+    public void save(Notification notification) {
+        notificationRepository.save(notification);
     }
 }
