@@ -129,9 +129,7 @@ public class DentistController {
     @PostMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail = authentication.getName();
-            Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(mail);
+            Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(userService.mailExtract());
             return ResponseEntity.ok(appointmentlist);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
