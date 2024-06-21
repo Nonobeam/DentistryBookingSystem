@@ -17,6 +17,7 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,10 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/staff")
@@ -45,15 +43,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Staff API")
 public class StaffController {
-    private final ClinicService clinicService;
     private final MailService emailService;
     private final UserService userService;
-    private final StaffService staffService;
+    private final ClinicService clinicService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private final DentistScheduleService dentistScheduleService;
+    private final AppointmentRepository appointmentRepository;
     private final Logger LOGGER = LogManager.getLogger(UserController.class);
 
 
@@ -71,37 +69,10 @@ public class StaffController {
     @GetMapping("/all-services")
     public ResponseEntity<List<Services>> getAllServices() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-            Staff staff = staffService.findStaffByMail(mail);
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
             Clinic clinic = staff.getClinic();
 
             return ResponseEntity.ok(serviceService.findServicesByClinic(clinic.getClinicID()));
-        } catch (Error error) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-
-    @Operation(summary = "All Dentists manage by a Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
-    })
-    @GetMapping("/dentist/all")
-    public ResponseEntity<List<Dentist>> getAllDentists() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String mail = authentication.getName();
-
-        Staff staff;
-        List<Dentist> dentists;
-        try {
-            staff = staffService.findStaffByMail(mail);
-            dentists = dentistService.findDentistByStaff(staff);
-            return ResponseEntity.ok(dentists);
         } catch (Error error) {
             return ResponseEntity.badRequest().build();
         }
@@ -136,10 +107,10 @@ public class StaffController {
 
     @Operation(summary = "Staff")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully"),
-        @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-        @ApiResponse(responseCode = "404", description = "Not found"),
-        @ApiResponse(responseCode = "500", description = "Error")
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Error")
 
     })
     @GetMapping("/dentistList")
@@ -150,17 +121,17 @@ public class StaffController {
 
             if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
-                    .map(client -> {
-                        UserDTO clientDTO = new UserDTO();
-                        clientDTO.setFirstName(client.getFirstName());
-                        clientDTO.setPhone(client.getPhone());
-                        clientDTO.setMail(client.getMail());
-                        clientDTO.setLastName(client.getLastName());
-                        clientDTO.setBirthday(client.getBirthday());
+                        .map(client -> {
+                            UserDTO clientDTO = new UserDTO();
+                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setPhone(client.getPhone());
+                            clientDTO.setMail(client.getMail());
+                            clientDTO.setLastName(client.getLastName());
+                            clientDTO.setBirthday(client.getBirthday());
 
-                        return clientDTO;
-                    })
-                    .collect(Collectors.toList());
+                            return clientDTO;
+                        })
+                        .collect(Collectors.toList());
 
                 return ResponseEntity.ok(Optional.of(clientDTOs));
             } else {
@@ -180,8 +151,8 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/dentist/{id}")
-    public ResponseEntity<?> findDentistInformationByStaff(@PathVariable("id") String id) {
+    @GetMapping("/dentistList/{id}")
+    public ResponseEntity<UserAppointDTO> findDentistInformationByStaff(@PathVariable("id") String id) {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
@@ -191,7 +162,7 @@ public class StaffController {
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
 
-            Optional<List<Appointment>> appointment=appointmentService.dentistAppointment(id);
+            Optional<List<Appointment>> appointment = appointmentService.findAllAppointByDentist(id);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
@@ -254,10 +225,10 @@ public class StaffController {
 
     })
     @GetMapping("/customerList")
-    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerManage() {
+    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerByStaff() {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findCustomerinClinic(mail);
+            Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
 
             if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
@@ -292,18 +263,18 @@ public class StaffController {
 
     })
     @GetMapping("/customer/{id}")
-    public ResponseEntity<?> findAllCusByStaff(@PathVariable("id") String id) {
+    public ResponseEntity<?> findCustomerByStaff(@PathVariable("id") String id) {
         try {
             String mail = userService.mailExtract();
 
-            UserDTO userDTO =new UserDTO();
-            Client client= userService.userInfo(id);
+            UserDTO userDTO = new UserDTO();
+            Client client = userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment=appointmentService.customerAppointment(id,mail);
+            Optional<List<Appointment>> appointment = appointmentService.customerAppointment(id, mail);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
@@ -357,7 +328,7 @@ public class StaffController {
         try {
             String mail = userService.mailExtract();
 
-            Optional<List<Notification>> notice = notificationService.receiveNotice(mail) ;
+            Optional<List<Notification>> notice = notificationService.receiveNotice(mail);
 
             return ResponseEntity.ok(notice);
         } catch (Exception e) {
@@ -375,34 +346,63 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid,@RequestParam("status") int status) {
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
 
         try {
-            Appointment appointment= appointmentService.findAppointmentById(appointmentid);
+            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-    @GetMapping("/available-service")
-    public ResponseEntity<List<Services>> getAvailableServices(
-            @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic
-    ){
-        List<Services> dentistService;
-        try {
-            dentistService = dentistScheduleService
-                    .getServiceNotNullByDate(bookDate, clinic);
-            return ResponseEntity.ok(dentistService);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+
+    @Operation(summary = "All Clinics")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/all-clinic")
+    public ResponseEntity<List<Clinic>> getAllClinics() {
+        try {
+            return ResponseEntity.ok(clinicService.findAll());
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
+
+
+    @Operation(summary = "Get All Services By Clinic")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+
+    @GetMapping("/all-service/{clinicID}")
+    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate,
+                                                                           @PathVariable String clinicID) {
+        try {
+            HashMap<String, Services> servicesByClinic = new HashMap<>();
+            Clinic clinic = clinicService.findClinicByID(clinicID);
+            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
+            for (DentistSchedule dentistSchedule : dentistScheduleList) {
+                if (dentistSchedule.getWorkDate().equals(workDate)) {
+                    if (dentistSchedule.getAvailable() == 1) {
+                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
+                    }
+                }
+            }
+            return ResponseEntity.ok(servicesByClinic);
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
 
     @Operation(summary = "Show available schedules")
     @ApiResponses(value = {
@@ -433,31 +433,36 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking")
-    public ResponseEntity<Appointment> makeBooking(@RequestBody DentistSchedule dentistSchedule, @RequestParam String customerid, @RequestParam Optional<String> dependentid ) {
+    @PostMapping("/make-booking/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false)  String dependentID) {
         try {
-            String mail = userService.mailExtract();
-            Client customer = userService.findUserById(customerid);
-            if(!dependentid.isPresent() || !dependentid.isEmpty()){
-                Dependent dependent = userService.findDependentById(dependentid);
-            }
-            Staff staff = userService.findStaffByMail(mail);
-            if (appointmentService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
-                throw new Error("Over booking in today!");
+            Client client = userService.findClientByMail(userService.mailExtract());
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
+                throw new Error("Over booked for today!");
             }
 
             if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
-                throw new Error("Over appointment in this date!");
+                throw new Error("Full appointment for this date!");
             }
             Appointment newAppointment = new Appointment();
-            newAppointment.setUser(customer);
+            newAppointment.setUser(client);
             newAppointment.setServices(dentistSchedule.getServices());
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
-            newAppointment.setStaff(staff);
-            dentistSchedule.setAvailable(0);
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule);
+            newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setStatus(1);
+            if (dependentID != null) {
+                Dependent dependent = userService.findDependentByDependentId(dependentID);
+                newAppointment.setDependent(dependent);
+            }
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
+            otherSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(0));
+            });
+            appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
@@ -475,7 +480,7 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping("/update-appointment")
-    public ResponseEntity <Appointment> updateAppointment(@RequestBody Appointment appointment) {
+    public ResponseEntity<Appointment> updateAppointment(@RequestBody Appointment appointment) {
         try {
             return ResponseEntity.ok(appointmentService.updateAppointment(appointment));
 
@@ -534,7 +539,7 @@ public class StaffController {
     @PostMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> searchAppointmentByStaff(@RequestParam("searchAppointment") LocalDate date, @RequestParam("name") String name) {
         try {
-            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date,name));
+            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -549,7 +554,7 @@ public class StaffController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date,staff);
+            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
 
             DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments);

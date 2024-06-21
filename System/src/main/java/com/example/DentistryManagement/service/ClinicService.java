@@ -102,6 +102,6 @@ public class ClinicService {
     }
 
     public List<Clinic> findAllClinicsByManager(String mail) {
-    return clinicRepository.findClinicByUserMail(mail);
+        return clinicRepository.findClinicByUserMail(mail);
     }
 }

@@ -35,7 +35,7 @@ public class Appointment {
     private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "customerID",nullable = false, referencedColumnName = "userID")
+    @JoinColumn(name = "customerID", nullable = false, referencedColumnName = "userID")
     private Client user;
 
     @ManyToOne
@@ -43,19 +43,19 @@ public class Appointment {
     private Dependent dependent;
 
     @ManyToOne
-    @JoinColumn(name = "timeSlotID",nullable = false, referencedColumnName = "timeSlotID")
+    @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
     private TimeSlot timeSlot;
 
     @ManyToOne
-    @JoinColumn(name = "dentistID",nullable = false, referencedColumnName = "dentistID")
+    @JoinColumn(name = "dentistID", nullable = false, referencedColumnName = "dentistID")
     private Dentist dentist;
 
     @ManyToOne
-    @JoinColumn(name = "serviceID",nullable = false, referencedColumnName = "serviceID")
+    @JoinColumn(name = "serviceID", nullable = false, referencedColumnName = "serviceID")
     private Services services;
 
     @ManyToOne
-    @JoinColumn(name = "clinicID",nullable = false, referencedColumnName = "clinicID")
+    @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
 }

@@ -48,14 +48,6 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> dentistAppointment(String mail) {
-        try {
-            return appointmentRepository.getAppointmentByDentist_User_MailOrderByDateAsc(mail);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
-        }
-    }
-
     public Optional<List<Appointment>> findAppointByDentist(String mail) {
         try {
             return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(),1);

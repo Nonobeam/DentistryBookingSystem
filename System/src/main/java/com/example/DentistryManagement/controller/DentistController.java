@@ -98,10 +98,8 @@ public class DentistController {
     public ResponseEntity<Notification> reminderNotice(@RequestBody Notification notification) {
         Notification insertedNotification;
         try {
-            if (notification != null){
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                String mail = authentication.getName();
-                Client client = userService.findClientByMail(mail);
+            if (notification != null) {
+                Client client = userService.findClientByMail(userService.mailExtract());
                 Dentist dentist = dentistService.findDentistByID(client.getUserID());
                 notification.setDentist(dentist);
                 LocalDate currentDate = LocalDate.now();
@@ -112,7 +110,7 @@ public class DentistController {
 
                 insertedNotification = notificationService.insertNotification(notification);
                 return ResponseEntity.ok(insertedNotification);
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
@@ -120,6 +118,7 @@ public class DentistController {
                     .body(null);
         }
     }
+
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -130,9 +129,7 @@ public class DentistController {
     @PostMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-            Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(mail);
+            Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(userService.mailExtract());
             return ResponseEntity.ok(appointmentlist);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -151,16 +148,15 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-            UserDTO userDTO =new UserDTO();
-            Client client= userService.userInfo(id);
+
+            UserDTO userDTO = new UserDTO();
+            Client client = userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment=appointmentService.customerAppointfollowdentist(id,mail);
+            Optional<List<Appointment>> appointment = appointmentService.customerAppointfollowdentist(id, userService.mailExtract());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
@@ -217,7 +213,7 @@ public class DentistController {
     @GetMapping("/appointment-history/{name}")
     public ResponseEntity<Optional<List<Appointment>>> setAppointmentStatus(@RequestParam("searchAppointment") LocalDate date, @PathVariable("name") String name) {
         try {
-            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date,name));
+            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -237,7 +233,7 @@ public class DentistController {
         try {
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
