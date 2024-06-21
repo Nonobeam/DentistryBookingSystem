@@ -207,7 +207,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking/{dentistScheduleId}")
+    @PostMapping("/booking/{dentistScheduleId}")
     public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
