@@ -24,6 +24,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  confirmation:
+    link:
+      baseurl: http://localhost:8080
+
   cloud:
     gcp:
       sql:
