@@ -61,7 +61,7 @@ public class JwtService {
                     .setClaims(extraClaims)
                     .setSubject(userDetails.getUsername())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 45))
                     .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                     .compact();
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             final String mail = extractMail(token);
-            if (mail.equals(userDetails.getUsername()) && !isTokenExpired(token)){
+            if (mail.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
                 System.out.printf("Validate success");
             } else {
                 System.out.printf("Validate fail");
