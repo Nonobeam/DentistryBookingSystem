@@ -46,7 +46,7 @@ public class ServiceService {
         Clinic clinic;
         try {
             clinic = clinicRepository.findByClinicID(clinicID);
-            services=clinic.getServicesList();
+            services = clinic.getServicesList();
             return services;
         } catch (Error error) {
             throw error;
