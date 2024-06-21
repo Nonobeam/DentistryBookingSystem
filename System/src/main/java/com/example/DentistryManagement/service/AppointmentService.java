@@ -43,7 +43,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> customerAppointfollowdentist(String cusid, String dentist) {
+    public Optional<List<Appointment>> customerAppointmentfollowdentist(String cusid, String dentist) {
         try {
             return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(cusid, dentist, 1, 2);
         } catch (DataAccessException e) {
@@ -51,7 +51,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> findAppointByDentist(String mail) {
+    public Optional<List<Appointment>> findAppointmentByDentist(String mail) {
         try {
             return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(), 1);
         } catch (DataAccessException e) {
@@ -117,19 +117,19 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> searchAppointmentByStaff(LocalDate date, String name,String staffmail) {
         try {
-            Staff staffClient = userRepository.findStaffByUserMail(staffmail);
+            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
 
-            Clinic clinic = staffClient.getClinic();
+            Clinic clinic = staffclient.getClinic();
             return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date,clinic, name, name, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name,String dentistmail) {
+    public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name,String staffmail) {
         try {
-            Dentist dentistClient = userRepository.findDentistByUserMail(dentistmail);
+            Dentist staffclient = userRepository.findDentistByUserMail(staffmail);
 
-            Clinic clinic = dentistClient.getClinic();
+            Clinic clinic = staffclient.getClinic();
             return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date,clinic, name, name, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -226,4 +226,6 @@ public class AppointmentService {
 
         return yearlyAppointmentCounts;
     }
+
+
 }

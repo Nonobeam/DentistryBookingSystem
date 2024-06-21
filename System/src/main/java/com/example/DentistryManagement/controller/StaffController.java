@@ -484,20 +484,6 @@ public class StaffController {
 
     })
 
-
-    @GetMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
-        try {
-            String mail = userService.mailExtract();
-
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
-        } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
     @PutMapping("/appointment-history/{appointmentid}")
     public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
 
@@ -519,7 +505,7 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> searchAppointmentByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
+    public ResponseEntity<Optional<List<Appointment>>> appointmentByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
         try {
             String mail = userService.mailExtract();
             if (date != null || (name != null && !name.isEmpty())) {

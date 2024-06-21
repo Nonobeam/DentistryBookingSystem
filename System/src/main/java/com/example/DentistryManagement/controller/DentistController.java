@@ -50,7 +50,7 @@ public class DentistController {
     public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentList() {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Appointment>> appointlist = appointmentService.findAppointByDentist(mail);
+            Optional<List<Appointment>> appointlist = appointmentService.findAppointmentByDentist(mail);
             if (appointlist.isPresent() && !appointlist.get().isEmpty()) {
                 // Chuyển đổi danh sách Client sang danh sách ClientDTO
                 List<AppointmentDTO> applist = appointlist.get().stream()
@@ -138,7 +138,7 @@ public class DentistController {
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment = appointmentService.customerAppointfollowdentist(id, userService.mailExtract());
+            Optional<List<Appointment>> appointment = appointmentService.customerAppointmentfollowdentist(id, userService.mailExtract());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
@@ -195,9 +195,9 @@ public class DentistController {
     @GetMapping("/appointment-history/")
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false)  String name) {
         try {
+            String mail= userService.mailExtract();
             if(date != null || (name != null && !name.isEmpty())) {
-                String mail = userService.mailExtract();
-                return ResponseEntity.ok(appointmentService.searchAppointmentByDentist(date, name, mail));
+                return ResponseEntity.ok(appointmentService.searchAppointmentByDentist(date, name,mail));
             }else {
                 return ResponseEntity.ok(appointmentService.findAllAppointmentByDentist(userService.mailExtract()));
             }

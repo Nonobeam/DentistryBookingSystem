@@ -68,6 +68,28 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(userID));
     }
 
+//    @Operation(summary = "All dentists follow status")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found")
+//    })
+//    @GetMapping("/allDentist/{status}")
+//    public ResponseEntity<List<Client>> findAllDentistsByStatus(@PathVariable int status, @PathVariable Role role) {
+//        return ResponseEntity.ok(dentistService.findAllDentistsByStatus(status, role));
+//    }
+
+//    @Operation(summary = "Get schedule for a dentist")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully"),
+//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+//            @ApiResponse(responseCode = "404", description = "Not found")
+//    })
+//    @GetMapping("/dentist/schedule/{dentistID}")
+//    public ResponseEntity<Schedule> findAllDentistsByStatus(@PathVariable UUID dentistID, @Param("date")LocalDate date) {
+//        return ResponseEntity.ok(dentistService.getDentistSchedule(dentistID, date));
+//    }
+
     @PostMapping("/sendMail/{mail}")
     public String sendMail(@PathVariable String mail, @RequestBody Notification notificationStructure) {
         notificationService.sendMail(mail, notificationStructure);
@@ -209,7 +231,7 @@ public class UserController {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
                 newAppointment.setDependent(dependent);
             }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));

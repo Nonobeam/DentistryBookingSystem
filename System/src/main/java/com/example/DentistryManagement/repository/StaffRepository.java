@@ -11,5 +11,5 @@ public interface StaffRepository extends JpaRepository<Staff, String> {
 
     Staff findStaffByStaffID(String staffID);
 
-    Dentist findDentistByUserMail(String dentistmail);
+    Dentist findDentistByUserMail(String staffmail);
 }
