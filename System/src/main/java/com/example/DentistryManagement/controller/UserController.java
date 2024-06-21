@@ -2,6 +2,7 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/user")
 @RestController
@@ -113,6 +115,35 @@ public class UserController {
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "All Clinics")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/dependentList")
+    public ResponseEntity<List<Dependent>> getAllDependentByCustomer() {
+        try {
+            String mail = userService.mailExtract();
+            List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
+            return ResponseEntity.ok(dependentsList);
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
+
+    @GetMapping("/dependentNew")
+    public ResponseEntity createDependentByCustomer(@RequestBody Dependent dependent) {
+        try {
+            String mail = userService.mailExtract();
+            dependent.setUser(userService.findClientByMail(mail));
+            return ResponseEntity.ok(userService.saveDependent(dependent));
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
         }
     }
 
@@ -231,7 +262,7 @@ public class UserController {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
                 newAppointment.setDependent(dependent);
             }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));
@@ -276,5 +307,49 @@ public class UserController {
         return ResponseEntity.ok("Password has been reset successfully");
     }
 
+    @Operation(summary = "User API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-history/")
+    public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
+        try {
+            String mail = userService.mailExtract();
+            Optional<List<Appointment>> appointmentList = null;
+            if (date != null || (search != null && !search.isEmpty())) {
+                appointmentList = appointmentService.searchAppointmentByCustomer(date, search, mail);
+            } else {
+                appointmentList = appointmentService.findAllAppointmentByCustomer(userService.mailExtract());
+            }
+            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                        }
+
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(Optional.of(appointmentDTOList));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

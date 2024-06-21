@@ -31,7 +31,8 @@ public class Clinic {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "clinicID")
     private String clinicID;
-
+    @NotBlank(message = "Name must not be empty")
+    private String clinicName;
     @NotBlank(message = "Phone number must not be empty")
     @Pattern(regexp = "\\+?[0-9]+", message = "Invalid phone number format")
     @Size(min = 8, max = 11, message = "Phone number cannot exceed 11 characters")

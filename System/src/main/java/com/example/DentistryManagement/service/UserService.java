@@ -269,4 +269,19 @@ public class UserService {
     }
 
 
+    public List<Dependent> findDependentByCustomer(String mail) {
+        Client customer = userRepository.findClientByMail(mail);
+        return dependentRepository.findByUser(customer);
+    }
+
+
+    public Object saveDependent(Dependent dependent) {
+        try {
+            // Perform necessary validation and business logic here
+            return dependentRepository.save(dependent);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while insert dependent: " + e.getMessage(), e);
+        }
+    }
 }

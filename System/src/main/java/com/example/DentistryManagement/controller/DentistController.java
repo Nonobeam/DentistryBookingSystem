@@ -56,19 +56,20 @@ public class DentistController {
                 List<AppointmentDTO> applist = appointlist.get().stream()
                         .map(appointmentriu -> {
                             AppointmentDTO appointment = new AppointmentDTO();
-                            appointment.setServices(appointmentriu.getServices());
+                            appointment.setServices(appointmentriu.getServices().getName());
                             appointment.setStatus(appointmentriu.getStatus());
                             appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                             if (appointmentriu.getStaff() != null) {
                                 if (appointmentriu.getUser() != null) {
-                                    appointment.setUser(appointmentriu.getUser());
+                                    appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
                                 } else {
-                                    appointment.setDependent(appointmentriu.getDependent());
+                                    appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
                                 }
                             } else {
                                 if (appointmentriu.getDependent() != null) {
-                                    appointment.setDependent(appointmentriu.getDependent());
-                                } else appointment.setUser(appointmentriu.getUser());
+                                    appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                } else
+                                    appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
                             }
 
                             return appointment;
@@ -138,10 +139,32 @@ public class DentistController {
             userDTO.setMail(client.getMail());
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment = appointmentService.customerAppointmentfollowdentist(id, userService.mailExtract());
+            Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(id, userService.mailExtract());
+            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                        }
+
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(appointment);
+            userAppointDTO.setAppointment(Optional.of(appointmentDTOList));
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -193,15 +216,38 @@ public class DentistController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/appointment-history/")
-    public ResponseEntity<Optional<List<Appointment>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false)  String name) {
+    public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
         try {
-            String mail= userService.mailExtract();
-            if(date != null || (name != null && !name.isEmpty())) {
-                return ResponseEntity.ok(appointmentService.searchAppointmentByDentist(date, name,mail));
-            }else {
-                return ResponseEntity.ok(appointmentService.findAllAppointmentByDentist(userService.mailExtract()));
+            String mail = userService.mailExtract();
+            Optional<List<Appointment>> appointmentList = null;
+            if (date != null || (name != null && !name.isEmpty())) {
+                appointmentList = appointmentService.searchAppointmentByDentist(date, name, mail);
+            } else {
+                appointmentList = appointmentService.findAllAppointmentByDentist(userService.mailExtract());
             }
+            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                        }
 
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(Optional.of(appointmentDTOList));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

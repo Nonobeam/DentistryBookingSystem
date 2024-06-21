@@ -10,6 +10,7 @@ import java.time.LocalTime;
 @Setter
 public class ClinicDTO {
     private String phone;
+    private String name;
     private String address;
     private LocalTime slotDuration;
     private LocalTime openTime;

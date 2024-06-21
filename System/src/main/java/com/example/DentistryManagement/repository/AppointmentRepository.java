@@ -6,8 +6,11 @@ import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +35,27 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2);
 
-    Optional<List<Appointment>> findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(LocalDate date,Clinic clinic, String firstname, String lastname, String depenFirst, String depenLast);
+    Optional<List<Appointment>> findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(LocalDate date, Clinic clinic, String firstname, String lastname, String depenFirst, String depenLast);
 
     List<Appointment> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff, int status, int status2);
 
     Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff, int status, int status2);
 
     List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
+
+    Optional<List<Appointment>> findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(LocalDate date, String name, String name1, String name2, String name3, String name4);
+
+    Optional<List<Appointment>> findAppointmentsByUser(Client client);
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year")
+    int countAppointmentsByMonthPresentByBoss(Month month, int year);
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year")
+    int countAppointmentsByYearPresentByBoss(int year);
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and dentist.staff =:staff")
+    int countAppointmentsByMonthPresentByStaff(Month month, int year,Staff staff);
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and dentist.staff =:staff")
+    int countAppointmentsByYearPresentByStaff( int year,Staff staff);
 }

@@ -5,26 +5,29 @@ import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.AppointmentRepository;
-import com.example.DentistryManagement.repository.ClinicRepository;
-import com.example.DentistryManagement.repository.StaffRepository;
+import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
-    private final StaffRepository userRepository;
+    private final StaffRepository staffRepository;
+    private final UserRepository userRepository;
+
+    private final DentistRepository dentistRepository;
+
     private final ClinicRepository clinicRepository;
 
     public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
         try {
-            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
+            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
             Clinic clinic = staffclient.getClinic();
             return appointmentRepository.findAppointmentByClinic(clinic);
@@ -35,7 +38,7 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> customerAppointment(String cusid, String staffmail) {
         try {
-            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
+            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
             Clinic clinic = staffclient.getClinic();
             return appointmentRepository.findAppointmentByUser_UserIDAndClinic(cusid, clinic);
         } catch (DataAccessException e) {
@@ -115,22 +118,43 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> searchAppointmentByStaff(LocalDate date, String name,String staffmail) {
+    public Optional<List<Appointment>> searchAppointmentByStaff(LocalDate date, String name, String staffmail) {
         try {
-            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
+            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
             Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date,clinic, name, name, name, name);
+            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, clinic, name, name, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name,String staffmail) {
+
+    public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name, String staffmail) {
         try {
-            Dentist staffclient = userRepository.findDentistByUserMail(staffmail);
+            Dentist staffclient = dentistRepository.findDentistByUserMail(staffmail);
 
             Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date,clinic, name, name, name, name);
+            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, clinic, name, name, name, name);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Optional<List<Appointment>> searchAppointmentByCustomer(LocalDate date, String name, String mail) {
+        try {
+            Client client = userRepository.findUserByMail(mail);
+
+            return appointmentRepository.findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, name, name, name, name, name);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Optional<List<Appointment>> findAllAppointmentByCustomer(String mail) {
+        try {
+            Client client = userRepository.findUserByMail(mail);
+
+            return appointmentRepository.findAppointmentsByUser(client);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -142,6 +166,22 @@ public class AppointmentService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int totalAppointmentsInMonthByBoss() {
+        return appointmentRepository.countAppointmentsByMonthPresentByBoss(LocalDate.now().getMonth(), LocalDate.now().getYear());
+    }
+
+    public int totalAppointmentsInYearByBoss() {
+        return appointmentRepository.countAppointmentsByYearPresentByBoss(LocalDate.now().getYear());
+    }
+
+    public int totalAppointmentsInMonthByStaff(Staff staff) {
+        return appointmentRepository.countAppointmentsByMonthPresentByStaff(LocalDate.now().getMonth(), LocalDate.now().getYear(), staff);
+    }
+
+    public int totalAppointmentsInYearByStaff(Staff staff) {
+        return appointmentRepository.countAppointmentsByYearPresentByStaff(LocalDate.now().getYear(), staff);
     }
 
     public Map<String, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
