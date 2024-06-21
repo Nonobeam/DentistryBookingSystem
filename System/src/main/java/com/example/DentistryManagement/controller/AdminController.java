@@ -2,7 +2,11 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ClinicService;
 import com.example.DentistryManagement.service.UserService;
@@ -131,6 +135,7 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updateduser) {
         try {
@@ -148,7 +153,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 

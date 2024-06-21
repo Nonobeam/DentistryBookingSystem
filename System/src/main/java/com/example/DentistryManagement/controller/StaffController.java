@@ -498,7 +498,7 @@ public class StaffController {
     }
 
 
-    @GetMapping("/appointment-history/{appointmentid}")
+    @PutMapping("/appointment-history/{appointmentid}")
     public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
 
         try {
@@ -523,7 +523,7 @@ public class StaffController {
         try {
             String mail = userService.mailExtract();
             if (date != null || (name != null && !name.isEmpty())) {
-                return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name, mail));
+                return ResponseEntity.ok(appointmentService.searchAppointmentByStaff(date, name, mail));
             } else return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
 
         } catch (Exception e) {

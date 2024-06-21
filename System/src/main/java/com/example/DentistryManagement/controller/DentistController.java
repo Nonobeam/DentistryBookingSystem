@@ -46,7 +46,7 @@ public class DentistController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/appointment-today")
+    @GetMapping("/appointment-today")
     public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentList() {
         try {
             String mail = userService.mailExtract();
@@ -196,7 +196,8 @@ public class DentistController {
     public ResponseEntity<Optional<List<Appointment>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false)  String name) {
         try {
             if(date != null || (name != null && !name.isEmpty())) {
-                return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
+                String mail = userService.mailExtract();
+                return ResponseEntity.ok(appointmentService.searchAppointmentByDentist(date, name, mail));
             }else {
                 return ResponseEntity.ok(appointmentService.findAllAppointmentByDentist(userService.mailExtract()));
             }
@@ -214,7 +215,7 @@ public class DentistController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/{status}")
+    @PutMapping("/{status}")
     public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
         try {
             appointment.setStatus(status);
