@@ -104,7 +104,6 @@ public class StaffController {
         }
     }
 
-
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -114,10 +113,13 @@ public class StaffController {
 
     })
     @GetMapping("/dentistList")
-    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
+    public ResponseEntity<Optional<List<UserDTO>>> searchDentistManageByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
+            Optional<List<Client>> clientsOptional = null;
+            if (search != null && !search.isEmpty()) {
+                clientsOptional = userService.searchDentistByStaff(mail, search);
+            } else clientsOptional = userService.findDentistByStaff(mail);
 
             if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
@@ -162,7 +164,7 @@ public class StaffController {
             userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
 
-            Optional<List<Appointment>> appointment = appointmentService.findAllAppointByDentist(id);
+            Optional<List<Appointment>> appointment = appointmentService.findAllAppointmentByDentist(id);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointment);
@@ -215,7 +217,6 @@ public class StaffController {
 
 //---------------------------MANAGE CUSTOMER---------------------------
 
-
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -225,11 +226,13 @@ public class StaffController {
 
     })
     @GetMapping("/customerList")
-    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerByStaff() {
+    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
-
+            Optional<List<Client>> clientsOptional = null;
+            if (search != null && !search.isEmpty()) {
+                clientsOptional = userService.searchCustomerInClinicByStaff(mail, search);
+            } else clientsOptional = userService.findCustomerInClinicByStaff(mail);
             if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
@@ -358,24 +361,6 @@ public class StaffController {
         }
     }
 
-
-    @Operation(summary = "All Clinics")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @GetMapping("/all-clinic")
-    public ResponseEntity<List<Clinic>> getAllClinics() {
-        try {
-            return ResponseEntity.ok(clinicService.findAll());
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
-
-
     @Operation(summary = "Get All Services By Clinic")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -434,7 +419,7 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/make-booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false)  String dependentID) {
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -457,7 +442,7 @@ public class StaffController {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
                 newAppointment.setDependent(dependent);
             }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));
@@ -534,9 +519,12 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> searchAppointmentByStaff(@RequestParam("searchAppointment") LocalDate date, @RequestParam("name") String name) {
+    public ResponseEntity<Optional<List<Appointment>>> searchAppointmentByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
         try {
-            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
+            String mail = userService.mailExtract();
+            if (date != null || (name != null && !name.isEmpty())) {
+                return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name, mail));
+            } else return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

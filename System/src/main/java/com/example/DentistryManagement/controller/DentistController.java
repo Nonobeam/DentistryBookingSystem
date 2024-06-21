@@ -124,24 +124,6 @@ public class DentistController {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> appointmentHistory() {
-        try {
-            Optional<List<Appointment>> appointmentlist = appointmentService.findAllAppointByDentist(userService.mailExtract());
-            return ResponseEntity.ok(appointmentlist);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
-
-    @Operation(summary = "Dentist")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
@@ -210,10 +192,14 @@ public class DentistController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/appointment-history/{name}")
-    public ResponseEntity<Optional<List<Appointment>>> setAppointmentStatus(@RequestParam("searchAppointment") LocalDate date, @PathVariable("name") String name) {
+    @GetMapping("/appointment-history/")
+    public ResponseEntity<Optional<List<Appointment>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false)  String name) {
         try {
-            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
+            if(date != null || (name != null && !name.isEmpty())) {
+                return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
+            }else {
+                return ResponseEntity.ok(appointmentService.findAllAppointmentByDentist(userService.mailExtract()));
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

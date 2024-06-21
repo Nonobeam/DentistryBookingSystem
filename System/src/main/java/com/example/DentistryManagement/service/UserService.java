@@ -47,15 +47,27 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
         }
     }
-
-    public Optional<List<Client>> findCustomerInClinic(String mailstaff) {
+    public Optional<List<Client>> searchDentistByStaff(String mail,String search) {
+        try {
+            return userRepository.getClientsByRoleAndDentist_Staff_UserMailAndFirstNameContainingOrLastNameContaining(Role.DENTIST, mail,search,search);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
+        }
+    }
+    public Optional<List<Client>> findCustomerInClinicByStaff(String mailstaff) {
         try {
             return userRepository.getCustomersByStaff(mailstaff);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
         }
     }
-
+    public Optional<List<Client>> searchCustomerInClinicByStaff(String mailstaff,String search) {
+        try {
+            return userRepository.searchCustomersByStaff(mailstaff,search);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
+        }
+    }
     public Client userInfo(String id) {
         try {
             return userRepository.findByUserID(id);

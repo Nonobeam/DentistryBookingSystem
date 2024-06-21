@@ -32,7 +32,12 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.user.mail =: mail ")
     Optional<List<Client>> getCustomersByStaff(String mail);
 
+    @Query("SELECT c FROM Client c, Staff s " +
+            "JOIN c.appointmentList a " +
+            "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.user.mail =: mail AND c.mail like :search OR c.firstName like :search or c.lastName like :search")
+    Optional<List<Client>> searchCustomersByStaff(String mail,String search);
     Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
+    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMailAndFirstNameContainingOrLastNameContaining(Role DENTIST, String staffmail,String searchfirstname, String searchlastname);
 
     //boss/adminlist
     Optional<List<Client>> getClientsByRole(Role role);

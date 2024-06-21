@@ -19,8 +19,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
-    private  final StaffRepository userRepository;
+    private final StaffRepository userRepository;
     private final ClinicRepository clinicRepository;
+
     public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
         try {
             Staff staffclient = userRepository.findStaffByUserMail(staffmail);
@@ -41,9 +42,10 @@ public class AppointmentService {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
     }
+
     public Optional<List<Appointment>> customerAppointfollowdentist(String cusid, String dentist) {
         try {
-            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(cusid, dentist,1,2);
+            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(cusid, dentist, 1, 2);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
@@ -51,13 +53,13 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> findAppointByDentist(String mail) {
         try {
-            return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(),1);
+            return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(), 1);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
         }
     }
 
-    public Optional<List<Appointment>> findAllAppointByDentist(String mail) {
+    public Optional<List<Appointment>> findAllAppointmentByDentist(String mail) {
         try {
             return appointmentRepository.getAppointmentByDentist_User_MailOrderByDateAsc(mail);
         } catch (DataAccessException e) {
@@ -112,9 +114,13 @@ public class AppointmentService {
             throw new RuntimeException(e);
         }
     }
-    public Optional<List<Appointment>> searchAppointmentByWorker(LocalDate date,String name) {
+
+    public Optional<List<Appointment>> searchAppointmentByWorker(LocalDate date, String name,String staffmail) {
         try {
-            return appointmentRepository.searchAppointmentByDateAndUser_FirstNameOrUser_LastNameOrDependent_FirstNameOrDependent_LastName(date,name,name,name,name);
+            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
+
+            Clinic clinic = staffclient.getClinic();
+            return appointmentRepository.searchAppointmentByDateAndClinicAndUserContaining_FirstNameOrUserContaining_LastNameOrDependentContaining_FirstNameOrDependentContaining_LastName(date,clinic, name, name, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -127,8 +133,9 @@ public class AppointmentService {
             throw new RuntimeException(e);
         }
     }
-    public Map<String, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date,Staff staff) {
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff,1, 2);
+
+    public Map<String, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff, 1, 2);
         Map<String, List<Appointment>> appointmentsByDentist = new HashMap<>();
 
         for (Appointment appointment : appointments) {
@@ -143,7 +150,7 @@ public class AppointmentService {
         Map<Integer, Long> monthlyAppointmentCounts = new HashMap<>();
 
         // Lấy danh sách cuộc hẹn theo từng ngày trong tháng
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(startDate, endDate, staff,1,2)
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(startDate, endDate, staff, 1, 2)
                 .orElse(Collections.emptyList());
 
         // Tính số lượng cuộc hẹn cho từng nha sĩ
@@ -174,8 +181,9 @@ public class AppointmentService {
 
         return yearlyAppointmentCounts;
     }
+
     public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date,1, 2);
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date, 1, 2);
         Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
 
         for (Appointment appointment : appointments) {
@@ -194,7 +202,7 @@ public class AppointmentService {
             LocalDate startDate = LocalDate.of(year, month, 1);
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
             List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startDate, endDate, 1, 2);
-            if(!appointments.isEmpty()) {
+            if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
                     String clinicid = clinic.getClinicID();
