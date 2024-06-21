@@ -358,24 +358,6 @@ public class StaffController {
         }
     }
 
-
-    @Operation(summary = "All Clinics")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @GetMapping("/all-clinic")
-    public ResponseEntity<List<Clinic>> getAllClinics() {
-        try {
-            return ResponseEntity.ok(clinicService.findAll());
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
-
-
     @Operation(summary = "Get All Services By Clinic")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),

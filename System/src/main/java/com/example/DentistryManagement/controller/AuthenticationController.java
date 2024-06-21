@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +25,13 @@ public class AuthenticationController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AuthenticationService authenticationService;
 
-    private AuthenticationResponse register(RegisterRequest request, Role role) {
+    private String register(RegisterRequest request, Role role) {
         return authenticationService.register(request, role);
     }
 
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> customerRegister(
+    public ResponseEntity<String> customerRegister(
             @RequestBody RegisterRequest request
     ) {
         Role role = Role.CUSTOMER;
@@ -38,21 +39,21 @@ public class AuthenticationController {
     }
 
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) {
-        AuthenticationResponse response = authenticationService.authenticate(request);
-
-        if (response == null) {
-            logger.error("Response is missing");
-        } else {
-            // Log response details
-            logger.info("Authentication response: {}", response.getToken());
-        }
-
-        return ResponseEntity.ok(response);
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirmUser(@RequestParam("token") String token) {
+        String jwtToken = authenticationService.confirmUser(token);
+        return ResponseEntity.ok(jwtToken);
     }
 
 
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request) {
+        AuthenticationResponse response = authenticationService.authenticate(request);
+        if (response == null || response.getToken() == null) {
+            logger.error("Wrong mail or password");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(response);
+    }
 }

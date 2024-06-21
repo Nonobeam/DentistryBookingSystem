@@ -3,7 +3,7 @@ spring:
 #    url: jdbc:mysql://localhost:3306/mydb
 #    username: myuser
 #    password: mypassword
-    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:asia-south2:sunflowerdentistry&socketFactory=com.google.cloud.sql.mysql.SocketFactory
     username: root
     password: Haha123456
   jpa:
@@ -24,6 +24,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  confirmation:
+    link:
+      baseurl: http://localhost:8080
+
   cloud:
     gcp:
       sql:
