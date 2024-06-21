@@ -220,6 +220,7 @@ public class UserController {
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setDentistScheduleId(dentistScheduleId);
             newAppointment.setStatus(1);
             dentistSchedule.setAvailable(0);
             appointmentRepository.save(newAppointment);
@@ -231,60 +232,75 @@ public class UserController {
         }
     }
 
-//    @Operation(summary = "Delete appointments")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-//    })
-////    @PutMapping("/delete-booking/{id}")
-////    public ResponseEntity<Appointment> deleteBooking(@PathVariable String appointmentId) {
-////        try {
-////            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-////            DentistSchedule dentistSchedule = dentistScheduleService.getByWorkDateAndServiceAndAvailableAndClinic(appointment.getDate()
-////            ,appointment.getServices(),1,appointment.getClinic());
-////            appointment.setStatus(0);
-////
-////
-////        }catch (Error e){
-////            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-////        }catch(Exception e){
-////            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-////        }
-////
-////    }
+    @Operation(summary = "Delete appointments")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/delete-booking/{appointmentId}")
+    public ResponseEntity<Appointment> deleteBooking(@PathVariable String appointmentId) {
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            String dentistScheduleId = appointment.getDentistScheduleId();
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            appointment.setStatus(0);
+            dentistSchedule.setAvailable(1);
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok(appointment);
+        }catch (Error e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
 
+    }
+
+    @Operation(summary = "Send a reset password link to customer's email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
-        Client user = userRepository.findByMail(mail).orElse(null);
-        if (user != null) {
-            String token = UUID.randomUUID().toString();
-            tokenService.createPasswordResetTokenForUser(user, token);
-            tokenService.sendPasswordResetEmail(mail, token);
+        try {
+            Client user = userRepository.findByMail(mail).orElse(null);
+            if (user != null) {
+                String token = UUID.randomUUID().toString();
+                tokenService.createPasswordResetTokenForUser(user, token);
+                tokenService.sendPasswordResetEmail(mail, token);
+            }
+            return ResponseEntity.ok("Password reset link has been sent to your email");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok("Password reset link has been sent to your email");
     }
 
+    @Operation(summary = "Reset customer's email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping("/resetPassword/{token}")
     public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestParam("password") String password) {
-        String validationResult = tokenService.validatePasswordResetToken(token);
-        if (validationResult.equalsIgnoreCase("invalid")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+        try {
+            String validationResult = tokenService.validatePasswordResetToken(token);
+            if (validationResult.equalsIgnoreCase("invalid")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+            }
+            tokenService.resetPassword(token, password);
+            return ResponseEntity.ok("Password has been reset successfully");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        tokenService.resetPassword(token, password);
-        if (validationResult != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-        }
-        PasswordResetToken passToken = tokenRepository.findByToken(token);
-        Client user = passToken.getUser();
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
-        tokenRepository.delete(passToken); // Invalidate the used token
-
-        return ResponseEntity.ok("Password has been reset successfully");
     }
-
-
-
 }

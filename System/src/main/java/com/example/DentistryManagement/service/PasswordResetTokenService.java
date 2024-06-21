@@ -38,7 +38,7 @@ public class PasswordResetTokenService {
         if (passToken == null || isTokenExpired(passToken)) {
             return "invalid";
         }
-        return null;
+        return "valid";
     }
 
     public void resetPassword(String token, String password){
@@ -48,8 +48,9 @@ public class PasswordResetTokenService {
         userRepository.save(user);
         tokenRepository.delete(passToken); // Invalidate the used token
     }
+
     public void sendPasswordResetEmail(String mail, String token) {
-        String url = "http://localhost:8080/changePassword/" + token;
+        String url = "http://localhost:8080/resetPassword/" + token;
         SimpleMailMessage resetMessage = new SimpleMailMessage();
         resetMessage.setFrom(fromMail);
         resetMessage.setSubject("Password Reset Request");
