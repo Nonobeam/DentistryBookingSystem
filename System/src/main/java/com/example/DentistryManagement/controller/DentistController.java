@@ -148,7 +148,6 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
             userDTO.setFirstName(client.getFirstName());
