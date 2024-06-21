@@ -254,15 +254,22 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping("/delete-booking/{appointmentId}")
-    public ResponseEntity<Appointment> deleteBooking(@PathVariable String appointmentId) {
+    public ResponseEntity<String> deleteBooking(@PathVariable String appointmentId) {
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            //Check for duplicate cancelled just in case
+            if(appointment.getStatus() == 0){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
+            }
             appointment.setStatus(0);
-            dentistSchedule.setAvailable(1);
+            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
+            unavailableSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(1));
+            });
             appointmentRepository.save(appointment);
-            return ResponseEntity.ok(appointment);
+            return ResponseEntity.ok("Appointment has been cancelled");
         }catch (Error e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch(Exception e){
