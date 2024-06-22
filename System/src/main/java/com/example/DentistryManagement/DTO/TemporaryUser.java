@@ -19,8 +19,7 @@ public class TemporaryUser {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "userID")
     private String userID;
-    private String firstName;
-    private String lastName;
+    private String name;
     private String phone;
     private String mail;
     private String password;
@@ -28,6 +27,5 @@ public class TemporaryUser {
     private LocalDate birthday;
     private String confirmationToken;
 
-    // Constructors, getters, setters, etc.
 }
 

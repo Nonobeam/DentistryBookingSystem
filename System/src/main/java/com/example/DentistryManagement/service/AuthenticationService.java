@@ -6,19 +6,22 @@ import com.example.DentistryManagement.auth.AuthenticationRequest;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.token.Token;
+import com.example.DentistryManagement.core.token.TokenType;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.DentistRepository;
-import com.example.DentistryManagement.repository.StaffRepository;
-import com.example.DentistryManagement.repository.TemporaryUserRepository;
-import com.example.DentistryManagement.repository.UserRepository;
+import com.example.DentistryManagement.repository.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +29,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -38,13 +42,40 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final MailService mailService;
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final StaffRepository staffRepository;
     private final DentistRepository dentistRepository;
-    private final TemporaryUserRepository temporaryUserRepository;
     private final AuthenticationManager authenticationManager;
+    private final TemporaryUserRepository temporaryUserRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
+
+    private void saveUserToken(Client user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(Client user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUserID());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+
+//----------------------------------- REGISTER -----------------------------------
 
     public AuthenticationResponse registerStaff(RegisterRequest request, Clinic clinic) {
         if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
@@ -54,8 +85,7 @@ public class AuthenticationService {
         Client user;
         try {
             user = Client.builder()
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
+                    .name(request.getName())
                     .phone(request.getPhone())
                     .mail(request.getMail())
                     .password(passwordEncoder.encode(request.getPassword()))
@@ -75,6 +105,8 @@ public class AuthenticationService {
         staffRepository.save(staff);
 
         var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -90,8 +122,7 @@ public class AuthenticationService {
         Client user;
         try {
             user = Client.builder()
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
+                    .name(request.getName())
                     .phone(request.getPhone())
                     .mail(request.getMail())
                     .password(passwordEncoder.encode(request.getPassword()))
@@ -135,10 +166,9 @@ public class AuthenticationService {
         TemporaryUser temporaryUser;
         try {
             temporaryUser = TemporaryUser.builder()
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())  // Include lastName
+                    .name(request.getName())
                     .phone(request.getPhone())
-                    .mail(request.getMail())  // Include mail
+                    .mail(request.getMail())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role(role)
                     .birthday(request.getBirthday())
@@ -177,8 +207,7 @@ public class AuthenticationService {
         }
 
         Client user = Client.builder()
-                .firstName(temporaryUser.getFirstName())
-                .lastName(temporaryUser.getLastName())
+                .name(temporaryUser.getName())
                 .phone(temporaryUser.getPhone())
                 .mail(temporaryUser.getMail())
                 .password(temporaryUser.getPassword())
@@ -194,6 +223,9 @@ public class AuthenticationService {
 
         return jwtToken;
     }
+
+//----------------------------------- LOGIN -----------------------------------
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -230,22 +262,39 @@ public class AuthenticationService {
                 .build();
     }
 
-    public boolean isUserAuthorized(Authentication authentication, String userId, Role userRole) {
-        try {
-            if (authentication != null && authentication.isAuthenticated()) {
-                String authenticatedUserId = authentication.getName();
-                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-                boolean hasUserRole = authorities.stream()
-                        .anyMatch(authority -> authority.getAuthority().equals(userRole.name()));
-
-                boolean isUserIdMatched = authenticatedUserId.equals(userId);
-                return hasUserRole && isUserIdMatched;
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String userMail;
+        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+            return;
+        }
+        refreshToken = authHeader.substring(7);
+        userMail = jwtService.extractMail(refreshToken);
+        if (userMail != null) {
+            var user = userRepository.findByMail(userMail)
+                    .orElseThrow();
+            if (jwtService.isTokenValid(refreshToken, user)) {
+                var accessToken = jwtService.generateToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken);
+                var authResponse = AuthenticationResponse.builder()
+                        .token(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
+
+
+//----------------------------------- LOGOUT -----------------------------------
+
+
+
+
 }

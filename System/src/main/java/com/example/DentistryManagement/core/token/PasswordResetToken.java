@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.core.passwordResetToken;
+package com.example.DentistryManagement.core.token;
 
 import com.example.DentistryManagement.core.user.Client;
 import jakarta.persistence.*;

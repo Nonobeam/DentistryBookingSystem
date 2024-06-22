@@ -17,7 +17,7 @@
       <driver-ref>mysql.cloud_sql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory</jdbc-url>
+      <jdbc-url>jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:asia-south2:sunflowerdentistry&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
       </jdbc-additional-properties>

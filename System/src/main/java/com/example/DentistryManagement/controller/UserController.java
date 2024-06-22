@@ -4,7 +4,7 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
+import com.example.DentistryManagement.core.token.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;

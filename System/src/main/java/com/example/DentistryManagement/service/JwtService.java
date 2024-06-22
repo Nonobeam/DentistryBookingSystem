@@ -21,8 +21,14 @@ import java.util.function.Function;
 public class JwtService {
 
     // Encryption key HS256
-    @Value("${secret_key.hs256}")
+    @Value("${application.security.jwt.secret-key.hs256}")
     private String SECRET_KEY;
+
+    @Value("${application.security.jwt.expiration}")
+    private long expiration;
+
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private long refreshExpiration;
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
     public String extractMail(String token) {
@@ -47,27 +53,36 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         try {
-            return generateToken(new HashMap<>(), userDetails);
+            return generateToken(new HashMap<>(), userDetails, refreshExpiration);
         } catch (Exception e) {
-            logger.error("Error while generating token: {}", e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Error while generating token", e);
         }
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            long expiration) {
         try {
             return Jwts
                     .builder()
                     .setClaims(extraClaims)
                     .setSubject(userDetails.getUsername())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 45))
+                    .setExpiration(new Date(System.currentTimeMillis() + expiration))
                     .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                     .compact();
         } catch (Exception e) {
-            logger.error("Error while generating token: {}", e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Error while generating token", e);
         }
+    }
+
+    public String generateRefreshToken(
+            UserDetails userDetails
+    ) {
+        return generateToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -93,7 +108,6 @@ public class JwtService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
 
     // Parameter with a token and build it with function getSigningKey()
     private Claims extractAllClaims(String token) {

@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
+import com.example.DentistryManagement.core.token.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;

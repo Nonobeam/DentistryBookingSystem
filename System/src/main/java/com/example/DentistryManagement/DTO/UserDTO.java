@@ -14,15 +14,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class UserDTO {
-    private String firstName;
-    private String lastName;
-    @Pattern(regexp = "\\+?[0-9]+", message = "Invalid phone number format")
-    @Size(min = 10, max = 11, message = "Phone number cannot exceed 11 characters")
+    private String name;
     private String phone;
-    @Email(message = "Invalid email format")
     private String mail;
     @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDate birthday;
-    private String name;
 }

@@ -23,8 +23,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     boolean existsByPhoneOrMailAndStatus(String phone, String mail, int status);
 
-    Optional<Client> findByFirstNameOrLastName(String firstName, String lastName);
-
     Client findClientsByUserID(String userId);
 
     @Query("SELECT c FROM Client c, Staff s " +
@@ -37,7 +35,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
     //boss/adminlist
     Optional<List<Client>> getClientsByRole(Role role);
 
-
     //Managerlistit
     @Query("SELECT c FROM Client c , Dentist d " +
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
@@ -47,9 +44,9 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findClientByMail(String mail);
 
-    Optional<List<Client>> searchClientByRoleAndFirstNameOrLastName(Role role, String search, String key);
+    Optional<List<Client>> searchClientByRoleAndName(Role role, String search);
 
-    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String searchname, String searchlast, String mail);
+    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrNameOrMail(Role role, String search, String searchName, String mail);
 
-    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String search1, String search2, String search3);
+    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role role, String search, String search1, String search2);
 }

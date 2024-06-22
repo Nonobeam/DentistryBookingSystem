@@ -113,7 +113,7 @@ public class AppointmentService {
     }
     public Optional<List<Appointment>> searchAppointmentByWorker(LocalDate date,String name) {
         try {
-            return appointmentRepository.searchAppointmentByDateAndUser_FirstNameOrUser_LastNameOrDependent_FirstNameOrDependent_LastName(date,name,name,name,name);
+            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
