@@ -485,9 +485,12 @@ public class StaffController {
     @GetMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
         try {
-            String mail = userService.mailExtract();
-
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String mail= authentication.getName();
+            Staff staff = userService.findStaffByMail(mail);
+            Clinic clinic = staff.getClinic();
+            String clinicID = clinic.getClinicID();
+            return ResponseEntity.ok(appointmentService.findApointmentclinic(clinicID));
         } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

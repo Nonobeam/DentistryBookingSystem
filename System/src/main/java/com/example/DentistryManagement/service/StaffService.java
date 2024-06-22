@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,14 @@ public class StaffService {
             staff = staffRepository.findStaffByStaffID(staffID);
             return staff;
         } catch (Error error) {
+            throw error;
+        }
+    }
+
+    public Clinic getClinicByStaff(Staff staff) {
+        try{
+            return staff.getClinic();
+        } catch(Error error) {
             throw error;
         }
     }

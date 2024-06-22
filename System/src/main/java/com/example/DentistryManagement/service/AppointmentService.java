@@ -21,11 +21,10 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private  final StaffRepository userRepository;
     private final ClinicRepository clinicRepository;
-    public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
-        try {
-            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
 
-            Clinic clinic = staffclient.getClinic();
+    public Optional<List<Appointment>> findApointmentclinic(String clinicID) {
+        try {
+            Clinic clinic = clinicRepository.findById(clinicID).orElse(null);
             return appointmentRepository.findAppointmentByClinic(clinic);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by clinic: " + e.getMessage(), e);

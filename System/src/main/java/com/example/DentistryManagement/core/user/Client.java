@@ -66,8 +66,8 @@ public class Client implements UserDetails {
     private List<Clinic> clinicList;
 
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
-    private PasswordResetToken passwordResetToken;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<PasswordResetToken> passwordResetTokenList;
 
     @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
