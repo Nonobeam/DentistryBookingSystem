@@ -6,13 +6,8 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.user.Client;
-
-//import com.example.DentistryManagement.core.mail.Mail;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
@@ -29,12 +24,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/staff")
@@ -123,10 +119,10 @@ public class StaffController {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
 
                             return clientDTO;
@@ -156,10 +152,9 @@ public class StaffController {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
 
             Optional<List<Appointment>> appointment = appointmentService.findAllAppointByDentist(id);
@@ -234,10 +229,9 @@ public class StaffController {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
                             clientDTO.setBirthday(client.getBirthday());
                             return clientDTO;
                         })
@@ -269,10 +263,9 @@ public class StaffController {
 
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
             Optional<List<Appointment>> appointment = appointmentService.customerAppointment(id, mail);
             UserAppointDTO userAppointDTO = new UserAppointDTO();

@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.repository;
 
-import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
+import com.example.DentistryManagement.core.token.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

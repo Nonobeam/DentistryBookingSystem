@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface DependentRepository extends JpaRepository<Dependent, Integer> {
 
-    Dependent findByDependentID(String dependentid);
+    Dependent findByDependentID(String dependentID);
 }

@@ -150,10 +150,9 @@ public class DentistController {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
             Optional<List<Appointment>> appointment = appointmentService.customerAppointfollowdentist(id, userService.mailExtract());
             UserAppointDTO userAppointDTO = new UserAppointDTO();

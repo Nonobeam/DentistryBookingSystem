@@ -226,7 +226,7 @@ public class AdminController {
         try {
             Optional<List<Client>> userList;
             if (search != null) {
-                userList = userService.searchCustomersearch(search);
+                userList = userService.searchCustomerSearch(search);
                 return ResponseEntity.ok(userList);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

@@ -11,8 +11,7 @@ import java.time.LocalDate;
 @Setter
 
 public class AdminDTO {
-    private String firstName;
-    private String lastName;
+    private String name;
     private String phone;
     private String mail;
     private LocalDate birthday;

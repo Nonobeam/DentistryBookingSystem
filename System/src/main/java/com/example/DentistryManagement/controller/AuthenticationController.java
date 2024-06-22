@@ -1,11 +1,10 @@
 package com.example.DentistryManagement.controller;
 
-
 import com.example.DentistryManagement.auth.AuthenticationRequest;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
-import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.core.user.Role;
+import com.example.DentistryManagement.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +23,9 @@ public class AuthenticationController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AuthenticationService authenticationService;
+
+//----------------------------------- REGISTER -----------------------------------
+
 
     private String register(RegisterRequest request, Role role) {
         return authenticationService.register(request, role);
@@ -45,6 +47,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(jwtToken);
     }
 
+//----------------------------------- LOGIN -----------------------------------
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
@@ -55,5 +58,13 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        authenticationService.refreshToken(request, response);
     }
 }
