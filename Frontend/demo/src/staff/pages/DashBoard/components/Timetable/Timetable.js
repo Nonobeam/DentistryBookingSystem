@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import { Button } from 'antd';
+import { Link } from 'react-router-dom'; // Thêm import cho Link
 import { CardTask } from './Card/CardTask';
 
 const taskTime = [
@@ -56,6 +57,11 @@ export const TimeTable = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Weekly Task Manager</h1>
+      <Link to="/schedule">
+        <Button style={{ marginRight: '10px' }}>
+          Schedule
+        </Button>
+      </Link>
       <Button onClick={previousWeek} style={{ marginRight: '10px' }}>
         Previous Week
       </Button>

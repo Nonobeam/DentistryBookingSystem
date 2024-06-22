@@ -20,8 +20,8 @@ public class PasswordResetToken {
     private String passwordResetTokenID;
     private String token;
 
-    @OneToOne
-    @JoinColumn(name = "userID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "userID", nullable = false, referencedColumnName = "userID")
     private Client user;
 
     private LocalDateTime expiryTime;

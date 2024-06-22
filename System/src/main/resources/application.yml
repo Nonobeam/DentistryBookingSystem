@@ -47,3 +47,4 @@ application:
 app:
   cors:
     allowed-origins: http://localhost:3000
+  url: http://localhost:8080

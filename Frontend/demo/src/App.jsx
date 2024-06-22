@@ -9,14 +9,15 @@ import Services from './homepage/Services';
 import Educational from './homepage/Educational';
 import Booking from './homepage/Booking';
 import Homepage from './homepage/Homepage';
-import { DashBoard } from './admin/pages/DashBoard';
-import { DentistList } from './admin/pages/DashBoard/components/DentistList/DentistList';
-import { CarDash } from './admin/pages/DashBoard/components/CarDash/CarDash';
-import AppointmentsPage from './admin/pages/DashBoard/components/ApointmenPage/ApointmenPage';
-import { TimeTable } from './admin/pages/DashBoard/components/Timetable/Timetable';
-import Profile from './admin/pages/DashBoard/components/Profile/Profile';
-import EditForm from './admin/pages/DashBoard/components/EditForm/EditForm';
-import AdminHomePage from './admin/pages/DashBoard/components/AdminHomePage/AdminHomePage';
+import { DashBoard } from './staff/pages/DashBoard';
+import { DentistList } from './staff/pages/DashBoard/components/DentistList/DentistList';
+import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
+import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
+import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
+import Profile from './staff/pages/DashBoard/components/Profile/Profile';
+import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
+import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
+import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 
 
 const App = () => {
@@ -41,6 +42,8 @@ const App = () => {
         </Route>
         <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
+        <Route path='/schedule' element={<Schedule />} />
+
       </Routes>
     </Router>
   );
