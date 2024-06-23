@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, Checkbox, Typography, DatePicker, Alert } from "antd";
-import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -9,7 +8,7 @@ const API_URL = "http://localhost:8080/api/v1/auth/register";
 
 const Signup = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const history = useNavigate();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const onFinish = async (values) => {
     console.log("Success:", values);
@@ -23,11 +22,9 @@ const Signup = () => {
         birthday: values.birthdate.format("YYYY-MM-DD"),
       });
 
-      if (response.status === 200) { //JSON: 201 Created, CHANGE BACK TO 200
-        setErrorMessage(""); // Clear any previous error message
-        alert("Registration successful!");
-        history.push("/login"); // Redirect to login page
-
+      if (response.status === 200) { 
+        setErrorMessage(""); 
+        setSuccessMessage("Registration successful. Please check your email to confirm your account. The link will expire in 24 hours. If you don't see the email, check your spam folder.");
       }
     } catch (error) {
       console.error("Failed to register:", error);
@@ -63,6 +60,12 @@ const Signup = () => {
             onFinishFailed={onFinishFailed}
             style={{ minWidth: "270px" }}
           >
+            {successMessage && (
+              <Form.Item>
+                <Alert message={successMessage} type="success" showIcon />
+              </Form.Item>
+            )}
+
             {errorMessage && (
               <Form.Item>
                 <Alert message={errorMessage} type="error" showIcon />
