@@ -38,4 +38,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff, int status, int status2);
 
     List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
+
+    List<Appointment> findAppointmentByUser_UserID(String customerID);
+
+    List<Appointment> findAppointmentByUser_UserIDAndDate(String userID, LocalDate date);
+
+    List<Appointment> findAppointmentByUser_UserIDAndDateAndStatus(String userID, LocalDate date, int status);
+
+    List<Appointment> findAppointmentsByUser_UserIDAndStatus(String userID, int status);
 }

@@ -271,7 +271,27 @@ public class UserController {
         }
     }
 
-
+    @Operation(summary = "Show user Appointment history")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("appointment-history")
+    public ResponseEntity<List<Appointment>> getAppointmentHistory
+            (@RequestParam(required = false) LocalDate workDate,
+             @RequestParam(required = false) Integer status) {
+        try{
+            Client user = userService.findClientByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
+            return ResponseEntity.ok(appointmentList);
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @Operation(summary = "Send a reset password link to customer's email")
     @ApiResponses(value = {
