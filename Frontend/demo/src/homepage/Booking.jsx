@@ -17,13 +17,15 @@ const Booking = () => {
   const [form] = Form.useForm();
   const [patients, setPatients] = useState([]);
   const [selectedFor, setSelectedFor] = useState("self");
+  const [isNewPatient, setIsNewPatient] = useState(false);
 
-  useEffect(() => {
-    // Fetch patients data
-    fetch("http://localhost:5000/patients")
-      .then((response) => response.json())
-      .then((data) => setPatients(data));
-  }, []);
+
+  // useEffect(() => {
+  //   // Fetch patients data
+  //   fetch("http://localhost:5000/patients")
+  //     .then((response) => response.json())
+  //     .then((data) => setPatients(data));
+  // }, []);
 
   const onFinish = (values) => {
     console.log("Success:", values);
@@ -62,14 +64,14 @@ const Booking = () => {
             {/* If choose for others person */}
             {selectedFor === "others" && (
               <Form.Item name="patient">
-                <Select placeholder="Patient">
+                <Select placeholder="Patient" onChange={value => setIsNewPatient(value === 'new')}>
                   {patients.map((patient) => (
                     <Option key={patient.id} value={patient.id}>
                       {patient.name} ({patient.dob})
                     </Option>
                     
                   ))}
-                  <Option value="patient1">Patien1</Option>
+                  <Option value="patient1">Patient 1</Option>
                   <Option value="new">Create new</Option>
                 </Select>
               </Form.Item>
@@ -77,7 +79,7 @@ const Booking = () => {
 
             {/* If choose for others person AND NEW */}
             {selectedFor === "others" &&
-              form.getFieldValue("patient") === "new" && (
+              isNewPatient && (
                 <>
                   <Form.Item
                     name="firstName"

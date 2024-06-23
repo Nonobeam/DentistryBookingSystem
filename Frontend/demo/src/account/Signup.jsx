@@ -1,11 +1,37 @@
-import React from "react";
-import { Form, Input, Button, Checkbox, Typography, DatePicker } from "antd";
+import React, { useState } from "react";
+import axios from "axios";
+import { Form, Input, Button, Checkbox, Typography, DatePicker, Alert } from "antd";
+import moment from "moment";
 
 const { Title } = Typography;
 
+const API_URL = "http://localhost:8080/api/v1/auth/register";
+
 const Signup = () => {
-  const onFinish = (values) => {
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const onFinish = async (values) => {
     console.log("Success:", values);
+    try {
+      const response = await axios.post(API_URL, {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phoneNumber,
+        mail: values.email,
+        password: values.password,
+        birthday: values.birthdate.format("YYYY-MM-DD"),
+      });
+
+      if (response.status === 200) { //JSON: 201 Created, CHANGE BACK TO 200
+        setErrorMessage(""); // Clear any previous error message
+        alert("Registration successful!");
+        // Redirect to login or another page if necessary
+
+      }
+    } catch (error) {
+      console.error("Failed to register:", error);
+      setErrorMessage("Email already exists in the system.");
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -13,9 +39,7 @@ const Signup = () => {
   };
 
   const disabledDate = (current) => {
-    // Get today's date and time
     const today = new Date();
-    // Disable dates after today
     return current && current > today.setHours(23, 59, 59, 999);
   };
 
@@ -29,7 +53,7 @@ const Signup = () => {
           alignItems: "center",
         }}
       >
-        <div style={{ padding: "30px", paddingTop: "70px"}}>
+        <div style={{ padding: "30px", paddingTop: "70px" }}>
           <Title>Sign Up</Title>
           <Form
             name="signup"
@@ -38,6 +62,11 @@ const Signup = () => {
             onFinishFailed={onFinishFailed}
             style={{ minWidth: "270px" }}
           >
+            {errorMessage && (
+              <Form.Item>
+                <Alert message={errorMessage} type="error" showIcon />
+              </Form.Item>
+            )}
             <Form.Item
               name="firstName"
               rules={[
@@ -97,7 +126,7 @@ const Signup = () => {
               <DatePicker
                 placeholder="Select Date"
                 style={{ width: "100%" }}
-                format="DD-MM-YYYY" ///////////Date format////////////
+                format="YYYY-MM-DD" ///////////Date format////////////
                 disabledDate={disabledDate}
               />
             </Form.Item>
@@ -107,7 +136,6 @@ const Signup = () => {
               rules={[
                 { required: true, message: "Please input your password!" },
                 { min: 8, message: "Password must be at least 8 characters!" },
-                // { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, message: 'Password must contain at least one letter and one number!' }
               ]}
             >
               <Input.Password placeholder="Password" />
