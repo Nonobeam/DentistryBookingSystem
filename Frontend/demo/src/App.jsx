@@ -20,6 +20,7 @@ import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/Admi
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import RoleBasedRoute from './account/RoleBasedRoute';
 import NotAuthorized from './account/NotAuthorized';
+import ConfirmAccount from './account/ConfirmAccount';
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/forgot' element={<ForgotPassword />} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
+        <Route path='/confirm' element={<ConfirmAccount />} />
 
           <Route path='/dashboard' element={<DashBoard />}>
             <Route path='dentist-list' element={<DentistList />} />
@@ -41,6 +43,7 @@ const App = () => {
             <Route path='admin-home-page' element={<AdminHomePage />} />
             <Route path='timetable' element={<TimeTable />} />
           </Route>
+
         <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
