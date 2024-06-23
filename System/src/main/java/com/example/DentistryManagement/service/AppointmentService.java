@@ -65,13 +65,26 @@ public class AppointmentService {
     }
 
 
-    //    public Optional<List<Appointment>> findAppointmentsByUserAndDateAndStatus(Client user, LocalDate date, int status) {
-//        try {
-//            return appointmentRepository.findAppointmentsByUserAndDateAndStatus(user, date, status);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+        public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
+        try {
+            String userID = user.getUserID();
+
+            if(date == null && status == null) {
+                return appointmentRepository.findAppointmentByUser_UserID(userID);
+            }
+            else {
+                if(status != null && date == null) {
+                    return appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
+                } else if(status == null && date != null) {
+                    return  appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
+                } else {
+                    return  appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID,date,status);
+                }
+            }
+            } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public Appointment AppointmentUpdate(Appointment appointment) {
         try {
             return appointmentRepository.save(appointment);

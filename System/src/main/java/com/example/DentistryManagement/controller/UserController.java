@@ -33,19 +33,13 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-    private final DentistService dentistService;
     private final DentistScheduleService dentistScheduleService;
     private final NotificationService notificationService;
     private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
-    private final PasswordResetTokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
-    private final Logger LOGGER = LogManager.getLogger(UserController.class);
-    private final ServiceService serviceService;
-
     @Operation(summary = "All users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -277,6 +271,28 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Show user Appointment history")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("appointment-history")
+    public ResponseEntity<List<Appointment>> getAppointmentHistory
+            (@RequestParam(required = false) LocalDate workDate,
+             @RequestParam(required = false) Integer status) {
+        try{
+            Client user = userService.findClientByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
+            return ResponseEntity.ok(appointmentList);
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @Operation(summary = "Send a reset password link to customer's email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -285,13 +301,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
+    public ResponseEntity<?> forgotPassword() {
         try {
-            Client user = userRepository.findByMail(mail).orElse(null);
+            Client user = userService.findClientByMail(userService.mailExtract());
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
-                tokenService.sendPasswordResetEmail(mail, token);
+                tokenService.sendPasswordResetEmail(user.getMail(), token);
             }
             return ResponseEntity.ok("Password reset link has been sent to your email");
         } catch (Error e) {

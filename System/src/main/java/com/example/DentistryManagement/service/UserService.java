@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.repository.DependentRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -252,6 +254,5 @@ public class UserService {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
-
 
 }
