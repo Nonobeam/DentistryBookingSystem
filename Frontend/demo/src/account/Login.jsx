@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, Typography, Alert } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -9,7 +9,7 @@ const API_URL = "http://localhost:8080/api/v1/auth/authenticate";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     console.log("Form values:", values);
@@ -36,8 +36,9 @@ const Login = () => {
       localStorage.setItem("expirationTime", expirationTime);
 
       console.log("Login successful:", response);
-      setErrorMessage(""); // Clear any previous error message
-      history.push("/dashboard"); // Redirect to the dashboard
+      console.log("Role:", role);
+      setErrorMessage(""); // Clear previous error message
+      navigate("/"); //
     } catch (error) {
       console.error("Failed to login:", error);
       if (error.response && error.response.status === 403) {

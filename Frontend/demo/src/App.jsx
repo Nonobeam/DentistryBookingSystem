@@ -26,7 +26,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route exact path='/' element={<Homepage />} />
-        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole="user" />}/>
+        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole="MANAGER" />} />
         <Route path='/educational' element={<Educational />} />
         <Route path='/services' element={<Services />} />
         <Route path='/signup' element={<Signup />} />

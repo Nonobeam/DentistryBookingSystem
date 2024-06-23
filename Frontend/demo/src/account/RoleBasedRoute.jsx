@@ -1,15 +1,24 @@
 import React from "react";
 import { Route, Navigate } from "react-router-dom";
-import useAuth from "./useAuth";
+import NotAuthorized from "./NotAuthorized";
 
 const RoleBasedRoute = ({ element: Component, requiredRole, ...rest }) => {
-  useAuth(requiredRole); // Call the custom hook with the required role
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const expirationTime = localStorage.getItem("expirationTime");
 
-  return localStorage.getItem("token") ? (
-    <Route {...rest} element={Component} />
-  ) : (
-    <Navigate to="/login" />
-  );
+  if (!token || new Date().getTime() > expirationTime) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("expirationTime");
+    return <Navigate to="/login" />;
+  }
+
+  if (requiredRole && role !== requiredRole) {
+    return <NotAuthorized/>;
+  }
+
+  return Component;
 };
 
 export default RoleBasedRoute;
