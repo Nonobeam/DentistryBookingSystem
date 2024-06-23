@@ -270,8 +270,10 @@ public class AuthenticationService {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userMail;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
+        } else {
+            logger.info("header", authHeader);
         }
         refreshToken = authHeader.substring(7);
         userMail = jwtService.extractMail(refreshToken);
@@ -290,11 +292,6 @@ public class AuthenticationService {
             }
         }
     }
-
-
-//----------------------------------- LOGOUT -----------------------------------
-
-
 
 
 }
