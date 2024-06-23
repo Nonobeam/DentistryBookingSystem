@@ -386,8 +386,6 @@ public class StaffController {
     }
 
 
-
-
     @Operation(summary = "Get All Services By Clinic")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -445,8 +443,8 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
+    @PostMapping("/booking/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String userID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -458,12 +456,14 @@ public class StaffController {
                 throw new Error("Full appointment for this date!");
             }
             Appointment newAppointment = new Appointment();
-            newAppointment.setUser(client);
+            newAppointment.setStaff(client.getStaff());
+            newAppointment.setUser(userService.findUserById(userID));
             newAppointment.setServices(dentistSchedule.getServices());
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setDentistScheduleId(dentistScheduleId);
             newAppointment.setStatus(1);
             if (dependentID != null) {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
@@ -483,23 +483,37 @@ public class StaffController {
         }
     }
 
-
-    @Operation(summary = "Staff")
+    @Operation(summary = "Delete appointments")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PutMapping("/update-appointment")
-    public ResponseEntity<Appointment> updateAppointment(@RequestBody Appointment appointment) {
+    @PutMapping("/delete-booking/{appointmentId}")
+    public ResponseEntity<String> deleteBooking(@PathVariable String appointmentId) {
         try {
-            return ResponseEntity.ok(appointmentService.updateAppointment(appointment));
-
-        } catch (Exception e) {
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            String dentistScheduleId = appointment.getDentistScheduleId();
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            //Check for duplicate cancelled just in case
+            if(appointment.getStatus() == 0){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
+            }
+            appointment.setStatus(0);
+            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
+            unavailableSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(1));
+            });
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok("Appointment has been cancelled");
+        }catch (Error e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
     @Operation(summary = "Staff")
@@ -533,7 +547,7 @@ public class StaffController {
     public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Appointment>> appointmentList ;
+            Optional<List<Appointment>> appointmentList;
             if (date != null || (search != null && !search.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
             } else appointmentList = appointmentService.findApointmentClinic(mail);
