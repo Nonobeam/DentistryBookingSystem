@@ -51,8 +51,10 @@ public class UserController {
     })
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
+        String mail = userService.mailExtract();
+        Client user = userService.findClientByMail(mail);
         UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(userService.findClientByMail(userService.mailExtract())));
+        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
     }
 
 

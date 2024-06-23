@@ -44,8 +44,8 @@ public class SecurityConfig{
             "/swagger-ui.html",
             "/swagger-ui/index.html#/**",
             "/user/forgotPassword",
-            "user/resetPassword",
-            "user/resetPassword/**"
+            "/user/resetPassword",
+            "/user/resetPassword/**"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -93,7 +93,7 @@ public class SecurityConfig{
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
+                registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
