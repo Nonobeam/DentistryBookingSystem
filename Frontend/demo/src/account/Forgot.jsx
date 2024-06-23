@@ -1,15 +1,28 @@
-import React from 'react';
-import { Form, Input, Button, Typography } from 'antd';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Form, Input, Button, Typography, Alert } from 'antd';
 
 const { Title } = Typography;
 
 const ForgotPassword = () => {
-  
-  const onFinish = values => {
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const onFinish = async (values) => {
     console.log('Success:', values);
+    try {
+      const response = await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
+      console.log('Response:', response);
+      setSuccessMessage("The reset password email link has been sent to your email.");
+      setErrorMessage(""); 
+    } catch (error) {
+      console.error('Failed to send reset password email:', error);
+      setErrorMessage("An error occurred. Please try again later.");
+      setSuccessMessage(""); 
+    }
   };
 
-  const onFinishFailed = errorInfo => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
@@ -20,6 +33,13 @@ const ForgotPassword = () => {
         <Title>Forgot your password?</Title>
         <p>We'll send you an email to help you reset your password.</p>
 
+        {successMessage && (
+          <Alert message={successMessage} type="success" showIcon style={{ marginBottom: '20px' }} />
+        )}
+        {errorMessage && (
+          <Alert message={errorMessage} type="error" showIcon style={{ marginBottom: '20px' }} />
+        )}
+
         <Form
           name="forgotPassword"
           initialValues={{ remember: true }}
@@ -28,8 +48,9 @@ const ForgotPassword = () => {
         >
           <Form.Item
             name="email"
-            rules={[{ required: true, message: 'Please input your email address!' },
-            { type: 'email', message: 'The input is not valid E-mail!' }
+            rules={[
+              { required: true, message: 'Please input your email address!' },
+              { type: 'email', message: 'The input is not valid E-mail!' }
             ]}
           >
             <Input placeholder="Enter your email address" />
@@ -42,8 +63,9 @@ const ForgotPassword = () => {
           </Form.Item>
 
         </Form>
-        <div style={{display: "flex", justifyContent: "flex-end"}}>
-        <Button href="/login">Login</Button></div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button href="/login">Login</Button>
+        </div>
         
       </div>
     </div>

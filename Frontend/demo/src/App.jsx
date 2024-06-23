@@ -21,6 +21,7 @@ import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Sche
 import RoleBasedRoute from './account/RoleBasedRoute';
 import NotAuthorized from './account/NotAuthorized';
 import ConfirmAccount from './account/ConfirmAccount';
+import ResetPassword from './account/ResetPassword';
 
 const App = () => {
   return (
@@ -35,6 +36,8 @@ const App = () => {
         <Route path='/forgot' element={<ForgotPassword />} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path='/confirm' element={<ConfirmAccount />} />
+        <Route path='/resetPassword/:token' element={<ResetPassword />} />
+
 
           <Route path='/dashboard' element={<DashBoard />}>
             <Route path='dentist-list' element={<DentistList />} />
