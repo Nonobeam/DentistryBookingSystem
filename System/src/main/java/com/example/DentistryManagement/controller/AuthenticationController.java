@@ -60,6 +60,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+
     @PostMapping("/refresh-token")
     public void refreshToken(
             HttpServletRequest request,
@@ -67,4 +68,5 @@ public class AuthenticationController {
     ) throws IOException {
         authenticationService.refreshToken(request, response);
     }
+
 }
