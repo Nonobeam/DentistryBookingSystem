@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Typography,
-  Select,
-  Radio,
-  DatePicker,
-  Checkbox,
-} from "antd";
+import axios from "axios";
+import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox } from "antd";
 import NavBar from "./Nav";
+
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -18,18 +11,35 @@ const Booking = () => {
   const [patients, setPatients] = useState([]);
   const [selectedFor, setSelectedFor] = useState("self");
   const [isNewPatient, setIsNewPatient] = useState(false);
+  const [clinics, setClinics] = useState([]);
 
+  useEffect(() => {
+    const fetchClinics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:8080/user/all-clinic", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setClinics(response.data);
+      }
+      
+      catch (error) {
+        console.error("Failed to fetch clinics:", error);
+      }
+    };
 
-  // useEffect(() => {
-  //   // Fetch patients data
-  //   fetch("http://localhost:5000/patients")
-  //     .then((response) => response.json())
-  //     .then((data) => setPatients(data));
-  // }, []);
+    fetchClinics();
+  }, []);
 
   const onFinish = (values) => {
     console.log("Success:", values);
-    // Here you can make a POST request to your backend to save the booking
+  };
+
+  const disabledDate = (current) => {
+    const today = new Date();
+    return current < today.setHours(23, 59, 59, 999);
   };
 
   return (
@@ -61,7 +71,6 @@ const Booking = () => {
               </Radio.Group>
             </Form.Item>
 
-            {/* If choose for others person */}
             {selectedFor === "others" && (
               <Form.Item name="patient">
                 <Select placeholder="Patient" onChange={value => setIsNewPatient(value === 'new')}>
@@ -69,56 +78,54 @@ const Booking = () => {
                     <Option key={patient.id} value={patient.id}>
                       {patient.name} ({patient.dob})
                     </Option>
-                    
                   ))}
-                  <Option value="patient1">Patient 1</Option>
                   <Option value="new">Create new</Option>
                 </Select>
               </Form.Item>
             )}
 
-            {/* If choose for others person AND NEW */}
-            {selectedFor === "others" &&
-              isNewPatient && (
-                <>
-                  <Form.Item
-                    name="firstName"
-                    rules={[
-                      { required: true, message: "Please input first name!" },
-                    ]}
-                  >
-                    <Input placeholder="First Name" />
-                  </Form.Item>
-                  <Form.Item
-                    name="lastName"
-                    rules={[
-                      { required: true, message: "Please input last name!" },
-                    ]}
-                  >
-                    <Input placeholder="Last Name" />
-                  </Form.Item>
-                  <Form.Item
-                    name="dob"
-                    rules={[
-                      { required: true, message: "Please input birthdate!" },
-                    ]}
-                  >
-                    <DatePicker
-                      placeholder="Patient's birthdate"
-                      style={{ width: "100%" }}
-                    />
-                  </Form.Item>
-                </>
-              )}
+            {selectedFor === "others" && isNewPatient && (
+              <>
+                <Form.Item
+                  name="firstName"
+                  rules={[
+                    { required: true, message: "Please input first name!" },
+                  ]}
+                >
+                  <Input placeholder="First Name" />
+                </Form.Item>
+                <Form.Item
+                  name="lastName"
+                  rules={[
+                    { required: true, message: "Please input last name!" },
+                  ]}
+                >
+                  <Input placeholder="Last Name" />
+                </Form.Item>
+                <Form.Item
+                  name="dob"
+                  rules={[
+                    { required: true, message: "Please input birthdate!" },
+                  ]}
+                >
+                  <DatePicker
+                    placeholder="Patient's birthdate"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </>
+            )}
 
-            {/* Others */}
             <Form.Item
               name="branch"
               rules={[{ required: true, message: "Please select a branch!" }]}
             >
               <Select placeholder="Choose our branch">
-                <Option value="branch1">Branch 1</Option>
-                <Option value="branch2">Branch 2</Option>
+                {clinics.map((clinic) => (
+                  <Option key={clinic.clinicID} value={clinic.clinicID}>
+                    {clinic.address}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
 
@@ -126,14 +133,15 @@ const Booking = () => {
               name="date"
               rules={[{ required: true, message: "Please choose a date!" }]}
             >
-              <DatePicker placeholder="Choose date" style={{ width: "100%" }} />
+              <DatePicker placeholder="Select Date"
+                style={{ width: "100%" }}
+                format="YYYY-MM-DD" ///////////Date format////////////
+                disabledDate={disabledDate} />
             </Form.Item>
 
             <Form.Item
               name="time"
-              rules={[
-                { required: true, message: "Please choose a time slot!" },
-              ]}
+              rules={[{ required: true, message: "Please choose a time slot!" }]}
             >
               <Select placeholder="Choose timeslot">
                 <Option value="9:00">9:00 AM</Option>

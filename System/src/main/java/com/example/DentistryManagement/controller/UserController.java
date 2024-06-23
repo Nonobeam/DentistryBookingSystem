@@ -4,7 +4,6 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -244,6 +242,28 @@ public class UserController {
     }
 
 
+    @Operation(summary = "Show user Appointment history")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("appointment-history")
+    public ResponseEntity<List<Appointment>> getAppointmentHistory
+            (@RequestParam(required = false) LocalDate workDate,
+             @RequestParam(required = false) Integer status) {
+        try{
+            Client user = userService.findClientByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
+            return ResponseEntity.ok(appointmentList);
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     //----------------------------------- UPDATE INFORMATION -----------------------------------
 
 
@@ -255,13 +275,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
+    public ResponseEntity<?> forgotPassword() {
         try {
-            Client user = userRepository.findByMail(mail).orElse(null);
+            Client user = userService.findClientByMail(userService.mailExtract());
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
-                tokenService.sendPasswordResetEmail(mail, token);
+                tokenService.sendPasswordResetEmail(user.getMail(), token);
             }
             return ResponseEntity.ok("Password reset link has been sent to your email");
         } catch (Error e) {
