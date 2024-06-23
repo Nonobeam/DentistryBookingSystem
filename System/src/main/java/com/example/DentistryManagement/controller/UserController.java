@@ -4,8 +4,9 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
+import com.example.DentistryManagement.core.token.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
@@ -19,17 +20,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Provider;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RequestMapping("/user")
 @RestController
@@ -124,10 +119,11 @@ public class UserController {
     @GetMapping("/available-service")
     public ResponseEntity<List<Services>> getAvailableServices(
             @RequestParam LocalDate bookDate,
-            @RequestParam Clinic clinic) {
+            @RequestParam String clinicid) {
 
         List<Services> dentistService;
         try {
+            Clinic clinic = clinicService.findClinicByID(clinicid);
             dentistService = dentistScheduleService
                     .getServiceNotNullByDate(bookDate, clinic);
             return ResponseEntity.ok(dentistService);
@@ -144,11 +140,39 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
             return ResponseEntity.ok(clinicService.findAll());
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
+
+
+    @Operation(summary = "Get All Services By Clinic")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+
+    @GetMapping("/all-service/{clinicID}")
+    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate,
+                                                                           @PathVariable String clinicID) {
+        try {
+            HashMap<String, Services> servicesByClinic = new HashMap<>();
+            Clinic clinic = clinicService.findClinicByID(clinicID);
+            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
+            for (DentistSchedule dentistSchedule : dentistScheduleList) {
+                if (dentistSchedule.getWorkDate().equals(workDate)) {
+                    if (dentistSchedule.getAvailable() == 1) {
+                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
+                    }
+                }
+            }
+            return ResponseEntity.ok(servicesByClinic);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -174,23 +198,7 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
-//    //Hiện ra các services cho người dùng chọn
-//    @Operation(summary = "Get services of clinic")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-//    })
-//    @GetMapping("/{clinicID}")
-//    public ResponseEntity<List<Services>> getServiceFromClinic(
-//            @PathVariable String clinicID){
-//        try {
-//            return ResponseEntity.ok(clinicService.getAllServices(clinicID));
-//        } catch (Error error) {
-//            throw new Error("Error while getting services" + error);
-//        }
-//    }
+
 
     @Operation(summary = "Booking")
     @ApiResponses(value = {
@@ -199,12 +207,10 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId) {
+    @PostMapping("/booking/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
-            Client client = userService.findClientByMail(mail);
+            Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
                 throw new Error("Over booked for today!");
@@ -220,8 +226,17 @@ public class UserController {
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setDentistScheduleId(dentistScheduleId);
             newAppointment.setStatus(1);
-            dentistSchedule.setAvailable(0);
+            if (dependentID != null) {
+                Dependent dependent = userService.findDependentByDependentId(dependentID);
+                newAppointment.setDependent(dependent);
+            }
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
+            otherSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(0));
+            });
             appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
@@ -231,60 +246,81 @@ public class UserController {
         }
     }
 
-//    @Operation(summary = "Delete appointments")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found"),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-//    })
-////    @PutMapping("/delete-booking/{id}")
-////    public ResponseEntity<Appointment> deleteBooking(@PathVariable String appointmentId) {
-////        try {
-////            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-////            DentistSchedule dentistSchedule = dentistScheduleService.getByWorkDateAndServiceAndAvailableAndClinic(appointment.getDate()
-////            ,appointment.getServices(),1,appointment.getClinic());
-////            appointment.setStatus(0);
-////
-////
-////        }catch (Error e){
-////            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-////        }catch(Exception e){
-////            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-////        }
-////
-////    }
+    @Operation(summary = "Delete appointments")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/delete-booking/{appointmentId}")
+    public ResponseEntity<String> deleteBooking(@PathVariable String appointmentId) {
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            String dentistScheduleId = appointment.getDentistScheduleId();
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            //Check for duplicate cancelled just in case
+            if(appointment.getStatus() == 0){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
+            }
+            appointment.setStatus(0);
+            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
+            unavailableSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(1));
+            });
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok("Appointment has been cancelled");
+        }catch (Error e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
+    @Operation(summary = "Send a reset password link to customer's email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
-        Client user = userRepository.findByMail(mail).orElse(null);
-        if (user != null) {
-            String token = UUID.randomUUID().toString();
-            tokenService.createPasswordResetTokenForUser(user, token);
-            tokenService.sendPasswordResetEmail(mail, token);
+        try {
+            Client user = userRepository.findByMail(mail).orElse(null);
+            if (user != null) {
+                String token = UUID.randomUUID().toString();
+                tokenService.createPasswordResetTokenForUser(user, token);
+                tokenService.sendPasswordResetEmail(mail, token);
+            }
+            return ResponseEntity.ok("Password reset link has been sent to your email");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok("Password reset link has been sent to your email");
     }
 
+    @Operation(summary = "Reset customer's email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping("/resetPassword/{token}")
     public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestParam("password") String password) {
-        String validationResult = tokenService.validatePasswordResetToken(token);
-        if (validationResult.equalsIgnoreCase("invalid")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+        try {
+            String validationResult = tokenService.validatePasswordResetToken(token);
+            if (validationResult.equalsIgnoreCase("invalid")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+            }
+            tokenService.resetPassword(token, password);
+            return ResponseEntity.ok("Password has been reset successfully");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        tokenService.resetPassword(token, password);
-        if (validationResult != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-        }
-        PasswordResetToken passToken = tokenRepository.findByToken(token);
-        Client user = passToken.getUser();
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
-        tokenRepository.delete(passToken); // Invalidate the used token
-
-        return ResponseEntity.ok("Password has been reset successfully");
     }
-
-
-
 }

@@ -18,20 +18,24 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     Optional<List<Appointment>> findAppointmentByClinic(Clinic c);
 
-    Optional<List<Appointment>> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistmail, LocalDate date,int status);
+    Optional<List<Appointment>> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistmail, LocalDate date, int status);
 
-    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(String customerId, String dentistMail,int status,int status_);
+    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(String customerId, String dentistMail, int status, int status_);
 
 
     Optional<List<Appointment>> findAppointmentsByDateAndStatus(LocalDate date, int status);
+
     Appointment findAppointmentByAppointmentID(String appointmentID);
+
     Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client client, int status);
 
     List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2);
 
-    Optional<List<Appointment>> searchAppointmentByDateAndUser_FirstNameOrUser_LastNameOrDependent_FirstNameOrDependent_LastName(LocalDate date,String firstname, String lastname,String depenFirst, String depenLast);
+    Optional<List<Appointment>> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
+
     List<Appointment> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff, int status, int status2);
-    Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff,int status,int status2);
+
+    Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff, int status, int status2);
 
     List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
 }

@@ -34,25 +34,25 @@ public class ManagerController {
     private final Logger logger = LogManager.getLogger(UserController.class);
 
 
-//---------------------------REGISTER STAFF && DENTIST---------------------------
-@Operation(summary = "Register a new staff member")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully registered"),
-        @ApiResponse(responseCode = "400", description = "Bad request"),
-        @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
-})
-@PostMapping("/register/staff")
-public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody RegisterRequest request,
-                                                            @RequestParam String clinicId) {
-    try {
-        Clinic clinic = clinicService.findClinicByID(clinicId);
-        AuthenticationResponse response = authenticationService.registerStaff(request, clinic);
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        return ResponseEntity.status(400).body(null);
-    }
-}
+    //---------------------------REGISTER STAFF && DENTIST---------------------------
 
+    @Operation(summary = "Register a new staff member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully registered"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
+    })
+    @PostMapping("/register/staff")
+    public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody RegisterRequest request,
+                                                                @RequestParam String clinicId) {
+        try {
+            Clinic clinic = clinicService.findClinicByID(clinicId);
+            AuthenticationResponse response = authenticationService.registerStaff(request, clinic);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
 
 
     @Operation(summary = "Register a new dentist")
@@ -89,10 +89,9 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
     public ResponseEntity<Client> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
         Client updateUser = userService.findUserById(userID);
 
-        if(updateUser != null) {
+        if (updateUser != null) {
 
-            updateUser.setFirstName(userDTO.getFirstName());
-            updateUser.setLastName(userDTO.getLastName());
+            updateUser.setName(userDTO.getName());
             updateUser.setPhone(userDTO.getPhone());
             updateUser.setMail(userDTO.getMail());
             updateUser.setBirthday(userDTO.getBirthday());
@@ -100,7 +99,8 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
             userService.updateUser(updateUser);
             return ResponseEntity.ok(updateUser);
         } else {
-            System.out.println("User not fail with userID: " + userID);;
+            System.out.println("User not fail with userID: " + userID);
+            ;
             return ResponseEntity.notFound().build();
         }
     }
@@ -115,7 +115,7 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
     public ResponseEntity<Clinic> editClinic(@PathVariable String clinicID, @RequestBody ClinicDTO clinicDTO) {
         Clinic updateClinic = clinicService.findClinicByID(clinicID);
 
-        if(updateClinic != null) {
+        if (updateClinic != null) {
             updateClinic.setPhone(clinicDTO.getPhone());
             updateClinic.setAddress(clinicDTO.getAddress());
             updateClinic.setSlotDuration(clinicDTO.getSlotDuration());
@@ -126,7 +126,8 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
             clinicService.save(updateClinic);
             return ResponseEntity.ok(updateClinic);
         } else {
-            System.out.println("Cannot find: " + clinicID);;
+            System.out.println("Cannot find: " + clinicID);
+            ;
             return ResponseEntity.notFound().build();
         }
     }
@@ -166,7 +167,7 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
     @GetMapping("/all-dentist")
     public ResponseEntity<List<Client>> getAllDentists() {
         try {
-            String mail =userService.mailExtract();
+            String mail = userService.mailExtract();
             return ResponseEntity.ok(userService.findAllDentistByManager(mail));
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
@@ -184,7 +185,7 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
     @GetMapping("/all-staff")
     public ResponseEntity<List<Client>> getAllStaffs() {
         try {
-            String mail =userService.mailExtract();
+            String mail = userService.mailExtract();
             return ResponseEntity.ok(userService.findAllStaffByManager(mail));
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
@@ -208,6 +209,7 @@ public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Registe
             throw new Error("Error while getting dentists " + error);
         }
     }
+
     @Operation(summary = "List staff dentist manage")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully registered"),

@@ -28,6 +28,7 @@ public class AdminController {
     private final UserMapping userMapping;
 
     private final ClinicService clinicService;
+
     @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -130,7 +131,7 @@ public class AdminController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updateduser) {
         try {
-            if (userService.isPresentUser(id) !=null) {
+            if (userService.isPresentUser(id) != null) {
                 Client client = userMapping.mapUser(updateduser);
                 userService.updateUser(client);
                 return ResponseEntity.ok().build();
@@ -156,7 +157,8 @@ public class AdminController {
                     userService.updateUserStatus(client);
                     return ResponseEntity.ok().build();
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();                    }
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
 
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
@@ -167,32 +169,32 @@ public class AdminController {
                     .body("An error occurred while creating the user.");
         }
     }
-@GetMapping("/dentistList/")
-public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search") String search) {
-    try {
-        Optional<List<Client>> userList;
-        if (search != null) {
-            userList=userService.findDentistInClinic(search);
-            return ResponseEntity.ok(userList);
-            }
-         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
 
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(null);
+    @GetMapping("/dentistList/")
+    public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search") String search) {
+        try {
+            Optional<List<Client>> userList;
+            if (search != null) {
+                userList = userService.findDentistInClinic(search);
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
-}
+
     @PostMapping("/managerList/")
     public ResponseEntity<Optional<List<Client>>> sortManager(@RequestParam("search") String search) {
         try {
             Optional<List<Client>> userList;
             if (search != null) {
-                userList=userService.searchManager(search);
+                userList = userService.searchManager(search);
                 return ResponseEntity.ok(userList);
-            }
-            else {
+            } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
@@ -201,15 +203,15 @@ public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search"
                     .body(null);
         }
     }
+
     @PostMapping("/staffList/")
     public ResponseEntity<Optional<List<Client>>> sortStaff(@RequestParam("search") String search) {
         try {
             Optional<List<Client>> userList;
             if (search != null) {
-                userList=userService.findStaffInClinic(search);
+                userList = userService.findStaffInClinic(search);
                 return ResponseEntity.ok(userList);
-            }
-            else {
+            } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
@@ -218,15 +220,15 @@ public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search"
                     .body(null);
         }
     }
+
     @PostMapping("/customerList/")
     public ResponseEntity<Optional<List<Client>>> sortCustomer(@RequestParam("search") String search) {
         try {
             Optional<List<Client>> userList;
             if (search != null) {
-                userList=userService.searchCustomersearch(search);
+                userList = userService.searchCustomerSearch(search);
                 return ResponseEntity.ok(userList);
-            }
-            else {
+            } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
@@ -235,7 +237,6 @@ public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search"
                     .body(null);
         }
     }
-
 
 
 }

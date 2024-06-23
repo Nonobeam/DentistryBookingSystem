@@ -21,11 +21,10 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private  final StaffRepository userRepository;
     private final ClinicRepository clinicRepository;
-    public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
-        try {
-            Staff staffclient = userRepository.findStaffByUserMail(staffmail);
 
-            Clinic clinic = staffclient.getClinic();
+    public Optional<List<Appointment>> findApointmentclinic(String clinicID) {
+        try {
+            Clinic clinic = clinicRepository.findById(clinicID).orElse(null);
             return appointmentRepository.findAppointmentByClinic(clinic);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by clinic: " + e.getMessage(), e);
@@ -46,14 +45,6 @@ public class AppointmentService {
             return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(cusid, dentist,1,2);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
-        }
-    }
-
-    public Optional<List<Appointment>> dentistAppointment(String mail) {
-        try {
-            return appointmentRepository.getAppointmentByDentist_User_MailOrderByDateAsc(mail);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
         }
     }
 
@@ -122,7 +113,7 @@ public class AppointmentService {
     }
     public Optional<List<Appointment>> searchAppointmentByWorker(LocalDate date,String name) {
         try {
-            return appointmentRepository.searchAppointmentByDateAndUser_FirstNameOrUser_LastNameOrDependent_FirstNameOrDependent_LastName(date,name,name,name,name);
+            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private  final StaffRepository staffRepository;
+    private final StaffRepository staffRepository;
     private final DentistService dentistService;
     private final DentistRepository dentistRepository;
     private final DependentRepository dependentRepository;
@@ -27,6 +27,7 @@ public class UserService {
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
+
     public Optional<List<Client>> findAllDentist() {
         try {
             return userRepository.getClientsByRole(Role.DENTIST);
@@ -34,8 +35,9 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
     }
+
     public boolean existsByPhoneOrMail(String phone, String mail) {
-        return userRepository.existsByPhoneOrMailAndStatus(phone, mail,1);
+        return userRepository.existsByPhoneOrMailAndStatus(phone, mail, 1);
     }
 
     public Optional<List<Client>> findDentistByStaff(String mail) {
@@ -46,7 +48,7 @@ public class UserService {
         }
     }
 
-    public Optional<List<Client>> findCustomerinClinic(String mailstaff) {
+    public Optional<List<Client>> findCustomerInClinic(String mailstaff) {
         try {
             return userRepository.getCustomersByStaff(mailstaff);
         } catch (DataAccessException e) {
@@ -86,6 +88,7 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
     }
+
     public Client createNewUser(Client newClient) {
         try {
             // Perform necessary validation and business logic here
@@ -96,16 +99,6 @@ public class UserService {
         }
         return null;
     }
-
-    public boolean isPresent(Client createdClient) {
-        try {
-            return userRepository.findClientByMailOrPhone(createdClient.getMail(),createdClient.getPhone());
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-        }
-    }
-
 
 
     public Optional<Client> isPresentUser(String id) {
@@ -127,7 +120,8 @@ public class UserService {
             throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
     }
-    public Optional<Client> updateUserStatus(Client client){
+
+    public Optional<Client> updateUserStatus(Client client) {
         try {
             // Perform necessary validation and business logic here
             return Optional.of(userRepository.save(client));
@@ -137,16 +131,18 @@ public class UserService {
         }
 
     }
+
     public String mailExtract() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             return authentication.getName();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error occurred while extracting mail: " + e.getMessage(), e);
         }
 
     }
-    public Client findClientByMail(String mail){
+
+    public Client findClientByMail(String mail) {
         try {
             // Perform necessary validation and business logic here
             return userRepository.findClientByMail(mail);
@@ -157,7 +153,7 @@ public class UserService {
 
     }
 
-    public Staff findStaffByMail(String mail){
+    public Staff findStaffByMail(String mail) {
         try {
             // Perform necessary validation and business logic here
             return staffRepository.findStaffByUserMail(mail);
@@ -178,20 +174,20 @@ public class UserService {
         }
     }
 
-    public Client findUserById(String customerid) {
+    public Client findUserById(String customerID) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.findClientsByUserID(customerid);
+            return userRepository.findClientsByUserID(customerID);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public Dependent findDependentById(Optional<String> dependentid) {
+    public Dependent findDependentByDependentId(String dependentID) {
         try {
             // Perform necessary validation and business logic here
-            return dependentRepository.findByDependentID(dependentid);
+            return dependentRepository.findByDependentID(dependentID);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -201,7 +197,7 @@ public class UserService {
     public List<Client> findAllDentistByManager(String mail) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.getWorkerByManager(Role.DENTIST,mail);
+            return userRepository.getWorkerByManager(Role.DENTIST, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -212,7 +208,7 @@ public class UserService {
     public List<Client> findAllStaffByManager(String mail) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.getWorkerByManager(Role.STAFF,mail);
+            return userRepository.getWorkerByManager(Role.STAFF, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -221,39 +217,36 @@ public class UserService {
 
     public Optional<List<Client>> findDentistInClinic(String search) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientsByRoleAndDentistClinicClinicIDOrFirstNameOrLastNameOrMail(Role.DENTIST,search,search,search,search);
-
+            return userRepository.searchClientsByRoleAndDentistClinicClinicIDOrNameOrMail(Role.DENTIST, search, search, search);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
 
     }
 
-    public  Optional<List<Client>> searchManager(String search) {
+    public Optional<List<Client>> searchManager(String search) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.searchClientByRoleAndFirstNameOrLastName(Role.MANAGER,search,search);
+            return userRepository.searchClientByRoleAndName(Role.MANAGER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public  Optional<List<Client>> findStaffInClinic(String search) {
+    public Optional<List<Client>> findStaffInClinic(String search) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.searchClientsByRoleAndStaffClinicClinicIDOrFirstNameOrLastNameOrMail(Role.STAFF,search,search,search,search);
+            return userRepository.searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role.STAFF, search, search, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public  Optional<List<Client>> searchCustomersearch(String search) {
+    public Optional<List<Client>> searchCustomerSearch(String search) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientByRoleAndFirstNameOrLastName(Role.CUSTOMER,search,search);
+            return userRepository.searchClientByRoleAndName(Role.CUSTOMER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);

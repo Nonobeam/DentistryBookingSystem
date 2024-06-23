@@ -5,11 +5,8 @@ import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.DentistRepository;
-import com.example.DentistryManagement.repository.ScheduleRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.EncoderException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
