@@ -24,10 +24,7 @@ public class Dependent {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "dependentID")
     private String dependentID;
-    @NotBlank(message = "Firstname must not be empty")
-    private String firstName;
-    @NotBlank(message = "Lastname must not be empty")
-    private String lastName;
+    private String name;
     private LocalDate birthday;
 
     @JsonIgnore

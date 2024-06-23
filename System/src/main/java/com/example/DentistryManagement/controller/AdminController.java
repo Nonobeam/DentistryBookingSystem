@@ -36,7 +36,7 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/dentistList/")
+    @GetMapping("/dentistList")
     public ResponseEntity<Optional<List<Client>>> dentistList(@RequestParam(required = false) String search) {
         try {
             Optional<List<Client>> userList;
@@ -60,7 +60,7 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/managerList/")
+    @GetMapping("/managerList")
     public ResponseEntity<Optional<List<Client>>> managerList(@RequestParam(required = false) String search) {
         try {
             Optional<List<Client>> userList;
@@ -84,7 +84,7 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/staffList/")
+    @GetMapping("/staffList")
     public ResponseEntity<Optional<List<Client>>> staffList(@RequestParam(required = false) String search) {
         try {
             Optional<List<Client>> userList;
@@ -107,7 +107,7 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/customerList/")
+    @GetMapping("/customerList")
     public ResponseEntity<Optional<List<Client>>> customerList(@RequestParam(required = false) String search) {
         try {
             Optional<List<Client>> userList;
@@ -123,6 +123,7 @@ public class AdminController {
                     .body(null);
         }
     }
+
 
     @Operation(summary = "Admin")
     @ApiResponses(value = {
@@ -170,6 +171,74 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while creating the user.");
+        }
+    }
+
+    @GetMapping("/dentistList/")
+    public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search") String search) {
+        try {
+            Optional<List<Client>> userList;
+            if (search != null) {
+                userList = userService.findDentistInClinic(search);
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @PostMapping("/managerList/")
+    public ResponseEntity<Optional<List<Client>>> sortManager(@RequestParam("search") String search) {
+        try {
+            Optional<List<Client>> userList;
+            if (search != null) {
+                userList = userService.searchManager(search);
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @PostMapping("/staffList/")
+    public ResponseEntity<Optional<List<Client>>> sortStaff(@RequestParam("search") String search) {
+        try {
+            Optional<List<Client>> userList;
+            if (search != null) {
+                userList = userService.findStaffInClinic(search);
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @PostMapping("/customerList/")
+    public ResponseEntity<Optional<List<Client>>> sortCustomer(@RequestParam("search") String search) {
+        try {
+            Optional<List<Client>> userList;
+            if (search != null) {
+                userList = userService.searchCustomersearch(search);
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 

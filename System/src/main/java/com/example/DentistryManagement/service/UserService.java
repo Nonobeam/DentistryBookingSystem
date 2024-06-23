@@ -186,20 +186,20 @@ public class UserService {
         }
     }
 
-    public Client findUserById(String customerid) {
+    public Client findUserById(String customerID) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.findClientsByUserID(customerid);
+            return userRepository.findClientsByUserID(customerID);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public Dependent findDependentByDependentId(String dependentid) {
+    public Dependent findDependentByDependentId(String dependentID) {
         try {
             // Perform necessary validation and business logic here
-            return dependentRepository.findByDependentID(dependentid);
+            return dependentRepository.findByDependentID(dependentID);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -229,9 +229,7 @@ public class UserService {
 
     public Optional<List<Client>> findDentistInClinic(String search) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientsByRoleAndDentistClinicClinicIDOrFirstNameOrLastNameOrMail(Role.DENTIST, search, search, search, search);
-
+            return userRepository.searchClientsByRoleAndDentistClinicClinicIDOrNameOrMail(Role.DENTIST, search, search, search);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
@@ -241,7 +239,7 @@ public class UserService {
     public Optional<List<Client>> searchManager(String search) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.searchClientByRoleAndFirstNameOrLastName(Role.MANAGER, search, search);
+            return userRepository.searchClientByRoleAndName(Role.MANAGER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -251,17 +249,16 @@ public class UserService {
     public Optional<List<Client>> findStaffInClinic(String search) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.searchClientsByRoleAndStaffClinicClinicIDOrFirstNameOrLastNameOrMail(Role.STAFF, search, search, search, search);
+            return userRepository.searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role.STAFF, search, search, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public Optional<List<Client>> searchCustomersearch(String search) {
+    public Optional<List<Client>> searchCustomerSearch(String search) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientByRoleAndFirstNameOrLastName(Role.CUSTOMER, search, search);
+            return userRepository.searchClientByRoleAndName(Role.CUSTOMER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);

@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     boolean existsByPhoneOrMailAndStatus(String phone, String mail, int status);
 
-    Optional<Client> findByFirstNameOrLastName(String firstName, String lastName);
+    Optional<Client> findByName(String firstName, String lastName);
 
     Client findClientsByUserID(String userId);
 
@@ -36,10 +36,9 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = 'CUSTOMER' " +
             "AND a.clinic.clinicID = s.clinic.clinicID " +
             "AND s.user.mail = :mail " +
-            "AND (c.mail LIKE :search OR c.firstName LIKE :search OR c.lastName LIKE :search)")
+            "AND (c.mail LIKE :search OR c.Name LIKE :search )")
     Optional<List<Client>> searchCustomersByStaff(@Param("mail") String mail, @Param("search") String search);
     Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
-    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMailAndFirstNameContainingOrLastNameContaining(Role DENTIST, String staffmail,String searchfirstname, String searchlastname);
 
     //boss/adminlist
     Optional<List<Client>> getClientsByRole(Role role);
@@ -54,11 +53,11 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findClientByMail(String mail);
 
-    Optional<List<Client>> searchClientByRoleAndFirstNameOrLastName(Role role, String search, String key);
+    Optional<List<Client>> searchClientByRoleAndName(Role role, String search);
 
-    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String searchname, String searchlast, String mail);
+    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrNameOrMail(Role role, String search, String searchName, String mail);
 
-    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrFirstNameOrLastNameOrMail(Role role, String search, String search1, String search2, String search3);
 
     Client findUserByMail(String mail);
+    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role role, String search, String search1, String search2);
 }

@@ -24,7 +24,6 @@ public class AppointmentService {
     private final DentistRepository dentistRepository;
 
     private final ClinicRepository clinicRepository;
-
     public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
@@ -71,13 +70,26 @@ public class AppointmentService {
     }
 
 
-    //    public Optional<List<Appointment>> findAppointmentsByUserAndDateAndStatus(Client user, LocalDate date, int status) {
-//        try {
-//            return appointmentRepository.findAppointmentsByUserAndDateAndStatus(user, date, status);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+        public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
+        try {
+            String userID = user.getUserID();
+
+            if(date == null && status == null) {
+                return appointmentRepository.findAppointmentByUser_UserID(userID);
+            }
+            else {
+                if(status != null && date == null) {
+                    return appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
+                } else if(status == null && date != null) {
+                    return  appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
+                } else {
+                    return  appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID,date,status);
+                }
+            }
+            } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public Appointment AppointmentUpdate(Appointment appointment) {
         try {
             return appointmentRepository.save(appointment);
@@ -231,7 +243,6 @@ public class AppointmentService {
 
         return yearlyAppointmentCounts;
     }
-
     public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date, 1, 2);
         Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
@@ -266,6 +277,4 @@ public class AppointmentService {
 
         return yearlyAppointmentCounts;
     }
-
-
 }

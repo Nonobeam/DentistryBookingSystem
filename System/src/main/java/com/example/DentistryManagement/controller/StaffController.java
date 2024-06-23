@@ -105,6 +105,7 @@ public class StaffController {
         }
     }
 
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -126,10 +127,10 @@ public class StaffController {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
 
                             return clientDTO;
@@ -159,10 +160,9 @@ public class StaffController {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
 
             Optional<List<Appointment>> appointmentList = appointmentService.findAllAppointmentByDentist(id);
@@ -240,6 +240,7 @@ public class StaffController {
 
 //---------------------------MANAGE CUSTOMER---------------------------
 
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -260,10 +261,9 @@ public class StaffController {
                 List<UserDTO> clientDTOs = clientsOptional.get().stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
                             clientDTO.setBirthday(client.getBirthday());
                             return clientDTO;
                         })
@@ -295,10 +295,9 @@ public class StaffController {
 
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
             Optional<List<Appointment>> appointmentList = appointmentService.customerAppointment(id, mail);
             List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
@@ -386,43 +385,6 @@ public class StaffController {
         }
     }
 
-
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @GetMapping("/dependentList")
-    public ResponseEntity<List<Dependent>> getAllDependentByCustomer() {
-        try {
-            String mail = userService.mailExtract();
-            List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
-            return ResponseEntity.ok(dependentsList);
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
-
-
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @GetMapping("/dependentNew")
-    public ResponseEntity createDependentByCustomer(@RequestBody Dependent dependent) {
-        try {
-            String mail = userService.mailExtract();
-            dependent.setUser(userService.findClientByMail(mail));
-            return ResponseEntity.ok(userService.saveDependent(dependent));
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
 
     @Operation(summary = "Staff")
     @ApiResponses(value = {
@@ -567,7 +529,21 @@ public class StaffController {
 
     })
 
-    @PutMapping("/appointment-history/{appointmentid}")
+
+    @GetMapping("/appointment-history")
+    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
+        try {
+            String mail = userService.mailExtract();
+
+            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
+        } catch (Exception e) {
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @GetMapping("/appointment-history/{appointmentid}")
     public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
 
         try {

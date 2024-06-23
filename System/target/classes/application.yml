@@ -3,8 +3,8 @@ spring:
 #    url: jdbc:mysql://localhost:3306/mydb
 #    username: myuser
 #    password: mypassword
-    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:us-central1:dentistrymanagement&socketFactory=com.google.cloud.sql.mysql.SocketFactory
-    username: root
+    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:asia-south2:sunflowerdentistry&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+    username: sa
     password: Haha123456
   jpa:
     hibernate:
@@ -32,12 +32,19 @@ spring:
     gcp:
       sql:
         database-name: DentistryManagementSystem
-        instance-connection-name: red-carver-425403-d9:us-central1:dentistrymanagement
+        instance-connection-name: red-carver-425403-d9:asia-south2:sunflowerdentistry
 
+application:
+  security:
+    jwt:
+      secret-key:
+        hs256: b1b61a49c7ad56cc29e71343a2fbbed93e0d459c3ac7949dd39f401236fd87d9
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
 
-secret_key:
-  hs256: b1b61a49c7ad56cc29e71343a2fbbed93e0d459c3ac7949dd39f401236fd87d9
 
 app:
   cors:
     allowed-origins: http://localhost:3000
+  url: http://localhost:8080

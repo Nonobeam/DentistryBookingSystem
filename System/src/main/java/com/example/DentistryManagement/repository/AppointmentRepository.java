@@ -35,7 +35,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2);
 
-    Optional<List<Appointment>> findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(LocalDate date, Clinic clinic, String firstname, String lastname, String depenFirst, String depenLast);
+    Optional<List<Appointment>> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
 
     List<Appointment> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff, int status, int status2);
 
@@ -43,7 +43,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
 
-    Optional<List<Appointment>> findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(LocalDate date, String name, String name1, String name2, String name3, String name4);
+    Optional<List<Appointment>> findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserNameContainingIgnoreCaseAndDependentNameContainingIgnoreCase(LocalDate date, String name, String name1);
 
     Optional<List<Appointment>> findAppointmentsByUser(Client client);
 
@@ -58,4 +58,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and dentist.staff =:staff")
     int countAppointmentsByYearPresentByStaff( int year,Staff staff);
+
+    List<Appointment> findAppointmentByUser_UserID(String customerID);
+
+    List<Appointment> findAppointmentByUser_UserIDAndDate(String userID, LocalDate date);
+
+    List<Appointment> findAppointmentByUser_UserIDAndDateAndStatus(String userID, LocalDate date, int status);
+
+    List<Appointment> findAppointmentsByUser_UserIDAndStatus(String userID, int status);
 }

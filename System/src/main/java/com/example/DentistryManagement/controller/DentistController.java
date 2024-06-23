@@ -131,13 +131,11 @@ public class DentistController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
         try {
-
             UserDTO userDTO = new UserDTO();
             Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
             Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(id, userService.mailExtract());
             List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()

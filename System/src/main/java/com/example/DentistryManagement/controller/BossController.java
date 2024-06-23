@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/boss")
+@RequestMapping("/api/v1/boss")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Boss API")

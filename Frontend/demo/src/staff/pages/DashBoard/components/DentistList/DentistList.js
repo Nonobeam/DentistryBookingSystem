@@ -5,22 +5,27 @@ import { FeatureAction } from './components/FeatureAction/FeatureAction';
 import axios from 'axios';
 
 import { Action } from './components/Action/Action';
-const apiEndPoint = 'https://65459271fe036a2fa95473f5.mockapi.io/api/Student';
+import { DentistServices } from '../../../../services/DentistServices/DentistServices';
 
 const columns = [
   {
-    title: 'Họ Tên',
-    dataIndex: 'name',
+    title: 'Full Name',
+    dataIndex: `firstName`,
     key: 'name',
   },
   {
-    title: 'Tuổi',
-    dataIndex: 'dateofbirth',
+    title: 'Birthday',
+    dataIndex: 'birthday',
     key: 'dateofbirth',
   },
   {
-    title: 'Class',
-    dataIndex: 'class',
+    title: 'Number',
+    dataIndex: 'phone',
+    key: 'class',
+  },
+  {
+    title: 'Email',
+    dataIndex: 'mail',
     key: 'class',
   },
   {
@@ -28,30 +33,35 @@ const columns = [
     dataIndex: '',
     key: 'x',
     render: (_, record) => <Action record={record} />,
-    
   },
 ];
 
 export const DentistList = () => {
   const [apiData, setApiData] = useState([]);
+  const [listDentist, setListDentist] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(apiEndPoint);
-        setApiData(response.data);
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
+      const response = await DentistServices.getAll();
+      console.log(response);
+      const dataDentist = response.map((item) => {
+        return item.user;
+      });
+
+      setListDentist(dataDentist);
+      setApiData(response);
     };
     fetchData();
   }, []);
   return (
     <div>
       <h1>DashBoard</h1>
-      <Flex> <FeatureAction /></Flex>
       <Flex>
-        <TableList dataSource={apiData} columns={columns} />
+        {' '}
+        <FeatureAction />
+      </Flex>
+      <Flex>
+        <TableList dataSource={listDentist} columns={columns} />
       </Flex>
     </div>
   );
