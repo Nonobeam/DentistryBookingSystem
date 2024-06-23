@@ -29,7 +29,7 @@ const Login = () => {
       );
 
       const { token, role } = response.data;
-      const expirationTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour expiration
+      const expirationTime = new Date().getTime() + 45 * 60 * 1000; // 1 hour expiration
 
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
@@ -107,13 +107,14 @@ const Login = () => {
                 Log In
               </Button>
             </Form.Item>
-            <Form.Item>
-              <a href="/forgot">Forgot Password?</a>
-            </Form.Item>
-            <Form.Item>
-              <a href="/signup">No account yet? Sign Up</a>
-            </Form.Item>
+            <a href="/forgot">Forgot Password?</a>
+              <br></br>
+
+            <a href="/signup">No account yet? Sign Up</a>
+              <br></br>
+            <a href="/">Return back home</a>
           </Form>
+
         </div>
       </div>
 
