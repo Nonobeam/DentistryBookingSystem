@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, Checkbox, Typography, DatePicker, Alert } from "antd";
-import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -9,6 +9,7 @@ const API_URL = "http://localhost:8080/api/v1/auth/register";
 
 const Signup = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const history = useNavigate();
 
   const onFinish = async (values) => {
     console.log("Success:", values);
@@ -25,7 +26,7 @@ const Signup = () => {
       if (response.status === 200) { //JSON: 201 Created, CHANGE BACK TO 200
         setErrorMessage(""); // Clear any previous error message
         alert("Registration successful!");
-        // Redirect to login or another page if necessary
+        history.push("/login"); // Redirect to login page
 
       }
     } catch (error) {
