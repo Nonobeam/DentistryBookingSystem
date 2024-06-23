@@ -15,7 +15,7 @@ const RoleBasedRoute = ({ element: Component, requiredRole, ...rest }) => {
     return <Navigate to="/login" />;
   }
 
-  if (requiredRole && role !== requiredRole) {
+  if (requiredRole && !requiredRole.includes(role)) {
     return <NotAuthorized/>;
   }
 

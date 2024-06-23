@@ -26,23 +26,21 @@ const App = () => {
     <Router>
       <Routes>
         <Route exact path='/' element={<Homepage />} />
-        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole="CUSTOMER" />} />
+        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole={['CUSTOMER', 'MANAGER']} />} />
         <Route path='/educational' element={<Educational />} />
         <Route path='/services' element={<Services />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/forgot' element={<ForgotPassword />} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
-      </Routes>
 
-      <Routes>
-        <Route path='/dashboard' element={<DashBoard />}>
-          <Route path='dentist-list' element={<DentistList />} />
-          <Route path='' element={<CarDash />} />
-          <Route path='appointment-history' element={<AppointmentsPage />} />
-          <Route path='admin-home-page' element={<AdminHomePage />} />
-          <Route path='timetable' element={<TimeTable />} />
-        </Route>
+          <Route path='/dashboard' element={<DashBoard />}>
+            <Route path='dentist-list' element={<DentistList />} />
+            <Route path='' element={<CarDash />} />
+            <Route path='appointment-history' element={<AppointmentsPage />} />
+            <Route path='admin-home-page' element={<AdminHomePage />} />
+            <Route path='timetable' element={<TimeTable />} />
+          </Route>
         <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
