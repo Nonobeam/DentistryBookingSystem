@@ -1,11 +1,52 @@
-import React from "react";
-import { Form, Input, Button, Typography } from "antd";
+import React, { useState } from "react";
+import axios from "axios";
+import { Form, Input, Button, Typography, Alert } from "antd";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
+const API_URL = "http://localhost:8080/api/v1/auth/authenticate";
+
 const Login = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    console.log("Form values:", values);
+    try {
+      const response = await axios.post(
+        API_URL,
+        {
+          mail: values.mail,
+          password: values.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      const { token, role } = response.data;
+      const expirationTime = new Date().getTime() + 45 * 60 * 1000; // 1 hour expiration
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+      localStorage.setItem("expirationTime", expirationTime);
+
+      console.log("Login successful:", response);
+      console.log("Role:", role);
+      setErrorMessage(""); // Clear previous error message
+      navigate("/"); //
+    } catch (error) {
+      console.error("Failed to login:", error);
+      if (error.response && error.response.status === 403) {
+        setErrorMessage("Wrong email or password. Please try again.");
+      } else {
+        setErrorMessage("An error occurred. Please try again later.");
+      }
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -31,8 +72,13 @@ const Login = () => {
             onFinishFailed={onFinishFailed}
             style={{ minWidth: "270px" }}
           >
+            {errorMessage && (
+              <Form.Item>
+                <Alert message={errorMessage} type="error" showIcon />
+              </Form.Item>
+            )}
             <Form.Item
-              name="email"
+              name="mail"
               rules={[
                 {
                   required: true,
@@ -61,18 +107,29 @@ const Login = () => {
                 Log In
               </Button>
             </Form.Item>
-            <Form.Item>
-              <a href="/forgot">Forgot Password?</a>
-            </Form.Item>
-            <Form.Item>
-              <a href="/signup">No account yet? Sign Up</a>
-            </Form.Item>
+            <a href="/forgot">Forgot Password?</a>
+              <br></br>
+
+            <a href="/signup">No account yet? Sign Up</a>
+              <br></br>
+            <a href="/">Return back home</a>
           </Form>
+
         </div>
       </div>
 
-      <div style={{ flex: 1, backgroundColor: "#f0f2f5", maxWidth: "50vw", maxHeight: "100vh"}}>
-        <img src="https://www.dpinc.net/wp-content/uploads/2021/03/9-scaled.jpg" style={{height: "100%"}}></img>
+      <div
+        style={{
+          flex: 1,
+          backgroundColor: "#f0f2f5",
+          maxWidth: "50vw",
+          maxHeight: "100vh",
+        }}
+      >
+        <img
+          src="https://www.dpinc.net/wp-content/uploads/2021/03/9-scaled.jpg"
+          style={{ height: "100%" }}
+        ></img>
       </div>
     </div>
   );

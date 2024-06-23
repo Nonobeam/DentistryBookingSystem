@@ -18,28 +18,29 @@ import Profile from './staff/pages/DashBoard/components/Profile/Profile';
 import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
 import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
-
+import RoleBasedRoute from './account/RoleBasedRoute';
+import NotAuthorized from './account/NotAuthorized';
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route exact path='/' element={<Homepage />} />
-        <Route exact path='/booking' element={<Booking />} />
+        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole={['CUSTOMER', 'MANAGER']} />} />
         <Route path='/educational' element={<Educational />} />
         <Route path='/services' element={<Services />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/forgot' element={<ForgotPassword />} />
-      </Routes>
-      <Routes>
-        <Route path='/dashboard' element={<DashBoard />}>
-          <Route path='dentist-list' element={<DentistList />} />
-          <Route path='' element={<CarDash />} />
-          <Route path='appointment-history' element={<AppointmentsPage />} />
-          <Route path='admin-home-page' element={<AdminHomePage />} />
-          <Route path='timetable' element={<TimeTable />} />
-        </Route>
+        <Route path='/not-authorized' element={<NotAuthorized />} />
+
+          <Route path='/dashboard' element={<DashBoard />}>
+            <Route path='dentist-list' element={<DentistList />} />
+            <Route path='' element={<CarDash />} />
+            <Route path='appointment-history' element={<AppointmentsPage />} />
+            <Route path='admin-home-page' element={<AdminHomePage />} />
+            <Route path='timetable' element={<TimeTable />} />
+          </Route>
         <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
