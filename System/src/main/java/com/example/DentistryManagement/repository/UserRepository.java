@@ -23,7 +23,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     boolean existsByPhoneOrMailAndStatus(String phone, String mail, int status);
 
-    Optional<Client> findByName(String firstName, String lastName);
 
     Client findClientsByUserID(String userId);
 
@@ -31,13 +30,12 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "JOIN c.appointmentList a " +
             "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.user.mail =: mail ")
     Optional<List<Client>> getCustomersByStaff(String mail);
-
-    @Query("SELECT c FROM Client c, Staff s JOIN c.appointmentList a " +
+    @Query("SELECT c FROM Client c JOIN c.appointmentList a JOIN a.clinic cl JOIN cl.staffList s " +
             "WHERE c.role = 'CUSTOMER' " +
-            "AND a.clinic.clinicID = s.clinic.clinicID " +
             "AND s.user.mail = :mail " +
-            "AND (c.mail LIKE :search OR c.Name LIKE :search )")
+            "AND (c.mail LIKE %:search% OR c.name LIKE %:search%)")
     Optional<List<Client>> searchCustomersByStaff(@Param("mail") String mail, @Param("search") String search);
+
     Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
 
     //boss/adminlist
@@ -60,4 +58,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findUserByMail(String mail);
     Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role role, String search, String search1, String search2);
+
+    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMailAndNameContaining(Role role, String mail, String search);
 }

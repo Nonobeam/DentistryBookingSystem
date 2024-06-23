@@ -12,9 +12,5 @@ public interface StaffRepository extends JpaRepository<Staff, String> {
 
     Staff findStaffByStaffID(String staffID);
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> da0cba6561488739cecc3dea681e682cabdd33c8
 }

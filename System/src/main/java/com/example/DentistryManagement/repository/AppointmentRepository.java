@@ -43,7 +43,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
 
-    Optional<List<Appointment>> findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserNameContainingIgnoreCaseAndDependentNameContainingIgnoreCase(LocalDate date, String name, String name1);
+    Optional<List<Appointment>> findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(LocalDate date, Clinic clinic, String name1,String dependentName);
 
     Optional<List<Appointment>> findAppointmentsByUser(Client client);
 

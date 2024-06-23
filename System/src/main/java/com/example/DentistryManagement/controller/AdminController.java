@@ -112,7 +112,7 @@ public class AdminController {
         try {
             Optional<List<Client>> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.searchCustomersearch(search);
+                userList = userService.searchCustomer(search);
             } else {
                 userList = userService.findAllCustomer();
             }
@@ -230,7 +230,7 @@ public class AdminController {
         try {
             Optional<List<Client>> userList;
             if (search != null) {
-                userList = userService.searchCustomersearch(search);
+                userList = userService.searchCustomer(search);
                 return ResponseEntity.ok(userList);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

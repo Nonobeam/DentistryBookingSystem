@@ -49,7 +49,7 @@ public class UserService {
     }
     public Optional<List<Client>> searchDentistByStaff(String mail,String search) {
         try {
-            return userRepository.getClientsByRoleAndDentist_Staff_UserMailAndFirstNameContainingOrLastNameContaining(Role.DENTIST, mail,search,search);
+            return userRepository.getClientsByRoleAndDentist_Staff_UserMailAndNameContaining(Role.DENTIST, mail,search);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
         }
@@ -256,7 +256,7 @@ public class UserService {
         }
     }
 
-    public Optional<List<Client>> searchCustomerSearch(String search) {
+    public Optional<List<Client>> searchCustomer(String search) {
         try {
             return userRepository.searchClientByRoleAndName(Role.CUSTOMER, search);
 
@@ -281,4 +281,6 @@ public class UserService {
             throw new RuntimeException("Error occurred while insert dependent: " + e.getMessage(), e);
         }
     }
+
+
 }

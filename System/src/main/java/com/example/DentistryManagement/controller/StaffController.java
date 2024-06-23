@@ -174,15 +174,15 @@ public class StaffController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;
@@ -308,15 +308,15 @@ public class StaffController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;
@@ -386,25 +386,7 @@ public class StaffController {
     }
 
 
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
 
-        try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
-            appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
     @Operation(summary = "Get All Services By Clinic")
     @ApiResponses(value = {
@@ -525,26 +507,10 @@ public class StaffController {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-
-
-    @GetMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
-        try {
-            String mail = userService.mailExtract();
-
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
-        } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-    @GetMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
+    @PatchMapping("/appointment-history/{appointmentid}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
 
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentid);
@@ -567,10 +533,10 @@ public class StaffController {
     public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Appointment>> appointmentList = null;
+            Optional<List<Appointment>> appointmentList ;
             if (date != null || (search != null && !search.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
-            } else appointmentList = appointmentService.findApointmentclinic(mail);
+            } else appointmentList = appointmentService.findApointmentClinic(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
                     .map(appointmentriu -> {
                         AppointmentDTO appointment = new AppointmentDTO();
@@ -579,15 +545,15 @@ public class StaffController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;

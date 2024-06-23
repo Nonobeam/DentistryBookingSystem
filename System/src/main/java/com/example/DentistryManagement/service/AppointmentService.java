@@ -24,7 +24,7 @@ public class AppointmentService {
     private final DentistRepository dentistRepository;
 
     private final ClinicRepository clinicRepository;
-    public Optional<List<Appointment>> findApointmentclinic(String staffmail) {
+    public Optional<List<Appointment>> findApointmentClinic(String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
@@ -135,7 +135,7 @@ public class AppointmentService {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
             Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, clinic, name, name, name, name);
+            return appointmentRepository.findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, clinic, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -143,10 +143,10 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name, String staffmail) {
         try {
-            Dentist staffclient = dentistRepository.findDentistByUserMail(staffmail);
+            Dentist dentist = dentistRepository.findDentistByUserMail(staffmail);
 
-            Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, clinic, name, name, name, name);
+            Clinic clinic = dentist.getClinic();
+            return appointmentRepository.findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, clinic, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -156,7 +156,7 @@ public class AppointmentService {
         try {
             Client client = userRepository.findUserByMail(mail);
 
-            return appointmentRepository.findByDateAndClinic_ClinicNameContainingIgnoreCaseOrUserFirstNameContainingIgnoreCaseOrUserLastNameContainingIgnoreCaseAndDependentFirstNameContainingIgnoreCaseOrDependentLastNameContainingIgnoreCase(date, name, name, name, name, name);
+            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date,name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

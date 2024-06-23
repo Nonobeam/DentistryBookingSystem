@@ -5,8 +5,6 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.passwordResetToken.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/user")
 @RestController
@@ -400,15 +399,15 @@ public class UserController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;

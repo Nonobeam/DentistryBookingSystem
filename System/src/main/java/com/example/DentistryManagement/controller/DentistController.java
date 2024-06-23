@@ -61,15 +61,15 @@ public class DentistController {
                             appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                             if (appointmentriu.getStaff() != null) {
                                 if (appointmentriu.getUser() != null) {
-                                    appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                    appointment.setUser(appointmentriu.getUser().getName());
                                 } else {
-                                    appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                    appointment.setDependent(appointmentriu.getDependent().getName());
                                 }
                             } else {
                                 if (appointmentriu.getDependent() != null) {
-                                    appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                    appointment.setDependent(appointmentriu.getDependent().getName());
                                 } else
-                                    appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                    appointment.setUser(appointmentriu.getUser().getName());
                             }
 
                             return appointment;
@@ -146,15 +146,15 @@ public class DentistController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;
@@ -231,15 +231,15 @@ public class DentistController {
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
                         if (appointmentriu.getStaff() != null) {
                             if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             }
                         } else {
                             if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getFirstName() + appointmentriu.getDependent().getLastName());
+                                appointment.setDependent(appointmentriu.getDependent().getName());
                             } else
-                                appointment.setUser(appointmentriu.getUser().getFirstName() + appointmentriu.getUser().getLastName());
+                                appointment.setUser(appointmentriu.getUser().getName());
                         }
 
                         return appointment;
