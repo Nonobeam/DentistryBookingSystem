@@ -41,17 +41,18 @@ const Login = () => {
         }
       );
 
-      const { token, role } = response.data;
+      const { access_token, refresh_token, role } = response.data;
       const expirationTime = new Date().getTime() + 45 * 60 * 1000; // 45 mins
 
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("refreshToken", refresh_token);
       localStorage.setItem("role", role);
       localStorage.setItem("expirationTime", expirationTime);
 
-      console.log("Login successful");
+      console.log("Token:", localStorage.getItem("token"));
       console.log("Role:", role);
       setErrorMessage(""); // Clear previous error message
-      navigate("/"); //navigate back to homepage
+      navigate("/"); // Navigate back to homepage
     } 
     
     catch (error) {
