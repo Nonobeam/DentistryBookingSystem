@@ -2,13 +2,11 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.token.PasswordResetToken;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
-import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +18,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -40,55 +37,26 @@ public class UserController {
     private final UserRepository userRepository;
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
-    @Operation(summary = "All users")
+    private final Logger LOGGER = LogManager.getLogger(UserController.class);
+
+
+    //----------------------------------- CUSTOMER INFORMATION -----------------------------------
+
+
+    @Operation(summary = "Customer information")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
-    @GetMapping("/all")
-    public ResponseEntity<List<Client>> findAllUsers() {
-        return ResponseEntity.ok(userService.findAllUsers());
+    @GetMapping("/info")
+    public ResponseEntity<UserDTO> findUser() {
+        UserDTO userDTO = new UserDTO();
+        return ResponseEntity.ok(userDTO.getUserDTOFromUser(userService.findClientByMail(userService.mailExtract())));
     }
 
-    @Operation(summary = "Find a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
-    })
-    @GetMapping("/all/{userID}")
-    public ResponseEntity<Client> findUser(@PathVariable String userID) {
-        return ResponseEntity.ok(userService.findUserById(userID));
-    }
 
-//    @Operation(summary = "All dentists follow status")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found")
-//    })
-//    @GetMapping("/allDentist/{status}")
-//    public ResponseEntity<List<Client>> findAllDentistsByStatus(@PathVariable int status, @PathVariable Role role) {
-//        return ResponseEntity.ok(dentistService.findAllDentistsByStatus(status, role));
-//    }
-
-//    @Operation(summary = "Get schedule for a dentist")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully"),
-//            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-//            @ApiResponse(responseCode = "404", description = "Not found")
-//    })
-//    @GetMapping("/dentist/schedule/{dentistID}")
-//    public ResponseEntity<Schedule> findAllDentistsByStatus(@PathVariable UUID dentistID, @Param("date")LocalDate date) {
-//        return ResponseEntity.ok(dentistService.getDentistSchedule(dentistID, date));
-//    }
-
-    @PostMapping("/sendMail/{mail}")
-    public String sendMail(@PathVariable String mail, @RequestBody Notification notificationStructure) {
-        notificationService.sendMail(mail, notificationStructure);
-        return "Successfully";
-    }
+    //----------------------------------- APPOINTMENT INFORMATION -----------------------------------
 
 
     @Operation(summary = "Customer")
@@ -110,14 +78,15 @@ public class UserController {
         }
     }
 
+
     @GetMapping("/available-service")
     public ResponseEntity<List<Services>> getAvailableServices(
             @RequestParam LocalDate bookDate,
-            @RequestParam String clinicid) {
+            @RequestParam String clinicId) {
 
         List<Services> dentistService;
         try {
-            Clinic clinic = clinicService.findClinicByID(clinicid);
+            Clinic clinic = clinicService.findClinicByID(clinicId);
             dentistService = dentistScheduleService
                     .getServiceNotNullByDate(bookDate, clinic);
             return ResponseEntity.ok(dentistService);
@@ -171,6 +140,7 @@ public class UserController {
             throw new Error("Error while getting clinic " + error);
         }
     }
+
 
     @Operation(summary = "Show available schedules")
     @ApiResponses(value = {
@@ -271,6 +241,7 @@ public class UserController {
         }
     }
 
+
     @Operation(summary = "Show user Appointment history")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -293,6 +264,9 @@ public class UserController {
         }
     }
 
+    //----------------------------------- UPDATE INFORMATION -----------------------------------
+
+
     @Operation(summary = "Send a reset password link to customer's email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -310,6 +284,29 @@ public class UserController {
                 tokenService.sendPasswordResetEmail(user.getMail(), token);
             }
             return ResponseEntity.ok("Password reset link has been sent to your email");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @Operation(summary = "User update their profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/info/update")
+    public ResponseEntity<UserDTO> updateProfile(@RequestBody UserDTO userDTO) {
+        try {
+            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
+            if (user != null) {
+                userDTO.getUserDTOFromUser(user);
+            }
+            return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {

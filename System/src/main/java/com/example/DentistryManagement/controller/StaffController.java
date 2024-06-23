@@ -14,6 +14,7 @@ import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
+import com.google.api.Authentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -480,8 +481,7 @@ public class StaffController {
     @GetMapping("/appointment-history")
     public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String mail= authentication.getName();
+            String mail= userService.mailExtract();
             Staff staff = userService.findStaffByMail(mail);
             Clinic clinic = staff.getClinic();
             String clinicID = clinic.getClinicID();

@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.DTO;
 
+import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,4 +21,14 @@ public class UserDTO {
     @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDate birthday;
+
+    public UserDTO getUserDTOFromUser(Client user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setName(user.getName());
+        userDTO.setPhone(user.getPhone());
+        userDTO.setMail(user.getMail());
+        userDTO.setRole(role);
+        userDTO.setBirthday(birthday);
+        return userDTO;
+    }
 }

@@ -42,7 +42,10 @@ public class SecurityConfig{
             "/swagger-resources",
             "/swagger-resources/**",
             "/swagger-ui.html",
-            "/swagger-ui/index.html#/**"
+            "/swagger-ui/index.html#/**",
+            "/user/forgotPassword",
+            "user/resetPassword",
+            "user/resetPassword/**"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -60,6 +63,8 @@ public class SecurityConfig{
                                 .permitAll()
                                 .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), MANAGER.name(), CUSTOMER.name(), STAFF.name(), DENTIST.name())
                                 .requestMatchers(GET, "/user/**").hasAnyAuthority(READ.name())
+                                .requestMatchers(PUT, "/user/**").hasAnyAuthority(UPDATE.name())
+                                .requestMatchers(POST, "/user/**").hasAnyAuthority(WRITE.name())
                                 .requestMatchers("/api/v1/manager/**").hasRole(MANAGER.name())
                                 .requestMatchers(GET, "/api/v1/manager/**").hasAuthority(READ.name())
                                 .requestMatchers(PUT, "/api/v1/manager/**").hasAuthority(UPDATE.name())
