@@ -33,19 +33,13 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-    private final DentistService dentistService;
     private final DentistScheduleService dentistScheduleService;
     private final NotificationService notificationService;
     private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
-    private final PasswordResetTokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
-    private final Logger LOGGER = LogManager.getLogger(UserController.class);
-    private final ServiceService serviceService;
-
     @Operation(summary = "All users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -277,6 +271,8 @@ public class UserController {
         }
     }
 
+
+
     @Operation(summary = "Send a reset password link to customer's email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -285,13 +281,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam("mail") String mail) {
+    public ResponseEntity<?> forgotPassword() {
         try {
-            Client user = userRepository.findByMail(mail).orElse(null);
+            Client user = userService.findClientByMail(userService.mailExtract());
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
-                tokenService.sendPasswordResetEmail(mail, token);
+                tokenService.sendPasswordResetEmail(user.getMail(), token);
             }
             return ResponseEntity.ok("Password reset link has been sent to your email");
         } catch (Error e) {
