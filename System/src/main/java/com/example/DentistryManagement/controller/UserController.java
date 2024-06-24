@@ -3,10 +3,12 @@ package com.example.DentistryManagement.controller;
 
 
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
+import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +20,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/user")
 @RestController
@@ -30,15 +34,18 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
+    private final DentistService dentistService;
     private final DentistScheduleService dentistScheduleService;
     private final NotificationService notificationService;
     private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
     private final Logger LOGGER = LogManager.getLogger(UserController.class);
-
+    private final ServiceService serviceService;
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
 
@@ -68,7 +75,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/{status}")
+    @PutMapping("/{status}")
     public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
 
         try {
@@ -80,6 +87,34 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "All Clinics")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/dependentList")
+    public ResponseEntity<List<Dependent>> getAllDependentByCustomer() {
+        try {
+            String mail = userService.mailExtract();
+            List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
+            return ResponseEntity.ok(dependentsList);
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
+
+    @GetMapping("/dependentNew")
+    public ResponseEntity createDependentByCustomer(@RequestBody Dependent dependent) {
+        try {
+            String mail = userService.mailExtract();
+            dependent.setUser(userService.findClientByMail(mail));
+            return ResponseEntity.ok(userService.saveDependent(dependent));
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
 
     @GetMapping("/available-service")
     public ResponseEntity<List<Services>> getAvailableServices(
@@ -198,7 +233,7 @@ public class UserController {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
                 newAppointment.setDependent(dependent);
             }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));
@@ -338,4 +373,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
 }

@@ -24,10 +24,12 @@ public class Dependent {
     private String name;
     private LocalDate birthday;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "customerID", nullable = false, referencedColumnName = "userID")
     private Client user;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dependent")
-    private List<Appointment> dependentList;
+    private List<Appointment> appointmentList;
 }

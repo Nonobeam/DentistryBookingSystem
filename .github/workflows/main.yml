@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -17,6 +17,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '17'
+        distribution: 'temurin'
 
     - name: Navigate to System directory
       working-directory: System
@@ -38,6 +39,14 @@ jobs:
       working-directory: System
       run: docker build --build-arg GOOGLE_APPLICATION_CREDENTIALS_JSON="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" -t dentistry-management:latest .
 
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+    - name: Tag Docker image
+      run: docker tag dentistry-management:latest ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
+
+    - name: Push Docker image to Docker Hub
+      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
+
     - name: Run Docker container
-      working-directory: System
-      run: docker run -d -p 8080:8080 dentistry-management:latest
+      run: docker run -d -p 8080:8080 ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
