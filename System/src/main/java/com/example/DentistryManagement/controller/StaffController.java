@@ -7,7 +7,7 @@ import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
-import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;

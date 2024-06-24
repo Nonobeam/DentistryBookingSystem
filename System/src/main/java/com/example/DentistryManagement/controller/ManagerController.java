@@ -90,7 +90,6 @@ public class ManagerController {
         Client updateUser = userService.findUserById(userID);
 
         if (updateUser != null) {
-
             updateUser.setName(userDTO.getName());
             updateUser.setPhone(userDTO.getPhone());
             updateUser.setMail(userDTO.getMail());

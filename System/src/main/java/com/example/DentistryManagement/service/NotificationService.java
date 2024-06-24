@@ -1,9 +1,8 @@
 package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.NotificationRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

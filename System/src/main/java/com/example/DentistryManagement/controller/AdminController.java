@@ -3,8 +3,6 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.service.AuthenticationService;
-import com.example.DentistryManagement.service.ClinicService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,8 +24,6 @@ import java.util.Optional;
 public class AdminController {
     private final UserService userService;
     private final UserMapping userMapping;
-
-    private final ClinicService clinicService;
 
     @Operation(summary = "Admin")
     @ApiResponses(value = {
@@ -73,6 +69,7 @@ public class AdminController {
         }
     }
 
+
     @Operation(summary = "Admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -95,6 +92,7 @@ public class AdminController {
                     .build();
         }
     }
+
 
     @Operation(summary = "Admin")
     @ApiResponses(value = {
@@ -129,10 +127,10 @@ public class AdminController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updateduser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
         try {
-            if (userService.isPresentUser(id) != null) {
-                Client client = userMapping.mapUser(updateduser);
+            if (userService.isPresentUser(id).isPresent()) {
+                Client client = userMapping.mapUser(updatedUser);
                 userService.updateUser(client);
                 return ResponseEntity.ok().build();
             } else {
@@ -145,16 +143,16 @@ public class AdminController {
         }
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-            if (userService.isPresentUser(id) != null) {
+            if (userService.isPresentUser(id).isPresent()) {
                 Optional<Client> c = userService.isPresentUser(id);
                 if (c.isPresent()) {
                     Client client = c.get();
-                    client.setStatus(0);
-                    userService.updateUserStatus(client);
+                    userService.updateUserStatus(client, 0);
                     return ResponseEntity.ok().build();
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -169,6 +167,7 @@ public class AdminController {
                     .body("An error occurred while creating the user.");
         }
     }
+
 
     @GetMapping("/dentistList/")
     public ResponseEntity<Optional<List<Client>>> sortDentist(@RequestParam("search") String search) {
@@ -187,6 +186,7 @@ public class AdminController {
         }
     }
 
+
     @PostMapping("/managerList/")
     public ResponseEntity<Optional<List<Client>>> sortManager(@RequestParam("search") String search) {
         try {
@@ -203,6 +203,7 @@ public class AdminController {
                     .body(null);
         }
     }
+
 
     @PostMapping("/staffList/")
     public ResponseEntity<Optional<List<Client>>> sortStaff(@RequestParam("search") String search) {
@@ -221,6 +222,7 @@ public class AdminController {
         }
     }
 
+
     @PostMapping("/customerList/")
     public ResponseEntity<Optional<List<Client>>> sortCustomer(@RequestParam("search") String search) {
         try {
@@ -237,6 +239,4 @@ public class AdminController {
                     .body(null);
         }
     }
-
-
 }

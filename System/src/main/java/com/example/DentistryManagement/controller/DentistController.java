@@ -4,7 +4,7 @@ import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.service.*;
@@ -15,8 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
