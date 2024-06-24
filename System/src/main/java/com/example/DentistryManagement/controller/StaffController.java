@@ -7,12 +7,9 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Client;
-
-//import com.example.DentistryManagement.core.mail.Mail;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
@@ -31,7 +28,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/staff")
@@ -42,11 +43,12 @@ import java.util.stream.Collectors;
 public class StaffController {
     private final MailService emailService;
     private final UserService userService;
-    private final DentistScheduleService dentistScheduleService;
+    private final ClinicService clinicService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
+    private final DentistScheduleService dentistScheduleService;
     private final AppointmentRepository appointmentRepository;
     private final Logger LOGGER = LogManager.getLogger(UserController.class);
 
@@ -275,6 +277,7 @@ public class StaffController {
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
+            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -372,7 +375,7 @@ public class StaffController {
 
     })
     @GetMapping()
-    public ResponseEntity<Optional<List<Notification>>> receiveNotification() {
+    public ResponseEntity<?> receiveNotification() {
         try {
             String mail = userService.mailExtract();
 
@@ -515,7 +518,7 @@ public class StaffController {
     }
 
 
-    @Operation(summary = "Get All Services By Clinic")
+    @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
@@ -619,7 +622,8 @@ public class StaffController {
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            // Xử lý ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -643,6 +647,7 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @Operation(summary = "Staff")
     @ApiResponses(value = {
