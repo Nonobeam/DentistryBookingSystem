@@ -110,13 +110,13 @@ public class StaffController {
 
     })
     @GetMapping("/dentistList")
-    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
+    public ResponseEntity<List<UserDTO>> findDentistManage() {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
+            List<Client> clientsOptional = userService.findDentistByStaff(mail);
 
-            if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-                List<UserDTO> clientDTOs = clientsOptional.get().stream()
+            if (!clientsOptional.isEmpty()) {
+                List<UserDTO> clientDTOs = clientsOptional.stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
                             clientDTO.setName(client.getName());
@@ -129,7 +129,7 @@ public class StaffController {
                         })
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(Optional.of(clientDTOs));
+                return ResponseEntity.ok(clientDTOs);
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }

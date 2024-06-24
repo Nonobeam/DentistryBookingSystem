@@ -42,7 +42,7 @@ public class UserService {
         return userRepository.existsByPhoneOrMailAndStatus(phone, mail, 1);
     }
 
-    public Optional<List<Client>> findDentistByStaff(String mail) {
+    public List<Client> findDentistByStaff(String mail) {
         try {
             return userRepository.getClientsByRoleAndDentist_Staff_UserMail(Role.DENTIST, mail);
         } catch (DataAccessException e) {

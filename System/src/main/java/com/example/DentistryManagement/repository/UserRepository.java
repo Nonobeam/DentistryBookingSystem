@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.user.mail =: mail ")
     Optional<List<Client>> getCustomersByStaff(String mail);
 
-    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
+    List<Client> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
 
     //boss/adminlist
     Optional<List<Client>> getClientsByRole(Role role);
