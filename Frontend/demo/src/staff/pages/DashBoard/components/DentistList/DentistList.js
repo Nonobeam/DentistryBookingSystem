@@ -1,4 +1,4 @@
-import { Flex } from 'antd';
+import { Flex, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TableList } from './components/Table/TableList';
 import { FeatureAction } from './components/FeatureAction/FeatureAction';
@@ -6,11 +6,12 @@ import axios from 'axios';
 
 import { Action } from './components/Action/Action';
 import { DentistServices } from '../../../../services/DentistServices/DentistServices';
+import { dataDentist } from '../../../../utils/data';
 
 const columns = [
   {
     title: 'Full Name',
-    dataIndex: `firstName`,
+    dataIndex: `name`,
     key: 'name',
   },
   {
@@ -42,14 +43,16 @@ export const DentistList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await DentistServices.getAll();
-      console.log(response);
-      const dataDentist = response.map((item) => {
-        return item.user;
-      });
+      // const response = await DentistServices.getAll();
+      // console.log(response);
+      // if (response) {
+      //   const dataDentist = response.map((item) => {
+      //     return item.user;
+      //   });
 
       setListDentist(dataDentist);
-      setApiData(response);
+      setApiData(dataDentist);
+      // }
     };
     fetchData();
   }, []);

@@ -18,7 +18,7 @@ import Profile from './staff/pages/DashBoard/components/Profile/Profile';
 import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
 import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
-
+import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
 
 const App = () => {
   return (
@@ -35,6 +35,10 @@ const App = () => {
       <Routes>
         <Route path='/dashboard' element={<DashBoard />}>
           <Route path='dentist-list' element={<DentistList />} />
+          <Route
+            path='dentist-list/detail/:dentistID'
+            element={<DentistInfo />}
+          />
           <Route path='' element={<CarDash />} />
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='admin-home-page' element={<AdminHomePage />} />
@@ -43,7 +47,6 @@ const App = () => {
         <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
-
       </Routes>
     </Router>
   );
