@@ -16,5 +16,7 @@ import java.util.Map;
 public class DashboardBoss {
     private Map<Clinic, List<Appointment>> dailyAppointments;
     private Map<String, Map<Integer, Long>>  monthlyAppointments;
+    private int totalAppointmentsInMonthNow;
+    private int totalAppointmentsInYearNow;
 
 }

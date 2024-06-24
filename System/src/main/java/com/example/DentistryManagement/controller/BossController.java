@@ -60,8 +60,10 @@ public class BossController {
 
             Map<Clinic, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByClinic(date);
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getAppointmentsByClinicsForYear(year);
+            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByBoss();
+            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByBoss();
 
-            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments);
+            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
