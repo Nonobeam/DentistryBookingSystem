@@ -1,18 +1,14 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.DashboardResponse;
 import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.mail.Notification;
-import com.example.DentistryManagement.core.user.Client;
-
-//import com.example.DentistryManagement.core.mail.Mail;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
@@ -29,12 +25,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/staff")
@@ -114,28 +112,32 @@ public class StaffController {
 
     })
     @GetMapping("/dentistList")
-    public ResponseEntity<Optional<List<UserDTO>>> findDentistManage() {
+    public ResponseEntity<List<UserDTO>> findAllDentistByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findDentistByStaff(mail);
+            List<Client> clientsOptional = null;
+            if (search != null && !search.isEmpty()) {
+                clientsOptional = userService.searchDentistByStaff(mail, search);
 
-            if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-                List<UserDTO> clientDTOs = clientsOptional.get().stream()
+            } else clientsOptional = userService.findDentistByStaff(mail);
+
+            if (!clientsOptional.isEmpty()) {
+                List<UserDTO> clientDTOs = clientsOptional.stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
 
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(Optional.of(clientDTOs));
+                return ResponseEntity.ok(clientDTOs);
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -151,21 +153,43 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/dentistList/{id}")
-    public ResponseEntity<UserAppointDTO> findDentistInformationByStaff(@PathVariable("id") String id) {
+    @GetMapping("/dentistList/{mail}")
+    public ResponseEntity<UserAppointDTO> findDentistInformationByStaff(@PathVariable("mail") String dentistMail) {
         try {
             UserDTO userDTO = new UserDTO();
-            Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            Client client = userService.findClientByMail(dentistMail);
+
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
 
-            Optional<List<Appointment>> appointment = appointmentService.findAllAppointByDentist(id);
+            List<Appointment> appointmentList = appointmentService.findAllAppointmentByDentist(client.getUserID());
+            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getName());
+                        }
+
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(appointment);
+            userAppointDTO.setAppointment(Optional.of(appointmentDTOList));
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -225,27 +249,32 @@ public class StaffController {
 
     })
     @GetMapping("/customerList")
-    public ResponseEntity<Optional<List<UserDTO>>> findAllCustomerByStaff() {
+    public ResponseEntity<List<UserDTO>> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Client>> clientsOptional = userService.findCustomerInClinic(mail);
+            List<Client> clients = null;
 
-            if (clientsOptional.isPresent() && !clientsOptional.get().isEmpty()) {
-                List<UserDTO> clientDTOs = clientsOptional.get().stream()
+            if (search != null && !search.isEmpty()) {
+                clients = userService.searchCustomerInClinicByStaff(mail, search);
+            } else {
+                clients = userService.findCustomerInClinicByStaff(mail);
+            }
+
+            if (clients != null && !clients.isEmpty()) {
+                List<UserDTO> clientDTOs = clients.stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
-                            clientDTO.setFirstName(client.getFirstName());
+                            clientDTO.setName(client.getName());
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setLastName(client.getLastName());
                             clientDTO.setBirthday(client.getBirthday());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(Optional.of(clientDTOs));
+                return ResponseEntity.ok(clientDTOs);
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
             // Xử lý ngoại lệ
@@ -262,23 +291,45 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<?> findCustomerByStaff(@PathVariable("id") String id) {
+    @GetMapping("/customerList/{mail}")
+    public ResponseEntity<?> findCustomerByStaff(@PathVariable("mail") String customerMail) {
         try {
             String mail = userService.mailExtract();
 
             UserDTO userDTO = new UserDTO();
-            Client client = userService.userInfo(id);
-            userDTO.setFirstName(client.getFirstName());
+            Client client = userService.findClientByMail(customerMail);
+            userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setLastName(client.getLastName());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointment = appointmentService.customerAppointment(id, mail);
+            Optional<List<Appointment>> appointmentList = appointmentService.customerAppointment(client.getUserID(), mail);
+            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getName());
+                        }
+
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(appointment);
-            return ResponseEntity.ok(userAppointDTO);
+            userAppointDTO.setAppointment(Optional.of(appointmentDTOList));
+            return ResponseEntity.ok(Optional.of(userAppointDTO));
+
         } catch (Exception e) {
             // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -338,26 +389,6 @@ public class StaffController {
     }
 
 
-    @Operation(summary = "Staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
-
-        try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
-            appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @Operation(summary = "Get All Services By Clinic")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -366,12 +397,12 @@ public class StaffController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
 
-    @GetMapping("/all-service/{clinicID}")
-    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate,
-                                                                           @PathVariable String clinicID) {
+    @GetMapping("/all-service")
+    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate) {
         try {
             HashMap<String, Services> servicesByClinic = new HashMap<>();
-            Clinic clinic = clinicService.findClinicByID(clinicID);
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Clinic clinic = staff.getClinic();
             List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
             for (DentistSchedule dentistSchedule : dentistScheduleList) {
                 if (dentistSchedule.getWorkDate().equals(workDate)) {
@@ -393,14 +424,14 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/{clinicID}/available-schedules")
+    @GetMapping("/available-schedules")
     public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
             @RequestParam LocalDate workDate,
-            @PathVariable String clinicID,
             @RequestParam String servicesId) {
-
+        Staff staff = userService.findStaffByMail(userService.mailExtract());
+        Clinic clinic = staff.getClinic();
         Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID);
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID());
 
         return dentistScheduleList
                 .map(ResponseEntity::ok)
@@ -415,8 +446,8 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/make-booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false)  String dependentID) {
+    @PostMapping("make-booking/booking/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String userID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -428,18 +459,20 @@ public class StaffController {
                 throw new Error("Full appointment for this date!");
             }
             Appointment newAppointment = new Appointment();
-            newAppointment.setUser(client);
+            newAppointment.setStaff(client.getStaff());
+            newAppointment.setUser(userService.findUserById(userID));
             newAppointment.setServices(dentistSchedule.getServices());
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setDentistScheduleId(dentistScheduleId);
             newAppointment.setStatus(1);
             if (dependentID != null) {
                 Dependent dependent = userService.findDependentByDependentId(dependentID);
                 newAppointment.setDependent(dependent);
             }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule,0);
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
             otherSchedule.ifPresent(schedules -> {
                 schedules.forEach(schedule -> schedule.setAvailable(0));
@@ -453,6 +486,37 @@ public class StaffController {
         }
     }
 
+    @Operation(summary = "Delete appointments")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/delete-booking/{appointmentId}")
+    public ResponseEntity<String> deleteBooking(@PathVariable String appointmentId) {
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            String dentistScheduleId = appointment.getDentistScheduleId();
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            //Check for duplicate cancelled just in case
+            if (appointment.getStatus() == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
+            }
+            appointment.setStatus(0);
+            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
+            unavailableSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(1));
+            });
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok("Appointment has been cancelled");
+        } catch (Error e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @Operation(summary = "Staff")
     @ApiResponses(value = {
@@ -461,12 +525,104 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PutMapping("/update-appointment")
-    public ResponseEntity<Appointment> updateAppointment(@RequestBody Appointment appointment) {
+    @GetMapping("update-booking/{appointmentId}/all-service")
+    public ResponseEntity<HashMap<String, Services>> getAllServiceToUpdateByClinic(@RequestParam LocalDate workDate, @PathVariable("appointmentId") String appointmentId) {
         try {
-            return ResponseEntity.ok(appointmentService.updateAppointment(appointment));
+            HashMap<String, Services> servicesByClinic = new HashMap<>();
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Clinic clinic = staff.getClinic();
+            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
+            for (DentistSchedule dentistSchedule : dentistScheduleList) {
+                if (dentistSchedule.getWorkDate().equals(workDate)) {
+                    if (dentistSchedule.getAvailable() == 1) {
+                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
+                    }
+                }
+            }
+            servicesByClinic.put((appointment.getServices().getServiceID()), appointment.getServices());
+            return ResponseEntity.ok(servicesByClinic);
+        } catch (Error error) {
+            throw new Error("Error while getting clinic " + error);
+        }
+    }
 
+
+    @Operation(summary = "Show available schedules")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("update-booking/{appointmentId}/available-schedules")
+    public ResponseEntity<List<DentistSchedule>> getAvailableSchedulesToUpdate(
+            @RequestParam LocalDate workDate,
+            @PathVariable String appointmentId,
+            @RequestParam String servicesId) {
+        List<DentistSchedule> dentistScheduleList;
+        Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+        Optional<List<DentistSchedule>> optionalDentistScheduleList = dentistScheduleService
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID());
+
+        DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(appointment.getDentistScheduleId());
+        if (optionalDentistScheduleList.isPresent()) {
+            dentistScheduleList = optionalDentistScheduleList.get();
+            dentistScheduleList.add(dentistSchedule);
+        } else {
+            dentistScheduleList = new ArrayList<>();
+            dentistScheduleList.add(dentistSchedule);
+        }
+        return ResponseEntity.ok(dentistScheduleList);
+    }
+
+
+    @Operation(summary = "Booking")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PostMapping("update-booking/{appointmentId}/{dentistScheduleId}")
+    public ResponseEntity<Appointment> makeBookingToUpdate(@PathVariable String dentistScheduleId, @PathVariable String appointmentId, @RequestParam(required = false) String dependentID, @RequestParam String userID) {
+        try {
+            Client client = userService.findClientByMail(userService.mailExtract());
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            deleteBooking(appointmentId);
+            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
+            if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
+                throw new Error("Over booked for today!");
+            }
+
+            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
+                throw new Error("Full appointment for this date!");
+            }
+            Appointment newAppointment = new Appointment();
+            newAppointment.setStaff(client.getStaff());
+            newAppointment.setUser(userService.findUserById(userID));
+            newAppointment.setServices(dentistSchedule.getServices());
+            newAppointment.setClinic(dentistSchedule.getClinic());
+            newAppointment.setDate(dentistSchedule.getWorkDate());
+            newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
+            newAppointment.setDentist(dentistSchedule.getDentist());
+            newAppointment.setDentistScheduleId(dentistScheduleId);
+            newAppointment.setStatus(1);
+            if (dependentID != null) {
+                Dependent dependent = userService.findDependentByDependentId(dependentID);
+                newAppointment.setDependent(dependent);
+            }
+            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
+            Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
+            otherSchedule.ifPresent(schedules -> {
+                schedules.forEach(schedule -> schedule.setAvailable(0));
+            });
+            appointmentRepository.save(newAppointment);
+            return ResponseEntity.ok(newAppointment);
+        } catch (Error e) {
+            return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
+            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -477,26 +633,10 @@ public class StaffController {
             @ApiResponse(responseCode = "200", description = "Successfully"),
             @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
             @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Error")
-
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-
-
-    @GetMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> findAllAppointmentHistory() {
-        try {
-            String mail = userService.mailExtract();
-
-            return ResponseEntity.ok(appointmentService.findApointmentclinic(mail));
-        } catch (Exception e) {
-            // Xử lý ngoại lệ
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-    @GetMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
+    @PatchMapping("/appointment-history/{appointmentid}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
 
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentid);
@@ -508,6 +648,7 @@ public class StaffController {
         }
     }
 
+
     @Operation(summary = "Staff")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -515,11 +656,38 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PostMapping("/appointment-history")
-    public ResponseEntity<Optional<List<Appointment>>> searchAppointmentByStaff(@RequestParam("searchAppointment") LocalDate date, @RequestParam("name") String name) {
+    @GetMapping("/appointment-history")
+    public ResponseEntity<List<AppointmentDTO>> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
         try {
-            return ResponseEntity.ok(appointmentService.searchAppointmentByWorker(date, name));
+            String mail = userService.mailExtract();
+            List<Appointment> appointmentList;
+            if (date != null || (search != null && !search.isEmpty())) {
+                appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
+            } else appointmentList = appointmentService.findApointmentClinic(mail);
+            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
+                    .map(appointmentriu -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setAppointmentId(appointmentriu.getAppointmentID());
+                        appointment.setServices(appointmentriu.getServices().getName());
+                        appointment.setStatus(appointmentriu.getStatus());
+                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
+                        if (appointmentriu.getStaff() != null) {
+                            if (appointmentriu.getUser() != null) {
+                                appointment.setUser(appointmentriu.getUser().getName());
+                            } else {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            }
+                        } else {
+                            if (appointmentriu.getDependent() != null) {
+                                appointment.setDependent(appointmentriu.getDependent().getName());
+                            } else
+                                appointment.setUser(appointmentriu.getUser().getName());
+                        }
 
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -535,8 +703,10 @@ public class StaffController {
 
             Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
+            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
+            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByStaff(staff);
 
-            DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments);
+            DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {

@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+
+    - name: Navigate to System directory
+      working-directory: System
+      run: pwd  # This is to ensure we are in the correct directory
+
+    - name: Build with Maven
+      working-directory: System
+      run: mvn clean package
+
+    - name: Extract JAR file
+      working-directory: System
+      run: cp target/DentistryManagement-0.0.1-SNAPSHOT.jar DentistryManagement.jar
+
+    - name: Save Google Cloud credentials to a file
+      working-directory: System
+      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > red-carver-425403-d9-bd68878073ca.json
+
+    - name: Build Docker image with credentials
+      working-directory: System
+      run: docker build --build-arg GOOGLE_APPLICATION_CREDENTIALS_JSON="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" -t dentistry-management:latest .
+
+    - name: Run Docker container
+      working-directory: System
+      run: docker run -d -p 8080:8080 dentistry-management:latest

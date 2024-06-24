@@ -35,6 +35,7 @@ public class ManagerController {
 
 
     //---------------------------REGISTER STAFF && DENTIST---------------------------
+
     @Operation(summary = "Register a new staff member")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully registered"),
@@ -90,8 +91,7 @@ public class ManagerController {
 
         if (updateUser != null) {
 
-            updateUser.setFirstName(userDTO.getFirstName());
-            updateUser.setLastName(userDTO.getLastName());
+            updateUser.setName(userDTO.getName());
             updateUser.setPhone(userDTO.getPhone());
             updateUser.setMail(userDTO.getMail());
             updateUser.setBirthday(userDTO.getBirthday());

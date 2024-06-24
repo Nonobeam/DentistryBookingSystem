@@ -15,6 +15,7 @@ import java.util.Map;
 public class DashboardResponse {
     private Map<String, List<Appointment>> dailyAppointments;
     private Map<Integer, Long> monthlyAppointments;
-
+    private int totalAppointmentsInMonthNow;
+    private int totalAppointmentsInYearNow;
 
 }
