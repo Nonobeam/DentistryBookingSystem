@@ -374,49 +374,5 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "User API")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @GetMapping("/appointment-history/")
-    public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
-        try {
-            String mail = userService.mailExtract();
-            Optional<List<Appointment>> appointmentList = null;
-            if (date != null || (search != null && !search.isEmpty())) {
-                appointmentList = appointmentService.searchAppointmentByCustomer(date, search, mail);
-            } else {
-                appointmentList = appointmentService.findAllAppointmentByCustomer(userService.mailExtract());
-            }
-            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
-                    .map(appointmentriu -> {
-                        AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setServices(appointmentriu.getServices().getName());
-                        appointment.setStatus(appointmentriu.getStatus());
-                        appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
-                        if (appointmentriu.getStaff() != null) {
-                            if (appointmentriu.getUser() != null) {
-                                appointment.setUser(appointmentriu.getUser().getName());
-                            } else {
-                                appointment.setDependent(appointmentriu.getDependent().getName());
-                            }
-                        } else {
-                            if (appointmentriu.getDependent() != null) {
-                                appointment.setDependent(appointmentriu.getDependent().getName());
-                            } else
-                                appointment.setUser(appointmentriu.getUser().getName());
-                        }
-
-                        return appointment;
-                    })
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(Optional.of(appointmentDTOList));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
 }

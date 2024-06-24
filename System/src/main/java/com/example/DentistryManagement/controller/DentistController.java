@@ -47,7 +47,7 @@ public class DentistController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/appointment-today")
-    public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentList() {
+    public ResponseEntity<List<AppointmentDTO>> appointmentList() {
         try {
             String mail = userService.mailExtract();
             Optional<List<Appointment>> appointlist = appointmentService.findAppointmentByDentist(mail);
@@ -76,14 +76,14 @@ public class DentistController {
                         })
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(Optional.of(applist));
+                return ResponseEntity.ok(applist);
             } else {
                 // lỗi 403
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Optional.empty());
+                    .body(null);
         }
     }
 
@@ -128,16 +128,16 @@ public class DentistController {
             @ApiResponse(responseCode = "500", description = "Error")
 
     })
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("id") String id) {
+    @GetMapping("/customer/{mail}")
+    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("mail") String customerMail) {
         try {
             UserDTO userDTO = new UserDTO();
-            Client client = userService.userInfo(id);
+            Client client = userService.findClientByMail(customerMail);
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(id, userService.mailExtract());
+            Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(client.getUserID(), userService.mailExtract());
             List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
                     .map(appointmentriu -> {
                         AppointmentDTO appointment = new AppointmentDTO();
@@ -178,11 +178,11 @@ public class DentistController {
 
     })
     @GetMapping("/weekSchedule")
-    public ResponseEntity<Optional<List<Appointment>>> getAppointmentsForDate(
+    public ResponseEntity<List<Appointment>> getAppointmentsForDate(
             @RequestParam String start, @RequestParam String end) {
         LocalDate startOfWeek = LocalDate.parse(start);
         LocalDate endOfWeek = LocalDate.parse(end);
-        Optional<List<Appointment>> appointments = appointmentService.getAppointmentsForWeek(startOfWeek, endOfWeek);
+        List<Appointment> appointments = appointmentService.getAppointmentsForWeek(startOfWeek, endOfWeek);
         return ResponseEntity.ok(appointments);
     }
 
@@ -214,18 +214,19 @@ public class DentistController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/appointment-history/")
-    public ResponseEntity<Optional<List<AppointmentDTO>>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
+    public ResponseEntity<List<AppointmentDTO>> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
         try {
             String mail = userService.mailExtract();
-            Optional<List<Appointment>> appointmentList = null;
+            List<Appointment> appointmentList = null;
             if (date != null || (name != null && !name.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByDentist(date, name, mail);
             } else {
                 appointmentList = appointmentService.findAllAppointmentByDentist(userService.mailExtract());
             }
-            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
                     .map(appointmentriu -> {
                         AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setAppointmentId(appointmentriu.getAppointmentID());
                         appointment.setServices(appointmentriu.getServices().getName());
                         appointment.setStatus(appointmentriu.getStatus());
                         appointment.setTimeSlot(appointmentriu.getTimeSlot().getStartTime());
@@ -245,7 +246,7 @@ public class DentistController {
                         return appointment;
                     })
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(Optional.of(appointmentDTOList));
+            return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

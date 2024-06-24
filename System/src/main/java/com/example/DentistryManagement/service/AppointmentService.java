@@ -11,7 +11,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 
 @Service
@@ -24,7 +23,7 @@ public class AppointmentService {
     private final DentistRepository dentistRepository;
 
     private final ClinicRepository clinicRepository;
-    public Optional<List<Appointment>> findApointmentClinic(String staffmail) {
+    public List<Appointment> findApointmentClinic(String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
@@ -61,7 +60,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> findAllAppointmentByDentist(String mail) {
+    public List<Appointment> findAllAppointmentByDentist(String mail) {
         try {
             return appointmentRepository.getAppointmentByDentist_User_MailOrderByDateAsc(mail);
         } catch (DataAccessException e) {
@@ -122,15 +121,15 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
+    public List<Appointment> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
         try {
-            return Optional.ofNullable(appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startOfWeek, endOfWeek, 1, 2));
+            return appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startOfWeek, endOfWeek, 1, 2);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Optional<List<Appointment>> searchAppointmentByStaff(LocalDate date, String name, String staffmail) {
+    public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
@@ -141,7 +140,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> searchAppointmentByDentist(LocalDate date, String name, String staffmail) {
+    public List<Appointment> searchAppointmentByDentist(LocalDate date, String name, String staffmail) {
         try {
             Dentist dentist = dentistRepository.findDentistByUserMail(staffmail);
 

@@ -18,6 +18,7 @@ import java.time.LocalTime;
 @Setter
 @Data
 public class AppointmentDTO {
+    private String appointmentId;
     private int status;
     private LocalDate date;
     private Staff staff;

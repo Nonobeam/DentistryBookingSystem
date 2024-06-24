@@ -26,20 +26,11 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findClientsByUserID(String userId);
 
-    @Query("SELECT c FROM Client c, Staff s " +
-            "JOIN c.appointmentList a " +
-            "WHERE c.role = 'CUSTOMER'  AND a.clinic.clinicID= s.clinic.clinicID AND s.user.mail =: mail ")
-    Optional<List<Client>> getCustomersByStaff(String mail);
-    @Query("SELECT c FROM Client c JOIN c.appointmentList a JOIN a.clinic cl JOIN cl.staffList s " +
-            "WHERE c.role = 'CUSTOMER' " +
-            "AND s.user.mail = :mail " +
-            "AND (c.mail LIKE %:search% OR c.name LIKE %:search%)")
-    Optional<List<Client>> searchCustomersByStaff(@Param("mail") String mail, @Param("search") String search);
 
-    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
+    List<Client> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
 
     //boss/adminlist
-    Optional<List<Client>> getClientsByRole(Role role);
+    List<Client> getClientsByRole(Role role);
 
 
     //Managerlistit
@@ -47,17 +38,12 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
     List<Client> getWorkerByManager(@Param("roleParam") Role role, String managerMail);
 
-    boolean findClientByMailOrPhone(String mail, String phone);
+    List<Client> searchClientByRoleAndNameContainingIgnoreCase(Role role, String search);
 
-    Client findClientByMail(String mail);
-
-    Optional<List<Client>> searchClientByRoleAndName(Role role, String search);
-
-    Optional<List<Client>> searchClientsByRoleAndDentistClinicClinicIDOrNameOrMail(Role role, String search, String searchName, String mail);
+    List<Client> searchClientsByRoleAndDentistClinicClinicIDAndNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String searchName, String mail);
 
 
     Client findUserByMail(String mail);
-    Optional<List<Client>> searchClientsByRoleAndStaffClinicClinicIDOrNameOrMail(Role role, String search, String search1, String search2);
+    List<Client> searchClientsByRoleAndStaffClinicClinicIDOrNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String search1, String search2);
 
-    Optional<List<Client>> getClientsByRoleAndDentist_Staff_UserMailAndNameContaining(Role role, String mail, String search);
 }

@@ -59,4 +59,5 @@ public class Appointment {
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
 
+
 }
