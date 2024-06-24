@@ -178,13 +178,41 @@ public class DentistController {
 
     })
     @GetMapping("/weekSchedule")
-    public ResponseEntity<List<Appointment>> getAppointmentsForDate(
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsForDate(
             @RequestParam String start, @RequestParam String end) {
         LocalDate startOfWeek = LocalDate.parse(start);
         LocalDate endOfWeek = LocalDate.parse(end);
         List<Appointment> appointments = appointmentService.getAppointmentsForWeek(startOfWeek, endOfWeek);
-        return ResponseEntity.ok(appointments);
+
+        List<AppointmentDTO> appointmentDTOList = appointments.stream()
+                .map(appointment -> {
+                    AppointmentDTO appointmentDTO = new AppointmentDTO();
+                    appointmentDTO.setAppointmentId(appointment.getAppointmentID());
+                    appointmentDTO.setServices(appointment.getServices().getName());
+                    appointmentDTO.setStatus(appointment.getStatus());
+                    appointmentDTO.setTimeSlot(appointment.getTimeSlot().getStartTime());
+
+                    if (appointment.getStaff() != null) {
+                        if (appointment.getUser() != null) {
+                            appointmentDTO.setUser(appointment.getUser().getName());
+                        } else {
+                            appointmentDTO.setDependent(appointment.getDependent().getName());
+                        }
+                    } else {
+                        if (appointment.getDependent() != null) {
+                            appointmentDTO.setDependent(appointment.getDependent().getName());
+                        } else {
+                            appointmentDTO.setUser(appointment.getUser().getName());
+                        }
+                    }
+
+                    return appointmentDTO;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(appointmentDTOList);
     }
+
 
     @Operation(summary = "Dentist")
     @ApiResponses(value = {
