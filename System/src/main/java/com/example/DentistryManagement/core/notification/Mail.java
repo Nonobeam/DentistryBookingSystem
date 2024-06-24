@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.core.mail;
+package com.example.DentistryManagement.core.notification;
 
 import lombok.Getter;
 import lombok.Setter;
