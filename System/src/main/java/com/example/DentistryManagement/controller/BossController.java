@@ -33,11 +33,6 @@ public class BossController {
     private final AppointmentService appointmentService;
 
     @Operation(summary = "Add new service")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
-    })
     @PostMapping("/service/add")
     public ResponseEntity<Services> addNewService(@RequestBody Services services) {
         return ResponseEntity.ok(serviceRepository.save(services));
@@ -45,13 +40,6 @@ public class BossController {
 
 
     @Operation(summary = "Boss dashboard")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
-    })
-
-
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardBoss> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
         try {
