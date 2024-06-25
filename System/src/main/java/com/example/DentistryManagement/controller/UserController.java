@@ -208,11 +208,12 @@ public class UserController {
             if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
                 throw new Error("Full appointment for this date!");
             }
+            Services services= serviceService.findServiceByID(serviceID);
             Appointment newAppointment = new Appointment();
             newAppointment.setUser(client);
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
-            newAppointment.setServices(serviceService.findServiceByID(serviceID));
+            newAppointment.setServices(services);
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
             newAppointment.setDentistScheduleId(dentistScheduleId);
