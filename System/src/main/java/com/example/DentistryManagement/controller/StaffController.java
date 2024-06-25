@@ -1,9 +1,6 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.AppointmentDTO;
-import com.example.DentistryManagement.DTO.DashboardResponse;
-import com.example.DentistryManagement.DTO.UserAppointDTO;
-import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.DTO.*;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
@@ -339,20 +336,14 @@ public class StaffController {
     }
 
     @GetMapping("/booking/all-service")
-    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate) {
+    public ResponseEntity<?> getAllServiceByClinic(@RequestParam LocalDate workDate) {
         try {
-            HashMap<String, Services> servicesByClinic = new HashMap<>();
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             Clinic clinic = staff.getClinic();
-            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
-            for (DentistSchedule dentistSchedule : dentistScheduleList) {
-                if (dentistSchedule.getWorkDate().equals(workDate)) {
-                    if (dentistSchedule.getAvailable() == 1) {
-                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
-                    }
-                }
-            }
-            return ResponseEntity.ok(servicesByClinic);
+            List<Services> dentistService;
+            dentistService = serviceService
+                    .getServiceNotNullByDate(workDate, clinic).stream().toList();
+            return ResponseEntity.ok(dentistService);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -366,8 +357,15 @@ public class StaffController {
         Staff staff = userService.findStaffByMail(userService.mailExtract());
         Clinic clinic = staff.getClinic();
         List<DentistSchedule> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID());
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID()).stream().toList();
 
+        List<AvailableSchedulesResponse> availableSchedulesResponses = new ArrayList<>();
+        for (DentistSchedule i : dentistScheduleList) {
+            AvailableSchedulesResponse availableSchedulesResponse = new AvailableSchedulesResponse();
+            availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
+            availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
+            availableSchedulesResponses.add(availableSchedulesResponse);
+        }
         return ResponseEntity.ok(dentistScheduleList);
     }
 
@@ -393,7 +391,6 @@ public class StaffController {
 
                 newAppointment.setStaff(client.getStaff());
                 newAppointment.setUser(userService.findClientByMail(customerMail));
-                newAppointment.setServices(dentistSchedule.getServices());
                 newAppointment.setClinic(dentistSchedule.getClinic());
                 newAppointment.setDate(dentistSchedule.getWorkDate());
                 newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
@@ -463,20 +460,14 @@ public class StaffController {
     @GetMapping("/update-booking/{appointmentId}/all-service")
     public ResponseEntity<?> getAllServiceToUpdateByClinic(@RequestParam LocalDate workDate, @PathVariable("appointmentId") String appointmentId) {
         try {
-            HashMap<String, Services> servicesByClinic = new HashMap<>();
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             Clinic clinic = staff.getClinic();
-            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
-            for (DentistSchedule dentistSchedule : dentistScheduleList) {
-                if (dentistSchedule.getWorkDate().equals(workDate)) {
-                    if (dentistSchedule.getAvailable() == 1) {
-                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
-                    }
-                }
-            }
-            servicesByClinic.put((appointment.getServices().getServiceID()), appointment.getServices());
-            return ResponseEntity.ok(servicesByClinic);
+            List<Services> dentistService;
+            dentistService = serviceService
+                    .getServiceNotNullByDate(workDate, clinic).stream().toList();
+            dentistService.add(appointment.getServices());
+            return ResponseEntity.ok(dentistService);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -489,18 +480,17 @@ public class StaffController {
             @RequestParam LocalDate workDate,
             @PathVariable String appointmentId,
             @RequestParam String servicesId) {
-        List<DentistSchedule> dentistScheduleList;
         Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-        List<DentistSchedule> optionalDentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID());
+        List<DentistSchedule> dentistScheduleList = dentistScheduleService
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID()).stream().toList();
 
-        DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(appointment.getDentistScheduleId());
-        if (optionalDentistScheduleList != null) {
-            dentistScheduleList = optionalDentistScheduleList;
-            dentistScheduleList.add(dentistSchedule);
-        } else {
-            dentistScheduleList = new ArrayList<>();
-            dentistScheduleList.add(dentistSchedule);
+        List<AvailableSchedulesResponse> availableSchedulesResponses = new ArrayList<>();
+        for (DentistSchedule i : dentistScheduleList) {
+            AvailableSchedulesResponse availableSchedulesResponse = new AvailableSchedulesResponse();
+            availableSchedulesResponse.setDentistScheduleID(i.getScheduleID());
+            availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
+            availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
+            availableSchedulesResponses.add(availableSchedulesResponse);
         }
         return ResponseEntity.ok(dentistScheduleList);
     }
@@ -509,7 +499,7 @@ public class StaffController {
     @Operation(summary = "Booking")
     @PostMapping("/update-booking/{appointmentId}/{dentistScheduleId}")
 
-    public ResponseEntity<?> makeBookingToUpdate(@PathVariable String dentistScheduleId, @PathVariable String appointmentId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail) {
+    public ResponseEntity<?> makeBookingToUpdate(@PathVariable String dentistScheduleId, @PathVariable String appointmentId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceID ) {
         ErrorResponseDTO error = new ErrorResponseDTO();
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
@@ -526,9 +516,9 @@ public class StaffController {
             Appointment newAppointment = new Appointment();
             newAppointment.setStaff(client.getStaff());
             newAppointment.setUser(userService.findClientByMail(customerMail));
-            newAppointment.setServices(dentistSchedule.getServices());
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
+            newAppointment.setServices(serviceService.findServiceByID(serviceID));
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
             newAppointment.setDentistScheduleId(dentistScheduleId);

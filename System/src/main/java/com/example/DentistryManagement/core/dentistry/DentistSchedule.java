@@ -35,10 +35,6 @@ public class DentistSchedule {
     @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
     private TimeSlot timeslot;
 
-    @ManyToOne
-    @JoinColumn(name = "serviceID", nullable = false, referencedColumnName = "serviceID")
-    private Services services;
-
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;
 }
