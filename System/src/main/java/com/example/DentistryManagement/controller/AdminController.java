@@ -151,7 +151,7 @@ public class AdminController {
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody AdminDTO updatedUser) {
         try {
             if (userService.isPresentUser(id).isPresent()) {
-                Client client = UserMapping.mapUserForAdmin(updatedUser);
+                Client client = userMapping.mapUserForAdmin(updatedUser);
                 userService.updateUser(client);
                 return ResponseEntity.ok(client);
             } else {

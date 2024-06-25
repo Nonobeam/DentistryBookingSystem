@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserMapping {
-    private final UserService userService;
+    private final UserService userService ;
 
-    public static Client mapUser(UserDTO userDTO) {
+    public Client mapUser(UserDTO userDTO) {
         Client client = new Client();
         client.setName(userDTO.getName());
         if(userService.existsByPhoneOrMail(client.getPhone(), client.getMail())){
@@ -24,7 +24,7 @@ public class UserMapping {
         return client;
     }
 
-    public static Client mapUserForAdmin(AdminDTO adminDTO) {
+    public Client mapUserForAdmin(AdminDTO adminDTO) {
         Client client = new Client();
         client.setName(adminDTO.getName());
         client.setPhone(adminDTO.getPhone());

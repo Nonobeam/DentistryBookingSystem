@@ -40,6 +40,7 @@ public class ManagerController {
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentService appointmentService;
+    private final UserMapping userMapping;
 
 
     //---------------------------REGISTER STAFF && DENTIST---------------------------
@@ -81,7 +82,7 @@ public class ManagerController {
     @PutMapping("/edit/{userID}")
     public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
         if (userService.isPresentUser(userID).isPresent()) {
-            Client updatedUser = UserMapping.mapUser(userDTO);
+            Client updatedUser = userMapping.mapUser(userDTO);
             userService.updateUser(updatedUser);
             return ResponseEntity.ok(updatedUser);
         } else {
