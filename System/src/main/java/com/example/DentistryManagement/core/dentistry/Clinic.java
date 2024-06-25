@@ -79,5 +79,4 @@ public class Clinic {
     @JsonIgnore
     @ManyToMany(mappedBy = "clinicList")
     private List<Services> servicesList;
-
 }
