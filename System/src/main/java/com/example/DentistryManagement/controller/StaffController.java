@@ -8,7 +8,7 @@ import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
-import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
@@ -328,9 +328,9 @@ public class StaffController {
                                        @RequestParam String mail,
                                        @RequestParam String subject,
                                        @RequestParam String text) {
-        Optional<Notification> optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
-        if (optionalNotification.isPresent()) {
-            Notification notification = optionalNotification.get();
+        Notification optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
+        if (optionalNotification != null) {
+            Notification notification = optionalNotification;
 
             emailService.sendSimpleMessage(mail, subject, text);
             notification.setStatus(1);

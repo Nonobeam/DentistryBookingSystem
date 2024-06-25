@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.core.mail.Notification;
+import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class NotificationService {
         }
     }
 
-    public Optional<Notification> findNotificationByIDAndStatus(String notificationID, int status) {
+    public Notification findNotificationByIDAndStatus(String notificationID, int status) {
         try {
             return notificationRepository.getNotificationByNotificationIDAndStatus(notificationID, status);
         } catch (Error e) {
