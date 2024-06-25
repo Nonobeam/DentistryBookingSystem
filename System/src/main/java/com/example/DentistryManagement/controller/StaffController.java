@@ -73,15 +73,15 @@ public class StaffController {
     public ResponseEntity<?> findAllDentistByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clientsOptional = new ArrayList<>();
+            List<Client> clients = new ArrayList<>();
             if (search != null && !search.isEmpty()) {
-                clientsOptional = userService.searchDentistByStaff(mail, search);
+                clients = userService.searchDentistByStaff(mail, search);
             } else {
-                clientsOptional = userService.findDentistByStaff(mail);
+                clients = userService.findDentistByStaff(mail);
             }
 
-            if (!clientsOptional.isEmpty()) {
-                List<UserDTO> clientDTOs = clientsOptional.stream()
+            if (!clients.isEmpty()) {
+                List<UserDTO> clientDTOs = clients.stream()
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
                             clientDTO.setName(client.getName());
@@ -211,7 +211,7 @@ public class StaffController {
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients = new ArrayList<>();
+            List<Client> clients;
 
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchCustomerInClinicByStaff(mail, search);
@@ -322,23 +322,20 @@ public class StaffController {
     @Operation(summary = "Get all notification in the clinic")
     @GetMapping()
     public ResponseEntity<?> receiveNotification() {
-        ErrorResponseDTO error = new ErrorResponseDTO();
         try {
             String mail = userService.mailExtract();
 
             List<Notification> notice = notificationService.receiveNotice(mail);
             if (notice == null) {
-                error.setCode("204");
-                error.setMessage("Notification not found");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Notification not found");
                 logger.error("Notification not found");
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
             }
 
             return ResponseEntity.ok(notice);
         } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -381,8 +378,6 @@ public class StaffController {
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
-        ErrorResponseDTO error = new ErrorResponseDTO();
-
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             if (userService.findClientByMail(customerMail) != null) {
@@ -417,18 +412,16 @@ public class StaffController {
                 return ResponseEntity.ok("Booking successfully");
 
             } else {
-                error.setCode("204");
-                error.setMessage("customer not found");
-                logger.error("customer not found");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
+                logger.error("Customer not found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
 
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -436,8 +429,6 @@ public class StaffController {
 
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
-        ErrorResponseDTO error = new ErrorResponseDTO();
-
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
@@ -451,14 +442,12 @@ public class StaffController {
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
-            error.setCode("204");
-            error.setMessage("customer not found");
-            logger.error("customer not found");
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
+            logger.error("Customer not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -473,10 +462,8 @@ public class StaffController {
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -487,7 +474,7 @@ public class StaffController {
     public ResponseEntity<?> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Appointment> appointmentList;
+            List<Appointment> appointmentList = new ArrayList<>();
             if (date != null || (search != null && !search.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
             } else appointmentList = appointmentService.findAppointmentInClinic(mail);
@@ -520,11 +507,9 @@ public class StaffController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("204");
-            error.setMessage("Not found any ");
-            logger.error("Server_error");
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
+            logger.error("Customer not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
 
@@ -546,11 +531,9 @@ public class StaffController {
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("204");
-            error.setMessage("Not found data in dashboard");
-            logger.error("Not found data in dashboard");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Data not found");
+            logger.error("Data not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
 }

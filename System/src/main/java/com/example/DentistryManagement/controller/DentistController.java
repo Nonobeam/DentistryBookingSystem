@@ -43,7 +43,6 @@ public class DentistController {
     @Operation(summary = "Dentist")
     @GetMapping("/appointment-today")
     public ResponseEntity<?> appointmentList() {
-        ErrorResponseDTO error = new ErrorResponseDTO();
         List<AppointmentDTO> applist = new ArrayList<>();
         try {
             String mail = userService.mailExtract();
@@ -77,11 +76,9 @@ public class DentistController {
             }
             return ResponseEntity.ok(applist);
 
-        } catch (
-                Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -91,8 +88,6 @@ public class DentistController {
     @PostMapping("/reminder")
     public ResponseEntity<?> reminderNotice(@RequestBody Notification notification) {
         Notification insertedNotification = new Notification();
-        ErrorResponseDTO error = new ErrorResponseDTO();
-
         try {
             if (notification != null) {
                 Client client = userService.findClientByMail(userService.mailExtract());
@@ -109,9 +104,8 @@ public class DentistController {
             }
             return ResponseEntity.ok(insertedNotification);
         } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -156,10 +150,8 @@ public class DentistController {
             userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -202,10 +194,8 @@ public class DentistController {
             return ResponseEntity.ok(appointmentDTOList);
 
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -221,10 +211,8 @@ public class DentistController {
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -269,10 +257,8 @@ public class DentistController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -286,10 +272,8 @@ public class DentistController {
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }

@@ -215,7 +215,9 @@ public class UserController {
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -227,7 +229,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping("/delete-booking/{appointmentId}")
-    public ResponseEntity<String> deleteBooking(@PathVariable String appointmentId) {
+    public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
@@ -244,9 +246,13 @@ public class UserController {
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("403", "Appointment can not be deleted");
+            logger.error("Appointment can not be deleted", e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -259,7 +265,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("appointment-history")
-    public ResponseEntity<List<Appointment>> getAppointmentHistory
+    public ResponseEntity<?> getAppointmentHistory
             (@RequestParam(required = false) LocalDate workDate,
              @RequestParam(required = false) Integer status) {
         try {
@@ -267,9 +273,13 @@ public class UserController {
             List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
             return ResponseEntity.ok(appointmentList);
         } catch (Error e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -294,9 +304,13 @@ public class UserController {
             }
             return ResponseEntity.ok("Password reset link has been sent to your email");
         } catch (Error e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -309,7 +323,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/info/update")
-    public ResponseEntity<UserDTO> updateProfile(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
@@ -317,9 +331,13 @@ public class UserController {
             }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -340,9 +358,13 @@ public class UserController {
             tokenService.resetPassword(token, password);
             return ResponseEntity.ok("Password has been reset successfully");
         } catch (Error e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 

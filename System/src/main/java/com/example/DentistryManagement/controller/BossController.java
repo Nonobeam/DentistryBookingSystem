@@ -4,6 +4,7 @@ import com.example.DentistryManagement.DTO.DashboardBoss;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.Services;
+import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.repository.ServiceRepository;
 import com.example.DentistryManagement.service.AppointmentService;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,7 @@ public class BossController {
     private final ServiceRepository serviceRepository;
     private final UserService userService;
     private final AppointmentService appointmentService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Operation(summary = "Add new service")
     @PostMapping("/service/add")
@@ -41,7 +45,7 @@ public class BossController {
 
     @Operation(summary = "Boss dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<DashboardBoss> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<?> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
         try {
             Client boss = userService.findClientByMail(userService.mailExtract());
             if (boss == null) {
@@ -57,7 +61,9 @@ public class BossController {
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found data in dashboard");
+            logger.error("Not found data in dashboard");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
 }

@@ -200,14 +200,11 @@ public class ManagerController {
             int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
 
             DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
-
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("204");
-            error.setMessage("Not found data in dashboard");
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found data in dashboard");
             logger.error("Not found data in dashboard");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
 }

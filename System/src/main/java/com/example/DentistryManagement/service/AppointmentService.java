@@ -74,18 +74,19 @@ public class AppointmentService {
     public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
         try {
             String userID = user.getUserID();
-
+            List<Appointment> appointmentsHistory;
             if (date == null && status == null) {
-                return appointmentRepository.findAppointmentByUser_UserID(userID);
+                appointmentsHistory = appointmentRepository.findAppointmentByUser_UserID(userID);
             } else {
                 if (status != null && date == null) {
-                    return appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
+                    appointmentsHistory = appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
                 } else if (status == null && date != null) {
-                    return appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
+                    appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
                 } else {
-                    return appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
+                    appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
                 }
             }
+            return appointmentsHistory;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
