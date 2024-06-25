@@ -1,7 +1,6 @@
 package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.notification.Notification;
-import com.example.DentistryManagement.core.mail.Notification;
 import com.example.DentistryManagement.core.user.Dentist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
