@@ -33,7 +33,7 @@ public class NotificationService {
         mailSender.send(simpleMailMessage);
     }
 
-    public Optional<List<Notification>> receiveNotice(String staffmail) {
+    public List<Notification> receiveNotice(String staffmail) {
         try {
             return notificationRepository.getNotificationByDentist_StaffUserMail(staffmail);
         } catch (DataAccessException e) {
@@ -57,7 +57,7 @@ public class NotificationService {
         }
     }
 
-    public Optional<Notification> findNotificationByIDAndStatus(String notificationID, int status) {
+    public Notification findNotificationByIDAndStatus(String notificationID, int status) {
         try {
             return notificationRepository.getNotificationByNotificationIDAndStatus(notificationID, status);
         } catch (Error e) {

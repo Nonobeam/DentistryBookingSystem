@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
-    Optional<List<Appointment>> findAppointmentByUser_UserIDAndClinic(String customerID, Clinic clinic);
+    List<Appointment> findAppointmentByUser_UserIDAndClinic(String customerID, Clinic clinic);
 
     List<Appointment> getAppointmentByDentist_User_MailOrderByDateAsc(String dentistmail);
 

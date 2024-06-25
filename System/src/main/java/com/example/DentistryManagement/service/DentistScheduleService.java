@@ -41,11 +41,10 @@ public class DentistScheduleService {
         dentistScheduleRepository.deleteByDentistAndWorkDate(dentist, workDate);
     }
 
-    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, String timeSlotID, String clinicID, String serviceID) {
+    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, String timeSlotID, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
         TimeSlot timeSlot = timeSlotRepository.findById(timeSlotID).orElseThrow(() -> new RuntimeException("Time slot not found"));
         Clinic clinic = clinicRepository.findById(clinicID).orElseThrow(() -> new RuntimeException("Clinic not found"));
-        Services services = serviceRepository.findById(serviceID).orElseThrow(() -> new RuntimeException("Service not found"));
 
         List<DentistSchedule> schedules = new ArrayList<>();
 
@@ -57,7 +56,6 @@ public class DentistScheduleService {
             schedule.setWorkDate(date);
             schedule.setTimeslot(timeSlot);
             schedule.setClinic(clinic);
-            schedule.setServices(services);
             schedules.add(schedule);
             schedule.setAvailable(1);
             date = date.plusDays(1);

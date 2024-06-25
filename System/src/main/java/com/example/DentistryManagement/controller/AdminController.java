@@ -2,13 +2,14 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +25,11 @@ import java.util.Optional;
 public class AdminController {
     private final UserService userService;
     private final UserMapping userMapping;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/dentistList")
-    public ResponseEntity<List<Client>> dentistList(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> dentistList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
@@ -44,21 +40,18 @@ public class AdminController {
             }
             return ResponseEntity.ok(userList);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setCode("400");
+            error.setMessage("Null data make mistake");
+            logger.error("Null data make mistake");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
 
     @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/managerList")
-    public ResponseEntity<List<Client>> managerList(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> managerList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
@@ -69,21 +62,19 @@ public class AdminController {
             return ResponseEntity.ok(userList);
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setCode("400");
+            error.setMessage("Data make mistake");
+            logger.error("Data make mistake");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
 
     @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @GetMapping("/staffList")
-    public ResponseEntity<List<Client>> staffList(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> staffList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
@@ -93,21 +84,19 @@ public class AdminController {
             }
             return ResponseEntity.ok(userList);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setCode("400");
+            error.setMessage("Data make mistake");
+            logger.error("Data make mistake");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
 
     @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/customerList")
-    public ResponseEntity<List<Client>> customerList(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> customerList(@RequestParam(required = false) String search) {
+        ErrorResponseDTO error = new ErrorResponseDTO();
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
@@ -118,39 +107,43 @@ public class AdminController {
             return ResponseEntity.ok(userList);
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
+            error.setCode("400");
+            error.setMessage("Data make mistake");
+            logger.error("Data make mistake");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
 
     @Operation(summary = "Admin")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
+        ErrorResponseDTO error = new ErrorResponseDTO();
         try {
             if (userService.isPresentUser(id).isPresent()) {
                 Client client = userMapping.mapUser(updatedUser);
                 userService.updateUser(client);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.ok(client);
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be update.");
+                error.setCode("403");
+                error.setMessage("User could not be update.");
+                logger.error("User could not be update.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred while creating the user.");
+            error.setCode("400");
+            error.setMessage("An error occurred while creating the user.");
+            logger.error("An error occurred while creating the user.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        ErrorResponseDTO error = new ErrorResponseDTO();
         try {
 
             if (userService.isPresentUser(id).isPresent()) {
@@ -160,16 +153,24 @@ public class AdminController {
                     userService.updateUserStatus(client, 0);
                     return ResponseEntity.ok().build();
                 } else {
+                    error.setCode("204");
+                    error.setMessage("Not found any client");
+                    logger.error("Not found any client");
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
 
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be delete.");
+                error.setCode("204");
+                error.setMessage("User could not be delete.");
+                logger.error("User could not be delete.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred while creating the user.");
+            error.setCode("400");
+            error.setMessage("Data make mistake");
+            logger.error("Data make mistake");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }
