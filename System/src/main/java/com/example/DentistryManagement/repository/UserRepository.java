@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,12 +39,9 @@ public interface UserRepository extends JpaRepository<Client, String> {
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
     List<Client> getWorkerByManager(@Param("roleParam") Role role, String managerMail);
 
-    List<Client> searchClientByRoleAndNameContainingIgnoreCase(Role role, String search);
-
-    List<Client> searchClientsByRoleAndDentistClinicClinicIDAndNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String searchName, String mail);
-
+    List<Client> findByRoleAndNameContainingIgnoreCase(Role role, String searchWord);
 
     Client findUserByMail(String mail);
-    List<Client> searchClientsByRoleAndStaffClinicClinicIDOrNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String search1, String search2);
+
 
 }
