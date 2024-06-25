@@ -3,15 +3,14 @@ package com.example.DentistryManagement.Mapping;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.UserService;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapping {
     private final UserService userService;
-
-    public UserMapping(UserService userService) {
-        this.userService = userService;
-    }
 
     public Client mapUser (UserDTO userDTO) {
         Client client = new Client();

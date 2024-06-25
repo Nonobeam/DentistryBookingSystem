@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,28 +25,28 @@ public class DentistScheduleService {
     private final DentistRepository dentistRepository;
     private final ClinicRepository clinicRepository;
 
-    public Optional<List<DentistSchedule>> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
-        return dentistScheduleRepository.findByWorkDateAndServices_ServiceIDAndAvailableAndClinic_ClinicID(workDate, serviceId, available, clinicId);
+    public HashSet<DentistSchedule> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
+        Services service = serviceRepository.findById(serviceId).orElse(null);
+        HashSet<DentistSchedule> dentistSchedulesHashSet = new HashSet<>();
+        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicID(workDate, available, clinicId);
+        for (DentistSchedule ds : dentistScheduleList) {
+            if(ds.getDentist().getServicesList().contains(service)) {
+                dentistSchedulesHashSet.add(ds);
+            }
+        }
+        return dentistSchedulesHashSet;
     }
 
-    public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
-        try {
-            return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
-        } catch (Error e) {
-            throw e;
-        }
-    }
 
     public void deleteDentistSchedule(String dentistID, LocalDate workDate) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
         dentistScheduleRepository.deleteByDentistAndWorkDate(dentist, workDate);
     }
 
-    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, String timeSlotID, String clinicID, String serviceID) {
+    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, String timeSlotID, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
         TimeSlot timeSlot = timeSlotRepository.findById(timeSlotID).orElseThrow(() -> new RuntimeException("Time slot not found"));
         Clinic clinic = clinicRepository.findById(clinicID).orElseThrow(() -> new RuntimeException("Clinic not found"));
-        Services services = serviceRepository.findById(serviceID).orElseThrow(() -> new RuntimeException("Service not found"));
 
         List<DentistSchedule> schedules = new ArrayList<>();
 
@@ -57,7 +58,6 @@ public class DentistScheduleService {
             schedule.setWorkDate(date);
             schedule.setTimeslot(timeSlot);
             schedule.setClinic(clinic);
-            schedule.setServices(services);
             schedules.add(schedule);
             schedule.setAvailable(1);
             date = date.plusDays(1);

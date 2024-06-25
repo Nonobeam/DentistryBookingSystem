@@ -6,8 +6,10 @@ import { FiTrash2 } from 'react-icons/fi';
 import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
 import { StudentServices } from '../../../../../../services/StudentServices/StudentServices';
+import { useNavigate } from 'react-router-dom';
 
 export const Action = ({ record }) => {
+  const navigator = useNavigate();
   const [info, setInfo] = React.useState(record);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -29,14 +31,25 @@ export const Action = ({ record }) => {
     setLoading(true);
   };
 
+  const handleClickEye = () => {
+    // console.log(record);
+    navigator(`detail/${record.id}`);
+  };
+
   const handleDelete = () => {};
 
   return (
     <>
       <Flex style={{ width: '80px' }} justify='space-between'>
-        <MdOutlineRemoveRedEye onClick={handleUpdate} />
-        <MdOutlineModeEdit onClick={handleUpdate} />
-        <FiTrash2 onClick={handleDelete} />
+        <div>
+          <MdOutlineRemoveRedEye onClick={handleClickEye} />
+        </div>
+        <div>
+          <MdOutlineModeEdit onClick={handleUpdate} />
+        </div>
+        <div>
+          <FiTrash2 onClick={handleDelete} />
+        </div>
       </Flex>
       <ModalInfo
         open={open}
