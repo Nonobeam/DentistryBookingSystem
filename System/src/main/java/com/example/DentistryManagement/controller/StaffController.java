@@ -16,6 +16,7 @@ import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,24 +48,21 @@ public class StaffController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 
-//---------------------------MANAGE DENTIST---------------------------
+    //---------------------------MANAGE DENTIST---------------------------
+
 
     @Operation(summary = "All Services in System")
     @GetMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
-        Dentist dentist;
-        Services service;
         try {
-            dentist = dentistService.findDentistByID(dentistID);
-            service = serviceService.findServiceByID(serviceID);
+            Dentist dentist = dentistService.findDentistByID(dentistID);
+            Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
 
             return ResponseEntity.ok(dentist);
-        } catch (Error e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -73,15 +71,14 @@ public class StaffController {
     @Operation(summary = "Staff")
     @GetMapping("/dentistList")
     public ResponseEntity<?> findAllDentistByStaff(@RequestParam(required = false) String search) {
-        ErrorResponseDTO error = new ErrorResponseDTO();
-
         try {
             String mail = userService.mailExtract();
-            List<Client> clientsOptional = null;
+            List<Client> clientsOptional = new ArrayList<>();
             if (search != null && !search.isEmpty()) {
                 clientsOptional = userService.searchDentistByStaff(mail, search);
-
-            } else clientsOptional = userService.findDentistByStaff(mail);
+            } else {
+                clientsOptional = userService.findDentistByStaff(mail);
+            }
 
             if (!clientsOptional.isEmpty()) {
                 List<UserDTO> clientDTOs = clientsOptional.stream()
@@ -99,18 +96,17 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                error.setCode("204");
-                error.setMessage("Not found any staff user");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any staff user");
                 logger.error("Not found any staff user");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
         } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
 
     @Operation(summary = "Staff")
     @GetMapping("/dentistList/{mail}")
@@ -140,44 +136,57 @@ public class StaffController {
                         } else {
                             if (appointmentEntity.getDependent() != null) {
                                 appointment.setDependent(appointmentEntity.getDependent().getName());
-                            } else
+                            } else {
                                 appointment.setUser(appointmentEntity.getUser().getName());
+                            }
                         }
 
                         return appointment;
                     })
                     .collect(Collectors.toList());
+
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
             userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
 
     @Operation(summary = "Set Dentist Schedule")
-
     @PostMapping("/set-schedule")
     public ResponseEntity<?> setDentistSchedule(@RequestParam String dentistID,
                                                 @RequestParam LocalDate startDate,
                                                 @RequestParam LocalDate endDate,
-                                                @RequestParam String timeSlotID) {
+                                                @RequestParam int slotNumber) {
         try {
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            String mail = userService.mailExtract();
+            if (mail == null) {
+                return new ResponseEntity<>(new ErrorResponseDTO("403", "Cannot find user with current mail"), HttpStatus.FORBIDDEN);
+            }
+
+            Staff staff = userService.findStaffByMail(mail);
+            if (staff == null) {
+                return new ResponseEntity<>(new ErrorResponseDTO("403", "You don't have permission to do this"), HttpStatus.FORBIDDEN);
+            }
+
             Clinic clinic = staff.getClinic();
-            dentistScheduleService.setDentistSchedule(dentistID, startDate, endDate, timeSlotID, clinic.getClinicID());
+            if (clinic == null) {
+                return new ResponseEntity<>(new ErrorResponseDTO("403", "Staff doesn't belong to any clinic"), HttpStatus.FORBIDDEN);
+            }
+
+            dentistScheduleService.setDentistSchedule(dentistID, startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
 
     @Operation(summary = "Delete Dentist Schedule")
     @DeleteMapping("/delete-schedule")
@@ -187,7 +196,9 @@ public class StaffController {
             dentistScheduleService.deleteDentistSchedule(dentistID, workDate);
             return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -200,7 +211,7 @@ public class StaffController {
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients = null;
+            List<Client> clients = new ArrayList<>();
 
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchCustomerInClinicByStaff(mail, search);
@@ -222,13 +233,13 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "No content");
+                logger.error("No content");
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -368,7 +379,6 @@ public class StaffController {
 
 
     @Operation(summary = "Booking")
-
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         ErrorResponseDTO error = new ErrorResponseDTO();
@@ -388,7 +398,6 @@ public class StaffController {
 
                 newAppointment.setStaff(client.getStaff());
                 newAppointment.setUser(userService.findClientByMail(customerMail));
-                newAppointment.setServices(serviceService.findServiceByID(serviceId));
                 newAppointment.setClinic(dentistSchedule.getClinic());
                 newAppointment.setDate(dentistSchedule.getWorkDate());
                 newAppointment.setTimeSlot(dentistSchedule.getTimeslot());

@@ -43,16 +43,16 @@ public class DentistScheduleService {
         dentistScheduleRepository.deleteByDentistAndWorkDate(dentist, workDate);
     }
 
-    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, String timeSlotID, String clinicID) {
+
+    public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, int slotNumber, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
-        TimeSlot timeSlot = timeSlotRepository.findById(timeSlotID).orElseThrow(() -> new RuntimeException("Time slot not found"));
         Clinic clinic = clinicRepository.findById(clinicID).orElseThrow(() -> new RuntimeException("Clinic not found"));
+        TimeSlot timeSlot = timeSlotRepository.findBySlotNumberAndClinic(slotNumber, clinic).orElseThrow(() -> new RuntimeException("Time slot not found"));
 
         List<DentistSchedule> schedules = new ArrayList<>();
 
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
-            // Create and add the schedule for each day
             DentistSchedule schedule = new DentistSchedule();
             schedule.setDentist(dentist);
             schedule.setWorkDate(date);
