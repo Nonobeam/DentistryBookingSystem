@@ -78,7 +78,6 @@ public class DentistController {
 
                 return ResponseEntity.ok(applist);
             } else {
-                // lỗi 403
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         } catch (Exception e) {
@@ -162,7 +161,7 @@ public class DentistController {
                     .collect(Collectors.toList());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(Optional.of(appointmentDTOList));
+            userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
