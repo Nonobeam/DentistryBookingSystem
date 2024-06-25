@@ -64,6 +64,7 @@ public class AuthenticationController {
             logger.error("Wrong mail or password");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
+
         return ResponseEntity.ok(response);
     }
 

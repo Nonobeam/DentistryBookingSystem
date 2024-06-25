@@ -17,6 +17,8 @@ import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -196,7 +198,7 @@ public class StaffController {
     }
 
 
-//---------------------------MANAGE CUSTOMER---------------------------
+    //---------------------------MANAGE CUSTOMER---------------------------
 
 
     @Operation(summary = "customerList")
@@ -288,7 +290,7 @@ public class StaffController {
     }
 
 
-//---------------------------MANAGE APPOINTMENT---------------------------
+    //---------------------------MANAGE APPOINTMENT---------------------------
 
 
     @Operation(summary = "Send mail for user")
@@ -363,12 +365,10 @@ public class StaffController {
             @RequestParam String servicesId) {
         Staff staff = userService.findStaffByMail(userService.mailExtract());
         Clinic clinic = staff.getClinic();
-        Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
+        List<DentistSchedule> dentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID());
 
-        return dentistScheduleList
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
+        return ResponseEntity.ok(dentistScheduleList);
     }
 
 
@@ -443,9 +443,7 @@ public class StaffController {
             }
             appointment.setStatus(0);
             Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
-            unavailableSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(1));
-            });
+            unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
@@ -493,12 +491,12 @@ public class StaffController {
             @RequestParam String servicesId) {
         List<DentistSchedule> dentistScheduleList;
         Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-        Optional<List<DentistSchedule>> optionalDentistScheduleList = dentistScheduleService
+        List<DentistSchedule> optionalDentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID());
 
         DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(appointment.getDentistScheduleId());
-        if (optionalDentistScheduleList.isPresent()) {
-            dentistScheduleList = optionalDentistScheduleList.get();
+        if (optionalDentistScheduleList != null) {
+            dentistScheduleList = optionalDentistScheduleList;
             dentistScheduleList.add(dentistSchedule);
         } else {
             dentistScheduleList = new ArrayList<>();
@@ -541,10 +539,7 @@ public class StaffController {
             }
             dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(0));
-            });
-            deleteBooking(appointmentId);
+            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
             appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
@@ -563,10 +558,10 @@ public class StaffController {
 
     @Operation(summary = "Staff")
     @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
+    public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentid") String appointmentId, @RequestParam("status") int status) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
