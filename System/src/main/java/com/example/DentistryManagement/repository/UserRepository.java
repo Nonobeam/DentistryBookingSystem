@@ -33,7 +33,7 @@ public interface UserRepository extends JpaRepository<Client, String> {
     List<Client> getClientsByRole(Role role);
 
 
-    //Managerlistit
+    //Managerlist
     @Query("SELECT c FROM Client c , Dentist d " +
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
     List<Client> getWorkerByManager(@Param("roleParam") Role role, String managerMail);

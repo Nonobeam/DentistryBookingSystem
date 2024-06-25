@@ -40,6 +40,7 @@ public class UserController {
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
     private final Logger logger = LogManager.getLogger(UserController.class);
+    private final ServiceService serviceService;
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
 
@@ -110,22 +111,22 @@ public class UserController {
         }
     }
 
-    @GetMapping("/available-service")
-    public ResponseEntity<List<Services>> getAvailableServices(
-            @RequestParam LocalDate bookDate,
-            @RequestParam String clinicId) {
-
-        List<Services> dentistService;
-        try {
-            Clinic clinic = clinicService.findClinicByID(clinicId);
-            dentistService = dentistScheduleService
-                    .getServiceNotNullByDate(bookDate, clinic);
-            return ResponseEntity.ok(dentistService);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+//    @GetMapping("/available-service")
+//    public ResponseEntity<?> getAvailableServices(
+//            @RequestParam LocalDate bookDate,
+//            @RequestParam String clinicId) {
+//
+//        List<Services> dentistService;
+//        try {
+//            Clinic clinic = clinicService.findClinicByID(clinicId);
+//            dentistService = serviceService
+//                    .getServiceNotNullByDate(bookDate, clinic).stream().toList();
+//            return ResponseEntity.ok(dentistService);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
     @Operation(summary = "All Clinics")
     @ApiResponses(value = {
@@ -144,29 +145,15 @@ public class UserController {
     }
 
 
-    @Operation(summary = "Get All Services By Clinic")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-
     @GetMapping("/all-service/{clinicID}")
-    public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate,
-                                                                           @PathVariable String clinicID) {
+    public ResponseEntity<?> getAllServiceByClinic(@RequestParam LocalDate bookDate,
+                                                   @PathVariable String clinicID) {
         try {
-            HashMap<String, Services> servicesByClinic = new HashMap<>();
+            List<Services> dentistService;
             Clinic clinic = clinicService.findClinicByID(clinicID);
-            List<DentistSchedule> dentistScheduleList = clinic.getDentistScheduleList();
-            for (DentistSchedule dentistSchedule : dentistScheduleList) {
-                if (dentistSchedule.getWorkDate().equals(workDate)) {
-                    if (dentistSchedule.getAvailable() == 1) {
-                        servicesByClinic.put(dentistSchedule.getServices().getServiceID(), dentistSchedule.getServices());
-                    }
-                }
-            }
-            return ResponseEntity.ok(servicesByClinic);
+            dentistService = serviceService
+                    .getServiceNotNullByDate(bookDate, clinic).stream().toList();
+            return ResponseEntity.ok(dentistService);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -187,11 +174,12 @@ public class UserController {
             @RequestParam String servicesId) {
 
         List<DentistSchedule> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID);
+                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID).stream().toList();
 
         List<AvailableSchedulesResponse> availableSchedulesResponses = new ArrayList<>();
         for (DentistSchedule i : dentistScheduleList) {
             AvailableSchedulesResponse availableSchedulesResponse = new AvailableSchedulesResponse();
+            availableSchedulesResponse.setDentistScheduleID(i.getScheduleID());
             availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
             availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
             availableSchedulesResponses.add(availableSchedulesResponse);
@@ -209,7 +197,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -222,9 +210,9 @@ public class UserController {
             }
             Appointment newAppointment = new Appointment();
             newAppointment.setUser(client);
-            newAppointment.setServices(dentistSchedule.getServices());
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
+            newAppointment.setServices(serviceService.findServiceByID(serviceID));
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
             newAppointment.setDentistScheduleId(dentistScheduleId);
@@ -261,7 +249,7 @@ public class UserController {
             String dentistScheduleId = appointment.getDentistScheduleId();
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             //Check for duplicate cancelled just in case
-            if(appointment.getStatus() == 0){
+            if (appointment.getStatus() == 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
             }
             appointment.setStatus(0);
@@ -271,9 +259,9 @@ public class UserController {
             });
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
-        }catch (Error e){
+        } catch (Error e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -290,7 +278,7 @@ public class UserController {
     public ResponseEntity<List<Appointment>> getAppointmentHistory
             (@RequestParam(required = false) LocalDate workDate,
              @RequestParam(required = false) Integer status) {
-        try{
+        try {
             Client user = userService.findClientByMail(userService.mailExtract());
             List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
             return ResponseEntity.ok(appointmentList);

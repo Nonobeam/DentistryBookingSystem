@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,17 +25,18 @@ public class DentistScheduleService {
     private final DentistRepository dentistRepository;
     private final ClinicRepository clinicRepository;
 
-    public List<DentistSchedule> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
-        return dentistScheduleRepository.findByWorkDateAndServices_ServiceIDAndAvailableAndClinic_ClinicID(workDate, serviceId, available, clinicId);
+    public HashSet<DentistSchedule> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
+        Services service = serviceRepository.findById(serviceId).orElse(null);
+        HashSet<DentistSchedule> dentistSchedulesHashSet = new HashSet<>();
+        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicID(workDate, available, clinicId);
+        for (DentistSchedule ds : dentistScheduleList) {
+            if(ds.getDentist().getServicesList().contains(service)) {
+                dentistSchedulesHashSet.add(ds);
+            }
+        }
+        return dentistSchedulesHashSet;
     }
 
-    public List<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
-        try {
-            return serviceRepository.getServiceNotNullByDate(bookDate, clinic);
-        } catch (Error e) {
-            throw e;
-        }
-    }
 
     public void deleteDentistSchedule(String dentistID, LocalDate workDate) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
