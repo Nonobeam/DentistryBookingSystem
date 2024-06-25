@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public class StaffController {
     private final MailService emailService;
     private final UserService userService;
-    private final ClinicService clinicService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
     private final AppointmentService appointmentService;
@@ -53,7 +52,7 @@ public class StaffController {
     private final Logger LOGGER = LogManager.getLogger(UserController.class);
 
 
-//---------------------------GET ALL SERVICES, CLINIC IN THE WORKING CLINIC---------------------------
+    //---------------------------GET ALL SERVICES, CLINIC IN THE WORKING CLINIC---------------------------
 
 
     @Operation(summary = "All Services in System")
@@ -115,7 +114,7 @@ public class StaffController {
     public ResponseEntity<List<UserDTO>> findAllDentistByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clientsOptional = null;
+            List<Client> clientsOptional;
             if (search != null && !search.isEmpty()) {
                 clientsOptional = userService.searchDentistByStaff(mail, search);
 
@@ -237,7 +236,7 @@ public class StaffController {
     }
 
 
-//---------------------------MANAGE CUSTOMER---------------------------
+    //---------------------------MANAGE CUSTOMER---------------------------
 
 
     @Operation(summary = "Staff")
@@ -252,7 +251,7 @@ public class StaffController {
     public ResponseEntity<List<UserDTO>> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients = null;
+            List<Client> clients;
 
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchCustomerInClinicByStaff(mail, search);
@@ -277,7 +276,6 @@ public class StaffController {
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -331,13 +329,12 @@ public class StaffController {
             return ResponseEntity.ok(Optional.of(userAppointDTO));
 
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
 
-//---------------------------MANAGE APPOINTMENT---------------------------
+    //---------------------------MANAGE APPOINTMENT---------------------------
 
 
     @Operation(summary = "Send mail for user")
@@ -383,7 +380,6 @@ public class StaffController {
 
             return ResponseEntity.ok(notice);
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -396,7 +392,6 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-
     @GetMapping("/all-service")
     public ResponseEntity<HashMap<String, Services>> getAllServiceByClinic(@RequestParam LocalDate workDate) {
         try {
@@ -430,12 +425,10 @@ public class StaffController {
             @RequestParam String servicesId) {
         Staff staff = userService.findStaffByMail(userService.mailExtract());
         Clinic clinic = staff.getClinic();
-        Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
+        List<DentistSchedule> dentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID());
 
-        return dentistScheduleList
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
+        return ResponseEntity.ok(dentistScheduleList);
     }
 
 
@@ -474,9 +467,7 @@ public class StaffController {
             }
             dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(0));
-            });
+            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
             appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
@@ -505,9 +496,7 @@ public class StaffController {
             }
             appointment.setStatus(0);
             Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
-            unavailableSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(1));
-            });
+            unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
@@ -562,12 +551,12 @@ public class StaffController {
             @RequestParam String servicesId) {
         List<DentistSchedule> dentistScheduleList;
         Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-        Optional<List<DentistSchedule>> optionalDentistScheduleList = dentistScheduleService
+        List<DentistSchedule> optionalDentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID());
 
         DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(appointment.getDentistScheduleId());
-        if (optionalDentistScheduleList.isPresent()) {
-            dentistScheduleList = optionalDentistScheduleList.get();
+        if (optionalDentistScheduleList != null) {
+            dentistScheduleList = optionalDentistScheduleList;
             dentistScheduleList.add(dentistSchedule);
         } else {
             dentistScheduleList = new ArrayList<>();
@@ -614,15 +603,12 @@ public class StaffController {
             }
             dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(0));
-            });
+            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
             appointmentRepository.save(newAppointment);
             return ResponseEntity.ok(newAppointment);
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            // Xử lý ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -635,11 +621,11 @@ public class StaffController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentid") String appointmentid, @RequestParam("status") int status) {
+    @PatchMapping("/appointment-history/{appointmentId}")
+    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("appointmentId") String appointmentId, @RequestParam("status") int status) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 

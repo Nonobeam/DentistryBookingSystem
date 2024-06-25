@@ -2,13 +2,14 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.core.dentistry.*;
+import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
-import com.example.DentistryManagement.repository.PasswordResetTokenRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,12 +21,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/user")
 @RestController
@@ -34,18 +33,13 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
-    private final DentistService dentistService;
     private final DentistScheduleService dentistScheduleService;
-    private final NotificationService notificationService;
     private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
-    private final PasswordResetTokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ClinicService clinicService;
     private final AppointmentRepository appointmentRepository;
-    private final Logger LOGGER = LogManager.getLogger(UserController.class);
-    private final ServiceService serviceService;
+    private final Logger logger = LogManager.getLogger(UserController.class);
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
 
@@ -187,17 +181,23 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/{clinicID}/available-schedules")
-    public ResponseEntity<List<DentistSchedule>> getAvailableSchedules(
+    public ResponseEntity<?> getAvailableSchedules(
             @RequestParam LocalDate workDate,
             @PathVariable String clinicID,
             @RequestParam String servicesId) {
 
-        Optional<List<DentistSchedule>> dentistScheduleList = dentistScheduleService
+        List<DentistSchedule> dentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinicID);
 
-        return dentistScheduleList
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
+        List<AvailableSchedulesResponse> availableSchedulesResponses = new ArrayList<>();
+        for (DentistSchedule i : dentistScheduleList) {
+            AvailableSchedulesResponse availableSchedulesResponse = new AvailableSchedulesResponse();
+            availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
+            availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
+            availableSchedulesResponses.add(availableSchedulesResponse);
+        }
+
+        return ResponseEntity.ok(availableSchedulesResponses);
     }
 
 
@@ -209,7 +209,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/booking/{dentistScheduleId}")
-    public ResponseEntity<Appointment> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID) {
         try {
             Client client = userService.findClientByMail(userService.mailExtract());
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -239,7 +239,7 @@ public class UserController {
                 schedules.forEach(schedule -> schedule.setAvailable(0));
             });
             appointmentRepository.save(newAppointment);
-            return ResponseEntity.ok(newAppointment);
+            return ResponseEntity.ok("Booking Successfully");
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
