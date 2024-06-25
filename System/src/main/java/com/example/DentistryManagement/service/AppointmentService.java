@@ -34,7 +34,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> customerAppointment(String cusid, String staffmail) {
+    public List<Appointment> customerAppointment(String cusid, String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
             Clinic clinic = staffclient.getClinic();

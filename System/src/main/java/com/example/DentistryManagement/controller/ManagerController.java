@@ -10,8 +10,6 @@ import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -37,11 +35,6 @@ public class ManagerController {
     //---------------------------REGISTER STAFF && DENTIST---------------------------
 
     @Operation(summary = "Register a new staff member")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully registered"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
-    })
     @PostMapping("/register/staff")
     public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody RegisterRequest request,
                                                                 @RequestParam String clinicId) {
@@ -56,11 +49,6 @@ public class ManagerController {
 
 
     @Operation(summary = "Register a new dentist")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully registered"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
-    })
     @PostMapping("/register/dentist")
     public ResponseEntity<AuthenticationResponse> registerDentist(@RequestBody RegisterRequest request,
                                                                   @RequestParam String clinicId,
@@ -80,11 +68,6 @@ public class ManagerController {
 
 
     @Operation(summary = "Edit users")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
-    })
     @PutMapping("/edit/{userID}")
     public ResponseEntity<Client> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
         Client updateUser = userService.findUserById(userID);
@@ -105,11 +88,6 @@ public class ManagerController {
     }
 
     @Operation(summary = "Edit clinic")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found")
-    })
     @PutMapping("/edit/{clinicID}")
     public ResponseEntity<Clinic> editClinic(@PathVariable String clinicID, @RequestBody ClinicDTO clinicDTO) {
         Clinic updateClinic = clinicService.findClinicByID(clinicID);
@@ -133,12 +111,6 @@ public class ManagerController {
 
 
     @Operation(summary = "Set dentist for staff")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @PutMapping("/set-staff/{staffID}/{dentistID}")
     public ResponseEntity<Dentist> updateStaffForDentist(@PathVariable String dentistID, @PathVariable String staffID) {
         Staff staff;
@@ -157,12 +129,6 @@ public class ManagerController {
 //---------------------------GET ALL STAFF && DENTIST && CLINIC---------------------------
 
     @Operation(summary = "All Dentists")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/all-dentist")
     public ResponseEntity<List<Client>> getAllDentists() {
         try {
@@ -175,12 +141,6 @@ public class ManagerController {
 
 
     @Operation(summary = "All Staffs")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/all-staff")
     public ResponseEntity<List<Client>> getAllStaffs() {
         try {
@@ -192,12 +152,6 @@ public class ManagerController {
     }
 
     @Operation(summary = "All Clinics")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
@@ -210,11 +164,6 @@ public class ManagerController {
     }
 
     @Operation(summary = "List staff dentist manage")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully registered"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "409", description = "Phone or mail already exists")
-    })
     @GetMapping("/{staffID}/all-dentists")
     public ResponseEntity<List<Dentist>> getDentistByStaff(@PathVariable String staffID) {
         List<Dentist> dentists;
