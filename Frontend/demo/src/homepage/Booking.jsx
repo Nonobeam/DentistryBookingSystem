@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox } from "antd";
+import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox, Spin } from "antd";
 import NavBar from "./Nav";
+import moment from "moment";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,6 +13,13 @@ const Booking = () => {
   const [selectedFor, setSelectedFor] = useState("self");
   const [isNewPatient, setIsNewPatient] = useState(false);
   const [clinics, setClinics] = useState([]);
+  const [services, setServices] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [isDateDisabled, setIsDateDisabled] = useState(true);
+  const [isServiceDisabled, setIsServiceDisabled] = useState(true);
+  const [loadingClinics, setLoadingClinics] = useState(true);
+  const [loadingServices, setLoadingServices] = useState(false);
 
   useEffect(() => {
     const fetchClinics = async () => {
@@ -28,13 +36,57 @@ const Booking = () => {
       catch (error) {
         console.error("Failed to fetch clinics:", error);
       }
+
+      finally {
+        setLoadingClinics(false);
+      }
     };
 
     fetchClinics();
   }, []);
 
+  useEffect(() => {
+    const fetchServices = async () => {
+      if (selectedBranch && selectedDate) {
+        setLoadingServices(true);
+        try {
+          const token = localStorage.getItem("token");
+          const formattedDate = selectedDate.format('YYYY-MM-DD');
+          const response = await axios.get(`http://localhost:8080/user/all-service/${selectedBranch}?workDate=${formattedDate}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const servicesArray = Object.values(response.data); // Transform the response object into an array
+          setServices(servicesArray);
+          setIsServiceDisabled(false);
+        } 
+        catch (error) {
+          console.error("Failed to fetch services:", error);
+        }
+        finally {
+          setLoadingServices(false);
+        }
+      }
+    };
+
+    fetchServices();
+  }, [selectedBranch, selectedDate]);
+
   const onFinish = (values) => {
     console.log("Success:", values);
+  };
+
+  const handleBranchChange = (value) => {
+    setSelectedBranch(value);
+    setIsDateDisabled(false); // Enable the date picker after selecting a branch
+    // setSelectedDate(null); 
+    setIsServiceDisabled(true); // Disable the service dropdown until a new date is selected
+    setServices([]);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
   };
 
   const disabledDate = (current) => {
@@ -62,6 +114,8 @@ const Booking = () => {
           }}
         >
           <Title level={2}>Reserve your appointment!</Title>
+
+          
 
           <Form form={form} name="booking" onFinish={onFinish}>
             <Form.Item name="forWhom" initialValue="self">
@@ -115,18 +169,22 @@ const Booking = () => {
                 </Form.Item>
               </>
             )}
-
+            
             <Form.Item
               name="branch"
               rules={[{ required: true, message: "Please select a branch!" }]}
             >
-              <Select placeholder="Choose our branch">
+              {loadingClinics ? (
+            <Spin size="medium" />
+          ) : (
+              <Select placeholder="Choose our branch" onChange={handleBranchChange}>
                 {clinics.map((clinic) => (
                   <Option key={clinic.clinicID} value={clinic.clinicID}>
                     {clinic.address}
                   </Option>
                 ))}
               </Select>
+          )}
             </Form.Item>
 
             <Form.Item
@@ -135,9 +193,28 @@ const Booking = () => {
             >
               <DatePicker placeholder="Select Date"
                 style={{ width: "100%" }}
-                format="YYYY-MM-DD" ///////////Date format////////////
-                disabledDate={disabledDate} />
+                onChange={handleDateChange}
+                format="DD-MM-YYYY" ///////////Date format////////////
+                disabledDate={disabledDate} 
+                disabled={isDateDisabled} />
             </Form.Item>
+
+            <Form.Item
+                name="service"
+                rules={[{ required: true, message: "Please select a service!" }]}
+              >
+                {loadingServices ? (
+                  <Spin size="small" />
+                ) : (
+                  <Select placeholder="Choose service" disabled={isServiceDisabled}>
+                    {services.map((service) => (
+                      <Option key={service.serviceID} value={service.serviceID}>
+                        {service.name}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
 
             <Form.Item
               name="time"
@@ -146,16 +223,6 @@ const Booking = () => {
               <Select placeholder="Choose timeslot">
                 <Option value="9:00">9:00 AM</Option>
                 <Option value="10:00">10:00 AM</Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="service"
-              rules={[{ required: true, message: "Please select a service!" }]}
-            >
-              <Select placeholder="Choose service">
-                <Option value="service1">Service 1</Option>
-                <Option value="service2">Service 2</Option>
               </Select>
             </Form.Item>
 
@@ -191,6 +258,7 @@ const Booking = () => {
               </Button>
             </Form.Item>
           </Form>
+          
         </div>
       </div>
     </>
