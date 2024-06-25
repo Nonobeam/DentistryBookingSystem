@@ -4,6 +4,7 @@ import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.DashboardBoss;
 import com.example.DentistryManagement.DTO.DashboardResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
@@ -78,21 +79,16 @@ public class ManagerController {
 
     @Operation(summary = "Edit users")
     @PutMapping("/edit/{userID}")
-    public ResponseEntity<Client> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        Client updateUser = userService.findUserById(userID);
-
-        if (updateUser != null) {
-            updateUser.setName(userDTO.getName());
-            updateUser.setPhone(userDTO.getPhone());
-            updateUser.setMail(userDTO.getMail());
-            updateUser.setBirthday(userDTO.getBirthday());
-
-            userService.updateUser(updateUser);
-            return ResponseEntity.ok(updateUser);
+    public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
+        if (userService.isPresentUser(userID).isPresent()) {
+            Client updatedUser = UserMapping.mapUser(userDTO);
+            userService.updateUser(updatedUser);
+            return ResponseEntity.ok(updatedUser);
         } else {
-            System.out.println("User not fail with userID: " + userID);
-            ;
-            return ResponseEntity.notFound().build();
+            ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
+            logger.error("User could not be update");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+
         }
     }
 
