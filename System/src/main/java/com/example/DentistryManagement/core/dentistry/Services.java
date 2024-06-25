@@ -30,10 +30,6 @@ public class Services {
     private List<Appointment> appointmentList;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "services")
-    private List<DentistSchedule> dentistScheduleList;
-
-    @JsonIgnore
     //This is the ServiceClinic table
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ServiceClinic",

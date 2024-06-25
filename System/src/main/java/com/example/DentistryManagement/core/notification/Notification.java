@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.core.mail;
+package com.example.DentistryManagement.core.notification;
 
 import com.example.DentistryManagement.core.user.Dentist;
 import com.fasterxml.jackson.annotation.JsonIgnore;
