@@ -146,13 +146,12 @@ public class AdminController {
         }
     }
 
-
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody AdminDTO updatedUser) {
         try {
             if (userService.isPresentUser(id).isPresent()) {
-                Client client = userMapping.mapUser(updatedUser);
+                Client client = userMapping.mapUserForAdmin(updatedUser);
                 userService.updateUser(client);
                 return ResponseEntity.ok(client);
             } else {
