@@ -22,6 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -117,13 +118,13 @@ public class StaffController {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.findClientByMail(dentistMail);
-
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
 
-            List<Appointment> appointmentList = appointmentService.findAllAppointmentByDentist(client.getUserID());
+            List<Appointment> appointmentList = appointmentService.findAllAppointmentByDentist(client.getMail(), staff.getClinic());
             List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
                     .map(appointmentEntity -> {
                         AppointmentDTO appointment = new AppointmentDTO();
@@ -235,9 +236,9 @@ public class StaffController {
 
     @Operation(summary = "Customer Info")
     @GetMapping("/customerList/{mail}")
-    public ResponseEntity<?> findCustomerByStaff(@PathVariable("mail") String customerMail) {
+    public ResponseEntity<?> findCustomerInformationByStaff(@PathVariable("mail") String customerMail) {
         try {
-            String mail = userService.mailExtract();
+            String staffMail = userService.mailExtract();
 
             UserDTO userDTO = new UserDTO();
             Client client = userService.findClientByMail(customerMail);
@@ -245,7 +246,7 @@ public class StaffController {
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
-            List<Appointment> appointmentList = appointmentService.customerAppointment(client.getUserID(), mail);
+            List<Appointment> appointmentList = appointmentService.customerAppointment(client.getUserID(), staffMail);
             List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
                     .map(appointmentEntity -> {
                         AppointmentDTO appointment = new AppointmentDTO();
@@ -369,7 +370,7 @@ public class StaffController {
     @Operation(summary = "Booking")
 
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         ErrorResponseDTO error = new ErrorResponseDTO();
 
         try {
@@ -387,6 +388,7 @@ public class StaffController {
 
                 newAppointment.setStaff(client.getStaff());
                 newAppointment.setUser(userService.findClientByMail(customerMail));
+                newAppointment.setServices(serviceService.findServiceByID(serviceId));
                 newAppointment.setClinic(dentistSchedule.getClinic());
                 newAppointment.setDate(dentistSchedule.getWorkDate());
                 newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
@@ -403,7 +405,7 @@ public class StaffController {
                     schedules.forEach(schedule -> schedule.setAvailable(0));
                 });
                 appointmentRepository.save(newAppointment);
-                return ResponseEntity.ok(newAppointment);
+                return ResponseEntity.ok("Booking successfully");
 
             } else {
                 error.setCode("204");
@@ -479,12 +481,16 @@ public class StaffController {
             List<Appointment> appointmentList;
             if (date != null || (search != null && !search.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
-            } else appointmentList = appointmentService.findApointmentClinic(mail);
+            } else appointmentList = appointmentService.findAppointmentInClinic(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
                     .map(appointmentEntity -> {
                         AppointmentDTO appointment = new AppointmentDTO();
                         appointment.setAppointmentId(appointmentEntity.getAppointmentID());
+                        appointment.setDate(appointmentEntity.getDate());
                         appointment.setServices(appointmentEntity.getServices().getName());
+                        appointment.setDentist(appointmentEntity.getDentist().getUser().getName());
+                        if (appointmentEntity.getStaff() != null)
+                            appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
                         appointment.setStatus(appointmentEntity.getStatus());
                         appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
                         if (appointmentEntity.getStaff() != null) {
@@ -512,6 +518,7 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
+
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
@@ -521,7 +528,7 @@ public class StaffController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
+            Map<Client, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
             int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByStaff(staff);

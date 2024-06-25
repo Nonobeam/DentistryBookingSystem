@@ -17,4 +17,5 @@ public class AdminDTO {
     private LocalDate birthday;
     private String password;
     private int status;
+    private String clinicName;
 }

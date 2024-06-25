@@ -9,21 +9,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
     List<Appointment> findAppointmentByUser_UserIDAndClinic(String customerID, Clinic clinic);
 
-    List<Appointment> getAppointmentByDentist_User_MailOrderByDateAsc(String dentistmail);
-
+    List<Appointment> getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(String dentistmail, Clinic clinic);
 
     List<Appointment> findAppointmentByClinic(Clinic c);
 
-    Optional<List<Appointment>> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistmail, LocalDate date, int status);
+    List<Appointment> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistmail, LocalDate date, int status);
 
-    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(String customerId, String dentistMail, int status, int status_);
+    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_Mail(String customerId, String dentistMail);
 
 
     Optional<List<Appointment>> findAppointmentsByDateAndStatus(LocalDate date, int status);
@@ -32,17 +30,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client client, int status);
 
-    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatusAndClinicUser(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2,Client manager);
+    List<Appointment> findAppointmentsByDateBetweenAndClinicUser(LocalDate startOfWeek, LocalDate endOfWeek, Client manager);
 
-    Optional<List<Appointment>> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
+    List<Appointment> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
 
-    List<Appointment> findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(LocalDate date, Staff staff, int status, int status2);
+    List<Appointment> findAppointmentsByDateAndDentist_Staff(LocalDate date, Staff staff);
 
-    Optional<List<Appointment>> findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(LocalDate startdate, LocalDate enddate, Staff staff, int status, int status2);
+    List<Appointment> findAppointmentsByDateBetweenAndDentistStaff(LocalDate startdate, LocalDate enddate, Staff staff);
 
-    List<Appointment> findAppointmentsByDateAndStatusOrStatus(LocalDate date, int i, int i1);
-
-    List<Appointment> findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(LocalDate date, Clinic clinic, String name1, String dependentName);
+    List<Appointment> findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(LocalDate date, String name1, String dependentName);
 
     Optional<List<Appointment>> findAppointmentsByUser(Client client);
 
@@ -64,6 +60,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and clinic.user=:manager")
     int countAppointmentsByYearPresentByManager(int year, Client manager);
+
     List<Appointment> findAppointmentByUser_UserID(String customerID);
 
     List<Appointment> findAppointmentByUser_UserIDAndDate(String userID, LocalDate date);
@@ -72,5 +69,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByUser_UserIDAndStatus(String userID, int status);
 
-    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startDate, LocalDate endDate, int i, int i1);
+    List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<Appointment> findAppointmentsByDate(LocalDate date);
 }

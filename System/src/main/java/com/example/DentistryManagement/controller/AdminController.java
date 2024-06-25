@@ -1,9 +1,13 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Role;
+import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/admin")
 @RestController
@@ -27,18 +32,41 @@ public class AdminController {
     private final UserMapping userMapping;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
+    private AdminDTO convertToAdminDTO(Client client) {
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setName(client.getName());
+        adminDTO.setPhone(client.getPhone());
+        adminDTO.setMail(client.getMail());
+        adminDTO.setBirthday(client.getBirthday());
+        adminDTO.setPassword(client.getPassword());
+        adminDTO.setStatus(client.getStatus());
+        if(client.getRole() == Role.DENTIST){
+            Dentist dentist = userService.findDentistByMail(client.getMail());
+            adminDTO.setClinicName(dentist.getClinic().getName());
+        }else if(client.getRole() == Role.STAFF ){
+            Staff staff = userService.findStaffByMail(client.getMail());
+            if(staff.getClinic()!=null)
+            adminDTO.setClinicName(staff.getClinic().getName());
+        }
+        return adminDTO;
+    }
+
     @Operation(summary = "Admin")
     @GetMapping("/dentistList")
     public ResponseEntity<?> dentistList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findDentistInClinic(search);
+                userList = userService.findDentistFollowSearching(search);
 
             } else {
                 userList = userService.findAllDentist();
             }
-            return ResponseEntity.ok(userList);
+            List<AdminDTO> adminDTOList = userList.stream()
+                    .map(this::convertToAdminDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(adminDTOList);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO();
             error.setCode("400");
@@ -55,11 +83,15 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.searchManager(search);
+                userList = userService.findManagerFollowSearching(search);
             } else {
                 userList = userService.findAllManager();
             }
-            return ResponseEntity.ok(userList);
+            List<AdminDTO> adminDTOList = userList.stream()
+                    .map(this::convertToAdminDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(adminDTOList);
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO();
@@ -78,11 +110,15 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findStaffInClinic(search);
+                userList = userService.findStaffFollowSearching(search);
             } else {
                 userList = userService.findAllStaff();
             }
-            return ResponseEntity.ok(userList);
+            List<AdminDTO> adminDTOList = userList.stream()
+                    .map(this::convertToAdminDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(adminDTOList);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO();
             error.setCode("400");
@@ -100,12 +136,15 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.searchCustomer(search);
+                userList = userService.findCustomerFollowSearching(search);
             } else {
                 userList = userService.findAllCustomer();
             }
-            return ResponseEntity.ok(userList);
+            List<AdminDTO> adminDTOList = userList.stream()
+                    .map(this::convertToAdminDTO)
+                    .collect(Collectors.toList());
 
+            return ResponseEntity.ok(adminDTOList);
         } catch (Exception e) {
             error.setCode("400");
             error.setMessage("Data make mistake");

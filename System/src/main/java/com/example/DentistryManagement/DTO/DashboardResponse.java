@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.DTO;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class DashboardResponse {
-    private Map<String, List<Appointment>> dailyAppointments;
+    private Map<Client, Integer>dailyAppointments;
     private Map<Integer, Long> monthlyAppointments;
     private int totalAppointmentsInMonthNow;
     private int totalAppointmentsInYearNow;

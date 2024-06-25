@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class AppointmentService {
 
     private final ClinicRepository clinicRepository;
 
-    public List<Appointment> findApointmentClinic(String staffmail) {
+    public List<Appointment> findAppointmentInClinic(String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
 
@@ -47,13 +48,13 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> customerAppointmentfollowdentist(String cusid, String dentist) {
         try {
-            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_MailAndStatusOrStatus(cusid, dentist, 1, 2);
+            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(cusid, dentist);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
     }
 
-    public Optional<List<Appointment>> findAppointmentByDentist(String mail) {
+    public List<Appointment> findAppointmentByDentist(String mail) {
         try {
             return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(), 1);
         } catch (DataAccessException e) {
@@ -61,9 +62,9 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> findAllAppointmentByDentist(String mail) {
+    public List<Appointment> findAllAppointmentByDentist(String mail, Clinic clinic) {
         try {
-            return appointmentRepository.getAppointmentByDentist_User_MailOrderByDateAsc(mail);
+            return appointmentRepository.getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(mail, clinic);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
         }
@@ -122,9 +123,18 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
+    public List<Appointment> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek, Dentist dentist) {
         try {
-            return appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startOfWeek, endOfWeek, 1, 2);
+            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetween(startOfWeek, endOfWeek);
+            List<Appointment> filterAppointments = new ArrayList<>();
+            for (Appointment appointment : appointments) {
+                if (appointment.getDentist() == dentist) {
+                    if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
+                        filterAppointments.add(appointment);
+                    }
+                }
+            }
+            return filterAppointments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -132,27 +142,36 @@ public class AppointmentService {
 
     public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffmail) {
         try {
-            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
-
-            Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, clinic, name, name);
+            Staff staffClient = staffRepository.findStaffByUserMail(staffmail);
+            List<Appointment> appointments = appointmentRepository.findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, name, name);
+            List<Appointment> filterAppointments = new ArrayList<>();
+            for (Appointment appointment : appointments) {
+                if (appointment.getClinic().getClinicID().equals(staffClient.getClinic().getClinicID())) {
+                    filterAppointments.add(appointment);
+                }
+            }
+            return filterAppointments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Appointment> searchAppointmentByDentist(LocalDate date, String name, String staffmail) {
+    public List<Appointment> searchAppointmentByDentist(LocalDate date, String name, Dentist dentist) {
         try {
-            Dentist dentist = dentistRepository.findDentistByUserMail(staffmail);
-
-            Clinic clinic = dentist.getClinic();
-            return appointmentRepository.findByDateAndClinicAndUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, clinic, name, name);
+            List<Appointment> appointments = appointmentRepository.findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, name, name);
+            List<Appointment> filterAppointments = new ArrayList<>();
+            for (Appointment appointment : appointments) {
+                if (appointment.getDentist() == dentist) {
+                    filterAppointments.add(appointment);
+                }
+            }
+            return filterAppointments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Optional<List<Appointment>> searchAppointmentByCustomer(LocalDate date, String name, String mail) {
+    public List<Appointment> searchAppointmentByCustomer(LocalDate date, String name, String mail) {
         try {
             Client client = userRepository.findUserByMail(mail);
 
@@ -196,24 +215,28 @@ public class AppointmentService {
         return appointmentRepository.countAppointmentsByYearPresentByStaff(LocalDate.now().getYear(), staff);
     }
 
-    public Map<String, List<Appointment>> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndDentist_StaffAndStatusOrStatus(date, staff, 1, 2);
-        Map<String, List<Appointment>> appointmentsByDentist = new HashMap<>();
+    public Map<Client, Integer> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
+        List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateAndDentist_Staff(date, staff);
+        Map<Client, Integer> appointmentsByDentist = new HashMap<>();
 
-        for (Appointment appointment : appointments) {
-            String dentist = appointment.getDentist().getDentistID();
-            appointmentsByDentist.computeIfAbsent(dentist, k -> new ArrayList<>()).add(appointment);
+        for (Appointment appointment : appointmentsBase) {
+            if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
+                Client dentist = appointment.getDentist().getUser();
+                appointmentsByDentist.put(dentist, appointmentsByDentist.getOrDefault(dentist, 0) + 1);
+            }
         }
 
         return appointmentsByDentist;
     }
 
-    public Map<Integer, Long> getMonthlyAppointmentsByDentist(int year, int month, LocalDate startDate, LocalDate endDate, Staff staff) {
+    public Map<Integer, Long> getMonthlyAppointmentsByDentist(LocalDate startDate, LocalDate endDate, Staff staff) {
         Map<Integer, Long> monthlyAppointmentCounts = new HashMap<>();
-
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(startDate, endDate, staff, 1, 2)
-                .orElse(Collections.emptyList());
-
+        List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaff(startDate, endDate, staff);
+        List<Appointment> appointments = Optional.ofNullable(appointmentsBase)
+                .orElse(new ArrayList<>())
+                .stream()
+                .filter(appointment -> appointment.getStatus() == 1 || appointment.getStatus() == 2)
+                .collect(Collectors.toList());
         //số lượng cuộc hẹn cho từng nha sĩ
         appointments.forEach(appointment -> {
             LocalDate appointmentDate = appointment.getDate();
@@ -225,16 +248,15 @@ public class AppointmentService {
         return monthlyAppointmentCounts;
     }
 
-    // Lấy số lượng cuộc hẹn của từng nha sĩ trong cả năm
+    // Lấy số lượng cuộc hẹn của cac dentist thuoc staff trong cả năm
     public Map<Integer, Long> getAppointmentsByStaffForYear(Staff staff, int year) {
         Map<Integer, Long> yearlyAppointmentCounts = new HashMap<>();
-        List<Dentist> dentists = staff.getDentistList();
 
         for (int month = 1; month <= 12; month++) {
             final int currentMonth = month;
             LocalDate startDate = LocalDate.of(year, currentMonth, 1);
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-            Map<Integer, Long> monthlyCounts = getMonthlyAppointmentsByDentist(year, currentMonth, startDate, endDate, staff);
+            Map<Integer, Long> monthlyCounts = getMonthlyAppointmentsByDentist(startDate, endDate, staff);
 
             // Tổng hợp số lượng cuộc hẹn trong tháng vào tổng số lượng của năm
             monthlyCounts.forEach((key, value) -> yearlyAppointmentCounts.merge(currentMonth, value, Long::sum));
@@ -244,7 +266,13 @@ public class AppointmentService {
     }
 
     public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
-        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date, 1, 2);
+        List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDate(date);
+        List<Appointment> appointments = new ArrayList<>();
+        for (Appointment appointment : appointmentBase) {
+            if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
+                appointments.add(appointment);
+            }
+        }
         Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
 
         for (Appointment appointment : appointments) {
@@ -261,7 +289,13 @@ public class AppointmentService {
         for (int month = 1; month <= 12; month++) {
             LocalDate startDate = LocalDate.of(year, month, 1);
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatus(startDate, endDate, 1, 2);
+            List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDateBetween(startDate, endDate);
+            List<Appointment> appointments = new ArrayList<>();
+            for (Appointment appointment : appointmentBase) {
+                if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
+                    appointments.add(appointment);
+                }
+            }
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
@@ -283,7 +317,13 @@ public class AppointmentService {
         for (int month = 1; month <= 12; month++) {
             LocalDate startDate = LocalDate.of(year, month, 1);
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatusAndClinicUser(startDate, endDate, 1, 2, manager);
+            List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDateBetweenAndClinicUser(startDate, endDate, manager);
+            List<Appointment> appointments = new ArrayList<>();
+            for (Appointment appointment : appointmentBase) {
+                if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
+                    appointments.add(appointment);
+                }
+            }
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();

@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.core.dentistry;
 
 import com.example.DentistryManagement.core.user.Dentist;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ public class DentistSchedule {
     @JoinColumn(name = "dentistID", referencedColumnName = "dentistID")
     private Dentist dentist;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
@@ -35,6 +37,7 @@ public class DentistSchedule {
     @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
     private TimeSlot timeslot;
 
+    @JsonIgnore
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;
 }

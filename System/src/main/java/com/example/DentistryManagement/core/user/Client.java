@@ -64,6 +64,7 @@ public class Client implements UserDetails {
     @PrimaryKeyJoinColumn
     private Staff staff;
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
