@@ -60,14 +60,14 @@ public class ServiceService {
     }
 
     public HashSet<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
-        List<DentistSchedule> scheduleList= dentistScheduleRepository.findDentistSchedulesByClinicAndWorkDateAndAvailable(clinic,bookDate,1);
-        HashSet<Services> servicesHashMap=new HashSet<>();
+        List<DentistSchedule> scheduleList = dentistScheduleRepository.findDentistSchedulesByClinicAndWorkDateAndAvailable(clinic, bookDate, 1);
+        HashSet<Services> servicesHashSet = new HashSet<>();
         for (DentistSchedule dentistSchedule : scheduleList) {
             for (Services dentistService : dentistSchedule.getDentist().getServicesList()) {
-                servicesHashMap.add(dentistService);
+                servicesHashSet.add(dentistService);
             }
         }
-        return servicesHashMap;
+        return servicesHashSet;
 
     }
 }

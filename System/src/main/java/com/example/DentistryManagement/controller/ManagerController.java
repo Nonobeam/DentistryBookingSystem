@@ -1,10 +1,14 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.ClinicDTO;
+import com.example.DentistryManagement.DTO.DashboardBoss;
+import com.example.DentistryManagement.DTO.DashboardResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
@@ -12,12 +16,16 @@ import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/v1/manager")
 @RestController
@@ -29,7 +37,8 @@ public class ManagerController {
     private final ClinicService clinicService;
     private final DentistService dentistService;
     private final AuthenticationService authenticationService;
-    private final Logger logger = LogManager.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final AppointmentService appointmentService;
 
 
     //---------------------------REGISTER STAFF && DENTIST---------------------------
@@ -174,6 +183,31 @@ public class ManagerController {
             return ResponseEntity.ok(dentists);
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
+        }
+    }
+
+    @Operation(summary = "Manager Dashboard")
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+        try {
+            Client manager = userService.findClientByMail(userService.mailExtract());
+            if (manager == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
+            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
+            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
+
+            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
+
+            return ResponseEntity.ok(dashboardResponse);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setCode("204");
+            error.setMessage("Not found data in dashboard");
+            logger.error("Not found data in dashboard");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
 }

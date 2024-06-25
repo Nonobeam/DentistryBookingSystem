@@ -32,7 +32,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client client, int status);
 
-    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2);
+    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatusAndClinicUser(LocalDate startOfWeek, LocalDate endOfWeek, int status, int status2,Client manager);
 
     Optional<List<Appointment>> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
 
@@ -47,17 +47,23 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     Optional<List<Appointment>> findAppointmentsByUser(Client client);
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year")
-    int countAppointmentsByMonthPresentByBoss(Month month, int year);
+    int countAppointmentsByMonthPresentByBoss(int month, int year);
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year")
     int countAppointmentsByYearPresentByBoss(int year);
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and dentist.staff =:staff")
-    int countAppointmentsByMonthPresentByStaff(Month month, int year,Staff staff);
+    int countAppointmentsByMonthPresentByStaff(int month, int year, Staff staff);
 
     @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and dentist.staff =:staff")
-    int countAppointmentsByYearPresentByStaff( int year,Staff staff);
+    int countAppointmentsByYearPresentByStaff(int year, Staff staff);
 
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and clinic.user=:manager")
+    int countAppointmentsByMonthPresentByManager(int month, int year, Client manager);
+
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and clinic.user=:manager")
+    int countAppointmentsByYearPresentByManager(int year, Client manager);
     List<Appointment> findAppointmentByUser_UserID(String customerID);
 
     List<Appointment> findAppointmentByUser_UserIDAndDate(String userID, LocalDate date);
@@ -66,4 +72,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByUser_UserIDAndStatus(String userID, int status);
 
+    List<Appointment> findAppointmentsByDateBetweenAndStatusOrStatus(LocalDate startDate, LocalDate endDate, int i, int i1);
 }

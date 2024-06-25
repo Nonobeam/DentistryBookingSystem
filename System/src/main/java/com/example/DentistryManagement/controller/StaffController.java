@@ -14,8 +14,6 @@ import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,9 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -456,96 +452,6 @@ public class StaffController {
         }
     }
 
-
-    @GetMapping("/update-booking/{appointmentId}/all-service")
-    public ResponseEntity<?> getAllServiceToUpdateByClinic(@RequestParam LocalDate workDate, @PathVariable("appointmentId") String appointmentId) {
-        try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
-            Clinic clinic = staff.getClinic();
-            List<Services> dentistService;
-            dentistService = serviceService
-                    .getServiceNotNullByDate(workDate, clinic).stream().toList();
-            dentistService.add(appointment.getServices());
-            return ResponseEntity.ok(dentistService);
-        } catch (Error error) {
-            throw new Error("Error while getting clinic " + error);
-        }
-    }
-
-
-    @Operation(summary = "Show available schedules")
-    @GetMapping("/update-booking/{appointmentId}/available-schedules")
-    public ResponseEntity<List<DentistSchedule>> getAvailableSchedulesToUpdate(
-            @RequestParam LocalDate workDate,
-            @PathVariable String appointmentId,
-            @RequestParam String servicesId) {
-        Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-        List<DentistSchedule> dentistScheduleList = dentistScheduleService
-                .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, appointment.getClinic().getClinicID()).stream().toList();
-
-        List<AvailableSchedulesResponse> availableSchedulesResponses = new ArrayList<>();
-        for (DentistSchedule i : dentistScheduleList) {
-            AvailableSchedulesResponse availableSchedulesResponse = new AvailableSchedulesResponse();
-            availableSchedulesResponse.setDentistScheduleID(i.getScheduleID());
-            availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
-            availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
-            availableSchedulesResponses.add(availableSchedulesResponse);
-        }
-        return ResponseEntity.ok(dentistScheduleList);
-    }
-
-
-    @Operation(summary = "Booking")
-    @PostMapping("/update-booking/{appointmentId}/{dentistScheduleId}")
-
-    public ResponseEntity<?> makeBookingToUpdate(@PathVariable String dentistScheduleId, @PathVariable String appointmentId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceID ) {
-        ErrorResponseDTO error = new ErrorResponseDTO();
-        try {
-            Client client = userService.findClientByMail(userService.mailExtract());
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-            deleteBooking(appointmentId);
-            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
-            if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
-                throw new Error("Over booked for today!");
-            }
-
-            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
-                throw new Error("Full appointment for this date!");
-            }
-            Appointment newAppointment = new Appointment();
-            newAppointment.setStaff(client.getStaff());
-            newAppointment.setUser(userService.findClientByMail(customerMail));
-            newAppointment.setClinic(dentistSchedule.getClinic());
-            newAppointment.setDate(dentistSchedule.getWorkDate());
-            newAppointment.setServices(serviceService.findServiceByID(serviceID));
-            newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
-            newAppointment.setDentist(dentistSchedule.getDentist());
-            newAppointment.setDentistScheduleId(dentistScheduleId);
-            newAppointment.setStatus(1);
-            if (dependentID != null) {
-                Dependent dependent = userService.findDependentByDependentId(dependentID);
-                newAppointment.setDependent(dependent);
-            }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
-            Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
-            appointmentRepository.save(newAppointment);
-            return ResponseEntity.ok(newAppointment);
-        } catch (Error e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        } catch (Exception e) {
-            error.setCode("400");
-            error.setMessage("Server_error");
-            logger.error("Server_error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-
     @Operation(summary = "Staff")
     @PatchMapping("/appointment-history/{appointmentid}")
     public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentid") String appointmentId, @RequestParam("status") int status) {
@@ -606,7 +512,7 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
-
+    @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
         try {

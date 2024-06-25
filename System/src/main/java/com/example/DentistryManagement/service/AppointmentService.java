@@ -23,6 +23,7 @@ public class AppointmentService {
     private final DentistRepository dentistRepository;
 
     private final ClinicRepository clinicRepository;
+
     public List<Appointment> findApointmentClinic(String staffmail) {
         try {
             Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
@@ -69,26 +70,26 @@ public class AppointmentService {
     }
 
 
-        public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
+    public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
         try {
             String userID = user.getUserID();
 
-            if(date == null && status == null) {
+            if (date == null && status == null) {
                 return appointmentRepository.findAppointmentByUser_UserID(userID);
-            }
-            else {
-                if(status != null && date == null) {
+            } else {
+                if (status != null && date == null) {
                     return appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
-                } else if(status == null && date != null) {
-                    return  appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
+                } else if (status == null && date != null) {
+                    return appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
                 } else {
-                    return  appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID,date,status);
+                    return appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
                 }
             }
-            } catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     public Appointment AppointmentUpdate(Appointment appointment) {
         try {
             return appointmentRepository.save(appointment);
@@ -155,7 +156,7 @@ public class AppointmentService {
         try {
             Client client = userRepository.findUserByMail(mail);
 
-            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date,name, name);
+            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -180,7 +181,7 @@ public class AppointmentService {
     }
 
     public int totalAppointmentsInMonthByBoss() {
-        return appointmentRepository.countAppointmentsByMonthPresentByBoss(LocalDate.now().getMonth(), LocalDate.now().getYear());
+        return appointmentRepository.countAppointmentsByMonthPresentByBoss(LocalDate.now().getMonthValue(), LocalDate.now().getYear());
     }
 
     public int totalAppointmentsInYearByBoss() {
@@ -188,7 +189,7 @@ public class AppointmentService {
     }
 
     public int totalAppointmentsInMonthByStaff(Staff staff) {
-        return appointmentRepository.countAppointmentsByMonthPresentByStaff(LocalDate.now().getMonth(), LocalDate.now().getYear(), staff);
+        return appointmentRepository.countAppointmentsByMonthPresentByStaff(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), staff);
     }
 
     public int totalAppointmentsInYearByStaff(Staff staff) {
@@ -210,11 +211,10 @@ public class AppointmentService {
     public Map<Integer, Long> getMonthlyAppointmentsByDentist(int year, int month, LocalDate startDate, LocalDate endDate, Staff staff) {
         Map<Integer, Long> monthlyAppointmentCounts = new HashMap<>();
 
-        // Lấy danh sách cuộc hẹn theo từng ngày trong tháng
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaffAndStatusOrStatus(startDate, endDate, staff, 1, 2)
                 .orElse(Collections.emptyList());
 
-        // Tính số lượng cuộc hẹn cho từng nha sĩ
+        //số lượng cuộc hẹn cho từng nha sĩ
         appointments.forEach(appointment -> {
             LocalDate appointmentDate = appointment.getDate();
             int dayOfMonth = appointmentDate.getDayOfMonth();
@@ -242,6 +242,7 @@ public class AppointmentService {
 
         return yearlyAppointmentCounts;
     }
+
     public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateAndStatusOrStatus(date, 1, 2);
         Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
@@ -254,7 +255,6 @@ public class AppointmentService {
         return appointmentsByClinic;
     }
 
-    // Method to get yearly appointments by clinics
     public Map<String, Map<Integer, Long>> getAppointmentsByClinicsForYear(int year) {
         Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
 
@@ -275,5 +275,36 @@ public class AppointmentService {
         }
 
         return yearlyAppointmentCounts;
+    }
+
+    public Map<String, Map<Integer, Long>> getClinicAppointmentsForYear(Client manager, int year) {
+        Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
+
+        for (int month = 1; month <= 12; month++) {
+            LocalDate startDate = LocalDate.of(year, month, 1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndStatusOrStatusAndClinicUser(startDate, endDate, 1, 2, manager);
+            if (!appointments.isEmpty()) {
+                for (Appointment appointment : appointments) {
+                    Clinic clinic = appointment.getClinic();
+                    String clinicid = clinic.getClinicID();
+                    yearlyAppointmentCounts.putIfAbsent(clinicid, new HashMap<>());
+                    Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicid);
+                    monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
+                }
+            }
+
+        }
+
+        return yearlyAppointmentCounts;
+    }
+
+    public int totalAppointmentsInMonthByManager(Client manager) {
+
+        return appointmentRepository.countAppointmentsByMonthPresentByManager(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), manager);
+    }
+
+    public int totalAppointmentsInYearByManager(Client manager) {
+        return appointmentRepository.countAppointmentsByYearPresentByManager(LocalDate.now().getYear(), manager);
     }
 }

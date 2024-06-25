@@ -30,7 +30,7 @@ public class DentistScheduleService {
         HashSet<DentistSchedule> dentistSchedulesHashSet = new HashSet<>();
         List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicID(workDate, available, clinicId);
         for (DentistSchedule ds : dentistScheduleList) {
-            if(ds.getDentist().getServicesList().contains(service)) {
+            if (ds.getDentist().getServicesList().contains(service)) {
                 dentistSchedulesHashSet.add(ds);
             }
         }
@@ -69,7 +69,7 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 
-    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule,int available) {
+    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule, int available) {
         dentistSchedule.setAvailable(available);
         return dentistScheduleRepository.save(dentistSchedule);
     }

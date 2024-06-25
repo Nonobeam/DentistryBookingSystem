@@ -111,22 +111,6 @@ public class UserController {
         }
     }
 
-//    @GetMapping("/available-service")
-//    public ResponseEntity<?> getAvailableServices(
-//            @RequestParam LocalDate bookDate,
-//            @RequestParam String clinicId) {
-//
-//        List<Services> dentistService;
-//        try {
-//            Clinic clinic = clinicService.findClinicByID(clinicId);
-//            dentistService = serviceService
-//                    .getServiceNotNullByDate(bookDate, clinic).stream().toList();
-//            return ResponseEntity.ok(dentistService);
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
 
     @Operation(summary = "All Clinics")
     @ApiResponses(value = {
@@ -208,12 +192,11 @@ public class UserController {
             if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
                 throw new Error("Full appointment for this date!");
             }
-            Services services= serviceService.findServiceByID(serviceID);
             Appointment newAppointment = new Appointment();
             newAppointment.setUser(client);
             newAppointment.setClinic(dentistSchedule.getClinic());
             newAppointment.setDate(dentistSchedule.getWorkDate());
-            newAppointment.setServices(services);
+            newAppointment.setServices(serviceService.findServiceByID(serviceID));
             newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
             newAppointment.setDentist(dentistSchedule.getDentist());
             newAppointment.setDentistScheduleId(dentistScheduleId);
