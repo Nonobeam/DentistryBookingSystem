@@ -8,10 +8,10 @@ WORKDIR /app
 COPY DentistryManagement.jar /app/DentistryManagement.jar
 
 # Build argument for Google Cloud credentials
-ARG GOOGLE_APPLICATION_CREDENTIALS_JSON
+ARG GOOGLE_APPLICATION_CREDENTIALS
 
 # Save the Google Cloud credentials JSON to a file
-RUN echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > /app/credentials.json
+RUN echo $GOOGLE_APPLICATION_CREDENTIALS > /app/credentials.json
 
 # Expose the port the application runs on
 EXPOSE 8080
