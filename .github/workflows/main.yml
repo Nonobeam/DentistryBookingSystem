@@ -31,13 +31,16 @@ jobs:
       working-directory: System
       run: cp target/DentistryManagement-0.0.1-SNAPSHOT.jar DentistryManagement.jar
 
-    - name: Save Google Cloud credentials to a file
+    - name: Encode Google Cloud credentials
       working-directory: System
-      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > red-carver-425403-d9-bd68878073ca.json
+      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" | base64 > gcp_credentials_base64.txt
 
     - name: Build Docker image with credentials
       working-directory: System
-      run: docker build --build-arg GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" -t dentistry-management .
+      run: |
+        docker build \
+          --build-arg GCP_CREDENTIALS_BASE64="$(cat gcp_credentials_base64.txt)" \
+          -t dentistry-management .
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
@@ -47,6 +50,3 @@ jobs:
 
     - name: Push Docker image to Docker Hub
       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
-
-    - name: Run Docker container
-      run: docker run -d -p 8080:8080 ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
