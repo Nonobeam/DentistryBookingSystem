@@ -19,6 +19,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Navigate to System directory
+      working-directory: System
+      run: pwd  # This is to ensure we are in the correct directory
+
     - name: Build with Maven
       working-directory: System
       run: mvn clean package
@@ -31,28 +35,9 @@ jobs:
       working-directory: System
       run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > red-carver-425403-d9-bd68878073ca.json
 
-    - name: Debug Google Cloud credentials
-      working-directory: System
-      run: |
-        echo "Google Cloud credentials:"
-        cat red-carver-425403-d9-bd68878073ca.json
-
     - name: Build Docker image with credentials
       working-directory: System
-      run: |
-        docker build \
-        --build-arg GOOGLE_APPLICATION_CREDENTIALS_JSON="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" \
-        -t dentistry-management:latest \
-        -f Dockerfile .
-
-    - name: Test Docker image
-      run: |
-        docker run -d -p 8080:8080 --name dentistry-management-test dentistry-management:latest
-        sleep 30  # Allow some time for the container to start
-        docker ps -a  # List all containers to check the status
-        docker logs dentistry-management-test  # Print container logs
-        docker stop dentistry-management-test
-        docker rm dentistry-management-test
+      run: docker build --build-arg GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" -t dentistry-management:latest .
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
@@ -62,3 +47,6 @@ jobs:
 
     - name: Push Docker image to Docker Hub
       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
+
+    - name: Run Docker container
+      run: docker run -d -p 8080:8080 ${{ secrets.DOCKER_HUB_USERNAME }}/dentistry-management:latest
