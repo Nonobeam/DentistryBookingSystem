@@ -39,7 +39,7 @@ jobs:
       working-directory: System
       run: |
         docker build \
-          --build-arg GCP_CREDENTIALS_BASE64="$(cat gcp_credentials_base64.txt)" \
+          --build-arg GOOGLE_APPLICATION_CREDENTIALS="$(cat gcp_credentials_base64.txt)" \
           -t dentistry-management .
 
     - name: Log in to Docker Hub
