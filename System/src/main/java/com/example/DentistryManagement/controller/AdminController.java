@@ -35,6 +35,7 @@ public class AdminController {
 
     private AdminDTO convertToAdminDTO(Client client) {
         AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setId(client.getUserID());
         adminDTO.setName(client.getName());
         adminDTO.setPhone(client.getPhone());
         adminDTO.setMail(client.getMail());

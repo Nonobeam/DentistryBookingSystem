@@ -213,7 +213,7 @@ public class UserService {
     public List<Client> findAllDentistByManager(String mail) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.getWorkerByManager(Role.DENTIST, mail);
+            return userRepository.getDentisByManager(Role.DENTIST, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -223,7 +223,7 @@ public class UserService {
 
     public List<Client> findAllStaffByManager(String mail) {
         try {
-            return userRepository.getWorkerByManager(Role.STAFF, mail);
+            return userRepository.getStaffByManager(Role.STAFF, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -232,7 +232,7 @@ public class UserService {
 
     public List<Client> findDentistFollowSearching(String search) {
         try {
-            List<Dentist> dentistsList = dentistRepository.findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search,search);
+            List<Dentist> dentistsList = dentistRepository.findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search, search);
             List<Client> dentistListFollowSearch = new ArrayList<>();
             for (Dentist d : dentistsList) {
                 dentistListFollowSearch.add(d.getUser());
@@ -257,7 +257,7 @@ public class UserService {
 
     public List<Client> findStaffFollowSearching(String search) {
         try {
-            List<Staff> staffList = staffRepository.findByClinic_NameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search,search);
+            List<Staff> staffList = staffRepository.findByClinic_NameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search, search);
             List<Client> staffListFollowSearch = new ArrayList<>();
             for (Staff s : staffList) {
                 staffListFollowSearch.add(s.getUser());
