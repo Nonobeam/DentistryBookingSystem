@@ -37,10 +37,7 @@ jobs:
 
     - name: Build Docker image with credentials
       working-directory: System
-      run: |
-        docker build \
-        --build-arg GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" \
-        -t dentistry-management .
+      run: docker build --build-arg GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" -t dentistry-management .
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
