@@ -19,10 +19,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Navigate to System directory
-      working-directory: System
-      run: pwd  # This is to ensure we are in the correct directory
-
     - name: Build with Maven
       working-directory: System
       run: mvn clean package
@@ -45,8 +41,9 @@ jobs:
       working-directory: System
       run: |
         docker build \
-        --build-arg GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" \
-        -t dentistry-management:latest .
+        --build-arg GOOGLE_APPLICATION_CREDENTIALS_JSON="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" \
+        -t dentistry-management:latest \
+        -f Dockerfile .
 
     - name: Test Docker image
       run: |
