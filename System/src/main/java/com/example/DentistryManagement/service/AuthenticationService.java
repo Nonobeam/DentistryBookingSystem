@@ -150,6 +150,36 @@ public class AuthenticationService {
                 .build();
     }
 
+    public AuthenticationResponse registerManager(RegisterRequest request) {
+        if (userRepository.existsByPhoneOrMailAndStatus(request.getMail(), request.getPhone(), 1)) {
+            throw new Error("Phone or mail is already existed");
+        }
+
+        Client user;
+        try {
+            user = Client.builder()
+                    .name(request.getName())
+                    .phone(request.getPhone())
+                    .mail(request.getMail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(Role.MANAGER)
+                    .birthday(request.getBirthday())
+                    .status(1)
+                    .build();
+        } catch (Exception e) {
+            logger.error(e.toString());
+            throw new Error("Something went wrong while creating a new user, please check your input field");
+        }
+
+        userRepository.save(user);
+
+        var jwtToken = jwtService.generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
+    }
+
 
     public String register(RegisterRequest request, Role role) {
 

@@ -1,5 +1,8 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.DTO.ClinicDTO;
+import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
@@ -24,6 +27,7 @@ public class AppointmentService {
     private final DentistRepository dentistRepository;
 
     private final ClinicRepository clinicRepository;
+    private final UserMapping userMapping;
 
     public List<Appointment> findAppointmentInClinic(String staffmail) {
         try {
@@ -216,14 +220,15 @@ public class AppointmentService {
         return appointmentRepository.countAppointmentsByYearPresentByStaff(LocalDate.now().getYear(), staff);
     }
 
-    public Map<Client, Integer> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
+    public Map<String, Integer> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
         List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateAndDentist_Staff(date, staff);
-        Map<Client, Integer> appointmentsByDentist = new HashMap<>();
+        Map<String, Integer> appointmentsByDentist = new HashMap<>();
 
         for (Appointment appointment : appointmentsBase) {
             if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
                 Client dentist = appointment.getDentist().getUser();
-                appointmentsByDentist.put(dentist, appointmentsByDentist.getOrDefault(dentist, 0) + 1);
+                UserDTO dentistDTO = new UserDTO().getUserDTOFromUser(dentist);
+                appointmentsByDentist.put(dentistDTO.toString(), appointmentsByDentist.getOrDefault(dentistDTO, 0) + 1);
             }
         }
 
@@ -266,7 +271,7 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
-    public Map<Clinic, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
+    public Map<String, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
         List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDate(date);
         List<Appointment> appointments = new ArrayList<>();
         for (Appointment appointment : appointmentBase) {
@@ -274,11 +279,12 @@ public class AppointmentService {
                 appointments.add(appointment);
             }
         }
-        Map<Clinic, List<Appointment>> appointmentsByClinic = new HashMap<>();
+        Map<String, List<Appointment>> appointmentsByClinic = new HashMap<>();
 
         for (Appointment appointment : appointments) {
             Clinic clinic = appointment.getClinic();
-            appointmentsByClinic.computeIfAbsent(clinic, k -> new ArrayList<>()).add(appointment);
+            ClinicDTO clinicDTO = new ClinicDTO().clinicMapping(clinic);
+            appointmentsByClinic.computeIfAbsent(clinicDTO.toString(), k -> new ArrayList<>()).add(appointment);
         }
 
         return appointmentsByClinic;
@@ -328,9 +334,9 @@ public class AppointmentService {
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
-                    String clinicid = clinic.getClinicID();
-                    yearlyAppointmentCounts.putIfAbsent(clinicid, new HashMap<>());
-                    Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicid);
+                    String clinicName = clinic.getName() + clinic.getAddress();
+                    yearlyAppointmentCounts.putIfAbsent(clinicName, new HashMap<>());
+                    Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicName);
                     monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
                 }
             }

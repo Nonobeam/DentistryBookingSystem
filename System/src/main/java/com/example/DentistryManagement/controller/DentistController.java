@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.controller;
 
+import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.UserAppointDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
@@ -8,6 +9,7 @@ import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +40,38 @@ public class DentistController {
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final UserRepository userRepository;
+
+//----------------------------------- USER INFORMATION -----------------------------------
+
+    @Operation(summary = "Dentist information")
+    @GetMapping("/info")
+    public ResponseEntity<UserDTO> findUser() {
+        String mail = userService.mailExtract();
+        Client user = userService.findClientByMail(mail);
+        UserDTO userDTO = new UserDTO();
+        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+    }
+
+    @Operation(summary = "User update their profile")
+    @GetMapping("/info/update")
+    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+        try {
+            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
+            if (user != null) {
+                userDTO.getUserDTOFromUser(user);
+            }
+            return ResponseEntity.ok(userDTO);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 
 
     @Operation(summary = "Dentist")

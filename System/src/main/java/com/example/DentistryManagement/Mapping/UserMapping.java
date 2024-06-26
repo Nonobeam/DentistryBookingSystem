@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserMapping {
-    private final UserService userService ;
+    private final UserService userService;
 
     public Client mapUser(UserDTO userDTO) {
         Client client = new Client();
         client.setName(userDTO.getName());
-        if(userService.existsByPhoneOrMail(client.getPhone(), client.getMail())){
+        if (userService.existsByPhoneOrMail(client.getPhone(), client.getMail())) {
             client.setPhone(userDTO.getPhone());
             client.setMail(userDTO.getMail());
         }
@@ -29,9 +29,10 @@ public class UserMapping {
         client.setName(adminDTO.getName());
         client.setPhone(adminDTO.getPhone());
         client.setMail(adminDTO.getMail());
-        client.setPassword(adminDTO.getPassword());
+        client.setPassword(client.getPassword() != null ? client.getPassword() : "");
         client.setBirthday(adminDTO.getBirthday());
         client.setStatus(adminDTO.getStatus());
         return client;
     }
+
 }

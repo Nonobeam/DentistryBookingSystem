@@ -13,8 +13,9 @@ import java.util.Map;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
+
 public class DashboardResponse {
-    private Map<Client, Integer>dailyAppointments;
+    private Map<String, Integer>dailyAppointments;
     private Map<Integer, Long> monthlyAppointments;
     private int totalAppointmentsInMonthNow;
     private int totalAppointmentsInYearNow;
