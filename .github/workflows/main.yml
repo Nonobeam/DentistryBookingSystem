@@ -31,15 +31,12 @@ jobs:
       working-directory: System
       run: cp target/DentistryManagement-0.0.1-SNAPSHOT.jar DentistryManagement.jar
 
-    - name: Encode Google Cloud credentials
-      working-directory: System
-      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" | base64 > gcp_credentials_base64.txt
-
     - name: Build Docker image with credentials
       working-directory: System
       run: |
+        echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > gcp_credentials.json
         docker build \
-          --build-arg GOOGLE_APPLICATION_CREDENTIALS="$(cat gcp_credentials_base64.txt)" \
+          --build-arg GOOGLE_APPLICATION_CREDENTIALS="$(cat gcp_credentials.json)" \
           -t dentistry-management .
 
     - name: Log in to Docker Hub
