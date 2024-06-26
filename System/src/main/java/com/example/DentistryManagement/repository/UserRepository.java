@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,14 +37,15 @@ public interface UserRepository extends JpaRepository<Client, String> {
     //Managerlist
     @Query("SELECT c FROM Client c , Dentist d " +
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
-    List<Client> getWorkerByManager(@Param("roleParam") Role role, String managerMail);
+    List<Client> getDentisByManager(@Param("roleParam") Role role, String managerMail);
 
-    List<Client> searchClientByRoleAndNameContainingIgnoreCase(Role role, String search);
+    @Query("SELECT c FROM Client c , Staff d " +
+            "WHERE c.role = :roleParam AND c.staff.user.userID = d.staffID and d.clinic.user.mail = :managerMail ")
+    List<Client> getStaffByManager(@Param("roleParam") Role role, String managerMail);
 
-    List<Client> searchClientsByRoleAndDentistClinicClinicIDAndNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String searchName, String mail);
-
+    List<Client> findByRoleAndNameContainingIgnoreCase(Role role, String searchWord);
 
     Client findUserByMail(String mail);
-    List<Client> searchClientsByRoleAndStaffClinicClinicIDOrNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role role, String search, String search1, String search2);
+
 
 }

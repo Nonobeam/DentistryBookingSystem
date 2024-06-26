@@ -22,14 +22,6 @@ public class ClinicService {
     private final ClinicRepository clinicRepository;
     private final TimeSlotRepository timeSlotRepository;
 
-//    public Optional<List<Clinic>> findClinicByManager(String userId) {
-//        try {
-//            return clinicRepository.getClinicsByUser_UserID(userId);
-//        } catch (Error e) {
-//            throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
-//        }
-//    }
-
     public List<Clinic> findAll() {
         try {
             return clinicRepository.findAll();

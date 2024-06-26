@@ -18,10 +18,6 @@ public class DentistService {
     private final UserRepository userRepository;
     private final DentistRepository dentistRepository;
 
-    public List<Dentist> findAllDentist() {
-        return dentistRepository.findAll();
-    }
-
     public Optional<List<Client>> findAllDentistsByStatus(int status) {
         Role role = Role.DENTIST;
         return userRepository.findClientsByRoleAndStatus(role, status);
@@ -30,7 +26,7 @@ public class DentistService {
     public Dentist findDentistByID(String dentistID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElse(null);
         if (dentist == null) {
-            throw new  Error("Cannot find dentist with ID " + dentistID);
+            throw new Error("Cannot find dentist with ID " + dentistID);
         } else {
             return dentist;
         }
