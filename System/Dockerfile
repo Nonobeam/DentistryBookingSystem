@@ -10,11 +10,11 @@ COPY DentistryManagement.jar /app/DentistryManagement.jar
 # Build argument for the Google Cloud service account key file
 ARG GOOGLE_APPLICATION_CREDENTIALS
 
-# Decode and save the credentials to a file inside the container
-RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 --decode > /app/red-carver-425403-d9-bd68878073ca.json
+# Save the credentials to a file inside the container
+RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" > /app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/red-carver-425403-d9-bd68878073ca.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/DentistryManagement.jar"]
