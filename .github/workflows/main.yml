@@ -31,10 +31,17 @@ jobs:
       working-directory: System
       run: cp target/DentistryManagement-0.0.1-SNAPSHOT.jar DentistryManagement.jar
 
+    - name: Save Google Cloud credentials to a file
+      working-directory: System
+      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > gcp_credentials.json
+
+    - name: Verify credentials file
+      working-directory: System
+      run: cat gcp_credentials.json
+
     - name: Build Docker image with credentials
       working-directory: System
       run: |
-        echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > gcp_credentials.json
         docker build \
           --build-arg GOOGLE_APPLICATION_CREDENTIALS="$(cat gcp_credentials.json)" \
           -t dentistry-management .
