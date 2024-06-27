@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox, Spin } from "antd";
 import NavBar from "./Nav";
-import moment from "moment";
 
 const { Title } = Typography;
 const { Option } = Select;
