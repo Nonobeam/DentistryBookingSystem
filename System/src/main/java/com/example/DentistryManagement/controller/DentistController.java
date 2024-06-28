@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -136,7 +137,7 @@ public class DentistController {
                 insertedNotification = notificationService.insertNotification(notification);
 
             }
-            return ResponseEntity.ok("Sen notification successfully");
+            return ResponseEntity.ok(insertedNotification);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -145,11 +146,11 @@ public class DentistController {
     }
 
     @Operation(summary = "Dentist")
-    @GetMapping("/customer/{mail}")
-    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("mail") String customerMail) {
+    @GetMapping("/customer/{customerID}")
+    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("customerID") String customerID) {
         try {
             UserDTO userDTO = new UserDTO();
-            Client client = userService.findClientByMail(customerMail);
+            Client client = userService.findUserById(customerID);
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
@@ -201,7 +202,6 @@ public class DentistController {
             List<AppointmentDTO> appointmentDTOList = appointments.stream()
                     .map(appointmentEntity -> {
                         AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setAppointmentId(appointmentEntity.getAppointmentID());
                         appointment.setServices(appointmentEntity.getServices().getName());
                         appointment.setStatus(appointmentEntity.getStatus());
                         appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
@@ -220,12 +220,14 @@ public class DentistController {
                                 appointment.setUser(appointmentEntity.getUser().getName());
                             }
                         }
-
                         return appointment;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
 
-            return ResponseEntity.ok(appointmentDTOList);
+            Map<LocalDate, List<AppointmentDTO>> appointmentMapByDate = appointmentDTOList.stream()
+                    .collect(Collectors.groupingBy(AppointmentDTO::getDate));
+
+            return ResponseEntity.ok(appointmentMapByDate);
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -243,7 +245,7 @@ public class DentistController {
             Appointment appointment = appointmentService.findAppointmentById(appointmentid);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
-            return ResponseEntity.ok("Modify status successfully");
+            return ResponseEntity.ok(appointment);
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
