@@ -115,7 +115,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse registerDentist(RegisterRequest request, Clinic clinic, Staff staff) {
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getMail(), request.getPhone(), 1)) {
+        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
             throw new Error("Phone or mail is already existed");
         }
 
