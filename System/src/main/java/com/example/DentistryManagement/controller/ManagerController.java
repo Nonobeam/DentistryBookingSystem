@@ -188,7 +188,7 @@ public class ManagerController {
                             clientDTO.setClinicName(client.getDentist().getClinic().getName());
                             return clientDTO;
                         })
-                        .collect(Collectors.toList());
+                            .collect(Collectors.toList());
 
                 return ResponseEntity.ok(clientDTOs);
             }
