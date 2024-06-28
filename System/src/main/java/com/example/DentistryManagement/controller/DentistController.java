@@ -54,12 +54,16 @@ public class DentistController {
     }
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
-                userDTO.getUserDTOFromUser(user);
+                user.setMail(userDTO.getMail());
+                user.setName(userDTO.getName());
+                user.setPhone(userDTO.getPhone());
+                user.setBirthday(userDTO.getBirthday());
+                userService.updateUser(user);
             }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
