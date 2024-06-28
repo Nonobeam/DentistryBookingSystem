@@ -17,7 +17,7 @@ export const Action = ({ record }) => {
     showModal();
     const fetchData = async () => {
       try {
-        const response = await StudentServices.getById(record.id);
+        const response = await StudentServices.getById(record.mail);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -33,7 +33,7 @@ export const Action = ({ record }) => {
 
   const handleClickEye = () => {
     // console.log(record);
-    navigator(`detail/${record.id}`);
+    navigator(`detail/${record.mail}`);
   };
 
   const handleDelete = () => {};

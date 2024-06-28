@@ -4,7 +4,6 @@ export const dataDentist = [
     name: 'John Doe',
     phone: '+1234567890',
     mail: 'john.doe@example.com',
-    role: 'CUSTOMER',
     birthday: '1990-05-15',
   },
   {
@@ -12,7 +11,6 @@ export const dataDentist = [
     name: 'Jane Smith',
     phone: '+1987654321',
     mail: 'jane.smith@example.com',
-    role: 'CUSTOMER',
     birthday: '1985-12-10',
   },
   {
@@ -20,7 +18,6 @@ export const dataDentist = [
     name: 'Michael Johnson',
     phone: '+14445556666',
     mail: 'michael.johnson@example.com',
-    role: 'CUSTOMER',
     birthday: '1982-08-25',
   },
   {
@@ -28,7 +25,6 @@ export const dataDentist = [
     name: 'Emily Brown',
     phone: '+17778889999',
     mail: 'emily.brown@example.com',
-    role: 'CUSTOMER',
     birthday: '1995-03-20',
   },
   {
@@ -36,7 +32,6 @@ export const dataDentist = [
     name: 'David Wilson',
     phone: '+16504321098',
     mail: 'david.wilson@example.com',
-    role: 'CUSTOMER',
     birthday: '1987-06-12',
   },
   {
@@ -44,7 +39,6 @@ export const dataDentist = [
     name: 'Sarah Lee',
     phone: '+15551234987',
     mail: 'sarah.lee@example.com',
-    role: 'CUSTOMER',
     birthday: '1991-09-30',
   },
   {
@@ -52,7 +46,6 @@ export const dataDentist = [
     name: 'Robert Garcia',
     phone: '+18887776655',
     mail: 'robert.garcia@example.com',
-    role: 'CUSTOMER',
     birthday: '1980-11-05',
   },
   {
@@ -60,7 +53,6 @@ export const dataDentist = [
     name: 'Maria Martinez',
     phone: '+16669998877',
     mail: 'maria.martinez@example.com',
-    role: 'CUSTOMER',
     birthday: '1989-04-18',
   },
   {
@@ -68,7 +60,6 @@ export const dataDentist = [
     name: 'Daniel White',
     phone: '+13334445555',
     mail: 'daniel.white@example.com',
-    role: 'CUSTOMER',
     birthday: '1993-07-08',
   },
   {
@@ -76,7 +67,6 @@ export const dataDentist = [
     name: 'Jessica Taylor',
     phone: '+17778889900',
     mail: 'jessica.taylor@example.com',
-    role: 'CUSTOMER',
     birthday: '1984-02-15',
   },
 ];
@@ -280,3 +270,28 @@ export const dataDentistDetail = {
     },
   ],
 };
+
+export const dashboardData = {
+  dailyAppointments: {
+    'UserDTO(id=tan, name=strings, phone=997264564, mail=dentist3, birthday=2024-06-19)': 1,
+    'UserDTO(id=khoa, name=strings2, phone=197264564, mail=dentist4, birthday=2024-06-19)': 2,
+  },
+  monthlyAppointments: {
+    6: 1,
+    7: 1,
+  },
+  totalAppointmentsInMonthNow: 1,
+  totalAppointmentsInYearNow: 3,
+};
+export const appointmentData = {  
+  appointmentId: "4ae0527e-b344-4c72-9367-4e6ffc767c5e",
+  status: 1,
+  date: "2024-06-19",
+  staff: "example1",
+  user: "example1",
+  dependent: null,
+  timeSlot: "07:00:00",
+  dentist: "strings",
+  services: "Tooth Extraction",
+  clinic: null
+}
