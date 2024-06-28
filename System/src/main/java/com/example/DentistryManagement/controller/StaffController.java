@@ -430,6 +430,7 @@ public class StaffController {
                 newAppointment.setDate(dentistSchedule.getWorkDate());
                 newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
                 newAppointment.setDentist(dentistSchedule.getDentist());
+                newAppointment.setServices(serviceService.findServiceByID(serviceId));
                 newAppointment.setDentistScheduleId(dentistScheduleId);
                 newAppointment.setStatus(1);
                 if (dependentID != null) {

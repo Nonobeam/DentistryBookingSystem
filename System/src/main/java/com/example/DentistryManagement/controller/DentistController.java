@@ -136,7 +136,7 @@ public class DentistController {
                 insertedNotification = notificationService.insertNotification(notification);
 
             }
-            return ResponseEntity.ok(insertedNotification);
+            return ResponseEntity.ok("Sen notification successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -242,7 +242,8 @@ public class DentistController {
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentid);
             appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+            appointment = appointmentService.AppointmentUpdate(appointment);
+            return ResponseEntity.ok("Modify status successfully");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -297,18 +298,4 @@ public class DentistController {
         }
     }
 
-
-    @Operation(summary = "Dentist")
-
-    @PutMapping("/{status}")
-    public ResponseEntity<?> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
-        try {
-            appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
 }
