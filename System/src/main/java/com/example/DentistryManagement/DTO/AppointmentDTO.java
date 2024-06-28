@@ -21,7 +21,7 @@ public class AppointmentDTO {
     private String appointmentId;
     private int status;
     private LocalDate date;
-    private Staff staff;
+    private String staff;
     private String user;
     private String dependent;
     private LocalTime timeSlot;

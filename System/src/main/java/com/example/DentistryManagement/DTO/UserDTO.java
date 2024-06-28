@@ -8,7 +8,9 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class UserDTO {
+    private String id;
     private String name;
     private String phone;
     private String mail;
@@ -19,7 +21,7 @@ public class UserDTO {
         userDTO.setName(user.getName());
         userDTO.setPhone(user.getPhone());
         userDTO.setMail(user.getMail());
-        userDTO.setBirthday(birthday);
+        userDTO.setBirthday(user.getBirthday());
         return userDTO;
     }
 }

@@ -1,23 +1,34 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.ClinicDTO;
-import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/manager")
 @RestController
@@ -29,7 +40,41 @@ public class ManagerController {
     private final ClinicService clinicService;
     private final DentistService dentistService;
     private final AuthenticationService authenticationService;
-    private final Logger logger = LogManager.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final AppointmentService appointmentService;
+    private final UserMapping userMapping;
+    private final UserRepository userRepository;
+
+    //----------------------------------- USER INFORMATION -----------------------------------
+
+    @Operation(summary = "Manager information")
+    @GetMapping("/info")
+    public ResponseEntity<UserDTO> findUser() {
+        String mail = userService.mailExtract();
+        Client user = userService.findClientByMail(mail);
+        UserDTO userDTO = new UserDTO();
+        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+    }
+
+    @Operation(summary = "User update their profile")
+    @GetMapping("/info/update")
+    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+        try {
+            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
+            if (user != null) {
+                userDTO.getUserDTOFromUser(user);
+            }
+            return ResponseEntity.ok(userDTO);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 
 
     //---------------------------REGISTER STAFF && DENTIST---------------------------
@@ -69,21 +114,16 @@ public class ManagerController {
 
     @Operation(summary = "Edit users")
     @PutMapping("/edit/{userID}")
-    public ResponseEntity<Client> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        Client updateUser = userService.findUserById(userID);
-
-        if (updateUser != null) {
-            updateUser.setName(userDTO.getName());
-            updateUser.setPhone(userDTO.getPhone());
-            updateUser.setMail(userDTO.getMail());
-            updateUser.setBirthday(userDTO.getBirthday());
-
-            userService.updateUser(updateUser);
-            return ResponseEntity.ok(updateUser);
+    public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
+        if (userService.isPresentUser(userID).isPresent()) {
+            Client updatedUser = userMapping.mapUser(userDTO);
+            userService.updateUser(updatedUser);
+            return ResponseEntity.ok(updatedUser);
         } else {
-            System.out.println("User not fail with userID: " + userID);
-            ;
-            return ResponseEntity.notFound().build();
+            ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
+            logger.error("User could not be update");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+
         }
     }
 
@@ -111,6 +151,24 @@ public class ManagerController {
 
 
     @Operation(summary = "Set dentist for staff")
+    @PutMapping("/set-staff/{clinicID}")
+    public ResponseEntity<?> setUpStaffForDentistInClinic(@PathVariable String clinicID) {
+        try {
+            List<Client> staff =userService.findAllStaffInClinic(clinicID);
+            List<ClinicWorkerDTO> staffList = ClinicWorkerDTO.fromClientList(staff);
+            List<Client> dentist =userService.findAllDentistInDentist(clinicID);
+            List<ClinicWorkerDTO> dentistList = ClinicWorkerDTO.fromClientList(dentist);
+
+            ClinicWorkerResponseDTO responseDTO = new ClinicWorkerResponseDTO(staffList, dentistList);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
+        }
+    }
+
+
+
+    @Operation(summary = "Set dentist for staff")
     @PutMapping("/set-staff/{staffID}/{dentistID}")
     public ResponseEntity<Dentist> updateStaffForDentist(@PathVariable String dentistID, @PathVariable String staffID) {
         Staff staff;
@@ -130,10 +188,29 @@ public class ManagerController {
 
     @Operation(summary = "All Dentists")
     @GetMapping("/all-dentist")
-    public ResponseEntity<List<Client>> getAllDentists() {
+    public ResponseEntity<?> getAllDentists() {
         try {
             String mail = userService.mailExtract();
-            return ResponseEntity.ok(userService.findAllDentistByManager(mail));
+            List<Client> dentists = userService.findAllDentistByManager(mail);
+            if (dentists != null && !dentists.isEmpty()) {
+                List<AdminDTO> clientDTOs = dentists.stream()
+                        .map(client -> {
+                            AdminDTO clientDTO = new AdminDTO();
+                            clientDTO.setName(client.getName());
+                            clientDTO.setPhone(client.getPhone());
+                            clientDTO.setMail(client.getMail());
+                            clientDTO.setBirthday(client.getBirthday());
+                            clientDTO.setId(client.getUserID());
+                            clientDTO.setStatus(client.getStatus());
+                            clientDTO.setPassword(client.getPassword());
+                            clientDTO.setClinicName(client.getDentist().getClinic().getName());
+                            return clientDTO;
+                        })
+                            .collect(Collectors.toList());
+
+                return ResponseEntity.ok(clientDTOs);
+            }
+            return ResponseEntity.ok("Not found any dentist");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -142,10 +219,29 @@ public class ManagerController {
 
     @Operation(summary = "All Staffs")
     @GetMapping("/all-staff")
-    public ResponseEntity<List<Client>> getAllStaffs() {
+    public ResponseEntity<?> getAllStaffs() {
         try {
             String mail = userService.mailExtract();
-            return ResponseEntity.ok(userService.findAllStaffByManager(mail));
+            List<Client> staffList = userService.findAllStaffByManager(mail);
+            if (staffList != null && !staffList.isEmpty()) {
+                List<AdminDTO> clientDTOs = staffList.stream()
+                        .map(client -> {
+                            AdminDTO clientDTO = new AdminDTO();
+                            clientDTO.setName(client.getName());
+                            clientDTO.setPhone(client.getPhone());
+                            clientDTO.setMail(client.getMail());
+                            clientDTO.setBirthday(client.getBirthday());
+                            clientDTO.setId(client.getUserID());
+                            clientDTO.setStatus(client.getStatus());
+                            clientDTO.setPassword(client.getPassword());
+                            clientDTO.setClinicName(client.getStaff().getClinic().getName());
+                            return clientDTO;
+                        })
+                        .collect(Collectors.toList());
+
+                return ResponseEntity.ok(clientDTOs);
+            }
+            return ResponseEntity.ok("Not found any staff");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -153,11 +249,13 @@ public class ManagerController {
 
     @Operation(summary = "All Clinics")
     @GetMapping("/all-clinic")
-    public ResponseEntity<List<Clinic>> getAllClinics() {
+    public ResponseEntity<List<ClinicDTO>> getAllClinics() {
         try {
             String mail = userService.mailExtract();
-
-            return ResponseEntity.ok(clinicService.findAllClinicsByManager(mail));
+            List<ClinicDTO> clinicDTOS = clinicService.findAllClinicsByManager(mail).stream()
+                    .map(clinic -> new ClinicDTO().clinicMapping(clinic))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(clinicDTOS);
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -165,15 +263,55 @@ public class ManagerController {
 
     @Operation(summary = "List staff dentist manage")
     @GetMapping("/{staffID}/all-dentists")
-    public ResponseEntity<List<Dentist>> getDentistByStaff(@PathVariable String staffID) {
+    public ResponseEntity<?> getDentistByStaff(@PathVariable String staffID) {
         List<Dentist> dentists;
         Staff staff;
         try {
             staff = staffService.findStaffById(staffID);
             dentists = dentistService.findDentistByStaff(staff);
-            return ResponseEntity.ok(dentists);
+            if (dentists != null && !dentists.isEmpty()) {
+                List<AdminDTO> clientDTOs = dentists.stream()
+                        .map(client -> {
+                            AdminDTO clientDTO = new AdminDTO();
+                            clientDTO.setName(client.getUser().getName());
+                            clientDTO.setPhone(client.getUser().getPhone());
+                            clientDTO.setMail(client.getUser().getMail());
+                            clientDTO.setBirthday(client.getUser().getBirthday());
+                            clientDTO.setId(client.getUser().getUserID());
+                            clientDTO.setStatus(client.getUser().getStatus());
+                            clientDTO.setPassword(client.getUser().getPassword());
+                            clientDTO.setClinicName(client.getStaff().getClinic().getName());
+                            return clientDTO;
+                        })
+                        .collect(Collectors.toList());
+
+                return ResponseEntity.ok(clientDTOs);
+            }
+            return ResponseEntity.ok("Not found any dentist");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
+        }
+    }
+
+    @Operation(summary = "Manager Dashboard")
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+        try {
+            Client manager = userService.findClientByMail(userService.mailExtract());
+            if (manager == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
+            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
+            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
+
+            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
+            return ResponseEntity.ok(dashboardResponse);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found data in dashboard");
+            logger.error("Not found data in dashboard");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
 }

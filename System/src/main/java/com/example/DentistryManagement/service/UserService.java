@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,12 +24,9 @@ public class UserService {
     private final DentistRepository dentistRepository;
     private final DependentRepository dependentRepository;
 
-
-
     public boolean existsByPhoneOrMail(String phone, String mail) {
         return userRepository.existsByPhoneOrMailAndStatus(phone, mail, 1);
     }
-
 
     public String mailExtract() {
         try {
@@ -47,11 +45,11 @@ public class UserService {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
     }
-    
+
 
     //----------------------------------- ALL USERS -----------------------------------
 
-    
+
     public List<Client> findAllUsers() {
         return userRepository.findAll();
     }
@@ -85,7 +83,7 @@ public class UserService {
             }
             if (searchList.size() > 0) {
                 return searchList;
-            }else return null;
+            } else return null;
         } catch (DataAccessException e) {
             // Log the database access exception
             System.err.println("Database access error: " + e.getMessage());
@@ -94,12 +92,12 @@ public class UserService {
     }
 
 
-    public List<Client> findCustomerInClinicByStaff(String mailstaff) {
+    public List<Client> findCustomerInClinicByStaff(String mailStaff) {
         try {
-            Staff staff = staffRepository.findStaffByUserMail(mailstaff);
+            Staff staff = staffRepository.findStaffByUserMail(mailStaff);
             List<Appointment> appointmentList = appointmentRepository.findAppointmentByClinic(staff.getClinic());
             List<Client> customerList = new ArrayList<>();
-            for(Appointment a:appointmentList){
+            for (Appointment a : appointmentList) {
                 customerList.add(a.getUser());
             }
             return customerList;
@@ -109,12 +107,12 @@ public class UserService {
     }
 
 
-    public List<Client> searchCustomerInClinicByStaff(String mailstaff,String search) {
+    public List<Client> searchCustomerInClinicByStaff(String mailStaff, String search) {
         try {
-            List<Client> customerList= findCustomerInClinicByStaff(mailstaff);
+            List<Client> customerList = findCustomerInClinicByStaff(mailStaff);
             List<Client> searchList = new ArrayList<>();
-            for(Client c:customerList){
-                if(c.getMail().contains(search) || c.getName().contains(search)){
+            for (Client c : customerList) {
+                if (c.getMail().contains(search) || c.getName().contains(search)) {
                     searchList.add(c);
                 }
             }
@@ -150,7 +148,6 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
     }
-
 
     public List<Client> findAllManager() {
         try {
@@ -193,7 +190,6 @@ public class UserService {
         }
     }
 
-
     public Client findUserById(String customerID) {
         try {
             // Perform necessary validation and business logic here
@@ -203,7 +199,6 @@ public class UserService {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
-
 
     public Dependent findDependentByDependentId(String dependentID) {
         try {
@@ -215,32 +210,34 @@ public class UserService {
         }
     }
 
-
     public List<Client> findAllDentistByManager(String mail) {
         try {
             // Perform necessary validation and business logic here
-            return userRepository.getWorkerByManager(Role.DENTIST, mail);
+            return userRepository.getDentisByManager(Role.DENTIST, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
 
     }
-
 
     public List<Client> findAllStaffByManager(String mail) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.getWorkerByManager(Role.STAFF, mail);
+            return userRepository.getStaffByManager(Role.STAFF, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
     }
 
-    public List<Client> findDentistInClinic(String search) {
+    public List<Client> findDentistFollowSearching(String search) {
         try {
-            return userRepository.searchClientsByRoleAndDentistClinicClinicIDAndNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role.DENTIST, search, search, search);
+            List<Dentist> dentistsList = dentistRepository.findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search, search);
+            List<Client> dentistListFollowSearch = new ArrayList<>();
+            for (Dentist d : dentistsList) {
+                dentistListFollowSearch.add(d.getUser());
+            }
+            return dentistListFollowSearch;
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
         }
@@ -248,21 +245,9 @@ public class UserService {
     }
 
 
-    public List<Client> searchManager(String search) {
+    public List<Client> findManagerFollowSearching(String search) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientByRoleAndNameContainingIgnoreCase(Role.MANAGER, search);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
-        }
-    }
-
-
-    public List<Client> findStaffInClinic(String search) {
-        try {
-            // Perform necessary validation and business logic here
-            return userRepository.searchClientsByRoleAndStaffClinicClinicIDOrNameContainingIgnoreCaseOrMailContainingIgnoreCase(Role.STAFF, search, search, search);
+            return userRepository.findByRoleAndNameContainingIgnoreCase(Role.MANAGER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -270,9 +255,23 @@ public class UserService {
     }
 
 
-    public List<Client> searchCustomer(String search) {
+    public List<Client> findStaffFollowSearching(String search) {
         try {
-            return userRepository.searchClientByRoleAndNameContainingIgnoreCase(Role.CUSTOMER, search);
+            List<Staff> staffList = staffRepository.findByClinic_NameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search, search);
+            List<Client> staffListFollowSearch = new ArrayList<>();
+            for (Staff s : staffList) {
+                staffListFollowSearch.add(s.getUser());
+            }
+            return staffListFollowSearch;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Client> findCustomerFollowSearching(String search) {
+        try {
+            return userRepository.findByRoleAndNameContainingIgnoreCase(Role.CUSTOMER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -281,7 +280,6 @@ public class UserService {
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
-
 
     public Client createNewUser(Client newClient) {
         try {
@@ -293,7 +291,6 @@ public class UserService {
         }
         return null;
     }
-
 
     public List<Dependent> findDependentByCustomer(String mail) {
         Client customer = userRepository.findUserByMail(mail);
@@ -311,7 +308,6 @@ public class UserService {
         }
     }
 
-
     public Client updateUser(Client newClient) {
         try {
             return userRepository.save(newClient);
@@ -321,11 +317,36 @@ public class UserService {
         }
     }
 
-
     public Optional<Client> updateUserStatus(Client client, int status) {
         try {
             client.setStatus(status);
             return Optional.of(userRepository.save(client));
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+
+    }
+
+    public List<Client> findAllStaffInClinic(String clinicID) {
+        try {
+            List<Client> staffs = new ArrayList<>();
+            for (Staff s : staffRepository.findStaffsByClinic_ClinicID(clinicID)) {
+                staffs.add(s.getUser());
+            }
+            return staffs;
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+        }
+
+    }
+
+    public List<Client> findAllDentistInDentist(String clinicID) {
+        try {
+            List<Client> dentists = new ArrayList<>();
+            for (Dentist s : dentistRepository.findDentistsByClinic_ClinicID(clinicID)) {
+                dentists.add(s.getUser());
+            }
+            return dentists;
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
