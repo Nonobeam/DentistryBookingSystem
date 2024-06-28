@@ -54,7 +54,7 @@ public class DentistScheduleService {
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
             DentistSchedule schedule = new DentistSchedule();
-            if(!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID,timeSlot,date)){
+            if (!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date)) {
                 schedule.setDentist(dentist);
                 schedule.setWorkDate(date);
                 schedule.setTimeslot(timeSlot);

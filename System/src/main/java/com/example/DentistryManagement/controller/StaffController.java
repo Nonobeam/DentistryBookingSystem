@@ -16,12 +16,12 @@ import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -89,7 +89,10 @@ public class StaffController {
 
     //---------------------------MANAGE DENTIST---------------------------
 
-
+public ModelMap getServices(ModelMap modelMap) {
+        Staff staff = userService.findStaffByMail(userService.mailExtract());
+        return modelMap.addAttribute("serviceList", serviceService.findServicesByClinic(staff.getClinic().getClinicID()));
+}
     @Operation(summary = "All Services in System")
     @GetMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
@@ -194,14 +197,15 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
     @Operation(summary = "Set Dentist Schedule")
-    @GetMapping("/set-schedule")
-    public ResponseEntity<?> showSetDentistSchedule(){
+    @GetMapping("/show-set-schedule")
+    public ResponseEntity<?> showSetDentistSchedule() {
         try {
             String mail = userService.mailExtract();
-            List<Client> dentistList ;
+            List<Client> dentistList;
             List<UserDTO> dentistListDTO = new ArrayList<>();
-            List<TimeSlotDTO> timeSlotDTOS= new ArrayList<>();
+            List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>();
             dentistList = userService.findDentistByStaff(mail);
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (!dentistList.isEmpty()) {
@@ -215,19 +219,21 @@ public class StaffController {
                             clientDTO.setBirthday(client.getBirthday());
                             return clientDTO;
                         })
-                        .collect(Collectors.toList());}
+                        .collect(Collectors.toList());
+            }
             List<TimeSlot> timeSlotList = timeSlotService.findByClinic(staff.getClinic());
-            if(!timeSlotList.isEmpty()){
+            if (!timeSlotList.isEmpty()) {
                 timeSlotDTOS = timeSlotList.stream()
                         .map(timeSlot -> {
                             TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
                             timeSlotDTO.setSlotNumber(timeSlotDTO.getSlotNumber());
                             return timeSlotDTO;
-                        }).collect(Collectors.toList());}
-            SetScheduleRequestDTO setScheduleRequestDTO = new SetScheduleRequestDTO(dentistListDTO,timeSlotDTOS);
+                        }).collect(Collectors.toList());
+            }
+            SetScheduleRequestDTO setScheduleRequestDTO = new SetScheduleRequestDTO(dentistListDTO, timeSlotDTOS);
             return ResponseEntity.ok(setScheduleRequestDTO);
-        }catch (Exception e){
+        } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
             logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -255,7 +261,7 @@ public class StaffController {
             if (clinic == null) {
                 return new ResponseEntity<>(new ErrorResponseDTO("403", "Staff doesn't belong to any clinic"), HttpStatus.FORBIDDEN);
             }
-            Dentist dentist= dentistRepository.findDentistByUserMail(dentistMail);
+            Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
             dentistScheduleService.setDentistSchedule(dentist.getDentistID(), startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
@@ -268,7 +274,7 @@ public class StaffController {
     @Operation(summary = "Delete Dentist Schedule")
     @DeleteMapping("/delete-schedule")
     public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate,@RequestParam int numSlot) {
+                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
         try {
             dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
             return ResponseEntity.ok("Schedule deleted successfully");
