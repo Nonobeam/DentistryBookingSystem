@@ -80,8 +80,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/dependentNew")
-    public ResponseEntity createDependentByCustomer(@RequestBody Dependent dependent) {
+    @PostMapping("/dependentNew")
+    public ResponseEntity<?> createDependentByCustomer(@RequestBody Dependent dependent) {
         try {
             String mail = userService.mailExtract();
             dependent.setUser(userService.findClientByMail(mail));
@@ -296,7 +296,7 @@ public class UserController {
 
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
