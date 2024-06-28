@@ -1,10 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
-import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Clinic;
-import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-import com.example.DentistryManagement.core.dentistry.Services;
+import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
@@ -12,17 +9,19 @@ import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.AppointmentRepository;
+import com.example.DentistryManagement.repository.DentistRepository;
+import com.example.DentistryManagement.repository.TimeSlotRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -48,6 +47,9 @@ public class StaffController {
     private final AppointmentRepository appointmentRepository;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final UserRepository userRepository;
+    private final DentistRepository dentistRepository;
+    private final TimeSlotRepository timeSlotRepository;
+    private final TimeSlotService timeSlotService;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -87,7 +89,10 @@ public class StaffController {
 
     //---------------------------MANAGE DENTIST---------------------------
 
-
+public ModelMap getServices(ModelMap modelMap) {
+        Staff staff = userService.findStaffByMail(userService.mailExtract());
+        return modelMap.addAttribute("serviceList", serviceService.findServicesByClinic(staff.getClinic().getClinicID()));
+}
     @Operation(summary = "All Services in System")
     @GetMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
@@ -110,7 +115,7 @@ public class StaffController {
     public ResponseEntity<?> findAllDentistByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients = new ArrayList<>();
+            List<Client> clients;
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchDentistByStaff(mail, search);
             } else {
@@ -193,10 +198,51 @@ public class StaffController {
         }
     }
 
+    @Operation(summary = "Set Dentist Schedule")
+    @GetMapping("/show-set-schedule")
+    public ResponseEntity<?> showSetDentistSchedule() {
+        try {
+            String mail = userService.mailExtract();
+            List<Client> dentistList;
+            List<UserDTO> dentistListDTO = new ArrayList<>();
+            List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>();
+            dentistList = userService.findDentistByStaff(mail);
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            if (!dentistList.isEmpty()) {
+                dentistListDTO = dentistList.stream()
+                        .map(client -> {
+                            UserDTO clientDTO = new UserDTO();
+                            clientDTO.setName(client.getName());
+                            clientDTO.setPhone(client.getPhone());
+                            clientDTO.setMail(client.getMail());
+                            clientDTO.setName(client.getName());
+                            clientDTO.setBirthday(client.getBirthday());
+                            return clientDTO;
+                        })
+                        .collect(Collectors.toList());
+            }
+            List<TimeSlot> timeSlotList = timeSlotService.findByClinic(staff.getClinic());
+            if (!timeSlotList.isEmpty()) {
+                timeSlotDTOS = timeSlotList.stream()
+                        .map(timeSlot -> {
+                            TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
+                            timeSlotDTO.setStartTime(timeSlot.getStartTime());
+                            timeSlotDTO.setSlotNumber(timeSlotDTO.getSlotNumber());
+                            return timeSlotDTO;
+                        }).collect(Collectors.toList());
+            }
+            SetScheduleRequestDTO setScheduleRequestDTO = new SetScheduleRequestDTO(dentistListDTO, timeSlotDTOS);
+            return ResponseEntity.ok(setScheduleRequestDTO);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 
     @Operation(summary = "Set Dentist Schedule")
     @PostMapping("/set-schedule")
-    public ResponseEntity<?> setDentistSchedule(@RequestParam String dentistID,
+    public ResponseEntity<?> setDentistSchedule(@RequestParam String dentistMail,
                                                 @RequestParam LocalDate startDate,
                                                 @RequestParam LocalDate endDate,
                                                 @RequestParam int slotNumber) {
@@ -215,8 +261,8 @@ public class StaffController {
             if (clinic == null) {
                 return new ResponseEntity<>(new ErrorResponseDTO("403", "Staff doesn't belong to any clinic"), HttpStatus.FORBIDDEN);
             }
-
-            dentistScheduleService.setDentistSchedule(dentistID, startDate, endDate, slotNumber, clinic.getClinicID());
+            Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
+            dentistScheduleService.setDentistSchedule(dentist.getDentistID(), startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
@@ -228,9 +274,9 @@ public class StaffController {
     @Operation(summary = "Delete Dentist Schedule")
     @DeleteMapping("/delete-schedule")
     public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate) {
+                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
         try {
-            dentistScheduleService.deleteDentistSchedule(dentistID, workDate);
+            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
             return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());

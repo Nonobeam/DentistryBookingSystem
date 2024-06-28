@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 public class UserDTO {
     private String id;
     private String name;

@@ -113,9 +113,9 @@ public class ManagerController {
 
 
     @Operation(summary = "Edit users")
-    @PutMapping("/edit/{userID}")
-    public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        if (userService.isPresentUser(userID).isPresent()) {
+    @PutMapping("/editWorker")
+    public ResponseEntity<?> editUser(@RequestBody UserDTO userDTO) {
+        if (userService.isPresentUser(userDTO.getId()).isPresent()) {
             Client updatedUser = userMapping.mapUser(userDTO);
             userService.updateUser(updatedUser);
             return ResponseEntity.ok(updatedUser);
@@ -128,9 +128,9 @@ public class ManagerController {
     }
 
     @Operation(summary = "Edit clinic")
-    @PutMapping("/edit/{clinicID}")
-    public ResponseEntity<Clinic> editClinic(@PathVariable String clinicID, @RequestBody ClinicDTO clinicDTO) {
-        Clinic updateClinic = clinicService.findClinicByID(clinicID);
+    @PutMapping("/editClinic")
+    public ResponseEntity<Clinic> editClinic(@RequestBody ClinicDTO clinicDTO) {
+        Clinic updateClinic = clinicService.findClinicByID(clinicDTO.getId());
 
         if (updateClinic != null) {
             updateClinic.setPhone(clinicDTO.getPhone());
@@ -143,7 +143,7 @@ public class ManagerController {
             clinicService.save(updateClinic);
             return ResponseEntity.ok(updateClinic);
         } else {
-            System.out.println("Cannot find: " + clinicID);
+            System.out.println("Cannot find: " + clinicDTO.getId());
             ;
             return ResponseEntity.notFound().build();
         }
