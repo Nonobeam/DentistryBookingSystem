@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface DentistRepository extends JpaRepository<Dentist, String> {
     Dentist findDentistByUserMail(String mail);
 
+    List<Dentist> findDentistsByClinic_ClinicID(String clinicID);
+
     Optional<List<Dentist>> findDentistByStaffAndUser_Status(Staff staff, int status);
 
     Dentist findByDentistID(String dentistID);

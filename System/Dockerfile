@@ -8,10 +8,10 @@ WORKDIR /app
 COPY /DentistryManagement.jar /app/DentistryManagement.jar
 
 # Build argument for the Google Cloud service account key file
-ARG GOOGLE_APPLICATION_CREDENTIALS_JSON
+ARG GOOGLE_APPLICATION_CREDENTIALS
 
 # Save the credentials to a file inside the container
-RUN echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /app/red-carver-425403-d9-bd68878073ca.json
+RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" > /app/red-carver-425403-d9-bd68878073ca.json
 
 # Set the environment variable for Google Cloud credentials
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/red-carver-425403-d9-bd68878073ca.json
