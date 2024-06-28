@@ -18,6 +18,7 @@ public class UserDTO {
 
     public UserDTO getUserDTOFromUser(Client user) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getUserID());
         userDTO.setName(user.getName());
         userDTO.setPhone(user.getPhone());
         userDTO.setMail(user.getMail());
