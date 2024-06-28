@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { CardNotification as Notification } from '../../pages/DashBoard/components/CarNotification/CarNotification';
+import { Button, Dropdown, Menu } from 'antd';
+import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
 
 const NotificationDropdown = ({ onClose }) => {
-  // Dummy notifications data
-  const notifications = [
-    { id: 1, message: 'Notification 1' },
-    { id: 2, message: 'Notification 2' },
-    { id: 3, message: 'Notification 3' },
-  ];
+  const [notifications, setNotifications] = useState([]);
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await PersonalServices.getNotificationStaff();
+        setNotifications(response);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+    fetchNotifications();
+  }, []);
 
   return (
     <div
@@ -27,22 +35,11 @@ const NotificationDropdown = ({ onClose }) => {
         borderRadius: '5px',
         // Add border radius for rounded corners
       }}>
-      {/* <button
-        style={{
-          backgroundColor: '#f0f0f0',
-          color: '#000',
-          border: 'none',
-          borderRadius: '3px',
-          padding: '5px 10px',
-          cursor: 'pointer',
-          marginBottom: '10px',
-        }}
-        onClick={onClose}
-      >
-        Close
-      </button> */}
       {notifications.map((notification) => (
-        <Notification key={notification.id} content={notification.message} />
+        <Notification
+          key={notification.notificationID}
+          content={notification.message}
+        />
       ))}
     </div>
   );
@@ -59,6 +56,27 @@ export const AppHeader = () => {
   const handleUserIconClick = () => {
     setShowUserDropdown(!showUserDropdown); // Toggle user dropdown visibility
   };
+
+  const handleLogout = () => {
+    // Logic for logout action
+    console.log('Logging out...');
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key='profile'>
+        <Link to='/dashboard/profile'>Profile</Link>
+      </Menu.Item>
+      <Menu.Item key='settings'>
+        <Link to='/settings'>Settings</Link>
+      </Menu.Item>
+      <Menu.Item key='logout'>
+        <Button type='link' onClick={handleLogout}>
+          Logout
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <div
@@ -91,41 +109,15 @@ export const AppHeader = () => {
           <NotificationDropdown onClose={() => setShowBellDropdown(false)} />
         )}
       </div>
-      <Link to='/profile'>
-        <FaUserCircle
-          className='user-icon'
-          style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-          onClick={handleUserIconClick}
-        />
-      </Link>
-      {showUserDropdown && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50px',
-            right: '50px',
-            background: '#fff',
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-          }}>
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
-            <li>
-              <Link to='/profile'>Profile</Link>
-            </li>
-            <li>
-              <Link to='/settings'>Settings</Link>
-            </li>
-            <li>
-              <button onClick={() => setShowUserDropdown(false)}>Logout</button>
-            </li>
-          </ul>
+      <Dropdown overlay={menu} placement='bottomRight' trigger={['click']}>
+        <div>
+          <FaUserCircle
+            className='user-icon'
+            style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
+            onClick={handleUserIconClick}
+          />
         </div>
-      )}
-      <FaCog
-        className='settings-icon'
-        style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-      />
+      </Dropdown>
     </div>
   );
 };

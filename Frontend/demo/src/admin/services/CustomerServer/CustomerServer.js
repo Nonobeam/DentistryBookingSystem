@@ -16,18 +16,4 @@ export const DentistServices = {
       });
     }
   },
-  getDentistById: async (mail) => {
-    try {
-      const responseData = await api.get(`staff/dentistList/${mail}`);
-      return responseData.data;
-    } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: error.message,
-        onClick: () => {
-          console.log('Notification Clicked!');
-        },
-      });
-    }
-  },
 };
