@@ -294,7 +294,7 @@ public class ManagerController {
 
     @Operation(summary = "Manager Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<?> getDashBoardData(@RequestParam("year") int year) {
         try {
             Client manager = userService.findClientByMail(userService.mailExtract());
             if (manager == null) {
