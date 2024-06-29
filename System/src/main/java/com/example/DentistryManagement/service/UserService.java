@@ -337,13 +337,12 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
-
     }
 
     public List<Client> findAllDentistInDentist(String clinicID) {
         try {
             List<Client> dentists = new ArrayList<>();
-            for (Dentist s : dentistRepository.findDentistsByClinic_ClinicID(clinicID)) {
+            for (Dentist s : dentistRepository.findDentistsByClinic_ClinicIDAndStaff(clinicID, null)) {
                 dentists.add(s.getUser());
             }
             return dentists;

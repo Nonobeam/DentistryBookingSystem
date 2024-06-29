@@ -174,7 +174,7 @@ public class AdminController {
         }
     }
 
-
+    @Operation(summary = "Delete user")
     @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
