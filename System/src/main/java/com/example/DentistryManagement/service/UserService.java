@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,7 +80,7 @@ public class UserService {
                     searchList.add(c);
                 }
             }
-            if (searchList.size() > 0) {
+            if (!searchList.isEmpty()) {
                 return searchList;
             } else return null;
         } catch (DataAccessException e) {
@@ -281,17 +280,6 @@ public class UserService {
 
     //----------------------------------- USER INFORMATION -----------------------------------
 
-    public Client createNewUser(Client newClient) {
-        try {
-            // Perform necessary validation and business logic here
-            Client savedClient = userRepository.save(newClient);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
-        }
-        return null;
-    }
-
     public List<Dependent> findDependentByCustomer(String mail) {
         Client customer = userRepository.findUserByMail(mail);
         return dependentRepository.findByUser(customer);
@@ -311,7 +299,6 @@ public class UserService {
     public Client updateUser(Client newClient) {
         try {
             return userRepository.save(newClient);
-
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
@@ -350,5 +337,9 @@ public class UserService {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
 
+    }
+
+    public Optional<Client> findByMail(String mail) {
+        return userRepository.findByMail(mail);
     }
 }

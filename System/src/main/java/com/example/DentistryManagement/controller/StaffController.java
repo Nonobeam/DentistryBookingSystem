@@ -8,10 +8,7 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.DentistRepository;
-import com.example.DentistryManagement.repository.TimeSlotRepository;
-import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -44,11 +40,10 @@ public class StaffController {
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private final DentistScheduleService dentistScheduleService;
-    private final AppointmentRepository appointmentRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-    private final UserRepository userRepository;
+
     private final DentistRepository dentistRepository;
-    private final TimeSlotRepository timeSlotRepository;
     private final TimeSlotService timeSlotService;
 
 //----------------------------------- USER INFORMATION -----------------------------------
@@ -66,7 +61,7 @@ public class StaffController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
         try {
-            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
+            Client user = userService.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
                 user.setMail(userDTO.getMail());
                 user.setName(userDTO.getName());
@@ -334,7 +329,7 @@ public class StaffController {
             } else {
                 ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
                 logger.error("Not found any customer ");
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.status(204).body(error);
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -405,12 +400,11 @@ public class StaffController {
                                        @RequestParam String text) {
         Notification optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
         if (optionalNotification != null) {
-            Notification notification = optionalNotification;
 
             emailService.sendSimpleMessage(mail, subject, text);
-            notification.setStatus(1);
+            optionalNotification.setStatus(1);
 
-            notificationService.save(notification);
+            notificationService.save(optionalNotification);
             return ResponseEntity.ok("Mail send successfully");
         } else {
             throw new IllegalArgumentException("Notification not found with ID: " + notificationID);
@@ -485,7 +479,7 @@ public class StaffController {
                     throw new Error("Over booked for today!");
                 }
 
-                if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
+                if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
                     throw new Error("Full appointment for this date!");
                 }
                 Appointment newAppointment = new Appointment();
@@ -505,10 +499,8 @@ public class StaffController {
                 }
                 dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
                 Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-                otherSchedule.ifPresent(schedules -> {
-                    schedules.forEach(schedule -> schedule.setAvailable(0));
-                });
-                appointmentRepository.save(newAppointment);
+                otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
+                appointmentService.save(newAppointment);
                 return ResponseEntity.ok("Booking successfully");
 
             } else {
@@ -539,7 +531,7 @@ public class StaffController {
             appointment.setStatus(0);
             Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
             unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
-            appointmentRepository.save(appointment);
+            appointmentService.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
@@ -574,7 +566,7 @@ public class StaffController {
     public ResponseEntity<?> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Appointment> appointmentList = new ArrayList<>();
+            List<Appointment> appointmentList;
             if (date != null || (search != null && !search.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
             } else appointmentList = appointmentService.findAppointmentInClinic(mail);
@@ -638,4 +630,25 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
         }
     }
+
+    //---------------------------MANAGE CLINIC---------------------------
+
+    @Operation(summary = "Get timetable for 1 specific date")
+    @PostMapping("/timetable/{date}")
+    public ResponseEntity<?> timeTable(@PathVariable("date") LocalDate date) {
+        try {
+            List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDate(date);
+            List<Appointment> appointments = appointmentService.findAppointmentsByDate(date);
+            TimeTableResponseDTO timeTables = new TimeTableResponseDTO();
+            List<TimeTableResponseDTO> timeTableResponseDTOList = timeTables.getTimeTableResponseDTOList(dentistSchedules, appointments);
+
+            return ResponseEntity.ok(timeTableResponseDTOList);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", e.getMessage());
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
 }
+
