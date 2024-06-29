@@ -115,7 +115,7 @@ public class DentistController {
             }
             if (!applist.isEmpty()) {
                 return ResponseEntity.ok(applist);
-            } else return ResponseEntity.ok(" ");
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment today");
 
 
         } catch (Exception e) {
@@ -235,7 +235,7 @@ public class DentistController {
                     .collect(Collectors.groupingBy(AppointmentDTO::getDate));
             if (!appointmentMapByDate.isEmpty()) {
                 return ResponseEntity.ok(appointmentMapByDate);
-            } else return ResponseEntity.ok(" ");
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any schedule this week ");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -300,7 +300,10 @@ public class DentistController {
                         return appointment;
                     })
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(appointmentDTOList);
+            if (!appointmentDTOList.isEmpty()) {
+                return ResponseEntity.ok(appointmentDTOList);
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);

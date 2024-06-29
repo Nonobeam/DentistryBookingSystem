@@ -154,8 +154,8 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any staff user");
-                logger.error("Not found any staff user");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any dentist user");
+                logger.error("Not found any dentist user");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
         } catch (Exception e) {
@@ -332,8 +332,8 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "No content");
-                logger.error("No content");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
+                logger.error("Not found any customer ");
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
@@ -605,7 +605,9 @@ public class StaffController {
                         return appointment;
                     })
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(appointmentDTOList);
+            if(!appointmentDTOList.isEmpty()){
+                return ResponseEntity.ok(appointmentDTOList);
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No appointments found");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");

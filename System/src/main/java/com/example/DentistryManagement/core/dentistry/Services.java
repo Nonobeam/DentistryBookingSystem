@@ -29,7 +29,6 @@ public class Services {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "services")
     private List<Appointment> appointmentList;
 
-
     @JsonIgnore
     @ManyToMany(mappedBy = "servicesList")
     private List<Dentist> dentistList;
