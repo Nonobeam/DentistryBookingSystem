@@ -69,7 +69,7 @@ public class AdminController {
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
-            } else return ResponseEntity.ok(" ");
+            } else return ResponseEntity.ok("Not found any dentist user  ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
             logger.error("User not found");
@@ -94,7 +94,7 @@ public class AdminController {
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
             } else
-                return ResponseEntity.ok(" ");
+                return ResponseEntity.ok("Not found any manager user  ");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
@@ -120,7 +120,7 @@ public class AdminController {
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
-            } else return ResponseEntity.ok(" ");
+            } else return ResponseEntity.ok("Not found any staff user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
             logger.error("User not found");
@@ -142,8 +142,9 @@ public class AdminController {
             List<AdminDTO> adminDTOList = userList.stream()
                     .map(this::convertToAdminDTO)
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(adminDTOList);
+            if (!adminDTOList.isEmpty()) {
+                return ResponseEntity.ok(adminDTOList);
+            } else return ResponseEntity.ok("Not found any customer user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");

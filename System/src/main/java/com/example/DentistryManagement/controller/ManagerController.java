@@ -209,7 +209,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any dentist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any dentist");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -240,7 +240,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any staff");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any staff");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -286,7 +286,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any dentist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No staff user found");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
