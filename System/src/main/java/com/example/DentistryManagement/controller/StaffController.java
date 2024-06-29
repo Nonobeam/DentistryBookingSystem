@@ -90,12 +90,11 @@ public class StaffController {
     //---------------------------MANAGE DENTIST---------------------------
 
 
-    @Operation(summary = "All Services in Clinic")
+    @Operation(summary = "All Services in Clinic To choose")
     @GetMapping("/show-service")
     public ResponseEntity<?> getServices() {
         try {
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
-            List<Services> services = serviceService.findServicesByClinic(staff.getClinic().getClinicID());
+            List<Services> services = serviceService.findAllServices();
             if (!services.isEmpty()) {
                 return ResponseEntity.ok(services);
             } else {
@@ -111,7 +110,7 @@ public class StaffController {
     }
 
     @Operation(summary = "All Services in System")
-    @GetMapping("/set-service/{dentistID}")
+    @PostMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
         try {
             Dentist dentist = dentistService.findDentistByID(dentistID);
@@ -215,7 +214,7 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "Set Dentist Schedule")
+    @Operation(summary = "show dentist list timeslot for choosing set schedule")
     @GetMapping("/show-set-schedule")
     public ResponseEntity<?> showSetDentistSchedule() {
         try {

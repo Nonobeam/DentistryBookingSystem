@@ -47,18 +47,6 @@ public class ServiceService {
         }
     }
 
-    public List<Services> findServicesByClinic(String clinicID) {
-        List<Services> services;
-        Clinic clinic;
-        try {
-            clinic = clinicRepository.findByClinicID(clinicID);
-            services = clinic.getServicesList();
-            return services;
-        } catch (Error error) {
-            throw error;
-        }
-    }
-
     public HashSet<Services> getServiceNotNullByDate(LocalDate bookDate, Clinic clinic) {
         List<DentistSchedule> scheduleList = dentistScheduleRepository.findDentistSchedulesByClinicAndWorkDateAndAvailable(clinic, bookDate, 1);
         HashSet<Services> servicesHashSet = new HashSet<>();

@@ -71,9 +71,9 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 
-    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule, int available) {
+    public void setAvailableDentistSchedule(DentistSchedule dentistSchedule, int available) {
         dentistSchedule.setAvailable(available);
-        return dentistScheduleRepository.save(dentistSchedule);
+        dentistScheduleRepository.save(dentistSchedule);
     }
 
     public Optional<List<DentistSchedule>> findDentistScheduleByWorkDateAndTimeSlotAndDentist(TimeSlot timeSlot, LocalDate workDate, Dentist dentist, int status) {

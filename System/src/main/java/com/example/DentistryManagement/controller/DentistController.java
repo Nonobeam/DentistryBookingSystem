@@ -113,7 +113,10 @@ public class DentistController {
                         .collect(Collectors.toList());
 
             }
-            return ResponseEntity.ok(applist);
+            if (!applist.isEmpty()) {
+                return ResponseEntity.ok(applist);
+            } else return ResponseEntity.ok(" ");
+
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -230,8 +233,9 @@ public class DentistController {
 
             Map<LocalDate, List<AppointmentDTO>> appointmentMapByDate = appointmentDTOList.stream()
                     .collect(Collectors.groupingBy(AppointmentDTO::getDate));
-
-            return ResponseEntity.ok(appointmentMapByDate);
+            if (!appointmentMapByDate.isEmpty()) {
+                return ResponseEntity.ok(appointmentMapByDate);
+            } else return ResponseEntity.ok(" ");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -265,7 +269,7 @@ public class DentistController {
         try {
             String mail = userService.mailExtract();
             Dentist dentist = userService.findDentistByMail(mail);
-            List<Appointment> appointmentList = null;
+            List<Appointment> appointmentList;
             if (date != null || (name != null && !name.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByDentist(date, name, dentist);
             } else {
