@@ -2,7 +2,6 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
@@ -23,11 +22,6 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
     private final UserRepository userRepository;
-
-    private final DentistRepository dentistRepository;
-
-    private final ClinicRepository clinicRepository;
-    private final UserMapping userMapping;
 
     public List<Appointment> findAppointmentInClinic(String staffmail) {
         try {
@@ -84,7 +78,7 @@ public class AppointmentService {
             } else {
                 if (status != null && date == null) {
                     appointmentsHistory = appointmentRepository.findAppointmentsByUser_UserIDAndStatus(userID, status);
-                } else if (status == null && date != null) {
+                } else if (status == null) {
                     appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDate(userID, date);
                 } else {
                     appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
@@ -112,7 +106,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> findAppointmentsByDateAndStatus(LocalDate date, int status) {
+    public List<Appointment> findAppointmentsByDate(LocalDate date) {
         try {
             return appointmentRepository.findAppointmentsByDateAndStatus(date, 1);
         } catch (Exception e) {
@@ -176,10 +170,8 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByCustomer(LocalDate date, String name, String mail) {
+    public List<Appointment> searchAppointmentByCustomer(LocalDate date, String name) {
         try {
-            Client client = userRepository.findUserByMail(mail);
-
             return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date, name, name);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -242,7 +234,7 @@ public class AppointmentService {
                 .orElse(new ArrayList<>())
                 .stream()
                 .filter(appointment -> appointment.getStatus() == 1 || appointment.getStatus() == 2)
-                .collect(Collectors.toList());
+                .toList();
         //số lượng cuộc hẹn cho từng nha sĩ
         appointments.forEach(appointment -> {
             LocalDate appointmentDate = appointment.getDate();
@@ -346,6 +338,10 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
+    public List<Appointment> getAppointmentsByDate(LocalDate date) {
+        return appointmentRepository.findAppointmentsByDateAndStatus(date, 1);
+    }
+
     public int totalAppointmentsInMonthByManager(Client manager) {
 
         return appointmentRepository.countAppointmentsByMonthPresentByManager(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), manager);
@@ -353,5 +349,13 @@ public class AppointmentService {
 
     public int totalAppointmentsInYearByManager(Client manager) {
         return appointmentRepository.countAppointmentsByYearPresentByManager(LocalDate.now().getYear(), manager);
+    }
+
+    public Appointment save (Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+    public List<Appointment> findAppointmentsByDateAndStatus(LocalDate workDate, int status) {
+        return appointmentRepository.findAppointmentsByDateAndStatus(workDate, status);
     }
 }

@@ -7,7 +7,6 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.UserRepository;
@@ -169,7 +168,7 @@ public class UserController {
                 throw new Error("Over booked for today!");
             }
 
-            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).map(List::size).orElse(10) >= 10) {
+            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
                 throw new Error("Full appointment for this date!");
             }
             Appointment newAppointment = new Appointment();
@@ -187,9 +186,7 @@ public class UserController {
             }
             dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
             Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(0));
-            });
+            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
             appointmentRepository.save(newAppointment);
             return ResponseEntity.ok("Booking Successfully");
         } catch (Error e) {
@@ -220,9 +217,7 @@ public class UserController {
             }
             appointment.setStatus(0);
             Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
-            unavailableSchedule.ifPresent(schedules -> {
-                schedules.forEach(schedule -> schedule.setAvailable(1));
-            });
+            unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
@@ -299,10 +294,7 @@ public class UserController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
-            if (user != null) {
-                userDTO.getUserDTOFromUser(user);
-            }
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

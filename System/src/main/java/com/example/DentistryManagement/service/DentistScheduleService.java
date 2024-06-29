@@ -79,4 +79,8 @@ public class DentistScheduleService {
     public Optional<List<DentistSchedule>> findDentistScheduleByWorkDateAndTimeSlotAndDentist(TimeSlot timeSlot, LocalDate workDate, Dentist dentist, int status) {
         return dentistScheduleRepository.findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(timeSlot, workDate, status, dentist);
     }
+
+    public List<DentistSchedule> findDentistScheduleByWorkDate(LocalDate date) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateAndAvailable(date, 1);
+    }
 }

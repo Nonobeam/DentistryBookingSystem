@@ -4,28 +4,22 @@ import com.example.DentistryManagement.DTO.*;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
-import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,10 +55,7 @@ public class ManagerController {
     @GetMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
         try {
-            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
-            if (user != null) {
-                userDTO.getUserDTOFromUser(user);
-            }
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

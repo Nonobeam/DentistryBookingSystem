@@ -24,13 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.UUID;
 
 @Service
@@ -105,7 +102,6 @@ public class AuthenticationService {
         staffRepository.save(staff);
 
         var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder()
@@ -249,9 +245,7 @@ public class AuthenticationService {
         userRepository.save(user);
         temporaryUserRepository.delete(temporaryUser);
 
-        var jwtToken = jwtService.generateToken(user);
-
-        return jwtToken;
+        return jwtService.generateToken(user);
     }
 
 //----------------------------------- LOGIN -----------------------------------
@@ -270,22 +264,13 @@ public class AuthenticationService {
                     .orElseThrow();
         } catch (Exception e) {
             logger.error(e.toString());
-
-            if (user == null) {
-                throw new Error("Cannot find the user with mail" + request.getMail());
-            } else {
-                throw new Error("Some unexpected problem has been happened");
-            }
         }
 
         System.out.println("User" + user);
         var jwtToken = jwtService.generateToken(user);
         logger.info("Token in service: {}", jwtToken);
 
-        if (jwtToken == null) {
-            System.out.printf("Token is null");
-        }
-
+        assert user != null;
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .role(user.getRole())
@@ -300,11 +285,7 @@ public class AuthenticationService {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userMail;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
-        } else {
-            logger.info("header", authHeader);
-        }
+
         refreshToken = authHeader.substring(7);
         userMail = jwtService.extractMail(refreshToken);
         if (userMail != null) {
