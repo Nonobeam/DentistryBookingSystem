@@ -154,9 +154,9 @@ public class ManagerController {
     @PutMapping("/set-staff/{clinicID}")
     public ResponseEntity<?> setUpStaffForDentistInClinic(@PathVariable String clinicID) {
         try {
-            List<Client> staff =userService.findAllStaffInClinic(clinicID);
+            List<Client> staff = userService.findAllStaffInClinic(clinicID);
             List<ClinicWorkerDTO> staffList = ClinicWorkerDTO.fromClientList(staff);
-            List<Client> dentist =userService.findAllDentistInDentist(clinicID);
+            List<Client> dentist = userService.findAllDentistInDentist(clinicID);
             List<ClinicWorkerDTO> dentistList = ClinicWorkerDTO.fromClientList(dentist);
 
             ClinicWorkerResponseDTO responseDTO = new ClinicWorkerResponseDTO(staffList, dentistList);
@@ -165,7 +165,6 @@ public class ManagerController {
             throw new Error("Error while getting dentists " + error);
         }
     }
-
 
 
     @Operation(summary = "Set dentist for staff")
@@ -206,7 +205,7 @@ public class ManagerController {
                             clientDTO.setClinicName(client.getDentist().getClinic().getName());
                             return clientDTO;
                         })
-                            .collect(Collectors.toList());
+                        .collect(Collectors.toList());
 
                 return ResponseEntity.ok(clientDTOs);
             }

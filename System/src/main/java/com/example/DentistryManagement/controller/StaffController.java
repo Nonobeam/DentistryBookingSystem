@@ -89,10 +89,27 @@ public class StaffController {
 
     //---------------------------MANAGE DENTIST---------------------------
 
-public ModelMap getServices(ModelMap modelMap) {
-        Staff staff = userService.findStaffByMail(userService.mailExtract());
-        return modelMap.addAttribute("serviceList", serviceService.findServicesByClinic(staff.getClinic().getClinicID()));
-}
+
+    @Operation(summary = "All Services in Clinic")
+    @GetMapping("/show-service")
+    public ResponseEntity<?> getServices() {
+        try {
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            List<Services> services = serviceService.findServicesByClinic(staff.getClinic().getClinicID());
+            if (!services.isEmpty()) {
+                return ResponseEntity.ok(services);
+            } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any service");
+                logger.error("Not found any service");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     @Operation(summary = "All Services in System")
     @GetMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {

@@ -170,7 +170,7 @@ public class AdminController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
