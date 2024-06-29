@@ -16,11 +16,12 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
 
     List<DentistSchedule> findByWorkDateAndAvailableAndClinic_ClinicID(LocalDate workDate, int available, String clinicId);
 
-    void deleteByDentistAndWorkDate(Dentist dentist, LocalDate workDate);
+    void deleteByDentistAndWorkDateAndTimeslot_SlotNumber(Dentist dentist, LocalDate workDate, int numSlot);
 
     DentistSchedule findByScheduleID(String scheduleID);
 
     Optional<List<DentistSchedule>> findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(TimeSlot timeSlot, LocalDate date, int available, Dentist dentist);
 
     List<DentistSchedule> findDentistSchedulesByClinicAndWorkDateAndAvailable(Clinic clinic, LocalDate workDate, int available);
+    Boolean existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(String dentist_dentistID, TimeSlot timeslot, LocalDate workDate);
 }

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/manager")
@@ -113,9 +114,9 @@ public class ManagerController {
 
 
     @Operation(summary = "Edit users")
-    @PutMapping("/edit/{userID}")
-    public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        if (userService.isPresentUser(userID).isPresent()) {
+    @PutMapping("/editWorker")
+    public ResponseEntity<?> editUser(@RequestBody UserDTO userDTO) {
+        if (userService.isPresentUser(userDTO.getId()).isPresent()) {
             Client updatedUser = userMapping.mapUser(userDTO);
             userService.updateUser(updatedUser);
             return ResponseEntity.ok(updatedUser);
@@ -127,10 +128,41 @@ public class ManagerController {
         }
     }
 
+    @Operation(summary = "Delete user")
+    @DeleteMapping("/delete-user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        try {
+
+            if (userService.isPresentUser(id).isPresent()) {
+                Optional<Client> c = userService.isPresentUser(id);
+                if (c.isPresent()) {
+                    Client client = c.get();
+                    userService.updateUserStatus(client, 0);
+                    return ResponseEntity.ok().build();
+                } else {
+                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                    logger.error("User not found");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                }
+
+            } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
+                logger.error("User could not be deleted");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+            }
+
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+
     @Operation(summary = "Edit clinic")
-    @PutMapping("/edit/{clinicID}")
-    public ResponseEntity<Clinic> editClinic(@PathVariable String clinicID, @RequestBody ClinicDTO clinicDTO) {
-        Clinic updateClinic = clinicService.findClinicByID(clinicID);
+    @PutMapping("/editClinic")
+    public ResponseEntity<Clinic> editClinic(@RequestBody ClinicDTO clinicDTO) {
+        Clinic updateClinic = clinicService.findClinicByID(clinicDTO.getId());
 
         if (updateClinic != null) {
             updateClinic.setPhone(clinicDTO.getPhone());
@@ -143,9 +175,25 @@ public class ManagerController {
             clinicService.save(updateClinic);
             return ResponseEntity.ok(updateClinic);
         } else {
-            System.out.println("Cannot find: " + clinicID);
-            ;
+            System.out.println("Cannot find: " + clinicDTO.getId());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @Operation(summary = "Set dentist for staff")
+    @PutMapping("/set-staff/{clinicID}")
+    public ResponseEntity<?> setUpStaffForDentistInClinic(@PathVariable String clinicID) {
+        try {
+            List<Client> staff = userService.findAllStaffInClinic(clinicID);
+            List<ClinicWorkerDTO> staffList = ClinicWorkerDTO.fromClientList(staff);
+            List<Client> dentist = userService.findAllDentistInDentist(clinicID);
+            List<ClinicWorkerDTO> dentistList = ClinicWorkerDTO.fromClientList(dentist);
+
+            ClinicWorkerResponseDTO responseDTO = new ClinicWorkerResponseDTO(staffList, dentistList);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Error error) {
+            throw new Error("Error while getting dentists " + error);
         }
     }
 
@@ -192,7 +240,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any dentist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any dentist");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -223,7 +271,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any staff");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any staff");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -269,7 +317,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("Not found any dentist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No staff user found");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -277,7 +325,7 @@ public class ManagerController {
 
     @Operation(summary = "Manager Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<?> getDashBoardData(@RequestParam("year") int year) {
         try {
             Client manager = userService.findClientByMail(userService.mailExtract());
             if (manager == null) {

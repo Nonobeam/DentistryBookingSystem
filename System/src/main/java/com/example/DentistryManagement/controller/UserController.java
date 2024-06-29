@@ -62,26 +62,6 @@ public class UserController {
 
     //----------------------------------- APPOINTMENT INFORMATION -----------------------------------
 
-
-    @Operation(summary = "Customer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PutMapping("/{status}")
-    public ResponseEntity<Appointment> setAppointmentStatus(@PathVariable("status") int status, Appointment appointment) {
-
-        try {
-            appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @Operation(summary = "All Clinics")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -100,8 +80,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/dependentNew")
-    public ResponseEntity createDependentByCustomer(@RequestBody Dependent dependent) {
+    @PostMapping("/dependentNew")
+    public ResponseEntity<?> createDependentByCustomer(@RequestBody Dependent dependent) {
         try {
             String mail = userService.mailExtract();
             dependent.setUser(userService.findClientByMail(mail));
@@ -264,7 +244,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("appointment-history")
+    @GetMapping("/appointment-history")
     public ResponseEntity<?> getAppointmentHistory
             (@RequestParam(required = false) LocalDate workDate,
              @RequestParam(required = false) Integer status) {
@@ -316,7 +296,7 @@ public class UserController {
 
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);

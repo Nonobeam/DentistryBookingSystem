@@ -16,6 +16,7 @@ public class UserMapping {
     public Client mapUser(UserDTO userDTO) {
         Client client = new Client();
         client.setName(userDTO.getName());
+        client.setUserID(userDTO.getId());
         if (userService.existsByPhoneOrMail(client.getPhone(), client.getMail())) {
             client.setPhone(userDTO.getPhone());
             client.setMail(userDTO.getMail());

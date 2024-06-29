@@ -32,9 +32,9 @@ public class StaffService {
     }
 
     public Clinic getClinicByStaff(Staff staff) {
-        try{
+        try {
             return staff.getClinic();
-        } catch(Error error) {
+        } catch (Error error) {
             throw error;
         }
     }

@@ -1,56 +1,90 @@
-import React from 'react';
-import { Card, Col, Row } from 'antd';
-import './CarDash.css';
-import UserChart from './ChartUser/UserChart';
-const totalUserData = [
-  { month: 'Jan', users: 100 },
-  { month: 'Feb', users: 150 },
-  { month: 'Mar', users: 200 },
-  { month: 'Apr', users: 180 },
-  { month: 'May', users: 220 },
-  { month: 'Jun', users: 250 },
-  { month: 'Jul', users: 280 },
-  { month: 'Aug', users: 300 },
-  { month: 'Sep', users: 320 },
-  { month: 'Oct', users: 350 },
-  { month: 'Nov', users: 380 },
-  { month: 'Dec', users: 400 },
-];
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, Table } from 'antd';
+// import './CarDash.css';
+import { ChartDailyAppointment } from './ChartDailyAppointment/ChartDailyAppointment';
+import { dashboardData } from '../../../../utils/data';
+import { ChartMonthly } from './ChartMonthly/ChartMonthly';
+import { DashBoardServices } from '../../../../services/DashBoardServices/DashBoardServices';
+import { Chart, ArcElement, linear } from 'chart.js';
+import { CategoryScale } from 'chart.js';
 
-export const CarDash = () => (
-  <Row gutter={16}>
-    <Col span={16}>
-    <div>
-      <p>khách hàng</p>
-      <p style={{ fontSize: '20px', fontWeight: 'bold'}}>782 customer</p>
-    </div>
-      <UserChart data={totalUserData} />
-    </Col>
-    <Col span={8}>
-      <div class='order-time-chart'>
-        <div class='time-slot'>
-          <div class='time'>9:00 AM</div>
-          <div class='order'>Order 1</div>
+export const CarDash = () => {
+  // const [dashboardData, setDashboardData] = useState({});
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const response = await DashBoardServices.getAll();
+  //     setDashboardData(response);
+  //   };
+  //   fetchData();
+  // }, []);
+
+  const dailyAppointmentsData = {
+    labels: Object.keys(dashboardData.dailyAppointments),
+    datasets: [
+      {
+        label: 'Daily Appointments',
+        data: Object.values(dashboardData.dailyAppointments),
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+        ], // Define colors as needed
+      },
+    ],
+  };
+
+  const monthlyAppointmentsData = {
+    labels: Object.keys(dashboardData.monthlyAppointments).map(
+      (month) => `Month ${month}`
+    ),
+    datasets: [
+      {
+        label: 'Monthly Appointments',
+        data: Object.values(dashboardData.monthlyAppointments),
+        backgroundColor: '#8884d8', // Bar color
+      },
+    ],
+  };
+  const servicesUsageData = dashboardData.servicesUsage || []; 
+
+  return (
+    <Row gutter={16}>
+      <Col span={16}>
+        <div>
+          {/* <p style={{ marginBottom: '8px' }}>Khách hàng</p>
+          <p
+            style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: '16px',
+            }}>
+            782 customer
+          </p> */}
         </div>
-        <div class='time-slot'>
-          <div class='time'>10:00 AM</div>
-          <div class='order'>Order 2</div>
-        </div>
-        <div class='time-slot'>
-          <div class='time'>11:00 AM</div>
-          <div class='order'>Order 3</div>
-        </div>
-      </div>
-    </Col>
-    <Col span={8}>
-      <Card title='Card title' bordered={false}>
-        Card content
-      </Card>
-    </Col>
-    <Col span={8}>
-      <Card title='Card title' bordered={false}>
-        Card content
-      </Card>
-    </Col>
-  </Row>
-);
+        <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
+      </Col>
+      <Col span={8}>
+        <ChartMonthly monthlyAppointmentsData={monthlyAppointmentsData} />
+      </Col>
+      <Col span={8}>
+        <Card
+          title='Total Appointments Now'
+          bordered={false}
+          style={{ marginBottom: '16px' }}>
+          {dashboardData.totalAppointmentsInMonthNow}
+        </Card>
+      </Col>
+      <Col span={8}>
+        <Card
+          title='Total Appointments In Year Now'
+          bordered={false}
+          style={{ marginBottom: '16px' }}>
+          {dashboardData.totalAppointmentsInYearNow}
+        </Card>
+      </Col>
+    </Row>
+  );
+};
