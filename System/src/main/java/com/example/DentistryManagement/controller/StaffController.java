@@ -9,6 +9,7 @@ import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.DentistRepository;
+import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,7 +60,7 @@ public class StaffController {
 
     @Operation(summary = "User update their profile")
     @PutMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userService.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {

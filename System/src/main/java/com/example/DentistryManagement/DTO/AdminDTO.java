@@ -19,7 +19,6 @@ public class AdminDTO {
     private String phone;
     private String mail;
     private LocalDate birthday;
-    private String password;
     private Role role;
     private int status;
     private String clinicName;
@@ -31,7 +30,6 @@ public class AdminDTO {
             userDTO.setPhone(user.getPhone() != null ? user.getPhone() : "");
             userDTO.setMail(user.getMail() != null ? user.getMail() : "");
             userDTO.setBirthday(user.getBirthday() != null ? user.getBirthday() : LocalDate.now()); // hoặc giá trị mặc định nào đó
-            userDTO.setPassword(user.getPassword() != null ? user.getPassword() : "");
         }
         return userDTO;
     }

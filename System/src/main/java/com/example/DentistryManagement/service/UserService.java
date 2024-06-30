@@ -163,7 +163,7 @@ public class UserService {
             return userRepository.findUserByMail(mail);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+            throw new RuntimeException("Error occurred while fetching user: " + e.getMessage(), e);
         }
 
     }

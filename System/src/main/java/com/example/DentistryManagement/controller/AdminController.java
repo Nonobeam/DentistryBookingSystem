@@ -39,7 +39,6 @@ public class AdminController {
         adminDTO.setPhone(client.getPhone());
         adminDTO.setMail(client.getMail());
         adminDTO.setBirthday(client.getBirthday());
-        adminDTO.setPassword(client.getPassword());
         adminDTO.setStatus(client.getStatus());
         if (client.getRole() == Role.DENTIST) {
             Dentist dentist = userService.findDentistByMail(client.getMail());

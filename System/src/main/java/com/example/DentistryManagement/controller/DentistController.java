@@ -115,7 +115,7 @@ public class DentistController {
             }
             if (!applist.isEmpty()) {
                 return ResponseEntity.ok(applist);
-            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment today");
+            } else return ResponseEntity.ok("Not found any appointment today");
 
 
         } catch (Exception e) {
@@ -161,35 +161,37 @@ public class DentistController {
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
+            UserAppointDTO userAppointDTO = new UserAppointDTO();
             userDTO.setBirthday(client.getBirthday());
             Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(client.getUserID(), userService.mailExtract());
-            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
-                    .map(appointmentEntity -> {
-                        AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setServices(appointmentEntity.getServices().getName());
-                        appointment.setStatus(appointmentEntity.getStatus());
-                        appointment.setDate(appointmentEntity.getDate());
-                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                        if (appointmentEntity.getStaff() != null) {
-                            if (appointmentEntity.getUser() != null) {
-                                appointment.setUser(appointmentEntity.getUser().getName());
+            if(appointmentList.isPresent()) {
+                List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
+                        .map(appointmentEntity -> {
+                            AppointmentDTO appointment = new AppointmentDTO();
+                            appointment.setServices(appointmentEntity.getServices().getName());
+                            appointment.setStatus(appointmentEntity.getStatus());
+                            appointment.setDate(appointmentEntity.getDate());
+                            appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                            if (appointmentEntity.getStaff() != null) {
+                                if (appointmentEntity.getUser() != null) {
+                                    appointment.setUser(appointmentEntity.getUser().getName());
+                                } else {
+                                    appointment.setDependent(appointmentEntity.getDependent().getName());
+                                }
+                                appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
                             } else {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
+                                if (appointmentEntity.getDependent() != null) {
+                                    appointment.setDependent(appointmentEntity.getDependent().getName());
+                                } else
+                                    appointment.setUser(appointmentEntity.getUser().getName());
                             }
-                            appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                        } else {
-                            if (appointmentEntity.getDependent() != null) {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            } else
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                        }
 
-                        return appointment;
-                    })
-                    .collect(Collectors.toList());
-            UserAppointDTO userAppointDTO = new UserAppointDTO();
+                            return appointment;
+                        })
+                        .collect(Collectors.toList());
+                userAppointDTO.setAppointment(appointmentDTOList);
+            }
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
