@@ -6,19 +6,25 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.DentistSchedule;
+import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
+    private final DentistScheduleService dentistScheduleService;
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
     private final UserMapping userMapping;
@@ -343,6 +349,39 @@ public class AppointmentService {
                 })
                 .toList();
         return appointmentDTOList;
+    }
+
+
+    /**
+     * @param staff Input Client staff
+     * @param customer Input Client customer
+     * @param dentistSchedule Input DentistSchedule
+     * @param services Input Services
+     * @param dependent Input Dependent dependent
+     * @return appointment
+     */
+    public Appointment createAppointment(@Nullable Client staff, Client customer , DentistSchedule dentistSchedule, Services services, Dependent dependent) {
+        Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
+                .staff(staff.getStaff())
+                .user(customer)
+                .clinic(dentistSchedule.getClinic())
+                .date(dentistSchedule.getWorkDate())
+                .timeSlot(dentistSchedule.getTimeslot())
+                .dentist(dentistSchedule.getDentist())
+                .services(services)
+                .dentistScheduleId(dentistSchedule.getScheduleID())
+                .status(1);
+
+        if (dependent != null) {
+            appointmentBuilder.dependent(dependent);
+        }
+        appointmentBuilder.build();
+
+        dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
+        Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
+        otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
+
+        return appointmentRepository.save(appointmentBuilder.build());
     }
 
 

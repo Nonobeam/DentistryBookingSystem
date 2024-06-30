@@ -136,12 +136,7 @@ public class AdminController {
         try {
             if (userService.isPresentUser(id).isPresent()) {
                 Client client = userService.findUserById(id);
-                client.setName(updatedUser.getName());
-                if (!userService.existsByPhoneOrMail(updatedUser.getPhone(), updatedUser.getMail())) {
-                    client.setPhone(updatedUser.getPhone());
-                }
-                client.setBirthday(updatedUser.getBirthday());
-                userService.updateUser(client);
+                userService.updateUser(updatedUser, client);
                 return ResponseEntity.ok(client);
             } else {
                 ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");

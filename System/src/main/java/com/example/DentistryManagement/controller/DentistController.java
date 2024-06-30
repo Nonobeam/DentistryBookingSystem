@@ -57,11 +57,9 @@ public class DentistController {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
-                user.setMail(userDTO.getMail());
-                user.setName(userDTO.getName());
-                user.setPhone(userDTO.getPhone());
-                user.setBirthday(userDTO.getBirthday());
-                userService.updateUser(user);
+                userService.updateUser(userDTO, user);
+            } else {
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Cannot find user"));
             }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {

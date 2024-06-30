@@ -166,35 +166,39 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceID) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
         try {
-            Client client = userService.findClientByMail(userService.mailExtract());
+            Client customer = userService.findClientByMail(userService.mailExtract());
+            Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
+            Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
-            if (appointmentService.findAppointmentsByUserAndStatus(client, 1).map(List::size).orElse(5) >= 5) {
-                throw new Error("Over booked for today!");
+
+            if (customer == null || customer.getStatus() == 0) {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
+                logger.error("Customer not found in system");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+
+            if (dentistSchedule == null || dentistSchedule.getAvailable() == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Dentist Schedule not found"));
+            } else if (dentistSchedule.getWorkDate().isBefore(LocalDate.now())) {
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "The booking must be in the future"));
+            }
+
+            if (services == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Service not found"));
+            }
+
+            if (appointmentService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Reach the limit of personal appointment. 5/5"));
             }
 
             if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
-                throw new Error("Full appointment for this date!");
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "You cannot book another appointment right now. The clinic is full right now!"));
             }
-            Appointment newAppointment = new Appointment();
-            newAppointment.setUser(client);
-            newAppointment.setClinic(dentistSchedule.getClinic());
-            newAppointment.setDate(dentistSchedule.getWorkDate());
-            newAppointment.setServices(serviceService.findServiceByID(serviceID));
-            newAppointment.setTimeSlot(dentistSchedule.getTimeslot());
-            newAppointment.setDentist(dentistSchedule.getDentist());
-            newAppointment.setDentistScheduleId(dentistScheduleId);
-            newAppointment.setStatus(1);
-            if (dependentID != null) {
-                Dependent dependent = userService.findDependentByDependentId(dependentID);
-                newAppointment.setDependent(dependent);
-            }
-            dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
-            Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-            otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
-            appointmentRepository.save(newAppointment);
-            return ResponseEntity.ok("Booking Successfully");
+
+            appointmentService.createAppointment(null, customer, dentistSchedule, services, dependent);
+            return ResponseEntity.ok("Booking successfully");
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
