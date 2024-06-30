@@ -37,17 +37,17 @@ const columns = [
 export const DentistList = () => {
   const [apiData, setApiData] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await DentistServices.getAll();
-        setApiData(response);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, []);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await DentistServices.getAll();
+          setApiData(response);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }, []);
   return (
     <div>
       <h1>DashBoardDentist</h1>

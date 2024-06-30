@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table } from 'antd';
 import { CustomerServices } from '../../services/CustomerServer/CustomerServer';
-import { Action } from './components/Action/Action';
 
-export const CustomerList = () => {
+const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
 
   const columns = [
@@ -31,13 +30,9 @@ export const CustomerList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => <span>{status === 1 ? 'Active' : 'Inactive'}</span>,
-    },
-    {
-      title: 'Action',
-      dataIndex: 'x',
-      key: 'x',
-      render: (_, record) => <Action record={record} />,
+      render: (status) => (
+        <span>{status === 1 ? 'Active' : 'Inactive'}</span>
+      ),
     },
   ];
 
@@ -63,16 +58,18 @@ export const CustomerList = () => {
 
   return (
     <div>
-      <Card title='Customer List' style={cardStyle}>
+      <Card title="Manager List" style={cardStyle}>
         <Table
           dataSource={apiData}
           columns={columns}
           pagination={false}
           bordered
-          size='small'
+          size="small"
           style={{ backgroundColor: 'white' }} // Background color for the table
         />
       </Card>
     </div>
   );
 };
+
+export default AppointmentHistory;

@@ -1,13 +1,11 @@
 import React from 'react';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { IoEyeOffOutline } from 'react-icons/io5';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FiTrash2 } from 'react-icons/fi';
 import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
-import { StudentServices } from '../../../../../../services/StudentServices/StudentServices';
 import { useNavigate } from 'react-router-dom';
-import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
+import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
 export const Action = ({ record }) => {
   const navigator = useNavigate();
@@ -18,7 +16,7 @@ export const Action = ({ record }) => {
     showModal();
     const fetchData = async () => {
       try {
-        const response = await DentistServices.getById(record.mail);
+        // const response = await DentistServices.getById(record.mail);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -37,7 +35,14 @@ export const Action = ({ record }) => {
     navigator(`detail/${record.mail}`);
   };
 
-  const handleDelete = () => {};
+  const handleDelete = async (id) => {
+    try {
+      const response = await CustomerServices.deleteCustomer(id);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -49,7 +54,7 @@ export const Action = ({ record }) => {
           <MdOutlineModeEdit onClick={handleUpdate} />
         </div>
         <div>
-          <FiTrash2 onClick={handleDelete} />
+          <FiTrash2 onClick={() => handleDelete(record.id)} />
         </div>
       </Flex>
       <ModalInfo

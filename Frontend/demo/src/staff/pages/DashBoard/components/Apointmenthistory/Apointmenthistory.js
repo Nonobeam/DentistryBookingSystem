@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table } from 'antd';
-import { appointmentData } from '../../../../utils/data';
+import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
-const AppointmentHistory = ({ appointmentData}) => {
+
+const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
-  const [listApointment, setListApointment] = useState([]);
+
   const columns = [
     {
       title: 'Date',
@@ -31,14 +32,14 @@ const AppointmentHistory = ({ appointmentData}) => {
       dataIndex: 'services',
       key: 'services',},
 
-    {
-      title: 'Treatment',
-      dataIndex: 'treatment',
-      key: 'treatment',
-      render: (text) => (
-        <span style={styles.treatment}>{text}</span>
-      ),
-    },
+    // {
+    //   title: 'Treatment',
+    //   dataIndex: 'treatment',
+    //   key: 'treatment',
+    //   render: (text) => (
+    //     <span style={styles.treatment}>{text}</span>
+    //   ),
+    // },
   ];
   const styles = {
     card: {
@@ -49,19 +50,14 @@ const AppointmentHistory = ({ appointmentData}) => {
       padding: '5px 10px',
       borderRadius: '5px',
     },
-  };
-  useEffect(() => {
+  }; useEffect(() => {
     const fetchData = async () => {
-      // const response = await DentistServices.getAll();
-      // console.log(response);
-      // if (response) {
-      //   const dataDentist = response.map((item) => {
-      //     return item.user;
-      //   });
-
-      setListApointment(appointmentData);
-      setApiData(appointmentData);
-      // }
+      try {
+        const response = await AppointmentHistoryServices.getAll();
+        setApiData(response);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
     fetchData();
   }, []);
@@ -69,7 +65,7 @@ const AppointmentHistory = ({ appointmentData}) => {
     <div>
       <Card title="Appointment History" style={styles.card}>
         <Table
-          dataSource={listApointment}
+          dataSource={apiData}
           columns={columns}
           pagination={false}
           bordered

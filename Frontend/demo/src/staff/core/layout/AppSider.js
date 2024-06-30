@@ -6,7 +6,7 @@ const items = [
   {
     key: 'Dashboard',
     label: (
-      <Link to='/staff' style={{ color: '#333', textDecoration: 'none' }}>
+      <Link to='/staff/dashboard' style={{ color: '#333', textDecoration: 'none' }}>
         Dashboard
       </Link>
     ),
@@ -18,6 +18,17 @@ const items = [
         to='/staff/dentist-list'
         style={{ color: '#333', textDecoration: 'none' }}>
         Dentist List
+      </Link>
+    ),
+  },
+  
+  {
+    key: 'CustomerList',
+    label: (
+      <Link
+        to='/staff/dentist-list'
+        style={{ color: '#333', textDecoration: 'none' }}>
+        Customer List
       </Link>
     ),
   },
@@ -35,7 +46,7 @@ const items = [
     key: 'Homepage',
     label: (
       <Link
-        to='/staff/admin-home-page'
+        to=''
         style={{ color: '#333', textDecoration: 'none' }}>
         Home Page
       </Link>

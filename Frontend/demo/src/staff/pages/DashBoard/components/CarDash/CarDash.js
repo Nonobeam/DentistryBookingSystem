@@ -1,69 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Table } from 'antd';
-// import './CarDash.css';
+import { Card, Col, Row } from 'antd';
 import { ChartDailyAppointment } from './ChartDailyAppointment/ChartDailyAppointment';
-import { dashboardData } from '../../../../utils/data';
 import { ChartMonthly } from './ChartMonthly/ChartMonthly';
 import { DashBoardServices } from '../../../../services/DashBoardServices/DashBoardServices';
-import { Chart, ArcElement, linear } from 'chart.js';
-import { CategoryScale } from 'chart.js';
+const data = {
+  date: '2024-06-19',
+  year: new Date().getFullYear(),
+};
 
 export const CarDash = () => {
-  // const [dashboardData, setDashboardData] = useState({});
+  const [dashboardData, setDashboardData] = useState({});
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await DashBoardServices.getAll(data);
+        console.log(response);
+        // setDashboardData(response || {}); // Đảm bảo response không null
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await DashBoardServices.getAll();
-  //     setDashboardData(response);
-  //   };
-  //   fetchData();
-  // }, []);
-
+  // Kiểm tra và khởi tạo dữ liệu mặc định nếu không có
   const dailyAppointmentsData = {
-    labels: Object.keys(dashboardData.dailyAppointments),
+    labels: Object.keys(dashboardData.dailyAppointments || {}),
     datasets: [
       {
         label: 'Daily Appointments',
-        data: Object.values(dashboardData.dailyAppointments),
+        data: Object.values(dashboardData.dailyAppointments || {}),
         backgroundColor: [
           '#FF6384',
           '#36A2EB',
           '#FFCE56',
           '#4BC0C0',
           '#9966FF',
-        ], // Define colors as needed
+        ],
       },
     ],
   };
 
   const monthlyAppointmentsData = {
-    labels: Object.keys(dashboardData.monthlyAppointments).map(
+    labels: Object.keys(dashboardData.monthlyAppointments || {}).map(
       (month) => `Month ${month}`
     ),
     datasets: [
       {
         label: 'Monthly Appointments',
-        data: Object.values(dashboardData.monthlyAppointments),
-        backgroundColor: '#8884d8', // Bar color
+        data: Object.values(dashboardData.monthlyAppointments || {}),
+        backgroundColor: '#8884d8',
       },
     ],
   };
-  const servicesUsageData = dashboardData.servicesUsage || []; 
 
   return (
     <Row gutter={16}>
       <Col span={16}>
-        <div>
-          {/* <p style={{ marginBottom: '8px' }}>Khách hàng</p>
-          <p
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              marginBottom: '16px',
-            }}>
-            782 customer
-          </p> */}
-        </div>
         <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
       </Col>
       <Col span={8}>
@@ -74,7 +67,8 @@ export const CarDash = () => {
           title='Total Appointments Now'
           bordered={false}
           style={{ marginBottom: '16px' }}>
-          {dashboardData.totalAppointmentsInMonthNow}
+          {dashboardData.totalAppointmentsInMonthNow || 0}{' '}
+          {/* Kiểm tra và hiển thị giá trị, mặc định là 0 nếu không có */}
         </Card>
       </Col>
       <Col span={8}>
@@ -82,7 +76,8 @@ export const CarDash = () => {
           title='Total Appointments In Year Now'
           bordered={false}
           style={{ marginBottom: '16px' }}>
-          {dashboardData.totalAppointmentsInYearNow}
+          {dashboardData.totalAppointmentsInYearNow || 0}{' '}
+          {/* Kiểm tra và hiển thị giá trị, mặc định là 0 nếu không có */}
         </Card>
       </Col>
     </Row>

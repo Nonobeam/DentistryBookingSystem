@@ -1,10 +1,11 @@
 import { notification } from 'antd';
-import api from '../../config/axios/axios';
+import api from '../../config/axios';
 
-export const DashBoardServices = {
-  getAll: async (data) => {
+
+export const CustomerServices = {
+  getAll: async () => {
     try {
-      const responseData = await api.get('staff/dashboard', data);
+      const responseData = await api.get('admin/staffList');
       return responseData.data;
     } catch (error) {
       notification.error({
