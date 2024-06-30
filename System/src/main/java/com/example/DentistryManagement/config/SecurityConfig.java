@@ -19,7 +19,6 @@ import static com.example.DentistryManagement.core.user.Role.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;

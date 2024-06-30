@@ -2,12 +2,8 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Role;
-import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,27 +25,8 @@ import java.util.stream.Collectors;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
-    private final UserMapping userMapping;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
-    private AdminDTO convertToAdminDTO(Client client) {
-        AdminDTO adminDTO = new AdminDTO();
-        adminDTO.setId(client.getUserID());
-        adminDTO.setName(client.getName());
-        adminDTO.setPhone(client.getPhone());
-        adminDTO.setMail(client.getMail());
-        adminDTO.setBirthday(client.getBirthday());
-        adminDTO.setStatus(client.getStatus());
-        if (client.getRole() == Role.DENTIST) {
-            Dentist dentist = userService.findDentistByMail(client.getMail());
-            adminDTO.setClinicName(dentist.getClinic().getName());
-        } else if (client.getRole() == Role.STAFF) {
-            Staff staff = userService.findStaffByMail(client.getMail());
-            if (staff.getClinic() != null)
-                adminDTO.setClinicName(staff.getClinic().getName());
-        }
-        return adminDTO;
-    }
 
     @Operation(summary = "Admin")
     @GetMapping("/dentistList")
@@ -63,15 +40,15 @@ public class AdminController {
                 userList = userService.findAllDentist();
             }
             List<AdminDTO> adminDTOList = userList.stream()
-                    .map(this::convertToAdminDTO)
+                    .map(userService::convertToAdminDTO)
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
             } else return ResponseEntity.ok("Not found any dentist user  ");
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-            logger.error("User not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -87,7 +64,7 @@ public class AdminController {
                 userList = userService.findAllManager();
             }
             List<AdminDTO> adminDTOList = userList.stream()
-                    .map(this::convertToAdminDTO)
+                    .map(userService::convertToAdminDTO)
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
@@ -95,9 +72,9 @@ public class AdminController {
                 return ResponseEntity.ok("Not found any manager user  ");
 
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-            logger.error("User not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -114,14 +91,14 @@ public class AdminController {
                 userList = userService.findAllStaff();
             }
             List<AdminDTO> adminDTOList = userList.stream()
-                    .map(this::convertToAdminDTO)
+                    .map(userService::convertToAdminDTO)
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
             } else return ResponseEntity.ok("Not found any staff user ");
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-            logger.error("User not found");
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Staff user not found");
+            logger.error("Staff user not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
@@ -138,15 +115,15 @@ public class AdminController {
                 userList = userService.findAllCustomer();
             }
             List<AdminDTO> adminDTOList = userList.stream()
-                    .map(this::convertToAdminDTO)
+                    .map(userService::convertToAdminDTO)
                     .collect(Collectors.toList());
             if (!adminDTOList.isEmpty()) {
                 return ResponseEntity.ok(adminDTOList);
             } else return ResponseEntity.ok("Not found any customer user ");
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
-            logger.error("Customer not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -157,7 +134,7 @@ public class AdminController {
             if (userService.isPresentUser(id).isPresent()) {
                 Client client = userService.findUserById(id);
                 client.setName(updatedUser.getName());
-                if (userService.existsByPhoneOrMail(updatedUser.getPhone(), updatedUser.getMail())) {
+                if (!userService.existsByPhoneOrMail(updatedUser.getPhone(), updatedUser.getMail())) {
                     client.setPhone(updatedUser.getPhone());
                 }
                 client.setBirthday(updatedUser.getBirthday());

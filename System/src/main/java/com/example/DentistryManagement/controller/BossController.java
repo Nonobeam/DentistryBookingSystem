@@ -87,16 +87,7 @@ public class BossController {
             List<Client> allManager = userService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
                 List<AdminDTO> clientDTOs = allManager.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            return clientDTO;
-                        })
+                        .map(userMapping::getUserDTOFromUser)
                         .collect(Collectors.toList());
 
                 return ResponseEntity.ok(clientDTOs);

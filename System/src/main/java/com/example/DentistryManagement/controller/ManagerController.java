@@ -9,7 +9,6 @@ import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +37,7 @@ public class ManagerController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentService appointmentService;
     private final UserMapping userMapping;
-    private final UserRepository userRepository;
+
 
     //----------------------------------- USER INFORMATION -----------------------------------
 

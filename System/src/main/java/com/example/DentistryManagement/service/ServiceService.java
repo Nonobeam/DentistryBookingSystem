@@ -5,8 +5,6 @@ import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ServiceService {
     private final ServiceRepository serviceRepository;
-    private static final Logger LOGGER = LogManager.getLogger(ServiceService.class);
     private final DentistScheduleRepository dentistScheduleRepository;
 
     public List<Services> findAllServices() {

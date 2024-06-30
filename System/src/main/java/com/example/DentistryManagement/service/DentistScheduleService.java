@@ -1,19 +1,19 @@
 package com.example.DentistryManagement.service;
 
-
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -80,7 +80,14 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(timeSlot, workDate, status, dentist);
     }
 
-    public List<DentistSchedule> findDentistScheduleByWorkDate(LocalDate date) {
-        return dentistScheduleRepository.findDentistScheduleByWorkDateAndAvailable(date, 1);
+    public List<DentistSchedule> findDentistScheduleByWorkDate(LocalDate date, int numDay, Staff staff) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(date, date.plusDays(numDay), 1,staff);
+
     }
+
+    public  List<DentistSchedule>  findDentistScheduleByWorkDateByDentist(LocalDate date,int numDay,Dentist dentist) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(date, date.plusDays(numDay), 1,dentist);
+
+    }
+
 }
