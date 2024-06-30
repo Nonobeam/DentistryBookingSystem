@@ -4,6 +4,7 @@ import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -18,5 +19,8 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
     Optional<List<DentistSchedule>> findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(TimeSlot timeSlot, LocalDate date, int available, Dentist dentist);
     List<DentistSchedule> findDentistSchedulesByClinicAndWorkDateAndAvailable(Clinic clinic, LocalDate workDate, int available);
     Boolean existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(String dentist_dentistID, TimeSlot timeslot, LocalDate workDate);
-    List<DentistSchedule> findDentistScheduleByWorkDateAndAvailable(LocalDate date, int available);
+    List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailable(LocalDate startDate,LocalDate endDate, int available);
+    List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(LocalDate startDate,LocalDate endDate, int available, Dentist dentist);
+
+    List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(LocalDate date, LocalDate localDate, int i, Staff staff);
 }

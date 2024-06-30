@@ -69,9 +69,14 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/dependentList")
-    public ResponseEntity<List<Dependent>> getAllDependentByCustomer() {
+    public ResponseEntity<?> getAllDependentByCustomer() {
         try {
             String mail = userService.mailExtract();
+            if (mail == null || mail.isEmpty()) {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
+                logger.error("Not found any customer ");
+                return ResponseEntity.status(204).body(error);
+            }
             List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
             return ResponseEntity.ok(dependentsList);
         } catch (Error error) {

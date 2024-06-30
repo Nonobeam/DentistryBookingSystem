@@ -4,6 +4,7 @@ import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class TimeTableResponseDTO {
     private String id;
     private LocalDate date;
@@ -20,6 +22,7 @@ public class TimeTableResponseDTO {
     private String dentistName;
     private String customerName;
     private String serviceName;
+    private int status;
 
     public List<TimeTableResponseDTO> getTimeTableResponseDTOList(List<DentistSchedule> dentistSchedules, List<Appointment> appointments) {
         List<TimeTableResponseDTO> timeTableResponseDTOList = new ArrayList<>();
@@ -48,6 +51,7 @@ public class TimeTableResponseDTO {
             timeTableResponseDTO.setDentistName(dentistSchedule.getDentist().getUser().getName());
             timeTableResponseDTO.setCustomerName(null);
             timeTableResponseDTO.setServiceName(null);
+            timeTableResponseDTO.setStatus(1);
         }
 
         return timeTableResponseDTO;
@@ -64,6 +68,7 @@ public class TimeTableResponseDTO {
             timeTableResponseDTO.setDentistName(appointment.getDentist().getUser().getName());
             timeTableResponseDTO.setCustomerName(appointment.getUser().getName());
             timeTableResponseDTO.setServiceName(appointment.getServices().getName());
+            timeTableResponseDTO.setStatus(appointment.getStatus());
         }
 
         return timeTableResponseDTO;

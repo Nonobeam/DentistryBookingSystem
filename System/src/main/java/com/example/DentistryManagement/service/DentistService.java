@@ -60,5 +60,13 @@ public class DentistService {
             throw error;
         }
     }
+
+    public Dentist findDentistByMail(String s) {
+        try {
+            return dentistRepository.findDentistByUserMail(s);
+        } catch (Error error) {
+            throw error;
+        }
+    }
 }
        

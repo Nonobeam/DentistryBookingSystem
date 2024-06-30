@@ -1,6 +1,8 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
+import com.example.DentistryManagement.DTO.TimeTableResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
@@ -44,7 +46,7 @@ public class AppointmentService {
         }
     }
 
-    public Optional<List<Appointment>> customerAppointmentfollowdentist(String cusid, String dentist) {
+    public List<Appointment> customerAppointmentfollowdentist(String cusid, String dentist) {
         try {
             return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(cusid, dentist);
         } catch (DataAccessException e) {
@@ -106,34 +108,10 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> findAppointmentsByDate(LocalDate date) {
-        try {
-            return appointmentRepository.findAppointmentsByDateAndStatus(date, 1);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client userId, int status) {
         try {
             return appointmentRepository.findAppointmentsByUserAndStatus(userId, status);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Appointment> getAppointmentsForWeek(LocalDate startOfWeek, LocalDate endOfWeek, Dentist dentist) {
-        try {
-            List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetween(startOfWeek, endOfWeek);
-            List<Appointment> filterAppointments = new ArrayList<>();
-            for (Appointment appointment : appointments) {
-                if (appointment.getDentist() == dentist) {
-                    if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
-                        filterAppointments.add(appointment);
-                    }
-                }
-            }
-            return filterAppointments;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -276,7 +254,7 @@ public class AppointmentService {
         for (Appointment appointment : appointments) {
             Clinic clinic = appointment.getClinic();
             ClinicDTO clinicDTO = new ClinicDTO().clinicMapping(clinic);
-            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName()+ " Address "+ clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
+            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + " Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
         }
 
         return appointmentsByClinic;
@@ -351,11 +329,64 @@ public class AppointmentService {
         return appointmentRepository.countAppointmentsByYearPresentByManager(LocalDate.now().getYear(), manager);
     }
 
-    public Appointment save (Appointment appointment) {
+    public Appointment save(Appointment appointment) {
         return appointmentRepository.save(appointment);
     }
 
     public List<Appointment> findAppointmentsByDateAndStatus(LocalDate workDate, int status) {
         return appointmentRepository.findAppointmentsByDateAndStatus(workDate, status);
     }
+
+    public List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate, Staff staff) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaff(startDate, endDate, staff);
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == 0) {
+                appointments.remove(appointment);
+            }
+        }
+        return appointments;
+    }
+
+    public List<Appointment> findAppointmentsByDateBetweenDentist(LocalDate startDate, LocalDate endDate, Dentist dentist) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentist(startDate, endDate, dentist);
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == 0) {
+                appointments.remove(appointment);
+            }
+        }
+        return appointments;
+    }
+
+    public List<AppointmentDTO> appointmentDTOList(List<Appointment> appointmentList) {
+        List<AppointmentDTO> appointmentDTOList;
+        appointmentDTOList = appointmentList.stream()
+                .map(appointmentEntity -> {
+                    AppointmentDTO appointment = new AppointmentDTO();
+                    appointment.setAppointmentId(appointmentEntity.getAppointmentID());
+                    appointment.setServices(appointmentEntity.getServices().getName());
+                    appointment.setStatus(appointmentEntity.getStatus());
+                    appointment.setDate(appointmentEntity.getDate());
+                    appointment.setDentist(appointmentEntity.getDentist().getUser().getName());
+                    appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                    if (appointmentEntity.getStaff() != null) {
+                        if (appointmentEntity.getUser() != null) {
+                            appointment.setUser(appointmentEntity.getUser().getName());
+                        } else {
+                            appointment.setDependent(appointmentEntity.getDependent().getName());
+                        }
+                        appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
+                    } else {
+                        if (appointmentEntity.getDependent() != null) {
+                            appointment.setDependent(appointmentEntity.getDependent().getName());
+                        } else
+                            appointment.setUser(appointmentEntity.getUser().getName());
+                    }
+
+                    return appointment;
+                })
+                .toList();
+        return appointmentDTOList;
+    }
+
+
 }
