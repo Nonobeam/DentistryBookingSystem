@@ -30,7 +30,6 @@ public class UserMapping {
         client.setName(adminDTO.getName());
         client.setPhone(adminDTO.getPhone());
         client.setMail(adminDTO.getMail());
-        client.setPassword(client.getPassword() != null ? client.getPassword() : "");
         client.setBirthday(adminDTO.getBirthday());
         client.setStatus(adminDTO.getStatus());
         return client;

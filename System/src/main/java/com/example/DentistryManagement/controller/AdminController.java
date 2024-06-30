@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AdminDTO;
+import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
@@ -38,7 +39,6 @@ public class AdminController {
         adminDTO.setPhone(client.getPhone());
         adminDTO.setMail(client.getMail());
         adminDTO.setBirthday(client.getBirthday());
-        adminDTO.setPassword(client.getPassword());
         adminDTO.setStatus(client.getStatus());
         if (client.getRole() == Role.DENTIST) {
             Dentist dentist = userService.findDentistByMail(client.getMail());
@@ -152,10 +152,10 @@ public class AdminController {
 
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody AdminDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
         try {
             if (userService.isPresentUser(id).isPresent()) {
-                Client client = userMapping.mapUserForAdmin(updatedUser);
+                Client client = userMapping.mapUser(updatedUser);
                 userService.updateUser(client);
                 return ResponseEntity.ok(client);
             } else {
@@ -177,22 +177,15 @@ public class AdminController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-            if (userService.isPresentUser(id).isPresent()) {
-                Optional<Client> c = userService.isPresentUser(id);
-                if (c.isPresent()) {
-                    Client client = c.get();
-                    userService.updateUserStatus(client, 0);
-                    return ResponseEntity.ok().build();
-                } else {
-                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-                    logger.error("User not found");
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-                }
-
+            Optional<Client> optionalClient = userService.isPresentUser(id);
+            if (optionalClient.isPresent()) {
+                Client client = optionalClient.get();
+                userService.updateUserStatus(client, 0);
+                return ResponseEntity.ok("Delete user successfully");
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
-                logger.error("User could not be deleted");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                logger.error("User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
 
         } catch (Exception e) {

@@ -53,9 +53,9 @@ public class ManagerController {
 
     @Operation(summary = "User update their profile")
     @GetMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            userService.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -124,23 +124,17 @@ public class ManagerController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-            if (userService.isPresentUser(id).isPresent()) {
-                Optional<Client> c = userService.isPresentUser(id);
-                if (c.isPresent()) {
-                    Client client = c.get();
-                    userService.updateUserStatus(client, 0);
-                    return ResponseEntity.ok().build();
-                } else {
-                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-                    logger.error("User not found");
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-                }
-
+            Optional<Client> optionalClient = userService.isPresentUser(id);
+            if (optionalClient.isPresent()) {
+                Client client = optionalClient.get();
+                userService.updateUserStatus(client, 0);
+                return ResponseEntity.ok("Delete user successfully");
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
-                logger.error("User could not be deleted");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                logger.error("User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
+
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -223,7 +217,6 @@ public class ManagerController {
                             clientDTO.setBirthday(client.getBirthday());
                             clientDTO.setId(client.getUserID());
                             clientDTO.setStatus(client.getStatus());
-                            clientDTO.setPassword(client.getPassword());
                             clientDTO.setClinicName(client.getDentist().getClinic().getName());
                             return clientDTO;
                         })
@@ -254,7 +247,6 @@ public class ManagerController {
                             clientDTO.setBirthday(client.getBirthday());
                             clientDTO.setId(client.getUserID());
                             clientDTO.setStatus(client.getStatus());
-                            clientDTO.setPassword(client.getPassword());
                             clientDTO.setClinicName(client.getStaff().getClinic().getName());
                             return clientDTO;
                         })
@@ -300,7 +292,6 @@ public class ManagerController {
                             clientDTO.setBirthday(client.getUser().getBirthday());
                             clientDTO.setId(client.getUser().getUserID());
                             clientDTO.setStatus(client.getUser().getStatus());
-                            clientDTO.setPassword(client.getUser().getPassword());
                             clientDTO.setClinicName(client.getStaff().getClinic().getName());
                             return clientDTO;
                         })
