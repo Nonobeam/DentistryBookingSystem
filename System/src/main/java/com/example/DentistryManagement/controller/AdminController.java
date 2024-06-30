@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AdminDTO;
+import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
@@ -152,10 +153,15 @@ public class AdminController {
 
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody AdminDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
         try {
             if (userService.isPresentUser(id).isPresent()) {
-                Client client = userMapping.mapUserForAdmin(updatedUser);
+                Client client = userService.findUserById(id);
+                client.setName(updatedUser.getName());
+                if (userService.existsByPhoneOrMail(updatedUser.getPhone(), updatedUser.getMail())) {
+                    client.setPhone(updatedUser.getPhone());
+                }
+                client.setBirthday(updatedUser.getBirthday());
                 userService.updateUser(client);
                 return ResponseEntity.ok(client);
             } else {
