@@ -4,7 +4,6 @@ import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.UserService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,15 +23,16 @@ public class UserMapping {
         client.setBirthday(userDTO.getBirthday());
         return client;
     }
-
-    public Client mapUserForAdmin(AdminDTO adminDTO) {
-        Client client = new Client();
-        client.setName(adminDTO.getName());
-        client.setPhone(adminDTO.getPhone());
-        client.setMail(adminDTO.getMail());
-        client.setBirthday(adminDTO.getBirthday());
-        client.setStatus(adminDTO.getStatus());
-        return client;
+    public AdminDTO getUserDTOFromUser(Client user) {
+        AdminDTO userDTO = new AdminDTO();
+        if (user != null) {
+            userDTO.setName(user.getName() != null ? user.getName() : "");
+            userDTO.setPhone(user.getPhone() != null ? user.getPhone() : "");
+            userDTO.setMail(user.getMail() != null ? user.getMail() : "");
+            userDTO.setBirthday(user.getBirthday());
+            userDTO.setStatus(user.getStatus());
+            userDTO.setId(user.getUserID());
+        }
+        return userDTO;
     }
-
 }

@@ -135,7 +135,7 @@ public class DentistController {
             userDTO.setMail(client.getMail());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userDTO.setBirthday(client.getBirthday());
-            List<Appointment> appointmentList = appointmentService.customerAppointmentfollowdentist(client.getUserID(), userService.mailExtract());
+            List<Appointment> appointmentList = appointmentService.customerAppointmentFollowDentist(client.getUserID(), userService.mailExtract());
             if (!appointmentList.isEmpty()) {
                 List<AppointmentDTO> appointmentDtoList = appointmentService.appointmentDTOList(appointmentList);
                 userAppointDTO.setAppointment(appointmentDtoList);
@@ -151,8 +151,7 @@ public class DentistController {
 
     @Operation(summary = "Dentist")
     @GetMapping("/weekSchedule/{startDate}")
-    public Object getAppointmentsForDate(
-            @PathVariable LocalDate startDate, @RequestParam int numDay) {
+    public Object getAppointmentsForDate(@PathVariable LocalDate startDate, @RequestParam int numDay) {
         try {
             Dentist dentist = dentistService.findDentistByMail(userService.mailExtract());
             Map<LocalDate, List<TimeTableResponseDTO>> timeTableResponseMap = new HashMap<>();
@@ -178,11 +177,11 @@ public class DentistController {
 
     @Operation(summary = "Dentist")
 
-    @GetMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<?> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
+    @GetMapping("/appointment-history/{appointmentId}")
+    public ResponseEntity<?> setAppointmentStatus(@RequestParam int status, @PathVariable String appointmentId) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
             return ResponseEntity.ok(appointment);

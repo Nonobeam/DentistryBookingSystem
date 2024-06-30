@@ -294,8 +294,8 @@ public class StaffController {
                     return ResponseEntity.ok(new ArrayList<>());
                 } else return ResponseEntity.ok(dependentsList);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
-                logger.error("Not found any customer ");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
+                logger.error("Not found any customer user ");
                 return ResponseEntity.status(204).body(error);
             }
         } catch (Error error) {
@@ -486,8 +486,8 @@ public class StaffController {
                 return ResponseEntity.ok("Booking successfully");
 
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
-                logger.error("Customer not found");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
+                logger.error("Customer not found in system");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
 
@@ -516,8 +516,8 @@ public class StaffController {
             appointmentService.save(appointment);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
-            logger.error("Customer not found");
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
+            logger.error("Customer not found in stem");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -527,8 +527,8 @@ public class StaffController {
     }
 
     @Operation(summary = "Staff")
-    @PatchMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentid") String appointmentId, @RequestParam("status") int status) {
+    @PatchMapping("/appointment-history/{appointmentId}")
+    public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentId") String appointmentId, @RequestParam("status") int status) {
 
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);
@@ -565,13 +565,14 @@ public class StaffController {
 
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) int year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-
+            if (date == null) date = LocalDate.now();
+            if (year == -1) year = LocalDate.now().getYear();
             Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);

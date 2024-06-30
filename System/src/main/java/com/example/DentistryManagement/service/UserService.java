@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.*;
@@ -47,11 +48,6 @@ public class UserService {
 
 
     //----------------------------------- ALL USERS -----------------------------------
-
-
-    public List<Client> findAllUsers() {
-        return userRepository.findAll();
-    }
 
     public List<Client> findAllDentist() {
         try {
@@ -120,15 +116,6 @@ public class UserService {
             throw new RuntimeException("Error occurred while fetching customer list in clinic: " + e.getMessage(), e);
         }
     }
-
-    public Client userInfo(String id) {
-        try {
-            return userRepository.findByUserID(id);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching user information: " + e.getMessage(), e);
-        }
-    }
-
 
     public List<Client> findAllCustomer() {
         try {
@@ -211,8 +198,7 @@ public class UserService {
 
     public List<Client> findAllDentistByManager(String mail) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.getDentisByManager(Role.DENTIST, mail);
+            return userRepository.getDentistByManager(Role.DENTIST, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -296,18 +282,18 @@ public class UserService {
         }
     }
 
-    public Client updateUser(Client newClient) {
+    public void updateUser(Client newClient) {
         try {
-            return userRepository.save(newClient);
+            userRepository.save(newClient);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
     }
 
-    public Optional<Client> updateUserStatus(Client client, int status) {
+    public void updateUserStatus(Client client, int status) {
         try {
             client.setStatus(status);
-            return Optional.of(userRepository.save(client));
+            userRepository.save(client);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
@@ -345,5 +331,25 @@ public class UserService {
 
     public Client save(Client client) {
         return userRepository.save(client);
+    }
+
+
+    public AdminDTO convertToAdminDTO(Client client) {
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setId(client.getUserID());
+        adminDTO.setName(client.getName());
+        adminDTO.setPhone(client.getPhone());
+        adminDTO.setMail(client.getMail());
+        adminDTO.setBirthday(client.getBirthday());
+        adminDTO.setStatus(client.getStatus());
+        if (client.getRole() == Role.DENTIST) {
+            Dentist dentist = findDentistByMail(client.getMail());
+            adminDTO.setClinicName(dentist.getClinic().getName());
+        } else if (client.getRole() == Role.STAFF) {
+            Staff staff = findStaffByMail(client.getMail());
+            if (staff.getClinic() != null)
+                adminDTO.setClinicName(staff.getClinic().getName());
+        }
+        return adminDTO;
     }
 }

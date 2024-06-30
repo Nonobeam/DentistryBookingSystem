@@ -1,11 +1,6 @@
 package com.example.DentistryManagement.DTO;
 
-import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
 import lombok.*;
-
-import java.util.List;
 import java.util.Map;
 
 @Getter

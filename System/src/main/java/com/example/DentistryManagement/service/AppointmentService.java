@@ -2,7 +2,6 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
-import com.example.DentistryManagement.DTO.TimeTableResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
@@ -13,42 +12,39 @@ import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
-    private final UserRepository userRepository;
 
-    public List<Appointment> findAppointmentInClinic(String staffmail) {
+    public List<Appointment> findAppointmentInClinic(String staffMail) {
         try {
-            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
+            Staff staff = staffRepository.findStaffByUserMail(staffMail);
 
-            Clinic clinic = staffclient.getClinic();
+            Clinic clinic = staff.getClinic();
             return appointmentRepository.findAppointmentByClinic(clinic);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by clinic: " + e.getMessage(), e);
         }
     }
 
-    public List<Appointment> customerAppointment(String cusid, String staffmail) {
+    public List<Appointment> customerAppointment(String customerId, String staffMail) {
         try {
-            Staff staffclient = staffRepository.findStaffByUserMail(staffmail);
-            Clinic clinic = staffclient.getClinic();
-            return appointmentRepository.findAppointmentByUser_UserIDAndClinic(cusid, clinic);
+            Staff staff = staffRepository.findStaffByUserMail(staffMail);
+            Clinic clinic = staff.getClinic();
+            return appointmentRepository.findAppointmentByUser_UserIDAndClinic(customerId, clinic);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
     }
 
-    public List<Appointment> customerAppointmentfollowdentist(String cusid, String dentist) {
+    public List<Appointment> customerAppointmentFollowDentist(String customerId, String dentist) {
         try {
-            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(cusid, dentist);
+            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(customerId, dentist);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
@@ -117,9 +113,9 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffmail) {
+    public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffMail) {
         try {
-            Staff staffClient = staffRepository.findStaffByUserMail(staffmail);
+            Staff staffClient = staffRepository.findStaffByUserMail(staffMail);
             List<Appointment> appointments = appointmentRepository.findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
             for (Appointment appointment : appointments) {
@@ -143,32 +139,6 @@ public class AppointmentService {
                 }
             }
             return filterAppointments;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Appointment> searchAppointmentByCustomer(LocalDate date, String name) {
-        try {
-            return appointmentRepository.searchAppointmentByDateAndUser_NameOrDependent_Name(date, name, name);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Optional<List<Appointment>> findAllAppointmentByCustomer(String mail) {
-        try {
-            Client client = userRepository.findUserByMail(mail);
-
-            return appointmentRepository.findAppointmentsByUser(client);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Appointment updateAppointment(Appointment appointment) {
-        try {
-            return appointmentRepository.save(appointment);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -213,7 +183,6 @@ public class AppointmentService {
                 .stream()
                 .filter(appointment -> appointment.getStatus() == 1 || appointment.getStatus() == 2)
                 .toList();
-        //số lượng cuộc hẹn cho từng nha sĩ
         appointments.forEach(appointment -> {
             LocalDate appointmentDate = appointment.getDate();
             int dayOfMonth = appointmentDate.getDayOfMonth();
@@ -224,7 +193,6 @@ public class AppointmentService {
         return monthlyAppointmentCounts;
     }
 
-    // Lấy số lượng cuộc hẹn của cac dentist thuoc staff trong cả năm
     public Map<Integer, Long> getAppointmentsByStaffForYear(Staff staff, int year) {
         Map<Integer, Long> yearlyAppointmentCounts = new HashMap<>();
 
@@ -234,7 +202,6 @@ public class AppointmentService {
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
             Map<Integer, Long> monthlyCounts = getMonthlyAppointmentsByDentist(startDate, endDate, staff);
 
-            // Tổng hợp số lượng cuộc hẹn trong tháng vào tổng số lượng của năm
             monthlyCounts.forEach((key, value) -> yearlyAppointmentCounts.merge(currentMonth, value, Long::sum));
         }
 
@@ -316,10 +283,6 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
-    public List<Appointment> getAppointmentsByDate(LocalDate date) {
-        return appointmentRepository.findAppointmentsByDateAndStatus(date, 1);
-    }
-
     public int totalAppointmentsInMonthByManager(Client manager) {
 
         return appointmentRepository.countAppointmentsByMonthPresentByManager(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), manager);
@@ -339,21 +302,13 @@ public class AppointmentService {
 
     public List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate, Staff staff) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaff(startDate, endDate, staff);
-        for (Appointment appointment : appointments) {
-            if (appointment.getStatus() == 0) {
-                appointments.remove(appointment);
-            }
-        }
+        appointments.removeIf(appointment -> appointment.getStatus() == 0);
         return appointments;
     }
 
     public List<Appointment> findAppointmentsByDateBetweenDentist(LocalDate startDate, LocalDate endDate, Dentist dentist) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentist(startDate, endDate, dentist);
-        for (Appointment appointment : appointments) {
-            if (appointment.getStatus() == 0) {
-                appointments.remove(appointment);
-            }
-        }
+        appointments.removeIf(appointment -> appointment.getStatus() == 0);
         return appointments;
     }
 

@@ -15,8 +15,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findByUserID(String id);
 
-    Client findByUserIDAndRole(String id, Role role);
-
     Optional<Client> findByMail(String mail);
 
     Optional<List<Client>> findClientsByRoleAndStatus(Role role, int status);
@@ -27,16 +25,16 @@ public interface UserRepository extends JpaRepository<Client, String> {
     Client findClientsByUserID(String userId);
 
 
-    List<Client> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffmail);
+    List<Client> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffMail);
 
-    //boss/adminlist
+    //boss/adminList
     List<Client> getClientsByRole(Role role);
 
 
-    //Managerlist
+    //managerList
     @Query("SELECT c FROM Client c , Dentist d " +
             "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
-    List<Client> getDentisByManager(@Param("roleParam") Role role, String managerMail);
+    List<Client> getDentistByManager(@Param("roleParam") Role role, String managerMail);
 
     @Query("SELECT c FROM Client c , Staff d " +
             "WHERE c.role = :roleParam AND c.staff.user.userID = d.staffID and d.clinic.user.mail = :managerMail ")

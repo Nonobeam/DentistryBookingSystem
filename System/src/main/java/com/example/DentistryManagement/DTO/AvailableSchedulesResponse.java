@@ -1,6 +1,5 @@
 package com.example.DentistryManagement.DTO;
 
-import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import lombok.Getter;
 import lombok.Setter;
 
