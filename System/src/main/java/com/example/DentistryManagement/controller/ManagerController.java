@@ -106,8 +106,8 @@ public class ManagerController {
     @PutMapping("/editWorker")
     public ResponseEntity<?> editUser(@RequestBody UserDTO userDTO) {
         if (userService.isPresentUser(userDTO.getId()).isPresent()) {
-            Client updatedUser = userMapping.mapUser(userDTO);
-            userService.updateUser(updatedUser);
+            Client updatedUser = userService.findUserById(userDTO.getId());
+            userService.updateUser(userDTO, updatedUser);
             return ResponseEntity.ok(updatedUser);
         } else {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");

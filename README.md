@@ -11,10 +11,16 @@ The Dentistry Booking System is a comprehensive platform designed to streamline 
 
 ## Key Tech Apply
 - **Nginx:** Reverse proxy, load balancing
-- **Redis:** Cache buffer database, singlethread query
+- **Cache:** Redis cache buffer database, singlethread query
 - **GCP:** Hosting
 - **Docker:** Running
 - **JWT:** Security (hs256, Base64)
+
+## Architecture
+- **3 LAYERS**
+- **Builder Pattern**
+- **Repository Pattern**
+- **RESTful API**
 
 ## Links
 - **SRS (Software Requirement Specification):** [SRS Document](https://docs.google.com/document/d/1-woQEySvFkJJ0rmm1Cmxhae86M1NNkhjnNEuN7u8aA4/edit?fbclid=IwAR2SaQ50oZuIRd5BgTc7FbD5_yG3FheTy1XL4ngi1sNnOGhl9CWxLJNXj3k)

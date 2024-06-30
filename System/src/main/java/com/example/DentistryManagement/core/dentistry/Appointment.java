@@ -58,6 +58,4 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "clinicID", nullable = false, referencedColumnName = "clinicID")
     private Clinic clinic;
-
-
 }
