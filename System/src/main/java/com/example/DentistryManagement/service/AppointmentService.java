@@ -3,6 +3,7 @@ package com.example.DentistryManagement.service;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
@@ -20,6 +21,7 @@ import java.util.*;
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
+    private final UserMapping userMapping;
 
     public List<Appointment> findAppointmentInClinic(String staffMail) {
         try {
@@ -167,7 +169,7 @@ public class AppointmentService {
         for (Appointment appointment : appointmentsBase) {
             if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
                 Client dentist = appointment.getDentist().getUser();
-                UserDTO dentistDTO = new UserDTO().getUserDTOFromUser(dentist);
+                UserDTO dentistDTO = userMapping.getUserDTOFromUser(dentist);
                 appointmentsByDentist.put("ID: " + dentistDTO.getId() + ",Name: " + dentistDTO.getName(), appointmentsByDentist.getOrDefault("ID: " + dentistDTO.getId() + ",Name: " + dentistDTO.getName(), 0) + 1);
             }
         }

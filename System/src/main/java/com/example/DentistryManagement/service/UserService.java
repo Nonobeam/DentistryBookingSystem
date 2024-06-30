@@ -1,6 +1,5 @@
 package com.example.DentistryManagement.service;
 
-import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.*;
@@ -334,22 +333,5 @@ public class UserService {
     }
 
 
-    public AdminDTO convertToAdminDTO(Client client) {
-        AdminDTO adminDTO = new AdminDTO();
-        adminDTO.setId(client.getUserID());
-        adminDTO.setName(client.getName());
-        adminDTO.setPhone(client.getPhone());
-        adminDTO.setMail(client.getMail());
-        adminDTO.setBirthday(client.getBirthday());
-        adminDTO.setStatus(client.getStatus());
-        if (client.getRole() == Role.DENTIST) {
-            Dentist dentist = findDentistByMail(client.getMail());
-            adminDTO.setClinicName(dentist.getClinic().getName());
-        } else if (client.getRole() == Role.STAFF) {
-            Staff staff = findStaffByMail(client.getMail());
-            if (staff.getClinic() != null)
-                adminDTO.setClinicName(staff.getClinic().getName());
-        }
-        return adminDTO;
-    }
+
 }
