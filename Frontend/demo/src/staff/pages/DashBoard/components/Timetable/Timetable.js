@@ -7,7 +7,7 @@ import { CardTask } from './Card/CardTask';
 const taskTime = [
   { time: '8:00', date: '10/10/2021', task: 'Task 1' },
   { time: '10:00', date: '10/10/2021', task: 'Task 2' },
-  { time: '12:00', date: '10/10/2021', task: 'Task 3' },
+  { time: '12:00', date: '29/05/2021', task: 'Task 3' },
   { time: '14:00', date: '28/05/2024', task: 'Task 4' },
   { time: '16:00', date: '26/05/2024', task: 'Task 5' },
   { time: '18:31', date: '30/05/2024', task: 'Task 6' },

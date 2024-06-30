@@ -4,11 +4,12 @@ import { ChartDailyAppointment } from './ChartDailyAppointment/ChartDailyAppoint
 import { ChartMonthly } from './ChartMonthly/ChartMonthly';
 import { DashBoardServices } from '../../../../services/DashBoardServices/DashBoardServices';
 const data = {
-  date: '2024-06-19',
+  date: 'new Date().toISOString().slice(0, 10)',
   year: new Date().getFullYear(),
 };
 
 export const CarDash = () => {
+  console.log(data);
   const [dashboardData, setDashboardData] = useState({});
   useEffect(() => {
     const fetchData = async () => {
