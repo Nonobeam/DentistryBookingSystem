@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
@@ -45,6 +46,7 @@ public class StaffController {
     private final DentistRepository dentistRepository;
     private final TimeSlotService timeSlotService;
     private final StaffService staffService;
+    private final UserMapping userMapping;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -53,8 +55,7 @@ public class StaffController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
@@ -202,10 +203,8 @@ public class StaffController {
                         .map(client -> {
                             UserDTO clientDTO = new UserDTO();
                             clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
-                            clientDTO.setBirthday(client.getBirthday());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());

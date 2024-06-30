@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
@@ -38,6 +39,7 @@ public class DentistController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final UserRepository userRepository;
     private final DentistScheduleService dentistScheduleService;
+    private final UserMapping userMapping;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -46,13 +48,12 @@ public class DentistController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @PutMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {

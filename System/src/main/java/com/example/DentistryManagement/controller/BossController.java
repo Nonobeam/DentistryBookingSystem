@@ -1,6 +1,5 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.DashboardBoss;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
@@ -52,15 +51,14 @@ public class BossController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @GetMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -86,7 +84,7 @@ public class BossController {
         try {
             List<Client> allManager = userService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
-                List<AdminDTO> clientDTOs = allManager.stream()
+                List<UserDTO> clientDTOs = allManager.stream()
                         .map(userMapping::getUserDTOFromUser)
                         .collect(Collectors.toList());
 

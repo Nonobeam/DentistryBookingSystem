@@ -4,6 +4,7 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
@@ -40,6 +41,7 @@ public class UserController {
     private final AppointmentRepository appointmentRepository;
     private final Logger logger = LogManager.getLogger(UserController.class);
     private final ServiceService serviceService;
+    private final UserMapping userMapping;
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
 
@@ -54,8 +56,7 @@ public class UserController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
 
@@ -299,7 +300,7 @@ public class UserController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

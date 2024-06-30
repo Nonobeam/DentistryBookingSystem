@@ -46,15 +46,14 @@ public class ManagerController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @GetMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -207,21 +206,11 @@ public class ManagerController {
             String mail = userService.mailExtract();
             List<Client> dentists = userService.findAllDentistByManager(mail);
             if (dentists != null && !dentists.isEmpty()) {
-                List<AdminDTO> clientDTOs = dentists.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            clientDTO.setClinicName(client.getDentist().getClinic().getName());
-                            return clientDTO;
-                        })
+                List<DentistResponseDTO> dentistList = dentists.stream()
+                        .map(userMapping::convertToDentistDTO)
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(dentistList);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any dentist");
         } catch (Error error) {
@@ -237,21 +226,10 @@ public class ManagerController {
             String mail = userService.mailExtract();
             List<Client> staffList = userService.findAllStaffByManager(mail);
             if (staffList != null && !staffList.isEmpty()) {
-                List<AdminDTO> clientDTOs = staffList.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            clientDTO.setClinicName(client.getStaff().getClinic().getName());
-                            return clientDTO;
-                        })
+                List<StaffResponseDTO> staffDTOList = staffList.stream()
+                        .map(userMapping::convertToStaffDTO)
                         .collect(Collectors.toList());
-
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(staffDTOList);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any staff");
         } catch (Error error) {
@@ -282,9 +260,9 @@ public class ManagerController {
             staff = staffService.findStaffById(staffID);
             dentists = dentistService.findDentistByStaff(staff);
             if (dentists != null && !dentists.isEmpty()) {
-                List<AdminDTO> clientDTOs = dentists.stream()
+                List<DentistResponseDTO> clientDTOs = dentists.stream()
                         .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
+                            DentistResponseDTO clientDTO = new DentistResponseDTO();
                             clientDTO.setName(client.getUser().getName());
                             clientDTO.setPhone(client.getUser().getPhone());
                             clientDTO.setMail(client.getUser().getMail());

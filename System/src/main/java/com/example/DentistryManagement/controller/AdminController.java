@@ -1,7 +1,9 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.AdminDTO;
+import com.example.DentistryManagement.DTO.DentistResponseDTO;
+import com.example.DentistryManagement.DTO.StaffResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.UserService;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class AdminController {
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final UserMapping userMapping;
 
 
     @Operation(summary = "Admin")
@@ -39,11 +42,11 @@ public class AdminController {
             } else {
                 userList = userService.findAllDentist();
             }
-            List<AdminDTO> adminDTOList = userList.stream()
-                    .map(userService::convertToAdminDTO)
+            List<DentistResponseDTO> dentistList = userList.stream()
+                    .map(userMapping::convertToDentistDTO)
                     .collect(Collectors.toList());
-            if (!adminDTOList.isEmpty()) {
-                return ResponseEntity.ok(adminDTOList);
+            if (!dentistList.isEmpty()) {
+                return ResponseEntity.ok(dentistList);
             } else return ResponseEntity.ok("Not found any dentist user  ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -63,11 +66,11 @@ public class AdminController {
             } else {
                 userList = userService.findAllManager();
             }
-            List<AdminDTO> adminDTOList = userList.stream()
-                    .map(userService::convertToAdminDTO)
+            List<UserDTO> managerList = userList.stream()
+                    .map(userMapping::getUserDTOFromUser)
                     .collect(Collectors.toList());
-            if (!adminDTOList.isEmpty()) {
-                return ResponseEntity.ok(adminDTOList);
+            if (!managerList.isEmpty()) {
+                return ResponseEntity.ok(managerList);
             } else
                 return ResponseEntity.ok("Not found any manager user  ");
 
@@ -90,11 +93,11 @@ public class AdminController {
             } else {
                 userList = userService.findAllStaff();
             }
-            List<AdminDTO> adminDTOList = userList.stream()
-                    .map(userService::convertToAdminDTO)
+            List<StaffResponseDTO> staffDTOList = userList.stream()
+                    .map(userMapping::convertToStaffDTO)
                     .collect(Collectors.toList());
-            if (!adminDTOList.isEmpty()) {
-                return ResponseEntity.ok(adminDTOList);
+            if (!staffDTOList.isEmpty()) {
+                return ResponseEntity.ok(staffDTOList);
             } else return ResponseEntity.ok("Not found any staff user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Staff user not found");
@@ -114,11 +117,11 @@ public class AdminController {
             } else {
                 userList = userService.findAllCustomer();
             }
-            List<AdminDTO> adminDTOList = userList.stream()
-                    .map(userService::convertToAdminDTO)
+            List<UserDTO> userDTOList = userList.stream()
+                    .map(userMapping::getUserDTOFromUser)
                     .collect(Collectors.toList());
-            if (!adminDTOList.isEmpty()) {
-                return ResponseEntity.ok(adminDTOList);
+            if (!userDTOList.isEmpty()) {
+                return ResponseEntity.ok(userDTOList);
             } else return ResponseEntity.ok("Not found any customer user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
