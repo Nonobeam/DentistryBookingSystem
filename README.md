@@ -9,13 +9,22 @@ The Dentistry Booking System is a comprehensive platform designed to streamline 
 - **Staff Management:** Facilitates the management of staff schedules, appointment history, and customer information.
 - **Dashboard and Statistics:** Provides various statistics and reports for staff and management to monitor service usage and customer visits.
 
+## Key Tech Apply
+- **Nginx:** Reverse proxy, load balancing
+- **Redis:** Cache buffer database, singlethread query
+- **GCP:** Hosting
+- **Docker:** Running
+- **JWT:** Security (hs256, Base64)
+
 ## Links
 - **SRS (Software Requirement Specification):** [SRS Document](https://docs.google.com/document/d/1-woQEySvFkJJ0rmm1Cmxhae86M1NNkhjnNEuN7u8aA4/edit?fbclid=IwAR2SaQ50oZuIRd5BgTc7FbD5_yG3FheTy1XL4ngi1sNnOGhl9CWxLJNXj3k)
 - **Diagram:** [System Diagram](https://app.diagrams.net/#G1-5mSVBvoR6uAEzkfXT2RGAQlZQ2oUZC8#%7B%22pageId%22%3A%22lsPBUERqXHNC8R6fdQQM%22%7D)
 - **Frontend (Vercel):** [Live Frontend](https://dentistry-booking-system-4jgo.vercel.app)
 
 ## In case you need your Docker image to run this project
-This below docker image is just for testing Backend in Swagger only, any private Date will not be included inside.
+This below docker image is just for testing Backend in Swagger and Frontend, any private Data will not be included inside.
+- **FE:** Port 3000
+- **BE:** Port 8080
 - **Docker:** [Docker]()
 ### Update
 The Docker image link will be updated soon...

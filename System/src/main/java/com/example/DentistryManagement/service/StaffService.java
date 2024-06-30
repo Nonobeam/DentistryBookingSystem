@@ -6,6 +6,8 @@ import com.example.DentistryManagement.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @Service
 @RequiredArgsConstructor
 public class StaffService {
@@ -32,9 +34,9 @@ public class StaffService {
     }
 
     public Clinic getClinicByStaff(Staff staff) {
-        try{
+        try {
             return staff.getClinic();
-        } catch(Error error) {
+        } catch (Error error) {
             throw error;
         }
     }

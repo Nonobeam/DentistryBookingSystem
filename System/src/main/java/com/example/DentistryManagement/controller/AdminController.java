@@ -1,7 +1,6 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AdminDTO;
-import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,8 +65,9 @@ public class AdminController {
             List<AdminDTO> adminDTOList = userList.stream()
                     .map(this::convertToAdminDTO)
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(adminDTOList);
+            if (!adminDTOList.isEmpty()) {
+                return ResponseEntity.ok(adminDTOList);
+            } else return ResponseEntity.ok("Not found any dentist user  ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
             logger.error("User not found");
@@ -90,8 +89,10 @@ public class AdminController {
             List<AdminDTO> adminDTOList = userList.stream()
                     .map(this::convertToAdminDTO)
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(adminDTOList);
+            if (!adminDTOList.isEmpty()) {
+                return ResponseEntity.ok(adminDTOList);
+            } else
+                return ResponseEntity.ok("Not found any manager user  ");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
@@ -115,8 +116,9 @@ public class AdminController {
             List<AdminDTO> adminDTOList = userList.stream()
                     .map(this::convertToAdminDTO)
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(adminDTOList);
+            if (!adminDTOList.isEmpty()) {
+                return ResponseEntity.ok(adminDTOList);
+            } else return ResponseEntity.ok("Not found any staff user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
             logger.error("User not found");
@@ -138,8 +140,9 @@ public class AdminController {
             List<AdminDTO> adminDTOList = userList.stream()
                     .map(this::convertToAdminDTO)
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(adminDTOList);
+            if (!adminDTOList.isEmpty()) {
+                return ResponseEntity.ok(adminDTOList);
+            } else return ResponseEntity.ok("Not found any customer user ");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");
@@ -169,8 +172,8 @@ public class AdminController {
         }
     }
 
-
-    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user")
+    @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 

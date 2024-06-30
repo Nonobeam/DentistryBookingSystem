@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,12 +55,16 @@ public class DentistController {
     }
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
-                userDTO.getUserDTOFromUser(user);
+                user.setMail(userDTO.getMail());
+                user.setName(userDTO.getName());
+                user.setPhone(userDTO.getPhone());
+                user.setBirthday(userDTO.getBirthday());
+                userService.updateUser(user);
             }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
@@ -108,7 +113,10 @@ public class DentistController {
                         .collect(Collectors.toList());
 
             }
-            return ResponseEntity.ok(applist);
+            if (!applist.isEmpty()) {
+                return ResponseEntity.ok(applist);
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment today");
+
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -136,7 +144,7 @@ public class DentistController {
                 insertedNotification = notificationService.insertNotification(notification);
 
             }
-            return ResponseEntity.ok("Sen notification successfully");
+            return ResponseEntity.ok(insertedNotification);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -145,11 +153,11 @@ public class DentistController {
     }
 
     @Operation(summary = "Dentist")
-    @GetMapping("/customer/{mail}")
-    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("mail") String customerMail) {
+    @GetMapping("/customer/{customerID}")
+    public ResponseEntity<?> findAllCustomerByDentist(@PathVariable("customerID") String customerID) {
         try {
             UserDTO userDTO = new UserDTO();
-            Client client = userService.findClientByMail(customerMail);
+            Client client = userService.findUserById(customerID);
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
@@ -201,7 +209,6 @@ public class DentistController {
             List<AppointmentDTO> appointmentDTOList = appointments.stream()
                     .map(appointmentEntity -> {
                         AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setAppointmentId(appointmentEntity.getAppointmentID());
                         appointment.setServices(appointmentEntity.getServices().getName());
                         appointment.setStatus(appointmentEntity.getStatus());
                         appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
@@ -220,12 +227,15 @@ public class DentistController {
                                 appointment.setUser(appointmentEntity.getUser().getName());
                             }
                         }
-
                         return appointment;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
 
-            return ResponseEntity.ok(appointmentDTOList);
+            Map<LocalDate, List<AppointmentDTO>> appointmentMapByDate = appointmentDTOList.stream()
+                    .collect(Collectors.groupingBy(AppointmentDTO::getDate));
+            if (!appointmentMapByDate.isEmpty()) {
+                return ResponseEntity.ok(appointmentMapByDate);
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any schedule this week ");
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -243,7 +253,7 @@ public class DentistController {
             Appointment appointment = appointmentService.findAppointmentById(appointmentid);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
-            return ResponseEntity.ok("Modify status successfully");
+            return ResponseEntity.ok(appointment);
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -259,7 +269,7 @@ public class DentistController {
         try {
             String mail = userService.mailExtract();
             Dentist dentist = userService.findDentistByMail(mail);
-            List<Appointment> appointmentList = null;
+            List<Appointment> appointmentList;
             if (date != null || (name != null && !name.isEmpty())) {
                 appointmentList = appointmentService.searchAppointmentByDentist(date, name, dentist);
             } else {
@@ -290,7 +300,10 @@ public class DentistController {
                         return appointment;
                     })
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(appointmentDTOList);
+            if (!appointmentDTOList.isEmpty()) {
+                return ResponseEntity.ok(appointmentDTOList);
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);

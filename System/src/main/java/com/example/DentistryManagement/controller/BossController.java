@@ -7,19 +7,15 @@ import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.ServiceRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/boss")
@@ -63,10 +60,7 @@ public class BossController {
     @GetMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
         try {
-            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
-            if (user != null) {
-                userDTO.getUserDTOFromUser(user);
-            }
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -139,6 +133,36 @@ public class BossController {
             logger.error("User could not be update");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 
+        }
+    }
+
+    @Operation(summary = "Delete user")
+    @DeleteMapping("/delete-user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        try {
+
+            if (userService.isPresentUser(id).isPresent()) {
+                Optional<Client> c = userService.isPresentUser(id);
+                if (c.isPresent()) {
+                    Client client = c.get();
+                    userService.updateUserStatus(client, 0);
+                    return ResponseEntity.ok().build();
+                } else {
+                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                    logger.error("User not found");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                }
+
+            } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
+                logger.error("User could not be deleted");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+            }
+
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
