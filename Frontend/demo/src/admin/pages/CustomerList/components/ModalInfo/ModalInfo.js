@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Modal, Input, Form, Avatar } from 'antd';
+import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
 const { TextArea } = Input;
 
@@ -10,9 +11,11 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
     setOpen(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Handle save logic here, like sending data to backend
     console.log(formData);
+    const response = await CustomerServices.updateCustomer(formData);
+    console.log(response);
     setOpen(false);
   };
 
@@ -44,22 +47,18 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
           </Form.Item>
           <Form.Item label='Date of Birth'>
             <Input
-              name='dateofbirth'
+              name='birthday'
               value={formData.birthday}
               onChange={handleChange}
             />
           </Form.Item>
+          <Form.Item label='mail'>
+            <Input name='mail' value={formData.mail} onChange={handleChange} />
+          </Form.Item>
           <Form.Item label='Phone'>
             <Input
-              name='gender'
-              value={formData.gender}
-              onChange={handleChange}
-            />
-          </Form.Item>
-          <Form.Item label='Class'>
-            <Input
-              name='class'
-              value={formData.class}
+              name='phone'
+              value={formData.phone}
               onChange={handleChange}
             />
           </Form.Item>

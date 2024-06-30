@@ -1,90 +1,104 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Table } from 'antd';
-// import './CarDash.css';
+import { Card, Col, Row, Button, DatePicker, Input } from 'antd';
 import { ChartDailyAppointment } from './ChartDailyAppointment/ChartDailyAppointment';
-import { dashboardData } from '../../../../utils/data';
 import { ChartMonthly } from './ChartMonthly/ChartMonthly';
 import { DashBoardServices } from '../../../../services/DashBoardServices/DashBoardServices';
-import { Chart, ArcElement, linear } from 'chart.js';
-import { CategoryScale } from 'chart.js';
+import moment from 'moment'; // Import moment for date formatting
 
 export const CarDash = () => {
-  // const [dashboardData, setDashboardData] = useState({});
+  const [dashboardData, setDashboardData] = useState({});
+  const [inputDate, setInputDate] = useState('');
+  const [inputYear, setInputYear] = useState('');
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await DashBoardServices.getAll();
-  //     setDashboardData(response);
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetchData(inputDate, inputYear); // Fetch data initially with default inputDate and inputYear
+  }, []);
+
+  const fetchData = async (date, year) => {
+    try {
+      const response = await DashBoardServices.getAll({ date, year });
+      console.log(response);
+      setDashboardData(response || {}); // Set dashboard data from API response
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  const handleDateChange = (date, dateString) => {
+    setInputDate(dateString); // Set inputDate when DatePicker value changes
+  };
+
+  const handleSearch = () => {
+    fetchData(inputDate, inputYear); // Call fetchData with current inputDate and inputYear
+  };
 
   const dailyAppointmentsData = {
-    labels: Object.keys(dashboardData.dailyAppointments),
+    labels: Object.keys(dashboardData.dailyAppointments || {}),
     datasets: [
       {
         label: 'Daily Appointments',
-        data: Object.values(dashboardData.dailyAppointments),
-        backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF',
-        ], // Define colors as needed
+        data: Object.values(dashboardData.dailyAppointments || {}),
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
       },
     ],
   };
 
   const monthlyAppointmentsData = {
-    labels: Object.keys(dashboardData.monthlyAppointments).map(
+    labels: Object.keys(dashboardData.monthlyAppointments || {}).map(
       (month) => `Month ${month}`
     ),
     datasets: [
       {
         label: 'Monthly Appointments',
-        data: Object.values(dashboardData.monthlyAppointments),
-        backgroundColor: '#8884d8', // Bar color
+        data: Object.values(dashboardData.monthlyAppointments || {}),
+        backgroundColor: '#8884d8',
       },
     ],
   };
-  const servicesUsageData = dashboardData.servicesUsage || []; 
 
   return (
-    <Row gutter={16}>
-      <Col span={16}>
-        <div>
-          {/* <p style={{ marginBottom: '8px' }}>Khách hàng</p>
-          <p
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              marginBottom: '16px',
-            }}>
-            782 customer
-          </p> */}
-        </div>
-        <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
-      </Col>
-      <Col span={8}>
-        <ChartMonthly monthlyAppointmentsData={monthlyAppointmentsData} />
-      </Col>
-      <Col span={8}>
-        <Card
-          title='Total Appointments Now'
-          bordered={false}
-          style={{ marginBottom: '16px' }}>
-          {dashboardData.totalAppointmentsInMonthNow}
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card
-          title='Total Appointments In Year Now'
-          bordered={false}
-          style={{ marginBottom: '16px' }}>
-          {dashboardData.totalAppointmentsInYearNow}
-        </Card>
-      </Col>
-    </Row>
+    <>
+      <Row gutter={16} style={{ marginBottom: '16px' }}>
+        <Col span={8}>
+          <DatePicker
+            placeholder="Select Date"
+            value={inputDate ? moment(inputDate, 'YYYY-MM-DD') : null}
+            format="YYYY-MM-DD"
+            onChange={handleDateChange}
+            style={{ width: '100%' }}
+          />
+        </Col>
+        <Col span={8}>
+          <Input
+            placeholder="Enter Year"
+            value={inputYear}
+            onChange={(e) => setInputYear(e.target.value)}
+          />
+        </Col>
+        <Col span={8}>
+          <Button type="primary" onClick={handleSearch} style={{ marginBottom: '16px', marginLeft: '8px' }}>
+            Search
+          </Button>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={16}>
+          <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
+        </Col>
+        <Col span={8}>
+          <ChartMonthly monthlyAppointmentsData={monthlyAppointmentsData} />
+        </Col>
+        <Col span={8}>
+          <Card title="Total Appointments Now" bordered={false} style={{ marginBottom: '16px' }}>
+            {dashboardData.totalAppointmentsInMonthNow || 0}
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Total Appointments In Year Now" bordered={false} style={{ marginBottom: '16px' }}>
+            {dashboardData.totalAppointmentsInYearNow || 0}
+          </Card>
+        </Col>
+      </Row>
+    </>
   );
 };

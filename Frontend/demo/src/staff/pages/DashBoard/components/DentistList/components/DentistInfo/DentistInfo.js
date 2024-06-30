@@ -4,40 +4,48 @@ import { HiOutlineMail } from 'react-icons/hi';
 import { EmailPopup } from './components/EmailPopup';
 import { useParams } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
-import { dataDentistDetail } from '../../../../../../utils/data';
+import { notification } from 'antd';
 
 export default function DentistInfo() {
-  const id = useParams().dentistID;
-  const [info, setInfo] = useState(dataDentistDetail);
+  const { dentistID } = useParams();
+  const [info, setInfo] = useState({});
   const [user, setUser] = useState({});
-  const [apointmentData, setAppointmentData] = useState([]);
+  const [appointmentData, setAppointmentData] = useState([]);
+  const [apiData, setApiData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await DentistServices.getDentistById(id);
-        console.log(response);
-        // setInfo(response);
+        const response = await DentistServices.getDentistById(dentistID);
+        setUser(response.userDTO);
+        setInfo(response.appointment);
+        
+        const aData = response.appointment.map((item) => ({
+          ...item,
+          key: item.id,
+          date: item.date,
+          feedback: item.feedback,
+          booking: item.user.name,
+          services: item.services.name,
+          clinic: item.clinic.name,
+          dentist: item.dentist.user.name,
+          dependent: item.dependent.name ? item.dependent.name : item.user.name,
+        }));
+        // setInfo(response.appointment || []); 
+        setAppointmentData(aData);
       } catch (error) {
-        console.log(error);
+        console.log('Error fetching data:', error);
+        notification.error({
+          message: 'Error',
+          description: error.message,
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
       }
     };
     fetchData();
-    const { userDTO, appointment } = info;
-    setUser(userDTO);
-    const aData = appointment.map((item) => ({
-      ...item,
-      key: item.id,
-      date: item.date,
-      feedback: item.feedback,
-      booking: item.user.name,
-      services: item.services.name,
-      clinic: item.clinic.name,
-      dentist: item.dentist.user.name,
-      dependent: item.dependent.name ? item.dependent.name : item.user.name,
-    }));
-    setAppointmentData(aData);
-  }, []);
+  }, [dentistID]);
 
   const styles = {
     card: {
@@ -57,14 +65,14 @@ export default function DentistInfo() {
       key: 'date',
     },
     {
-      title: 'Feedback',
-      dataIndex: 'feedback',
-      key: 'feedback',
+      title: 'TimeSlot',
+      dataIndex: 'timeSlot',
+      key: 'timeSlot',
     },
     {
-      title: 'Booking',
-      dataIndex: 'booking',
-      key: 'booking',
+      title: 'User',
+      dataIndex: 'user',
+      key: 'user',
     },
     {
       title: 'Patient',
@@ -95,32 +103,17 @@ export default function DentistInfo() {
   ];
 
   return (
-    <div
-      className='customer-info'
-      style={{
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-      }}>
+    <div className='customer-info' style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <h2>Dentist Information</h2>
       <EmailPopup />
-      <div>
-        <strong>Name:</strong> {user.name}
-      </div>
-      <div>
-        <strong>Email:</strong> {user.mail}
-      </div>
-      <div>
-        <strong>Phone:</strong> {user.phone}
-      </div>
-      <div>
-        <strong>Birthday:</strong> {user.birthday}
-      </div>
+      <div><strong>Name:</strong> {user.name}</div>
+      <div><strong>Email:</strong> {user.mail}</div>
+      <div><strong>Phone:</strong> {user.phone}</div>
+      <div><strong>Birthday:</strong> {user.birthday}</div>
       <div>
         <Card title='Appointment History' style={styles.card}>
           <Table
-            dataSource={apointmentData}
+            dataSource={info}
             columns={columns}
             pagination={false}
             bordered

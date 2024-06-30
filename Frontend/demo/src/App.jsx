@@ -23,7 +23,10 @@ import RoleBasedRoute from './account/RoleBasedRoute';
 import NotAuthorized from './account/NotAuthorized';
 import ConfirmAccount from './account/ConfirmAccount';
 import ResetPassword from './account/ResetPassword';
-import CustomerListAdmin from './admin/pages/CustomerList/CustomerList';
+import { CustomerList } from './admin/pages/CustomerList/CustomerList';
+import ManagerList from './admin/pages/ManagerList/ManagerList';
+import StaffList from './admin/pages/StaffList/StaffList';
+import DentistListAmin from './admin/pages/DentistListAmin/DentistListAmin';
 
 const App = () => {
   return (
@@ -55,6 +58,7 @@ const App = () => {
             path='dentist-list/detail/:dentistID'
             element={<DentistInfo />}
           />
+
           <Route path='dashboard' element={<CarDash />} />
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
@@ -63,10 +67,13 @@ const App = () => {
 
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
-        <Route path='/customer-list' element={<CustomerListAdmin />} />
+        {/* <Route path='/customer-list' element={<CustomerList />} /> */}
 
         <Route path='/admin'>
-          <Route path='customer-list' element={<CustomerListAdmin />} />
+          <Route path='customer-list-admin' element={<CustomerList />} />
+          <Route path='dentist-list-admin' element={<DentistListAmin />} />
+          <Route path='manager-list' element={<ManagerList />} />
+          <Route path='staff-list' element={<StaffList />} />
         </Route>
       </Routes>
     </Router>
