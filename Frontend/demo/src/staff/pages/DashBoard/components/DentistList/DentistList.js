@@ -41,6 +41,7 @@ export const DentistList = () => {
       const fetchData = async () => {
         try {
           const response = await DentistServices.getAll();
+          
           setApiData(response);
         } catch (error) {
           console.error('Error fetching data:', error);

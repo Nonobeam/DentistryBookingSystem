@@ -17,11 +17,11 @@ export const Profile = () => {
   }, []);
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
-    // const response = await PersonalServices.updatePersonalInfo(profileData);
-    // if (response.status === 200) {
+    const response = await PersonalServices.updatePersonalInfo(profileData);
+    if (response.status === 200) {
     setProfileData({ ...profileData, [name]: value });
-    // }
-  };
+    }
+  };  
 
   const handleEditClick = () => {
     setEditMode(true);

@@ -17,11 +17,9 @@ export default function DentistInfo() {
     const fetchData = async () => {
       try {
         const response = await DentistServices.getDentistById(dentistID);
-        console.log(response);
-        // setInfo(response); // Cập nhật thông tin nha sĩ từ API
-         // Cập nhật thông tin người dùng (nha sĩ)
+        setUser(response.userDTO);
+        setInfo(response.appointment);
         
-        // Xử lý dữ liệu lịch hẹn
         const aData = response.appointment.map((item) => ({
           ...item,
           key: item.id,
@@ -33,6 +31,7 @@ export default function DentistInfo() {
           dentist: item.dentist.user.name,
           dependent: item.dependent.name ? item.dependent.name : item.user.name,
         }));
+        // setInfo(response.appointment || []); 
         setAppointmentData(aData);
       } catch (error) {
         console.log('Error fetching data:', error);
@@ -66,14 +65,14 @@ export default function DentistInfo() {
       key: 'date',
     },
     {
-      title: 'Feedback',
-      dataIndex: 'feedback',
-      key: 'feedback',
+      title: 'TimeSlot',
+      dataIndex: 'timeSlot',
+      key: 'timeSlot',
     },
     {
-      title: 'Booking',
-      dataIndex: 'booking',
-      key: 'booking',
+      title: 'User',
+      dataIndex: 'user',
+      key: 'user',
     },
     {
       title: 'Patient',
@@ -114,7 +113,7 @@ export default function DentistInfo() {
       <div>
         <Card title='Appointment History' style={styles.card}>
           <Table
-            dataSource={apiData}
+            dataSource={info}
             columns={columns}
             pagination={false}
             bordered
