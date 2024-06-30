@@ -48,11 +48,6 @@ public class UserService {
 
     //----------------------------------- ALL USERS -----------------------------------
 
-
-    public List<Client> findAllUsers() {
-        return userRepository.findAll();
-    }
-
     public List<Client> findAllDentist() {
         try {
             return userRepository.getClientsByRole(Role.DENTIST);
@@ -121,15 +116,6 @@ public class UserService {
         }
     }
 
-    public Client userInfo(String id) {
-        try {
-            return userRepository.findByUserID(id);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching user information: " + e.getMessage(), e);
-        }
-    }
-
-
     public List<Client> findAllCustomer() {
         try {
             return userRepository.getClientsByRole(Role.CUSTOMER);
@@ -163,7 +149,7 @@ public class UserService {
             return userRepository.findUserByMail(mail);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
+            throw new RuntimeException("Error occurred while fetching user: " + e.getMessage(), e);
         }
 
     }
@@ -211,8 +197,7 @@ public class UserService {
 
     public List<Client> findAllDentistByManager(String mail) {
         try {
-            // Perform necessary validation and business logic here
-            return userRepository.getDentisByManager(Role.DENTIST, mail);
+            return userRepository.getDentistByManager(Role.DENTIST, mail);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -296,18 +281,18 @@ public class UserService {
         }
     }
 
-    public Client updateUser(Client newClient) {
+    public void updateUser(Client newClient) {
         try {
-            return userRepository.save(newClient);
+            userRepository.save(newClient);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
     }
 
-    public Optional<Client> updateUserStatus(Client client, int status) {
+    public void updateUserStatus(Client client, int status) {
         try {
             client.setStatus(status);
-            return Optional.of(userRepository.save(client));
+            userRepository.save(client);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while creating new user: " + e.getMessage(), e);
         }
@@ -346,4 +331,7 @@ public class UserService {
     public Client save(Client client) {
         return userRepository.save(client);
     }
+
+
+
 }

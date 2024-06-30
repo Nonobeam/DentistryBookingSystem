@@ -1,7 +1,6 @@
 package com.example.DentistryManagement.DTO;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import lombok.*;
 
 import java.util.List;

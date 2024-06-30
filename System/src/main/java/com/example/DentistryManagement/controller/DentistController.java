@@ -1,10 +1,9 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.AdminDTO;
-import com.example.DentistryManagement.DTO.UserAppointDTO;
-import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.DTO.AppointmentDTO;
+import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
@@ -24,10 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.sql.Date;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/dentist")
@@ -42,6 +38,8 @@ public class DentistController {
     private final NotificationService notificationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final UserRepository userRepository;
+    private final DentistScheduleService dentistScheduleService;
+    private final UserMapping userMapping;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -50,13 +48,12 @@ public class DentistController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @PutMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
             if (user != null) {
@@ -82,40 +79,16 @@ public class DentistController {
     @Operation(summary = "Dentist")
     @GetMapping("/appointment-today")
     public ResponseEntity<?> appointmentList() {
-        List<AppointmentDTO> applist = new ArrayList<>();
         try {
             String mail = userService.mailExtract();
             List<Appointment> appointlist = appointmentService.findAppointmentByDentist(mail);
+            List<AppointmentDTO> appointmentDtoList = new ArrayList<>();
             if (!appointlist.isEmpty()) {
-                applist = appointlist.stream()
-                        .map(appointmentEntity -> {
-                            AppointmentDTO appointment = new AppointmentDTO();
-                            appointment.setServices(appointmentEntity.getServices().getName());
-                            appointment.setStatus(appointmentEntity.getStatus());
-                            appointment.setDate(appointmentEntity.getDate());
-                            appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                            if (appointmentEntity.getStaff() != null) {
-                                if (appointmentEntity.getUser() != null) {
-                                    appointment.setUser(appointmentEntity.getUser().getName());
-                                } else {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                }
-                                appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                            } else {
-                                if (appointmentEntity.getDependent() != null) {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                } else
-                                    appointment.setUser(appointmentEntity.getUser().getName());
-                            }
-
-                            return appointment;
-                        })
-                        .collect(Collectors.toList());
-
+                appointmentDtoList = appointmentService.appointmentDTOList(appointlist);
             }
-            if (!applist.isEmpty()) {
-                return ResponseEntity.ok(applist);
-            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment today");
+            if (!appointmentDtoList.isEmpty()) {
+                return ResponseEntity.ok(appointmentDtoList);
+            } else return ResponseEntity.ok("Not found any appointment today");
 
 
         } catch (Exception e) {
@@ -161,35 +134,14 @@ public class DentistController {
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
-            userDTO.setBirthday(client.getBirthday());
-            Optional<List<Appointment>> appointmentList = appointmentService.customerAppointmentfollowdentist(client.getUserID(), userService.mailExtract());
-            List<AppointmentDTO> appointmentDTOList = appointmentList.get().stream()
-                    .map(appointmentEntity -> {
-                        AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setServices(appointmentEntity.getServices().getName());
-                        appointment.setStatus(appointmentEntity.getStatus());
-                        appointment.setDate(appointmentEntity.getDate());
-                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                        if (appointmentEntity.getStaff() != null) {
-                            if (appointmentEntity.getUser() != null) {
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                            } else {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            }
-                            appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                        } else {
-                            if (appointmentEntity.getDependent() != null) {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            } else
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                        }
-
-                        return appointment;
-                    })
-                    .collect(Collectors.toList());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
+            userDTO.setBirthday(client.getBirthday());
+            List<Appointment> appointmentList = appointmentService.customerAppointmentFollowDentist(client.getUserID(), userService.mailExtract());
+            if (!appointmentList.isEmpty()) {
+                List<AppointmentDTO> appointmentDtoList = appointmentService.appointmentDTOList(appointmentList);
+                userAppointDTO.setAppointment(appointmentDtoList);
+            }
             userAppointDTO.setUserDTO(userDTO);
-            userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -199,44 +151,24 @@ public class DentistController {
     }
 
     @Operation(summary = "Dentist")
-    @GetMapping("/weekSchedule")
-    public ResponseEntity<?> getAppointmentsForDate(
-            @RequestParam LocalDate start, @RequestParam LocalDate end) {
+    @GetMapping("/weekSchedule/{startDate}")
+    public Object getAppointmentsForDate(@PathVariable LocalDate startDate, @RequestParam int numDay) {
         try {
-            Dentist dentist = userService.findDentistByMail(userService.mailExtract());
-            List<Appointment> appointments = appointmentService.getAppointmentsForWeek(start, end, dentist);
+            Dentist dentist = dentistService.findDentistByMail(userService.mailExtract());
+            Map<LocalDate, List<TimeTableResponseDTO>> timeTableResponseMap = new HashMap<>();
+            startDate.datesUntil(startDate.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
+                List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDateByDentist(startDate, numDay, dentist).stream()
+                        .filter(schedule -> schedule.getWorkDate().equals(currentDate))
+                        .collect(Collectors.toList());
+                List<Appointment> appointments = appointmentService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
+                        .filter(appointment -> appointment.getDate().equals(currentDate))
+                        .collect(Collectors.toList());
+                TimeTableResponseDTO timeTableResponseDTO = new TimeTableResponseDTO();
+                List<TimeTableResponseDTO> timeTableResponseDTOList = timeTableResponseDTO.getTimeTableResponseDTOList(dentistSchedules, appointments);
+                timeTableResponseMap.put(currentDate, timeTableResponseDTOList);
+            });
 
-            List<AppointmentDTO> appointmentDTOList = appointments.stream()
-                    .map(appointmentEntity -> {
-                        AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setServices(appointmentEntity.getServices().getName());
-                        appointment.setStatus(appointmentEntity.getStatus());
-                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                        appointment.setDate(appointmentEntity.getDate());
-                        if (appointmentEntity.getStaff() != null) {
-                            if (appointmentEntity.getUser() != null) {
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                            } else {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            }
-                            appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                        } else {
-                            if (appointmentEntity.getDependent() != null) {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            } else {
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                            }
-                        }
-                        return appointment;
-                    })
-                    .toList();
-
-            Map<LocalDate, List<AppointmentDTO>> appointmentMapByDate = appointmentDTOList.stream()
-                    .collect(Collectors.groupingBy(AppointmentDTO::getDate));
-            if (!appointmentMapByDate.isEmpty()) {
-                return ResponseEntity.ok(appointmentMapByDate);
-            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any schedule this week ");
-
+            return ResponseEntity.ok(timeTableResponseMap);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -246,11 +178,11 @@ public class DentistController {
 
     @Operation(summary = "Dentist")
 
-    @GetMapping("/appointment-history/{appointmentid}")
-    public ResponseEntity<?> setAppointmentStatus(@RequestParam("status") int status, @PathVariable("appointmentid") String appointmentid) {
+    @GetMapping("/appointment-history/{appointmentId}")
+    public ResponseEntity<?> setAppointmentStatus(@RequestParam int status, @PathVariable String appointmentId) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentid);
+            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
             return ResponseEntity.ok(appointment);
@@ -275,33 +207,9 @@ public class DentistController {
             } else {
                 appointmentList = appointmentService.findAllAppointmentByDentist(dentist.getUser().getMail(), dentist.getClinic());
             }
-            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
-                    .map(appointmentEntity -> {
-                        AppointmentDTO appointment = new AppointmentDTO();
-                        appointment.setAppointmentId(appointmentEntity.getAppointmentID());
-                        appointment.setServices(appointmentEntity.getServices().getName());
-                        appointment.setStatus(appointmentEntity.getStatus());
-                        appointment.setDate(appointmentEntity.getDate());
-                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                        if (appointmentEntity.getStaff() != null) {
-                            if (appointmentEntity.getUser() != null) {
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                            } else {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            }
-                            appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                        } else {
-                            if (appointmentEntity.getDependent() != null) {
-                                appointment.setDependent(appointmentEntity.getDependent().getName());
-                            } else
-                                appointment.setUser(appointmentEntity.getUser().getName());
-                        }
-
-                        return appointment;
-                    })
-                    .collect(Collectors.toList());
-            if (!appointmentDTOList.isEmpty()) {
-                return ResponseEntity.ok(appointmentDTOList);
+            List<AppointmentDTO> appointmentDtoList = appointmentService.appointmentDTOList(appointmentList);
+            if (!appointmentDtoList.isEmpty()) {
+                return ResponseEntity.ok(appointmentDtoList);
             } else
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any appointment");
         } catch (Exception e) {
@@ -310,5 +218,6 @@ public class DentistController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
 
 }

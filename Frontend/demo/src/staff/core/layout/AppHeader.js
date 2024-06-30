@@ -3,7 +3,7 @@ import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { CardNotification as Notification } from '../../pages/DashBoard/components/CarNotification/CarNotification';
+// import { CardNotification as Notification } from '../../pages/DashBoard/components/CarNotification/CarNotification';
 import { Button, Dropdown, Menu } from 'antd';
 import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
 
@@ -35,12 +35,12 @@ const NotificationDropdown = ({ onClose }) => {
         borderRadius: '5px',
         // Add border radius for rounded corners
       }}>
-      {notifications.map((notification) => (
+      {/* {notifications.map((notification) => (
         <Notification
           key={notification.notificationID}
           content={notification.message}
         />
-      ))}
+      ))} */}
     </div>
   );
 };
@@ -65,7 +65,7 @@ export const AppHeader = () => {
   const menu = (
     <Menu>
       <Menu.Item key='profile'>
-        <Link to='/dashboard/profile'>Profile</Link>
+        <Link to='/staff/profile'>Profile</Link>
       </Menu.Item>
       <Menu.Item key='settings'>
         <Link to='/settings'>Settings</Link>

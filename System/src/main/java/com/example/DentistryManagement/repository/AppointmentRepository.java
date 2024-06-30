@@ -4,6 +4,7 @@ package com.example.DentistryManagement.repository;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistMail, LocalDate date, int status);
 
-    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_Mail(String customerId, String dentistMail);
+    List<Appointment> getAppointmentByUser_UserIDAndDentist_User_Mail(String customerId, String dentistMail);
 
     List<Appointment> findAppointmentsByDateAndStatus(LocalDate date, int status);
 
@@ -71,4 +72,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<Appointment> findAppointmentsByDate(LocalDate date);
+
+    List<Appointment> findAppointmentsByDateBetweenAndDentist(LocalDate startDate, LocalDate endDate, Dentist dentist);
 }

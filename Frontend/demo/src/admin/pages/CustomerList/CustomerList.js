@@ -1,105 +1,78 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Card, Table } from 'antd';
+import { CustomerServices } from '../../services/CustomerServer/CustomerServer';
+import { Action } from './components/Action/Action';
 
-export default function CustomerListAdmin() {
-  // Sample customer data (replace with actual data fetching)
-  const [customers, setCustomers] = useState([
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890' },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', phone: '987-654-3210' }
-    // Add more customers as needed
-  ]);
+export const CustomerList = () => {
+  const [apiData, setApiData] = useState([]);
 
-  const [editCustomer, setEditCustomer] = useState(null);
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Number',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'mail',
+      key: 'mail',
+    },
+    {
+      title: 'Birthday',
+      dataIndex: 'birthday',
+      key: 'birthday',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => <span>{status === 1 ? 'Active' : 'Inactive'}</span>,
+    },
+    {
+      title: 'Action',
+      dataIndex: 'x',
+      key: 'x',
+      render: (_, record) => <Action record={record} />,
+    },
+  ];
 
-  const handleEditClick = (customer) => {
-    setEditCustomer({ ...customer });
+  const cardStyle = {
+    marginBottom: '20px',
+    border: '1px solid #e8e8e8',
+    borderRadius: '5px',
+    padding: '10px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   };
 
-  const handleSaveEdit = () => {
-    const updatedCustomers = customers.map(cust =>
-      cust.id === editCustomer.id ? editCustomer : cust
-    );
-    setCustomers(updatedCustomers);
-    setEditCustomer(null);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditCustomer(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await CustomerServices.getAll();
+        setApiData(response);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center' }}>Customer List</h1>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-        <thead>
-          <tr>
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f2f2f2' }}>ID</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f2f2f2' }}>Name</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f2f2f2' }}>Email</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f2f2f2' }}>Phone</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f2f2f2' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map(customer =>
-            <tr key={customer.id}>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{customer.id}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                {editCustomer && editCustomer.id === customer.id ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={editCustomer.name}
-                    onChange={handleInputChange}
-                    style={{ width: '100%', padding: '4px' }}
-                  />
-                ) : (
-                  customer.name
-                )}
-              </td>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                {editCustomer && editCustomer.id === customer.id ? (
-                  <input
-                    type="text"
-                    name="email"
-                    value={editCustomer.email}
-                    onChange={handleInputChange}
-                    style={{ width: '100%', padding: '4px' }}
-                  />
-                ) : (
-                  customer.email
-                )}
-              </td>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                {editCustomer && editCustomer.id === customer.id ? (
-                  <input
-                    type="text"
-                    name="phone"
-                    value={editCustomer.phone}
-                    onChange={handleInputChange}
-                    style={{ width: '100%', padding: '4px' }}
-                  />
-                ) : (
-                  customer.phone
-                )}
-              </td>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                {editCustomer && editCustomer.id === customer.id ? (
-                  <div>
-                    <button onClick={handleSaveEdit} style={{ marginRight: '4px' }}>Save</button>
-                    <button onClick={() => setEditCustomer(null)}>Cancel</button>
-                  </div>
-                ) : (
-                  <button onClick={() => handleEditClick(customer)}>Edit</button>
-                )}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+    <div>
+      <Card title='Customer List' style={cardStyle}>
+        <Table
+          dataSource={apiData}
+          columns={columns}
+          pagination={false}
+          bordered
+          size='small'
+          style={{ backgroundColor: 'white' }} // Background color for the table
+        />
+      </Card>
     </div>
   );
-}
+};

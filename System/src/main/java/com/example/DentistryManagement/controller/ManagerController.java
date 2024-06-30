@@ -9,7 +9,6 @@ import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +37,7 @@ public class ManagerController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentService appointmentService;
     private final UserMapping userMapping;
-    private final UserRepository userRepository;
+
 
     //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -47,15 +46,14 @@ public class ManagerController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @GetMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -124,23 +122,17 @@ public class ManagerController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-            if (userService.isPresentUser(id).isPresent()) {
-                Optional<Client> c = userService.isPresentUser(id);
-                if (c.isPresent()) {
-                    Client client = c.get();
-                    userService.updateUserStatus(client, 0);
-                    return ResponseEntity.ok().build();
-                } else {
-                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-                    logger.error("User not found");
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-                }
-
+            Optional<Client> optionalClient = userService.isPresentUser(id);
+            if (optionalClient.isPresent()) {
+                Client client = optionalClient.get();
+                userService.updateUserStatus(client, 0);
+                return ResponseEntity.ok("Delete user successfully");
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
-                logger.error("User could not be deleted");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                logger.error("User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
+
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -214,22 +206,11 @@ public class ManagerController {
             String mail = userService.mailExtract();
             List<Client> dentists = userService.findAllDentistByManager(mail);
             if (dentists != null && !dentists.isEmpty()) {
-                List<AdminDTO> clientDTOs = dentists.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            clientDTO.setPassword(client.getPassword());
-                            clientDTO.setClinicName(client.getDentist().getClinic().getName());
-                            return clientDTO;
-                        })
+                List<DentistResponseDTO> dentistList = dentists.stream()
+                        .map(userMapping::convertToDentistDTO)
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(dentistList);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any dentist");
         } catch (Error error) {
@@ -245,22 +226,10 @@ public class ManagerController {
             String mail = userService.mailExtract();
             List<Client> staffList = userService.findAllStaffByManager(mail);
             if (staffList != null && !staffList.isEmpty()) {
-                List<AdminDTO> clientDTOs = staffList.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            clientDTO.setPassword(client.getPassword());
-                            clientDTO.setClinicName(client.getStaff().getClinic().getName());
-                            return clientDTO;
-                        })
+                List<StaffResponseDTO> staffDTOList = staffList.stream()
+                        .map(userMapping::convertToStaffDTO)
                         .collect(Collectors.toList());
-
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(staffDTOList);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any staff");
         } catch (Error error) {
@@ -291,16 +260,15 @@ public class ManagerController {
             staff = staffService.findStaffById(staffID);
             dentists = dentistService.findDentistByStaff(staff);
             if (dentists != null && !dentists.isEmpty()) {
-                List<AdminDTO> clientDTOs = dentists.stream()
+                List<DentistResponseDTO> clientDTOs = dentists.stream()
                         .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
+                            DentistResponseDTO clientDTO = new DentistResponseDTO();
                             clientDTO.setName(client.getUser().getName());
                             clientDTO.setPhone(client.getUser().getPhone());
                             clientDTO.setMail(client.getUser().getMail());
                             clientDTO.setBirthday(client.getUser().getBirthday());
                             clientDTO.setId(client.getUser().getUserID());
                             clientDTO.setStatus(client.getUser().getStatus());
-                            clientDTO.setPassword(client.getUser().getPassword());
                             clientDTO.setClinicName(client.getStaff().getClinic().getName());
                             return clientDTO;
                         })

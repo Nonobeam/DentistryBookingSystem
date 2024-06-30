@@ -11,7 +11,7 @@ export const PersonalServices = {
   },
   updatePersonalInfo: async (data) => {
     try {
-      const response = await api.put(`/staff/info`, data);
+      const response = await api.put(`/staff/info/update`, data);
       return response.data;
     } catch (err) {
       console.log(err);
