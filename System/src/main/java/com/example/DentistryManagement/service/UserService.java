@@ -342,4 +342,8 @@ public class UserService {
     public Optional<Client> findByMail(String mail) {
         return userRepository.findByMail(mail);
     }
+
+    public Client save(Client client) {
+        return userRepository.save(client);
+    }
 }

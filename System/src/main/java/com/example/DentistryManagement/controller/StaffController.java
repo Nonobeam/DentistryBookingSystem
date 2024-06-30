@@ -104,7 +104,7 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "All Services in System")
+    @Operation(summary = "Set Service for dentists")
     @PostMapping("/set-service/{dentistID}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
         try {
