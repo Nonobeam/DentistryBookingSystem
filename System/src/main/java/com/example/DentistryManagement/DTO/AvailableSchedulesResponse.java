@@ -15,13 +15,4 @@ public class AvailableSchedulesResponse {
     private String dentistScheduleID;
     private LocalDate workDate;
 
-    public static AvailableSchedulesResponse ScheduleConvert(DentistSchedule dentistSchedule){
-        AvailableSchedulesResponse ScheduleConvert = new AvailableSchedulesResponse();
-        ScheduleConvert.setDentistScheduleID(dentistSchedule.getScheduleID());
-        ScheduleConvert.setDentistName(dentistSchedule.getDentist().getUser().getName());
-        ScheduleConvert.setStartTime(dentistSchedule.getTimeslot().getStartTime());
-        ScheduleConvert.setWorkDate(dentistSchedule.getWorkDate());  // Set the workDate
-
-        return ScheduleConvert;
-    }
 }
