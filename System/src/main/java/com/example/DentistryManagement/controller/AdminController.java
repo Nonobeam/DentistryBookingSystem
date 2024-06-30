@@ -155,7 +155,12 @@ public class AdminController {
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
         try {
             if (userService.isPresentUser(id).isPresent()) {
-                Client client = userMapping.mapUser(updatedUser);
+                Client client = userService.findUserById(id);
+                client.setName(updatedUser.getName());
+                if (userService.existsByPhoneOrMail(updatedUser.getPhone(), updatedUser.getMail())) {
+                    client.setPhone(updatedUser.getPhone());
+                }
+                client.setBirthday(updatedUser.getBirthday());
                 userService.updateUser(client);
                 return ResponseEntity.ok(client);
             } else {
@@ -177,15 +182,22 @@ public class AdminController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
         try {
 
-            Optional<Client> optionalClient = userService.isPresentUser(id);
-            if (optionalClient.isPresent()) {
-                Client client = optionalClient.get();
-                userService.updateUserStatus(client, 0);
-                return ResponseEntity.ok("Delete user successfully");
+            if (userService.isPresentUser(id).isPresent()) {
+                Optional<Client> c = userService.isPresentUser(id);
+                if (c.isPresent()) {
+                    Client client = c.get();
+                    userService.updateUserStatus(client, 0);
+                    return ResponseEntity.ok().build();
+                } else {
+                    ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                    logger.error("User not found");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                }
+
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-                logger.error("User not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be deleted");
+                logger.error("User could not be deleted");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
             }
 
         } catch (Exception e) {

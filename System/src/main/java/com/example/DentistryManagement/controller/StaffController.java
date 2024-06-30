@@ -46,7 +46,6 @@ public class StaffController {
 
     private final DentistRepository dentistRepository;
     private final TimeSlotService timeSlotService;
-    private final UserRepository userRepository;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -63,7 +62,14 @@ public class StaffController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).ifPresent(userDTO::getUserDTOFromUser);
+            Client user = userService.findByMail(userService.mailExtract()).orElse(null);
+            if (user != null) {
+                user.setMail(userDTO.getMail());
+                user.setName(userDTO.getName());
+                user.setPhone(userDTO.getPhone());
+                user.setBirthday(userDTO.getBirthday());
+                userService.updateUser(user);
+            }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -99,11 +105,11 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "All Services in System")
-    @PostMapping("/set-service/{dentistMail}")
-    public ResponseEntity<?> updateDentistService(@PathVariable String dentistMail, @RequestParam String serviceID) {
+    @Operation(summary = "Set Service for dentists")
+    @PostMapping("/set-service/{dentistID}")
+    public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
         try {
-            Dentist dentist = userService.findDentistByMail(dentistMail);
+            Dentist dentist = dentistService.findDentistByID(dentistID);
             Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
 
@@ -137,14 +143,16 @@ public class StaffController {
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
+
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                return ResponseEntity.ok("Not found any dentist");
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any dentist user");
+                logger.error("Not found any dentist user");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -165,38 +173,35 @@ public class StaffController {
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
-            UserAppointDTO userAppointDTO = new UserAppointDTO();
 
             List<Appointment> appointmentList = appointmentService.findAllAppointmentByDentist(client.getMail(), staff.getClinic());
-            if (!appointmentList.isEmpty() && appointmentList != null) {
-                List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
-                        .map(appointmentEntity -> {
-                            AppointmentDTO appointment = new AppointmentDTO();
-                            appointment.setServices(appointmentEntity.getServices().getName());
-                            appointment.setStatus(appointmentEntity.getStatus());
-                            appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                            if (appointmentEntity.getStaff() != null) {
-                                if (appointmentEntity.getUser() != null) {
-                                    appointment.setUser(appointmentEntity.getUser().getName());
-                                } else {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                }
+            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
+                    .map(appointmentEntity -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentEntity.getServices().getName());
+                        appointment.setStatus(appointmentEntity.getStatus());
+                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                        if (appointmentEntity.getStaff() != null) {
+                            if (appointmentEntity.getUser() != null) {
+                                appointment.setUser(appointmentEntity.getUser().getName());
                             } else {
-                                if (appointmentEntity.getDependent() != null) {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                } else {
-                                    appointment.setUser(appointmentEntity.getUser().getName());
-                                }
+                                appointment.setDependent(appointmentEntity.getDependent().getName());
                             }
+                        } else {
+                            if (appointmentEntity.getDependent() != null) {
+                                appointment.setDependent(appointmentEntity.getDependent().getName());
+                            } else {
+                                appointment.setUser(appointmentEntity.getUser().getName());
+                            }
+                        }
 
-                            return appointment;
-                        })
-                        .collect(Collectors.toList());
-                userAppointDTO.setAppointment(appointmentDTOList);
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
 
-            }
-
+            UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
+            userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -241,7 +246,7 @@ public class StaffController {
             SetScheduleRequestDTO setScheduleRequestDTO = new SetScheduleRequestDTO(dentistListDTO, timeSlotDTOS);
             return ResponseEntity.ok(setScheduleRequestDTO);
         } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", e.getMessage());
+            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
             logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -323,8 +328,9 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                return ResponseEntity.ok("Not found any customer");
-
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
+                logger.error("Not found any customer ");
+                return ResponseEntity.status(204).body(error);
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -339,7 +345,7 @@ public class StaffController {
     public ResponseEntity<?> findCustomerInformationByStaff(@PathVariable("mail") String customerMail) {
         try {
             String staffMail = userService.mailExtract();
-            UserAppointDTO userAppointDTO = new UserAppointDTO();
+
             UserDTO userDTO = new UserDTO();
             Client client = userService.findClientByMail(customerMail);
             userDTO.setName(client.getName());
@@ -347,33 +353,31 @@ public class StaffController {
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
             List<Appointment> appointmentList = appointmentService.customerAppointment(client.getUserID(), staffMail);
-            if (appointmentList != null && !appointmentList.isEmpty()) {
-                List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
-                        .map(appointmentEntity -> {
-                            AppointmentDTO appointment = new AppointmentDTO();
-                            appointment.setServices(appointmentEntity.getServices().getName());
-                            appointment.setStatus(appointmentEntity.getStatus());
-                            appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                            if (appointmentEntity.getStaff() != null) {
-                                if (appointmentEntity.getUser() != null) {
-                                    appointment.setUser(appointmentEntity.getUser().getName());
-                                } else {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                }
+            List<AppointmentDTO> appointmentDTOList = appointmentList.stream()
+                    .map(appointmentEntity -> {
+                        AppointmentDTO appointment = new AppointmentDTO();
+                        appointment.setServices(appointmentEntity.getServices().getName());
+                        appointment.setStatus(appointmentEntity.getStatus());
+                        appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                        if (appointmentEntity.getStaff() != null) {
+                            if (appointmentEntity.getUser() != null) {
+                                appointment.setUser(appointmentEntity.getUser().getName());
                             } else {
-                                if (appointmentEntity.getDependent() != null) {
-                                    appointment.setDependent(appointmentEntity.getDependent().getName());
-                                } else
-                                    appointment.setUser(appointmentEntity.getUser().getName());
+                                appointment.setDependent(appointmentEntity.getDependent().getName());
                             }
+                        } else {
+                            if (appointmentEntity.getDependent() != null) {
+                                appointment.setDependent(appointmentEntity.getDependent().getName());
+                            } else
+                                appointment.setUser(appointmentEntity.getUser().getName());
+                        }
 
-                            return appointment;
-                        })
-                        .collect(Collectors.toList());
-                userAppointDTO.setAppointment(appointmentDTOList);
-            }
-
+                        return appointment;
+                    })
+                    .collect(Collectors.toList());
+            UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
+            userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
 
         } catch (Exception e) {
@@ -594,9 +598,9 @@ public class StaffController {
                         return appointment;
                     })
                     .collect(Collectors.toList());
-            if (!appointmentDTOList.isEmpty()) {
+            if(!appointmentDTOList.isEmpty()){
                 return ResponseEntity.ok(appointmentDTOList);
-            } else return ResponseEntity.ok("No appointments found");
+            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No appointments found");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");
@@ -610,7 +614,7 @@ public class StaffController {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found STAFF");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
             Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
