@@ -158,6 +158,8 @@ public class BossController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
+            if (date == null) date = LocalDate.now();
+            if (year == -1) year = LocalDate.now().getYear();
             Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByClinic(date);
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getAppointmentsByClinicsForYear(year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByBoss();

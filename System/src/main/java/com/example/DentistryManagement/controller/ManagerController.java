@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -290,7 +291,7 @@ public class ManagerController {
             if (manager == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-
+            if (year == -1) year = LocalDate.now().getYear();
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
