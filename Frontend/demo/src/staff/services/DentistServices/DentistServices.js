@@ -4,7 +4,7 @@ import api from '../../config/axios/axios';
 export const DentistServices = {
   getAll: async () => {
     try {
-      const responseData = await api.get('staff/dentist/all');
+      const responseData = await api.get('staff/dentistList');
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -16,18 +16,18 @@ export const DentistServices = {
       });
     }
   },
-  getDentistById: async (id) => {
-    try {
-      const responseData = await api.get(`staff/dentistList/${id}`);
-      return responseData.data;
-    } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: error.message,
-        onClick: () => {
-          console.log('Notification Clicked!');
-        },
-      });
-    }
+    getDentistById: async (mail) => {
+      try {
+        const responseData = await api.get(`staff/dentistList/${mail}`);
+        return responseData.data;
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: error.message,
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
+      }
   },
 };

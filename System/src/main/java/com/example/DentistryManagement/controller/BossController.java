@@ -1,25 +1,20 @@
 package com.example.DentistryManagement.controller;
 
-import com.example.DentistryManagement.DTO.AdminDTO;
 import com.example.DentistryManagement.DTO.DashboardBoss;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.repository.ServiceRepository;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/boss")
@@ -55,18 +51,14 @@ public class BossController {
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
         Client user = userService.findClientByMail(mail);
-        UserDTO userDTO = new UserDTO();
-        return ResponseEntity.ok(userDTO.getUserDTOFromUser(user));
+        return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
     @Operation(summary = "User update their profile")
     @GetMapping("/info/update")
-    public ResponseEntity<?> updateProfile(@RequestBody AdminDTO userDTO) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client user = userRepository.findByMail(userService.mailExtract()).orElse(null);
-            if (user != null) {
-                userDTO.getUserDTOFromUser(user);
-            }
+            userRepository.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -92,17 +84,8 @@ public class BossController {
         try {
             List<Client> allManager = userService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
-                List<AdminDTO> clientDTOs = allManager.stream()
-                        .map(client -> {
-                            AdminDTO clientDTO = new AdminDTO();
-                            clientDTO.setName(client.getName());
-                            clientDTO.setPhone(client.getPhone());
-                            clientDTO.setMail(client.getMail());
-                            clientDTO.setBirthday(client.getBirthday());
-                            clientDTO.setId(client.getUserID());
-                            clientDTO.setStatus(client.getStatus());
-                            return clientDTO;
-                        })
+                List<UserDTO> clientDTOs = allManager.stream()
+                        .map(userMapping::getUserDTOFromUser)
                         .collect(Collectors.toList());
 
                 return ResponseEntity.ok(clientDTOs);
@@ -131,14 +114,38 @@ public class BossController {
     @PutMapping("/edit/{userID}")
     public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
         if (userService.isPresentUser(userID).isPresent()) {
-            Client updatedUser = userMapping.mapUser(userDTO);
-            userService.updateUser(updatedUser);
+            Client updatedUser = userService.findUserById(userID);
+            userService.updateUser(userDTO, updatedUser);
             return ResponseEntity.ok(updatedUser);
         } else {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
             logger.error("User could not be update");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 
+        }
+    }
+
+    @Operation(summary = "Delete user")
+    @DeleteMapping("/delete-user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        try {
+
+            Optional<Client> optionalClient = userService.isPresentUser(id);
+            if (optionalClient.isPresent()) {
+                Client client = optionalClient.get();
+                userService.updateUserStatus(client, 0);
+                return ResponseEntity.ok("Delete user successfully");
+            } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
+                logger.error("User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+
+
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 

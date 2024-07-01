@@ -45,11 +45,11 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
           <Form.Item label='Date of Birth'>
             <Input
               name='dateofbirth'
-              value={formData.dateofbirth}
+              value={formData.birthday}
               onChange={handleChange}
             />
           </Form.Item>
-          <Form.Item label='Gender'>
+          <Form.Item label='Phone'>
             <Input
               name='gender'
               value={formData.gender}

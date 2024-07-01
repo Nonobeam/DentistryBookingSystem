@@ -4,6 +4,7 @@ package com.example.DentistryManagement.repository;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,16 +16,15 @@ import java.util.Optional;
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
     List<Appointment> findAppointmentByUser_UserIDAndClinic(String customerID, Clinic clinic);
 
-    List<Appointment> getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(String dentistmail, Clinic clinic);
+    List<Appointment> getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(String dentistMail, Clinic clinic);
 
     List<Appointment> findAppointmentByClinic(Clinic c);
 
-    List<Appointment> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistmail, LocalDate date, int status);
+    List<Appointment> getAppointmentByDentist_User_MailAndDateAndStatus(String dentistMail, LocalDate date, int status);
 
-    Optional<List<Appointment>> getAppointmentByUser_UserIDAndDentist_User_Mail(String customerId, String dentistMail);
+    List<Appointment> getAppointmentByUser_UserIDAndDentist_User_Mail(String customerId, String dentistMail);
 
-
-    Optional<List<Appointment>> findAppointmentsByDateAndStatus(LocalDate date, int status);
+    List<Appointment> findAppointmentsByDateAndStatus(LocalDate date, int status);
 
     Appointment findAppointmentByAppointmentID(String appointmentID);
 
@@ -36,7 +36,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateAndDentist_Staff(LocalDate date, Staff staff);
 
-    List<Appointment> findAppointmentsByDateBetweenAndDentistStaff(LocalDate startdate, LocalDate enddate, Staff staff);
+    List<Appointment> findAppointmentsByDateBetweenAndDentistStaff(LocalDate startDate, LocalDate endDate, Staff staff);
 
     List<Appointment> findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(LocalDate date, String name1, String dependentName);
 
@@ -72,4 +72,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<Appointment> findAppointmentsByDate(LocalDate date);
+
+    List<Appointment> findAppointmentsByDateBetweenAndDentist(LocalDate startDate, LocalDate endDate, Dentist dentist);
 }

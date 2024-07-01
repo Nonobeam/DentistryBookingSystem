@@ -1,7 +1,6 @@
 package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.notification.Notification;
-import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +31,9 @@ public class NotificationService {
         mailSender.send(simpleMailMessage);
     }
 
-    public List<Notification> receiveNotice(String staffmail) {
+    public List<Notification> receiveNotice(String staffMail) {
         try {
-            return notificationRepository.getNotificationByDentist_StaffUserMail(staffmail);
+            return notificationRepository.getNotificationByDentist_StaffUserMail(staffMail);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
         }
@@ -46,14 +44,6 @@ public class NotificationService {
             return notificationRepository.save(notification);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while create notification: " + e.getMessage(), e);
-        }
-    }
-
-    public List<Notification> findNotificationsByDentist(Dentist dentist) {
-        try {
-            return notificationRepository.getNotificationsByDentistAndStatus(dentist, 0);
-        } catch (Error e) {
-            throw e;
         }
     }
 

@@ -30,14 +30,6 @@ public class Services {
     private List<Appointment> appointmentList;
 
     @JsonIgnore
-    //This is the ServiceClinic table
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "ServiceClinic",
-            joinColumns = @JoinColumn(name = "serviceID", referencedColumnName = "serviceID"),
-            inverseJoinColumns = @JoinColumn(name = "clinicID", referencedColumnName = "clinicID"))
-    private List<Clinic> clinicList;
-
-    @JsonIgnore
     @ManyToMany(mappedBy = "servicesList")
     private List<Dentist> dentistList;
 

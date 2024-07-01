@@ -1,19 +1,19 @@
 package com.example.DentistryManagement.service;
 
-
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -38,9 +38,9 @@ public class DentistScheduleService {
     }
 
 
-    public void deleteDentistSchedule(String dentistID, LocalDate workDate) {
+    public void deleteDentistSchedule(String dentistID, LocalDate workDate, int numSlot) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
-        dentistScheduleRepository.deleteByDentistAndWorkDate(dentist, workDate);
+        dentistScheduleRepository.deleteByDentistAndWorkDateAndTimeslot_SlotNumber(dentist, workDate, numSlot);
     }
 
 
@@ -54,12 +54,14 @@ public class DentistScheduleService {
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
             DentistSchedule schedule = new DentistSchedule();
-            schedule.setDentist(dentist);
-            schedule.setWorkDate(date);
-            schedule.setTimeslot(timeSlot);
-            schedule.setClinic(clinic);
-            schedules.add(schedule);
-            schedule.setAvailable(1);
+            if (!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date)) {
+                schedule.setDentist(dentist);
+                schedule.setWorkDate(date);
+                schedule.setTimeslot(timeSlot);
+                schedule.setClinic(clinic);
+                schedules.add(schedule);
+                schedule.setAvailable(1);
+            }
             date = date.plusDays(1);
         }
         dentistScheduleRepository.saveAll(schedules);
@@ -69,12 +71,23 @@ public class DentistScheduleService {
         return dentistScheduleRepository.findByScheduleID(scheduleId);
     }
 
-    public DentistSchedule setAvailableDentistSchedule(DentistSchedule dentistSchedule, int available) {
+    public void setAvailableDentistSchedule(DentistSchedule dentistSchedule, int available) {
         dentistSchedule.setAvailable(available);
-        return dentistScheduleRepository.save(dentistSchedule);
+        dentistScheduleRepository.save(dentistSchedule);
     }
 
     public Optional<List<DentistSchedule>> findDentistScheduleByWorkDateAndTimeSlotAndDentist(TimeSlot timeSlot, LocalDate workDate, Dentist dentist, int status) {
         return dentistScheduleRepository.findDentistSchedulesByTimeslotAndWorkDateAndAvailableAndDentist(timeSlot, workDate, status, dentist);
     }
+
+    public List<DentistSchedule> findDentistScheduleByWorkDate(LocalDate date, int numDay, Staff staff) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(date, date.plusDays(numDay), 1,staff);
+
+    }
+
+    public  List<DentistSchedule>  findDentistScheduleByWorkDateByDentist(LocalDate date,int numDay,Dentist dentist) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(date, date.plusDays(numDay), 1,dentist);
+
+    }
+
 }

@@ -7,6 +7,7 @@ import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
 import { StudentServices } from '../../../../../../services/StudentServices/StudentServices';
 import { useNavigate } from 'react-router-dom';
+import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
 
 export const Action = ({ record }) => {
   const navigator = useNavigate();
@@ -17,7 +18,7 @@ export const Action = ({ record }) => {
     showModal();
     const fetchData = async () => {
       try {
-        const response = await StudentServices.getById(record.id);
+        const response = await DentistServices.getById(record.mail);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -33,7 +34,7 @@ export const Action = ({ record }) => {
 
   const handleClickEye = () => {
     // console.log(record);
-    navigator(`detail/${record.id}`);
+    navigator(`detail/${record.mail}`);
   };
 
   const handleDelete = () => {};

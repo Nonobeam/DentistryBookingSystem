@@ -14,7 +14,7 @@ import { DentistList } from './staff/pages/DashBoard/components/DentistList/Dent
 import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
-import Profile from './staff/pages/DashBoard/components/Profile/Profile';
+import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
 import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
 import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
@@ -23,6 +23,10 @@ import RoleBasedRoute from './account/RoleBasedRoute';
 import NotAuthorized from './account/NotAuthorized';
 import ConfirmAccount from './account/ConfirmAccount';
 import ResetPassword from './account/ResetPassword';
+import { CustomerList } from './admin/pages/CustomerList/CustomerList';
+import ManagerList from './admin/pages/ManagerList/ManagerList';
+import StaffList from './admin/pages/StaffList/StaffList';
+import DentistListAmin from './admin/pages/DentistListAmin/DentistListAmin';
 
 const App = () => {
   return (
@@ -47,21 +51,30 @@ const App = () => {
         <Route path='/confirm' element={<ConfirmAccount />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
 
-        <Route path='/dashboard' element={<DashBoard />}>
+        <Route path='/staff' element={<DashBoard />}>
+          <Route path='' element={<AdminHomePage />} />
           <Route path='dentist-list' element={<DentistList />} />
           <Route
             path='dentist-list/detail/:dentistID'
             element={<DentistInfo />}
           />
-          <Route path='' element={<CarDash />} />
+
+          <Route path='dashboard' element={<CarDash />} />
           <Route path='appointment-history' element={<AppointmentsPage />} />
-          <Route path='admin-home-page' element={<AdminHomePage />} />
           <Route path='timetable' element={<TimeTable />} />
+          <Route path='profile' element={<Profile />} />
         </Route>
 
-        <Route path='/profile' element={<Profile />} />
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
+        {/* <Route path='/customer-list' element={<CustomerList />} /> */}
+
+        <Route path='/admin'>
+          <Route path='customer-list-admin' element={<CustomerList />} />
+          <Route path='dentist-list-admin' element={<DentistListAmin />} />
+          <Route path='manager-list' element={<ManagerList />} />
+          <Route path='staff-list' element={<StaffList />} />
+        </Route>
       </Routes>
     </Router>
   );
