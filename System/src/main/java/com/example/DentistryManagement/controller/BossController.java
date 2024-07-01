@@ -114,8 +114,8 @@ public class BossController {
     @PutMapping("/edit/{userID}")
     public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
         if (userService.isPresentUser(userID).isPresent()) {
-            Client updatedUser = userMapping.mapUser(userDTO);
-            userService.updateUser(updatedUser);
+            Client updatedUser = userService.findUserById(userID);
+            userService.updateUser(userDTO, updatedUser);
             return ResponseEntity.ok(updatedUser);
         } else {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");

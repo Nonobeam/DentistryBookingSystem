@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.service;
 
+import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.*;
@@ -177,7 +178,6 @@ public class UserService {
 
     public Client findUserById(String customerID) {
         try {
-            // Perform necessary validation and business logic here
             return userRepository.findClientsByUserID(customerID);
 
         } catch (Exception e) {
@@ -281,9 +281,13 @@ public class UserService {
         }
     }
 
-    public void updateUser(Client newClient) {
+    public void updateUser(UserDTO userDTO, Client updatedUser) {
         try {
-            userRepository.save(newClient);
+            updatedUser.setMail(userDTO.getMail());
+            updatedUser.setName(userDTO.getName());
+            updatedUser.setPhone(userDTO.getPhone());
+            updatedUser.setBirthday(userDTO.getBirthday());
+            userRepository.save(updatedUser);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while update  user: " + e.getMessage(), e);
         }
