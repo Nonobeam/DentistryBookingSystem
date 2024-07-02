@@ -3,8 +3,6 @@ package com.example.DentistryManagement.core.dentistry;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.ClinicRepository;
-import com.example.DentistryManagement.repository.TimeSlotRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -13,9 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.sql.Time;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -51,7 +47,6 @@ public class Clinic {
     private LocalTime breakEndTime;
     private int status;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false, referencedColumnName = "userID")
     private Client user;
