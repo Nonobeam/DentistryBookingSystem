@@ -19,7 +19,7 @@ export const PersonalServices = {
   },
   getNotificationStaff: async () => {
     try {
-      const response = await api.get(`/staff`);
+      const response = await api.get(`/staff/notification`);
       return response.data;
     } catch (err) {
       console.log(err);

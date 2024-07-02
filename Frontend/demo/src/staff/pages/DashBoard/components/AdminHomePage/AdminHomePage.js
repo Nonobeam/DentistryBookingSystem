@@ -19,7 +19,7 @@ const AdminHomePage = () => {
       <Row gutter={16}>
         <Col span={8}>
           <Card
-            onClick={() => handleNavigate('/dashboard/timetable')}
+            onClick={() => handleNavigate(' /staff/timetable')}
             hoverable
             cover={
               <img
@@ -35,7 +35,7 @@ const AdminHomePage = () => {
         </Col>
         <Col span={8}>
           <Card
-            onClick={() => handleNavigate('/dashboard/patients')}
+            onClick={() => handleNavigate('/staff/customer-list')}
             hoverable
             cover={
               <img
@@ -44,14 +44,14 @@ const AdminHomePage = () => {
               />
             }
             style={{ textAlign: 'center' }}>
-            <h2>Patients</h2>
+            <h2>Customers</h2>
             <UserOutlined style={{ fontSize: '48px', color: '#87d068' }} />
             <p>View and manage patient profiles and records.</p>
           </Card>
         </Col>
         <Col span={8}>
           <Card
-            onClick={() => handleNavigate('/dashboard/appointment-history')}
+            onClick={() => handleNavigate('/staff/appointment-history')}
             hoverable
             cover={
               <img

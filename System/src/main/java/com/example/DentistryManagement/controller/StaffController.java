@@ -201,7 +201,7 @@ public class StaffController {
                             UserDTO clientDTO = new UserDTO();
                             clientDTO.setName(client.getName());
                             clientDTO.setMail(client.getMail());
-                            clientDTO.setName(client.getName());
+                            clientDTO.setStatus(client.getStatus());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
@@ -212,7 +212,7 @@ public class StaffController {
                         .map(timeSlot -> {
                             TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
-                            timeSlotDTO.setSlotNumber(timeSlotDTO.getSlotNumber());
+                            timeSlotDTO.setSlotNumber(timeSlot.getSlotNumber());
                             return timeSlotDTO;
                         }).collect(Collectors.toList());
             }
