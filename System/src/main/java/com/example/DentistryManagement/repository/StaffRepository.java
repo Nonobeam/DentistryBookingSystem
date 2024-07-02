@@ -14,6 +14,5 @@ public interface StaffRepository extends JpaRepository<Staff, String> {
 
     Staff findStaffByStaffID(String staffID);
 
-    List<Staff> findByClinic_NameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(String searchClinicName, String searchWord, String searchName);
-
+    List<Staff> findByClinic_NameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCaseAndUser_Status(String search, String search1, String search2, int i);
 }

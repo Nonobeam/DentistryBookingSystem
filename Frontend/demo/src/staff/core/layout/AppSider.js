@@ -26,7 +26,7 @@ const items = [
     key: 'CustomerList',
     label: (
       <Link
-        to='/staff/dentist-list'
+        to='/staff/customer-list'
         style={{ color: '#333', textDecoration: 'none' }}>
         Customer List
       </Link>
@@ -62,6 +62,7 @@ const items = [
       </Link>
     ),
   },
+  
 ];
 
 export const AppSider = () => {

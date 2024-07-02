@@ -17,19 +17,22 @@ export const Profile = () => {
   }, []);
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
-    const response = await PersonalServices.updatePersonalInfo(profileData);
-    if (response.status === 200) {
     setProfileData({ ...profileData, [name]: value });
-    }
-  };  
+  };
+
 
   const handleEditClick = () => {
     setEditMode(true);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     // Here you can handle saving the updated profile data
     setEditMode(false);
+
+    const response = await PersonalServices.updatePersonalInfo(profileData);
+    if (response.status === 200) {
+      setProfileData(response.data);
+    }
     // For demo purposes, let's log the updated data
     console.log('Updated Profile Data:', profileData);
   };

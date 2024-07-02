@@ -75,7 +75,7 @@ public class ManagerController {
     @Operation(summary = "Register a new staff member")
     @PostMapping("/register/staff")
     public ResponseEntity<?> registerStaff(@RequestBody RegisterRequest request,
-                                                                @RequestParam String clinicId) {
+                                           @RequestParam String clinicId) {
         try {
             Clinic clinic = clinicService.findClinicByID(clinicId);
             AuthenticationResponse response = authenticationService.registerStaff(request, clinic);
@@ -89,8 +89,8 @@ public class ManagerController {
     @Operation(summary = "Register a new dentist")
     @PostMapping("/register/dentist")
     public ResponseEntity<?> registerDentist(@RequestBody RegisterRequest request,
-                                                                  @RequestParam String clinicId,
-                                                                  @RequestParam String staffId) {
+                                             @RequestParam String clinicId,
+                                             @RequestParam String staffId) {
         try {
             Clinic clinic = clinicService.findClinicByID(clinicId);
             Staff staff = staffService.findStaffById(staffId);
@@ -144,6 +144,7 @@ public class ManagerController {
         }
     }
 
+
     // Choose the last appointment date
     // Create new timeslot
     @Operation(summary = "Edit clinic")
@@ -178,8 +179,6 @@ public class ManagerController {
                         updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
 
             }
-
-
             clinicService.save(updateClinic);
             return ResponseEntity.ok(updateClinic);
         } else {

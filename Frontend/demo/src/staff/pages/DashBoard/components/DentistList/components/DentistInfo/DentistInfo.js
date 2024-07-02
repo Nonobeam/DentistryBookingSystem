@@ -8,44 +8,48 @@ import { notification } from 'antd';
 
 export default function DentistInfo() {
   const { dentistID } = useParams();
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState([{}]);
   const [user, setUser] = useState({});
   const [appointmentData, setAppointmentData] = useState([]);
   const [apiData, setApiData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await DentistServices.getDentistById(dentistID);
-        setUser(response.userDTO);
-        setInfo(response.appointment);
-        
-        const aData = response.appointment.map((item) => ({
-          ...item,
-          key: item.id,
-          date: item.date,
-          feedback: item.feedback,
-          booking: item.user.name,
-          services: item.services.name,
-          clinic: item.clinic.name,
-          dentist: item.dentist.user.name,
-          dependent: item.dependent.name ? item.dependent.name : item.user.name,
-        }));
-        // setInfo(response.appointment || []); 
-        setAppointmentData(aData);
-      } catch (error) {
-        console.log('Error fetching data:', error);
-        notification.error({
-          message: 'Error',
-          description: error.message,
-          onClick: () => {
-            console.log('Notification Clicked!');
-          },
-        });
-      }
-    };
     fetchData();
   }, [dentistID]);
+
+  const fetchData = async () => {
+    try {
+      const response = await DentistServices.getDentistById(dentistID);
+      console.log(response);
+      setUser(response.userDTO);
+      setInfo(response.appointment);
+
+      if (Array.isArray(response.appointment)) {
+      //   const aData = response.appointment.map((item) => ({
+      //     ...item,
+      //     key: item.id,
+      //     date: item.date,
+      //     feedback: item.feedback,
+      //     booking: item.user.name,
+      //     services: item.services.name,
+      //     clinic: item.clinic.name,
+      //     dentist: item.dentist.user.name,
+      //     dependent: item.dependent.name ? item.dependent.name : item.user.name,
+      //   }));
+
+      //   setAppointmentData(aData);
+      }
+    } catch (error) {
+      console.log('Error fetching data:', error);
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        onClick: () => {
+          console.log('Notification Clicked!');
+        },
+      });
+    }
+  };
 
   const styles = {
     card: {
@@ -75,11 +79,6 @@ export default function DentistInfo() {
       key: 'user',
     },
     {
-      title: 'Patient',
-      dataIndex: 'dependent',
-      key: 'dependent',
-    },
-    {
       title: 'Dentist',
       dataIndex: 'dentist',
       key: 'dentist',
@@ -89,27 +88,37 @@ export default function DentistInfo() {
       dataIndex: 'services',
       key: 'services',
     },
-    {
-      title: 'Clinic',
-      dataIndex: 'clinic',
-      key: 'clinic',
-    },
-    {
-      title: 'Treatment',
-      dataIndex: 'treatment',
-      key: 'treatment',
-      render: (text) => <span style={styles.treatment}>{text}</span>,
-    },
+    // {
+    //   title: 'Treatment',
+    //   dataIndex: 'treatment',
+    //   key: 'treatment',
+    //   render: (text) => <span style={styles.treatment}>{text}</span>,
+    // },
   ];
 
   return (
-    <div className='customer-info' style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div
+      className='customer-info'
+      style={{
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+      }}>
       <h2>Dentist Information</h2>
       <EmailPopup />
-      <div><strong>Name:</strong> {user.name}</div>
-      <div><strong>Email:</strong> {user.mail}</div>
-      <div><strong>Phone:</strong> {user.phone}</div>
-      <div><strong>Birthday:</strong> {user.birthday}</div>
+      <div>
+        <strong>Name:</strong> {user.name}
+      </div>
+      <div>
+        <strong>Email:</strong> {user.mail}
+      </div>
+      <div>
+        <strong>Phone:</strong> {user.phone}
+      </div>
+      <div>
+        <strong>Birthday:</strong> {user.birthday}
+      </div>
       <div>
         <Card title='Appointment History' style={styles.card}>
           <Table
