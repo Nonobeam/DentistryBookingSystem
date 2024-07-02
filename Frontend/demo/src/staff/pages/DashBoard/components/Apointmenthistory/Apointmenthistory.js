@@ -11,7 +11,6 @@ const AppointmentHistory = () => {
 
   const fetchData = async () => {
     try {
-      // const response = await AppointmentHistoryServices.getAll(date, search);
       const response = await AppointmentHistoryServices.getAll();
       setApiData(response);
     } catch (error) {
@@ -19,30 +18,31 @@ const AppointmentHistory = () => {
     }
   };
 
-  
-
-  const handleUpdateStatus = (record, status) => {
-    // Implement your logic to update treatment status here
-    // For example, you might show a confirmation dialog and then update the status
-    message.success(
-      `Updated status to ${status} for treatment ID ${record.key}`
-    );
-    // Assuming you have updated the status, you can then update the table data
-    fetchData(); // Refresh data after update
+  const handleUpdateStatus = async (record, status) => {
+    try {
+      const response = await AppointmentHistoryServices.patchAppointment({
+        appointmentId: record.id,
+        status: status,
+      });
+      message.success(`Updated status to ${status} for treatment ID ${record.id}`);
+      setApiData(response);
+      fetchData(); // Refresh data after update
+      console.log('Updated status:', status);
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
   };
 
   const handleDelete = (record) => {
-    // Implement your logic to delete the appointment here
-    // For example, show a confirmation dialog before deletion
     Modal.confirm({
       title: 'Confirm Delete',
-      content: `Are you sure you want to delete treatment ID ${record.key}?`,
+      content: `Are you sure you want to delete treatment ID ${record.id}?`,
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
       onOk() {
         // Perform deletion
-        message.success(`Deleted treatment ID ${record.key}`);
+        message.success(`Deleted treatment ID ${record.id}`);
         // Assuming you have deleted the record, update the table data
         fetchData(); // Refresh data after deletion
       },
@@ -94,6 +94,11 @@ const AppointmentHistory = () => {
       title: 'Services',
       dataIndex: 'services',
       key: 'services',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
     },
     {
       title: 'Actions',

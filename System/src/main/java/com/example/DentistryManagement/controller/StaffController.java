@@ -212,7 +212,7 @@ public class StaffController {
                         .map(timeSlot -> {
                             TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
-                            timeSlotDTO.setSlotNumber(timeSlotDTO.getSlotNumber());
+                            timeSlotDTO.setSlotNumber(timeSlot.getSlotNumber());
                             return timeSlotDTO;
                         }).collect(Collectors.toList());
             }
