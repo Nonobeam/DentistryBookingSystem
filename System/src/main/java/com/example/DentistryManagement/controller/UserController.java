@@ -168,6 +168,7 @@ public class UserController {
     @PostMapping("/booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
         try {
+            // Current user
             Client customer = userService.findClientByMail(userService.mailExtract());
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);

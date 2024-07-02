@@ -1,8 +1,5 @@
 spring:
   datasource:
-#    url: jdbc:mysql://localhost:3306/mydb
-#    username: myuser
-#    password: mypassword
     url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:asia-south2:sunflowerdentistry&socketFactory=com.google.cloud.sql.mysql.SocketFactory
     username: sa
     password: Haha123456
@@ -27,12 +24,14 @@ spring:
   confirmation:
     link:
       baseurl: http://localhost:8080
-
   cloud:
     gcp:
       sql:
         database-name: DentistryManagementSystem
         instance-connection-name: red-carver-425403-d9:asia-south2:sunflowerdentistry
+  data:
+    redis:
+      url: redis://default:*******@redis-18190.c1.asia-northeast1-1.gce.redns.redis-cloud.com:18190
 
 application:
   security:
@@ -43,8 +42,3 @@ application:
       refresh-token:
         expiration: 604800000 # 7 days
 
-
-app:
-  cors:
-    allowed-origins: http://localhost:3000
-  url: http://localhost:8080
