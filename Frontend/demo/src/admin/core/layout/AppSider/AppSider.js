@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 
 const items = [
   {
-    key: 'Dashboard',
+    key: 'CustomerList',
     label: (
-      <Link to='/staff/dashboard' style={{ color: '#333', textDecoration: 'none' }}>
-        Dashboard
+      <Link to='/admin/customer-list-admin' style={{ color: '#333', textDecoration: 'none' }}>
+        CustomerList
       </Link>
     ),
   },
@@ -15,53 +15,34 @@ const items = [
     key: 'DentistList',
     label: (
       <Link
-        to='/staff/dentist-list'
+        to='/admin/dentist-list-admin'
         style={{ color: '#333', textDecoration: 'none' }}>
-        Dentist List
+        DentistList
       </Link>
     ),
   },
   
   {
-    key: 'CustomerList',
+    key: 'StaffList',
     label: (
       <Link
-        to='/staff/customer-list'
+        to='/admin/staff-list'
         style={{ color: '#333', textDecoration: 'none' }}>
-        Customer List
+        StaffList
       </Link>
     ),
   },
   {
-    key: 'AppointmentHistory',
+    key: 'ManagerList',
     label: (
       <Link
-        to='/staff/appointment-history'
+        to='/admin/manager-list'
         style={{ color: '#333', textDecoration: 'none' }}>
-        Appointment History
+        ManagerList
       </Link>
     ),
   },
-  {
-    key: 'Homepage',
-    label: (
-      <Link
-        to=''
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Home Page
-      </Link>
-    ),
-  },
-  {
-    key: 'Timetable',
-    label: (
-      <Link
-        to='/staff/timetable'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Timetable
-      </Link>
-    ),
-  },
+ 
   
 ];
 
