@@ -14,7 +14,7 @@ const NavBar = () => {
     localStorage.removeItem("role");
     localStorage.removeItem("expirationTime");
   }
-  
+
   const location = useLocation();
   const pathToKey = {
     '/': '1',
@@ -24,7 +24,6 @@ const NavBar = () => {
   };
   const currentKey = pathToKey[location.pathname];
 
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -32,16 +31,17 @@ const NavBar = () => {
     window.location.href = '/'; // Redirect to the homepage after logout
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="1">
-        <Link to="/profile">Profile</Link>
-      </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
-        Logout
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    {
+      key: '1',
+      label: <Link to="/profile">Profile</Link>
+    },
+    {
+      key: '2',
+      label: 'Logout',
+      onClick: handleLogout
+    }
+  ];
 
   return (
     <Header
@@ -75,19 +75,20 @@ const NavBar = () => {
             lineHeight: "40px",
             width: "100%"
           }}
-        > 
-          <Menu.Item key="1"><Link to="/">Home</Link></Menu.Item>
-          <Menu.Item key="2"><Link to="/booking">Booking</Link></Menu.Item>
-          <Menu.Item key="3"><Link to="/educational">Educational</Link></Menu.Item>
-          <Menu.Item key="4"><Link to="/services">Services</Link></Menu.Item>
-        </Menu>
+          items={[
+            { key: '1', label: <Link to="/">Home</Link> },
+            { key: '2', label: <Link to="/booking">Booking</Link> },
+            { key: '3', label: <Link to="/educational">Educational</Link> },
+            { key: '4', label: <Link to="/services">Services</Link> }
+          ]}
+        />
       </div>
 
       <div
         style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
       >
         {token ? (
-          <Dropdown overlay={menu} placement="bottomRight">
+          <Dropdown menu={{ items: menuItems }} placement="bottomRight">
             <Button>My Account</Button>
           </Dropdown>
         ) : (
