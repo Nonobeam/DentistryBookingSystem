@@ -145,6 +145,35 @@ public class ManagerController {
     }
 
 
+    @PostMapping
+    public ResponseEntity<Clinic> createClinic(
+            @RequestParam String name,
+            @RequestParam String phone,
+            @RequestParam String address,
+            @RequestParam LocalTime slotDuration,
+            @RequestParam LocalTime openTime,
+            @RequestParam LocalTime closeTime,
+            @RequestParam LocalTime breakStartTime,
+            @RequestParam LocalTime breakEndTime,
+            @RequestParam int status) {
+
+        Clinic clinic = Clinic.builder()
+                .name(name)
+                .phone(phone)
+                .address(address)
+                .slotDuration(slotDuration)
+                .openTime(openTime)
+                .closeTime(closeTime)
+                .breakStartTime(breakStartTime)
+                .breakEndTime(breakEndTime)
+                .status(status)
+                .build();
+
+        Clinic createdClinic = clinicService.save(clinic);
+        return ResponseEntity.ok(createdClinic);
+    }
+
+
     // Choose the last appointment date
     // Create new timeslot
     @Operation(summary = "Edit clinic")

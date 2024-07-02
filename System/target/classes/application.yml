@@ -27,12 +27,14 @@ spring:
   confirmation:
     link:
       baseurl: http://localhost:8080
-
   cloud:
     gcp:
       sql:
         database-name: DentistryManagementSystem
         instance-connection-name: red-carver-425403-d9:asia-south2:sunflowerdentistry
+  data:
+    redis:
+      url: redis://default:*******@redis-18190.c1.asia-northeast1-1.gce.redns.redis-cloud.com:18190
 
 application:
   security:
