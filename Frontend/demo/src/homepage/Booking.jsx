@@ -223,7 +223,8 @@ const Booking = () => {
           content: "The new dependent has been added successfully.",
           onOk: () => {
             setModalVisible(false);
-            fetchPatients(); // Refresh the patient list
+            // fetchPatients();
+            window.location.reload();
           }
         });
       }
@@ -272,8 +273,19 @@ const Booking = () => {
 
   const disabledDate = (current) => {
     const today = new Date();
-    return current < today.setHours(23, 59, 59, 999);
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + 2);
+  
+    return current < today.setHours(0, 0, 0, 0) || current > maxDate.setHours(23, 59, 59, 999);
   };
+
+  const disableDatesAfterToday = (current) => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return current > today;
+  };
+  
+  
 
   return (
     <>
@@ -366,7 +378,7 @@ const Booking = () => {
               {loadingServices ? (
                 <Spin size="small" />
               ) : (
-                <Select placeholder="Choose service" disabled={isServiceDisabled} onChange={handleServiceChange}>
+                <Select placeholder="Choose service" disabled={isServiceDisabled} onChange={handleServiceChange} notFoundContent="No services are available for this date. Please choose another date or clinic.">
                   {services.map((service) => (
                     <Option key={service.serviceID} value={service.serviceID}>
                       {service.name}
@@ -453,6 +465,7 @@ const Booking = () => {
           <Form.Item label="Birthday" required>
             <DatePicker
               style={{ width: "100%" }}
+              disabledDate={disableDatesAfterToday}
               onChange={(date) => setNewDependentBirthday(date)}
               format="YYYY-MM-DD"
             />
