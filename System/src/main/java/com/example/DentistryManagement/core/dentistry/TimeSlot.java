@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class TimeSlot {
     @Column(name = "timeSlotID")
     private String timeSlotID;
     private int slotNumber;
+    @NotBlank(message = "Date must not be blank")
+    private LocalDate date;
     @NotBlank(message = "Start time must not be blank")
     private LocalTime startTime;
 

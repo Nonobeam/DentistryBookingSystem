@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class ManagerController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentService appointmentService;
     private final UserMapping userMapping;
+    private final TimeSlotService timeSlotService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -72,21 +74,21 @@ public class ManagerController {
 
     @Operation(summary = "Register a new staff member")
     @PostMapping("/register/staff")
-    public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody RegisterRequest request,
+    public ResponseEntity<?> registerStaff(@RequestBody RegisterRequest request,
                                                                 @RequestParam String clinicId) {
         try {
             Clinic clinic = clinicService.findClinicByID(clinicId);
             AuthenticationResponse response = authenticationService.registerStaff(request, clinic);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+        } catch (Error e) {
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 
 
     @Operation(summary = "Register a new dentist")
     @PostMapping("/register/dentist")
-    public ResponseEntity<AuthenticationResponse> registerDentist(@RequestBody RegisterRequest request,
+    public ResponseEntity<?> registerDentist(@RequestBody RegisterRequest request,
                                                                   @RequestParam String clinicId,
                                                                   @RequestParam String staffId) {
         try {
@@ -94,13 +96,13 @@ public class ManagerController {
             Staff staff = staffService.findStaffById(staffId);
             AuthenticationResponse response = authenticationService.registerDentist(request, clinic, staff);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+        } catch (Error e) {
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 
 
-//---------------------------MODIFY CLINIC AND USER---------------------------
+    //---------------------------MODIFY CLINIC AND USER---------------------------
 
 
     @Operation(summary = "Edit users")
@@ -142,11 +144,16 @@ public class ManagerController {
         }
     }
 
-
+    // Choose the last appointment date
+    // Create new timeslot
     @Operation(summary = "Edit clinic")
     @PutMapping("/editClinic")
-    public ResponseEntity<Clinic> editClinic(@RequestBody ClinicDTO clinicDTO) {
+    public ResponseEntity<?> editClinic(@RequestBody ClinicDTO clinicDTO) {
         Clinic updateClinic = clinicService.findClinicByID(clinicDTO.getId());
+
+        if (updateClinic == null) {
+            ResponseEntity.status(400).body("Cannot find the clinic with ID: " + clinicDTO.getId());
+        }
 
         if (updateClinic != null) {
             updateClinic.setPhone(clinicDTO.getPhone());
@@ -157,10 +164,14 @@ public class ManagerController {
             updateClinic.setBreakStartTime(clinicDTO.getBreakEndTime());
 
             clinicService.save(updateClinic);
+
+            LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
+            timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic, updateClinic.getOpenTime(), updateClinic.getCloseTime(), updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
+
             return ResponseEntity.ok(updateClinic);
         } else {
-            System.out.println("Cannot find: " + clinicDTO.getId());
-            return ResponseEntity.notFound().build();
+            System.out.println("Cannot find clinic with ID: " + clinicDTO.getId());
+            return ResponseEntity.status(400).body("Cannot find clinic with ID: " + clinicDTO.getId());
         }
     }
 
@@ -291,7 +302,7 @@ public class ManagerController {
             if (manager == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-            if (year == -1) year = LocalDate.now().getYear();
+
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
