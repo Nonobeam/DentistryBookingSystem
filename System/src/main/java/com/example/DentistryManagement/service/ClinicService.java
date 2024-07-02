@@ -4,6 +4,7 @@ import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
+import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -87,6 +88,15 @@ public class ClinicService {
             currentTime = currentTime.plusMinutes(slotDuration.getMinute());
         }
         return timeSlots;
+    }
+
+    public boolean checkSlotDurationValid(LocalTime slotDuration){
+        LocalTime min = LocalTime.of(0,30,0);
+        LocalTime max = LocalTime.of(1,30, 0);
+        if(slotDuration.isBefore(min) || slotDuration.isAfter(max)){
+            return false;
+        }
+        return true;
     }
 
     public List<Clinic> findAllClinicsByManager(String mail) {

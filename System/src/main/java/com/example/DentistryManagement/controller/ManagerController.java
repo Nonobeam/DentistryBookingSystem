@@ -151,25 +151,35 @@ public class ManagerController {
     @PutMapping("/editClinic")
     public ResponseEntity<?> editClinic(@RequestBody ClinicDTO clinicDTO) {
         Clinic updateClinic = clinicService.findClinicByID(clinicDTO.getId());
-
-        if (updateClinic == null) {
-            ResponseEntity.status(400).body("Cannot find the clinic with ID: " + clinicDTO.getId());
+        if(!clinicService.checkSlotDurationValid(clinicDTO.getSlotDuration())){
+            return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
         }
 
         if (updateClinic != null) {
             updateClinic.setPhone(clinicDTO.getPhone());
             updateClinic.setAddress(clinicDTO.getAddress());
-            updateClinic.setSlotDuration(clinicDTO.getSlotDuration());
-            updateClinic.setOpenTime(clinicDTO.getOpenTime());
-            updateClinic.setCloseTime(clinicDTO.getCloseTime());
-            updateClinic.setBreakStartTime(clinicDTO.getBreakEndTime());
-            updateClinic.setBreakEndTime(clinicDTO.getBreakStartTime());
             updateClinic.setName(clinicDTO.getName());
+
+            //Check changes in clinic schedule
+            if( !updateClinic.getSlotDuration().equals(clinicDTO.getSlotDuration()) ||
+                !updateClinic.getOpenTime().equals(clinicDTO.getOpenTime()) ||
+                !updateClinic.getCloseTime().equals(clinicDTO.getCloseTime()) ||
+                !updateClinic.getBreakStartTime().equals(clinicDTO.getBreakStartTime()) ||
+                !updateClinic.getBreakEndTime().equals(clinicDTO.getBreakEndTime())) {
+
+                updateClinic.setSlotDuration(clinicDTO.getSlotDuration());
+                updateClinic.setOpenTime(clinicDTO.getOpenTime());
+                updateClinic.setCloseTime(clinicDTO.getCloseTime());
+                updateClinic.setBreakStartTime(clinicDTO.getBreakStartTime());
+                updateClinic.setBreakEndTime(clinicDTO.getBreakEndTime());
+
+                LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
+                timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,
+                        updateClinic.getOpenTime(), updateClinic.getCloseTime(),
+                        updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
+
+            }
             clinicService.save(updateClinic);
-
-            LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
-            timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic, updateClinic.getOpenTime(), updateClinic.getCloseTime(), updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
-
             return ResponseEntity.ok(updateClinic);
         } else {
             System.out.println("Cannot find clinic with ID: " + clinicDTO.getId());
