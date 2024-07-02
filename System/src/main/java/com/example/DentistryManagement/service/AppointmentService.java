@@ -4,10 +4,7 @@ import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.Mapping.UserMapping;
-import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.Clinic;
-import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-import com.example.DentistryManagement.core.dentistry.Services;
+import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
@@ -15,6 +12,7 @@ import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
@@ -384,5 +382,14 @@ public class AppointmentService {
         return appointmentRepository.save(appointmentBuilder.build());
     }
 
+    public LocalDate startUpdateTimeSlotDate(String clinicID) {
+        LocalDate result;
+        Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
+        result = appointment.getDate();
+        if (result != null) {
+            return result;
+        }
+        return null;
+    }
 
 }
