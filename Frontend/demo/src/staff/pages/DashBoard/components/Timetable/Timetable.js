@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { Button } from 'antd';
-import { Link } from 'react-router-dom'; // Thêm import cho Link
+import { Link } from 'react-router-dom';
 import { CardTask } from './Card/CardTask';
-
-const taskTime = [
-  { time: '8:00', date: '10/10/2021', task: 'Task 1' },
-  { time: '10:00', date: '10/10/2021', task: 'Task 2' },
-  { time: '12:00', date: '29/05/2021', task: 'Task 3' },
-  { time: '14:00', date: '28/05/2024', task: 'Task 4' },
-  { time: '16:00', date: '26/05/2024', task: 'Task 5' },
-  { time: '18:31', date: '30/05/2024', task: 'Task 6' },
-  { time: '20:00', date: '30/05/2024', task: 'Task 7' },
-  { time: '20:00', date: '30/05/2024', task: 'Task 7' },
-];
+import TimetableServices from '../../../../services/TimetableServices/TimetableServices';
 
 export const TimeTable = () => {
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
+  const [firstDayOfWeek, setFirstDayOfWeek] = useState(
+    moment().startOf('week')
+  );
+  const [tasksFromApi, setTasksFromApi] = useState({}); // Initialize as an object
+
+  useEffect(() => {
+    fetchTimetableData();
+  }, [firstDayOfWeek]);
+
+  const fetchTimetableData = async () => {
+    try {
+      const formattedDate = firstDayOfWeek.format('YYYY-MM-DD');
+      const response = await TimetableServices.getAll({
+        date: formattedDate,
+        numDay: 6,
+      });
+      setTasksFromApi(response);
+    } catch (error) {
+      console.error('Error fetching timetable data:', error);
+    }
+  };
+
+  useEffect(() => {
+    setFirstDayOfWeek(moment(currentWeek).startOf('week'));
+  }, [currentWeek]);
 
   const nextWeek = () => {
     setCurrentWeek(currentWeek.clone().add(1, 'week'));
@@ -29,7 +44,7 @@ export const TimeTable = () => {
   const getWeekDates = (startOfWeek) => {
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
-      weekDates.push(startOfWeek.clone().add(i, 'day'));
+      weekDates.push(startOfWeek.clone().add(i, 'day').format('YYYY-MM-DD'));
     }
     return weekDates;
   };
@@ -38,18 +53,18 @@ export const TimeTable = () => {
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const tasksForWeek = [];
 
-    weekDates.forEach((date, index) => {
-      const tasksForDay = taskTime
-        .filter((task) => moment(task.date, 'DD/MM/YYYY').isSame(date, 'day'))
-        .map((task) => ({
-          time: task.time,
-          task: task.task,
-        }));
+    weekDates.forEach((date) => {
+      const tasksForDay = tasksFromApi[date] || []; // Get tasks for the current date from tasksFromApi
 
       tasksForWeek.push({
-        day: daysOfWeek[index],
-        date: date.format('DD/MM'),
-        tasks: tasksForDay,
+        date: date,
+        day: moment(date).format('ddd'),
+        tasks: tasksForDay.map((task) => ({
+          time: moment(task.time, 'HH:mm:ss').format('HH:mm'), // Format time if needed
+          dentistName: task.dentistName,
+          customerName: task.customerName || 'N/A',
+          serviceName: task.serviceName || 'N/A',
+        })),
       });
     });
 
@@ -93,7 +108,8 @@ export const TimeTable = () => {
                 fontWeight: 'bold',
                 background: index % 2 === 0 ? '#f0f0f0' : '#fff',
               }}>
-              <h3>{date.format('DD/MM')}</h3>
+              <h3>{moment(date).format('DD/MM')}</h3>
+              <p>{moment(date).format('ddd')}</p>
             </div>
           ))}
         </div>

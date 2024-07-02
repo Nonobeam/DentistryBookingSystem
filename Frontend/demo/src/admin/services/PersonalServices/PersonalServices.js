@@ -1,4 +1,5 @@
-import api from '../../config/axios/axios';
+import api from "../../config/axios";
+
 
 export const PersonalServices = {
   getPersonalInfo: async () => {

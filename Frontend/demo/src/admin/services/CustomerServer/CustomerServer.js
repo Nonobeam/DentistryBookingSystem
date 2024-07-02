@@ -32,7 +32,8 @@ export const CustomerServices = {
   },
   deleteCustomer: async (id) => {
     try {
-      const responseData = await api.delete(`admin/${id}`);
+      const responseData = await api.delete(`admin/delete-user/${id}`);
+      
       return responseData.data;
     } catch (error) {
       notification.error({

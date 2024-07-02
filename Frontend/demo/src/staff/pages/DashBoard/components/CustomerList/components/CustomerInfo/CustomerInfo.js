@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Table } from 'antd';
 import { HiOutlineMail } from 'react-icons/hi';
-import { EmailPopup } from './components/EmailPopup';
-import { useParams } from 'react-router-dom';
-import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
-import { notification } from 'antd';
 
-export default function DentistInfo() {
-  const { dentistID } = useParams();
+import { useParams } from 'react-router-dom';
+import { notification } from 'antd';
+import { CustomerListDash } from '../../CustomerList';
+import { EmailPopup } from '../EmailPopup';
+import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
+
+export default function CustomerInfo() {
+  const { customerID } = useParams();
   const [info, setInfo] = useState([{}]);
   const [user, setUser] = useState({});
   const [appointmentData, setAppointmentData] = useState([]);
@@ -15,14 +17,14 @@ export default function DentistInfo() {
 
   useEffect(() => {
     fetchData();
-  }, [dentistID]);
+  }, [customerID]);
 
   const fetchData = async () => {
     try {
-      const response = await DentistServices.getDentistById(dentistID);
+      const response = await CustomerServicess.getCustomerById(customerID);
       console.log(response);
-      setUser(response.userDTO);
-      setInfo(response.appointment);
+        setUser(response.userDTO);
+        setInfo(response.appointment);
 
       if (Array.isArray(response.appointment)) {
       //   const aData = response.appointment.map((item) => ({
@@ -105,7 +107,7 @@ export default function DentistInfo() {
         flexDirection: 'column',
         gap: '10px',
       }}>
-      <h2>Dentist Information</h2>
+      <h2>Customer Information</h2>
       <EmailPopup />
       <div>
         <strong>Name:</strong> {user.name}

@@ -2,9 +2,11 @@ import { notification } from 'antd';
 import api from '../../config/axios/axios';
 
 export const AppointmentHistoryServices = {
-  getAll: async () => {
+  getAll: async (date, search) => {
     try {
-      const responseData = await api.get('staff/appointment-history');
+      const responseData = await api.get(
+        `staff/appointment-history?date=${date}&search=${search}`
+      );
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -63,6 +65,23 @@ export const AppointmentHistoryServices = {
       notification.error({
         message: 'Booking Failed',
         description: error.message,
+      });
+    }
+  },
+  patchBooking: async ({ appointmentId, status }) => {
+    try {
+      const responseData = await api.patch(
+        `staff/appointment-history/${appointmentId}?status=${status}`
+      );
+
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        onClick: () => {
+          console.log('Notification Clicked!');
+        },
       });
     }
   },
