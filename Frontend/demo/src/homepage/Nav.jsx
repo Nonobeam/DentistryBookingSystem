@@ -6,6 +6,15 @@ const { Header } = Layout;
 const { Title } = Typography;
 
 const NavBar = () => {
+  const token = localStorage.getItem("token");
+  const expirationTime = localStorage.getItem("expirationTime");
+
+  if (!token || new Date().getTime() > expirationTime) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("expirationTime");
+  }
+  
   const location = useLocation();
   const pathToKey = {
     '/': '1',
@@ -15,7 +24,6 @@ const NavBar = () => {
   };
   const currentKey = pathToKey[location.pathname];
 
-  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
