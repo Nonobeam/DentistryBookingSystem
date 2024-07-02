@@ -30,6 +30,7 @@ import DentistListAmin from './admin/pages/DentistListAmin/DentistListAmin';
 import { Pages } from './admin/pages';
 import { CustomerListDash } from './staff/pages/DashBoard/components/CustomerList/CustomerList';
 import CustomerInfo from './staff/pages/DashBoard/components/CustomerList/components/CustomerInfo/CustomerInfo';
+import History from './homepage/History';
 
 
 
@@ -38,12 +39,17 @@ const App = () => {
     <Router>
       <Routes>
         <Route exact path='/' element={<Homepage />} />
-        <Route
-          path='/booking'
-          element={
+        <Route path='/booking' element={
             <RoleBasedRoute
               element={<Booking />}
               requiredRole={['CUSTOMER', 'MANAGER']}
+            />
+          }
+        />
+        <Route path='/history' element={
+            <RoleBasedRoute
+              element={<History />}
+              requiredRole={['CUSTOMER']}
             />
           }
         />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox, Spin, Modal } from "antd";
-import { useNavigate } from "react-router-dom"; // Import useHistory for redirection
+import { useNavigate } from "react-router-dom";
 import NavBar from "./Nav";
 
 const { Title } = Typography;
@@ -10,27 +10,35 @@ const { Option } = Select;
 const Booking = () => {
   const [form] = Form.useForm();
   const [patients, setPatients] = useState([]);
-  const [selectedFor, setSelectedFor] = useState("self");
+  
   const [clinics, setClinics] = useState([]);
   const [services, setServices] = useState([]);
+  const [dentists, setDentists] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
+
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [isDateDisabled, setIsDateDisabled] = useState(true);
-  const [isServiceDisabled, setIsServiceDisabled] = useState(true);
-  const [loadingClinics, setLoadingClinics] = useState(true);
-  const [loadingServices, setLoadingServices] = useState(false);
-  const [timeSlots, setTimeSlots] = useState([]);
+  const [selectedFor, setSelectedFor] = useState("self");
   const [selectedService, setSelectedService] = useState(null);
-  const [dentists, setDentists] = useState([]);
-  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedDentist, setSelectedDentist] = useState("random");
   const [selectedDependant, setSelectedDependant] = useState(null);
+
+  const [isDateDisabled, setIsDateDisabled] = useState(true);
+  const [isServiceDisabled, setIsServiceDisabled] = useState(true);
+  const [isDentistDisabled, setIsDentistDisabled] = useState(true);
+  const [isTimeSlotDisabled, setIsTimeSlotDisabled] = useState(true);
+
+  const [loadingClinics, setLoadingClinics] = useState(true);
+  const [loadingServices, setLoadingServices] = useState(false);
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(false);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [newDependentName, setNewDependentName] = useState("");
   const [newDependentBirthday, setNewDependentBirthday] = useState(null);
-  const [loadingPatients, setLoadingPatients] = useState(false);
-  const history = useNavigate();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClinics = async () => {
@@ -48,7 +56,6 @@ const Booking = () => {
         setLoadingClinics(false);
       }
     };
-
     fetchClinics();
   }, []);
 
@@ -74,10 +81,10 @@ const Booking = () => {
         }
       }
     };
-
     fetchServices();
   }, [selectedBranch, selectedDate]);
 
+  useEffect(() => {
   const fetchTimeSlots = async () => {
     if (selectedBranch && selectedDate && selectedService) {
       setLoadingTimeSlots(true);
@@ -89,31 +96,28 @@ const Booking = () => {
             Authorization: `Bearer ${token}`
           }
         });
-
         const schedules = response.data;
         const timeSlotsMap = new Map();
-
         schedules.forEach(schedule => {
           if (!timeSlotsMap.has(schedule.startTime)) {
             timeSlotsMap.set(schedule.startTime, []);
           }
           timeSlotsMap.get(schedule.startTime).push({ dentistName: schedule.dentistName, dentistScheduleID: schedule.dentistScheduleID });
         });
-
-        const timeSlotsArray = Array.from(timeSlotsMap, ([time, dentists]) => ({ time, dentists }));
-        setTimeSlots(timeSlotsArray);
+          setTimeSlots(Array.from(timeSlotsMap, ([time, dentists]) => ({ time, dentists })));
+        setIsTimeSlotDisabled(false); 
       } catch (error) {
         console.error("Failed to fetch time slots:", error);
       } finally {
         setLoadingTimeSlots(false);
-      }
+        }
     }
   };
-
-  useEffect(() => {
     fetchTimeSlots();
   }, [selectedBranch, selectedDate, selectedService]);
 
+  useEffect(() => {
+    if (selectedFor === "others") {
   const fetchPatients = async () => {
     setLoadingPatients(true);
     try {
@@ -130,30 +134,54 @@ const Booking = () => {
       setLoadingPatients(false);
     }
   };
-
-  useEffect(() => {
-    if (selectedFor === "others") {
       fetchPatients();
     }
   }, [selectedFor]);
 
   const handleBranchChange = (value) => {
     setSelectedBranch(value);
-    setIsDateDisabled(false); // Enable the date picker after selecting a branch
-    setIsServiceDisabled(true); // Disable the service dropdown until a new date is selected
-    setSelectedService(null); // Reset the selected service
+    setSelectedService(null);
+    setSelectedTimeSlot(null);
+    setSelectedDentist(null);
+
     setServices([]);
     setTimeSlots([]);
+    setDentists([]);
+
+    setIsDateDisabled(false);
+    setIsTimeSlotDisabled(true);
+    setIsDentistDisabled(true);
+    setIsServiceDisabled(true);
+
+    form.setFieldsValue({ service: null, time: null, dentist: null });
+
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    setSelectedService(null); // Reset the selected service
+    setSelectedService(null);
+    setSelectedTimeSlot(null);
+    setSelectedDentist(null);
+
+    setServices([]);
     setTimeSlots([]);
+    setDentists([]);
+
+    form.setFieldsValue({ service: null , time: null, dentist: null});
+    setIsTimeSlotDisabled(true); 
+    setIsDentistDisabled(true); 
   };
 
   const handleServiceChange = (value) => {
     setSelectedService(value);
+    setSelectedTimeSlot(null);
+    setSelectedDentist(null);
+
+    setTimeSlots([]);
+    setDentists([]);
+
+    form.setFieldsValue({ time: null, dentist: null });
+    setIsDentistDisabled(true);
   };
 
   const handleDependantChange = (value) => {
@@ -162,9 +190,15 @@ const Booking = () => {
 
   const handleTimeSlotChange = (time) => {
     const selectedSlot = timeSlots.find(slot => slot.time === time);
-    setDentists(selectedSlot.dentists);
     setSelectedTimeSlot(time);
-    setSelectedDentist("random");
+    setSelectedDentist(null);
+
+    setDentists([]);
+
+    setDentists(selectedSlot.dentists);
+
+    form.setFieldsValue({ dentist: null });
+    setIsDentistDisabled(false);
   };
 
   const handleDentistChange = (value) => {
@@ -210,27 +244,20 @@ const Booking = () => {
       const dentistScheduleID = selectedDentist === "random"
         ? selectedSlot.dentists[Math.floor(Math.random() * selectedSlot.dentists.length)].dentistScheduleID
         : selectedDentistObj.dentistScheduleID;
-        
-        const url =
-          `http://localhost:8080/user/booking/${dentistScheduleID}?serviceId=${selectedService}` +
+      const url = `http://localhost:8080/user/booking/${dentistScheduleID}?serviceId=${selectedService}` +
           (selectedFor === "others" ? `&dependentID=${selectedDependant}` : "");
 
-        const response = await axios.post(
-          url,
-          {},
-          {
+      const response = await axios.post(url, {}, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
-        );
-      
+      });
 
       if (response.status === 200) {
         Modal.success({
           title: "Booking Successful",
           content: "Your booking has been reserved.",
-          // onOk: () => history("/history"),
+          onOk: () => navigate("/history"),
         });
       }
     } catch (error) {
@@ -356,7 +383,7 @@ const Booking = () => {
               {loadingTimeSlots ? (
                 <Spin size="small" />
               ) : (
-                <Select placeholder="Choose timeslot" onChange={handleTimeSlotChange}>
+                <Select placeholder="Choose timeslot" disabled={isTimeSlotDisabled} onChange={handleTimeSlotChange}>
                   {timeSlots.map((slot, index) => (
                     <Option key={index} value={slot.time}>
                       {slot.time}
@@ -366,9 +393,8 @@ const Booking = () => {
               )}
             </Form.Item>
 
-            {dentists.length > 0 && (
-              <Form.Item name="dentist" initialValue="random">
-                <Select placeholder="Choose dentist" onChange={handleDentistChange}>
+              <Form.Item name="dentist">
+                <Select placeholder="Choose dentist" disabled={isDentistDisabled} onChange={handleDentistChange}>
                   <Option value="random">Random</Option>
                   {dentists.map((dentist, index) => (
                     <Option key={index} value={dentist.dentistName}>
@@ -377,7 +403,7 @@ const Booking = () => {
                   ))}
                 </Select>
               </Form.Item>
-            )}
+            
 
             <Form.Item
               name="agreement"
