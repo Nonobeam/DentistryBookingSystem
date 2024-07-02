@@ -8,6 +8,8 @@ import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -44,16 +46,35 @@ public class DentistScheduleService {
     }
 
 
+    /**
+     * @param dentistID Input Dentist dentist
+     * @param startDate Input LocalDate startDate
+     * @param endDate Input LocalDate endDate
+     * @param slotNumber Input int slot (e.g: 1, 2, 3, 4.....)
+     * @param clinicID Input String clinicID
+     * @return appointment
+     */
     public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, int slotNumber, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
         Clinic clinic = clinicRepository.findById(clinicID).orElseThrow(() -> new RuntimeException("Clinic not found"));
-        TimeSlot timeSlot = timeSlotRepository.findBySlotNumberAndClinic(slotNumber, clinic).orElseThrow(() -> new RuntimeException("Time slot not found"));
+        TimeSlot newestTimeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
+        LocalDate newestStartDate = newestTimeSlot.getDate();
+
+        // Check if slotNumber exist or not
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinicAndDate(clinic, newestStartDate);
+        boolean slotNumberExists = timeSlots.stream().anyMatch(timeSlot -> timeSlot.getSlotNumber() == slotNumber);
+        if (!slotNumberExists) {
+            throw new Error("Slot number " + slotNumber + " not found for clinic ID " + clinicID + "in date" + newestStartDate);
+        }
 
         List<DentistSchedule> schedules = new ArrayList<>();
 
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
             DentistSchedule schedule = new DentistSchedule();
+
+            TimeSlot timeSlot = timeSlotRepository.findBySlotNumberAndClinicAndDate(slotNumber, clinic, newestStartDate).orElseThrow(() -> new RuntimeException("Time slot not found"));
+
             if (!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date)) {
                 schedule.setDentist(dentist);
                 schedule.setWorkDate(date);
