@@ -3,11 +3,14 @@ package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -74,4 +77,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByDate(LocalDate date);
 
     List<Appointment> findAppointmentsByDateBetweenAndDentist(LocalDate startDate, LocalDate endDate, Dentist dentist);
+
+    @Query("SELECT a FROM Appointment a WHERE a.clinic.clinicID = :clinicID ORDER BY a.date DESC")
+    List<Appointment> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
 }
