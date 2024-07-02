@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table } from 'antd';
-import { CustomerServices } from '../../services/CustomerServer/CustomerServer';
+import { ManagerServices } from '../../services/ManagerSever/ManagerSever';
+import { Action } from './components/Action/Action';
 
 const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
@@ -34,6 +35,12 @@ const AppointmentHistory = () => {
         <span>{status === 1 ? 'Active' : 'Inactive'}</span>
       ),
     },
+    {
+      title: 'Action',
+      dataIndex: 'x',
+      key: 'x',
+      render: (_, record) => <Action record={record} />,
+    },
   ];
 
   const cardStyle = {
@@ -47,7 +54,7 @@ const AppointmentHistory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await CustomerServices.getAll();
+        const response = await ManagerServices.getAll();
         setApiData(response);
       } catch (error) {
         console.error('Error fetching data:', error);

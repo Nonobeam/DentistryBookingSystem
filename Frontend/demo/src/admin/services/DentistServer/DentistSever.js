@@ -2,7 +2,7 @@ import { notification } from 'antd';
 import api from '../../config/axios';
 
 
-export const CustomerServices = {
+export const DentistServices = {
   getAll: async () => {
     try {
       const responseData = await api.get('admin/dentistList');
@@ -17,4 +17,5 @@ export const CustomerServices = {
       });
     }
   },
+  
 };

@@ -351,16 +351,14 @@ public class AppointmentService {
 
 
     /**
-     * @param staff Input Client staff
-     * @param customer Input Client customer
+     * @param staff           Input Client staff
+     * @param customer        Input Client customer
      * @param dentistSchedule Input DentistSchedule
-     * @param services Input Services
-     * @param dependent Input Dependent dependent
-     * @return appointment
+     * @param services        Input Services
+     * @param dependent       Input Dependent dependent
      */
-    public Appointment createAppointment(@Nullable Client staff, Client customer , DentistSchedule dentistSchedule, Services services, Dependent dependent) {
+    public void createAppointment(@Nullable Client staff, Client customer , DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
         Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
-                .staff(staff.getStaff())
                 .user(customer)
                 .clinic(dentistSchedule.getClinic())
                 .date(dentistSchedule.getWorkDate())
@@ -369,6 +367,10 @@ public class AppointmentService {
                 .services(services)
                 .dentistScheduleId(dentistSchedule.getScheduleID())
                 .status(1);
+
+        if (staff != null) {
+            appointmentBuilder.staff(staff.getStaff());
+        }
 
         if (dependent != null) {
             appointmentBuilder.dependent(dependent);
@@ -379,17 +381,14 @@ public class AppointmentService {
         Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
         otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
 
-        return appointmentRepository.save(appointmentBuilder.build());
+        appointmentRepository.save(appointmentBuilder.build());
     }
 
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
         Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
         result = appointment.getDate();
-        if (result != null) {
-            return result;
-        }
-        return null;
+        return result;
     }
 
 }

@@ -17,6 +17,5 @@ public interface DentistRepository extends JpaRepository<Dentist, String> {
 
     List<Dentist> findAll();
 
-    List<Dentist> findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(String searchClinicName, String searchWord, String searchName);
-
+    List<Dentist> findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCaseAndUser_Status(String search, String search1, String search2, int i);
 }
