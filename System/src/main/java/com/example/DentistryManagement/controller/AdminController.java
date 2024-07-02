@@ -162,7 +162,7 @@ public class AdminController {
                 if (c.isPresent()) {
                     Client client = c.get();
                     userService.updateUserStatus(client, 0);
-                    return ResponseEntity.ok().build();
+                    return ResponseEntity.ok("Delete user successfully");
                 } else {
                     ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
                     logger.error("User not found");
