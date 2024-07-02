@@ -9,7 +9,6 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +45,6 @@ public class StaffController {
     private final TimeSlotService timeSlotService;
     private final StaffService staffService;
     private final UserMapping userMapping;
-    private final AppointmentRepository appointmentRepository;
 
     //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -110,8 +108,8 @@ public class StaffController {
             Dentist dentist = dentistService.findDentistByID(dentistID);
             Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
-
-            return ResponseEntity.ok(dentist);
+            dentistService.save(dentist);
+            return ResponseEntity.ok("Set successful");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -249,7 +247,13 @@ public class StaffController {
             if (clinic == null) {
                 return new ResponseEntity<>(new ErrorResponseDTO("403", "Staff doesn't belong to any clinic"), HttpStatus.FORBIDDEN);
             }
+
             Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
+            //Check for the newest Date;
+            LocalDate startUpdateTimeSlotDate = timeSlotService.startUpdateTimeSlotDate(dentist.getClinic().getClinicID());
+            if (startUpdateTimeSlotDate.isAfter(startDate) && startUpdateTimeSlotDate.isBefore(endDate)) {
+                return new ResponseEntity<>(new ErrorResponseDTO("400", "Must be done this separately. The schedule is must after or before the update timeslot date " + startUpdateTimeSlotDate), HttpStatus.BAD_REQUEST);
+            }
             dentistScheduleService.setDentistSchedule(dentist.getDentistID(), startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
@@ -259,19 +263,22 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "Delete Dentist Schedule")
-    @DeleteMapping("/delete-schedule")
-    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
-        try {
-            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
-            return ResponseEntity.ok("Schedule deleted successfully");
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
+
+    // Missing check if available or not
+
+//    @Operation(summary = "Delete Dentist Schedule")
+//    @DeleteMapping("/delete-schedule")
+//    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
+//                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
+//        try {
+//            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
+//            return ResponseEntity.ok("Schedule deleted successfully");
+//        } catch (Exception e) {
+//            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
+//            logger.error("Server_error", e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+//        }
+//    }
 
 
     //---------------------------MANAGE CUSTOMER---------------------------
@@ -441,8 +448,10 @@ public class StaffController {
         List<AvailableSchedulesResponse> availableSchedulesResponse = new ArrayList<>();
         for (DentistSchedule i : dentistScheduleList) {
             AvailableSchedulesResponse availableSchedule = new AvailableSchedulesResponse();
+            availableSchedule.setDentistScheduleID(i.getScheduleID());
             availableSchedule.setDentistName(i.getDentist().getUser().getName());
             availableSchedule.setStartTime(i.getTimeslot().getStartTime());
+            availableSchedule.setWorkDate(workDate);
             availableSchedulesResponse.add(availableSchedule);
         }
         return ResponseEntity.ok(availableSchedulesResponse);
