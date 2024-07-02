@@ -38,7 +38,13 @@ export const CarDash = () => {
       {
         label: 'Daily Appointments',
         data: Object.values(dashboardData.dailyAppointments || {}),
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+        ],
       },
     ],
   };
@@ -61,40 +67,50 @@ export const CarDash = () => {
       <Row gutter={16} style={{ marginBottom: '16px' }}>
         <Col span={8}>
           <DatePicker
-            placeholder="Select Date"
-            value={inputDate ? moment(inputDate, 'YYYY-MM-DD') : null}
-            format="YYYY-MM-DD"
+            placeholder='Select Date'
+            format='YYYY-MM-DD'
             onChange={handleDateChange}
             style={{ width: '100%' }}
           />
         </Col>
         <Col span={8}>
           <Input
-            placeholder="Enter Year"
+            placeholder='Enter Year'
             value={inputYear}
             onChange={(e) => setInputYear(e.target.value)}
           />
         </Col>
         <Col span={8}>
-          <Button type="primary" onClick={handleSearch} style={{ marginBottom: '16px', marginLeft: '8px' }}>
+          <Button
+            type='primary'
+            onClick={handleSearch}
+            style={{ marginBottom: '16px', marginLeft: '8px' }}>
             Search
           </Button>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col span={16}>
-          <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
+          <ChartDailyAppointment
+            dailyAppointmentsData={dailyAppointmentsData}
+          />
         </Col>
         <Col span={8}>
           <ChartMonthly monthlyAppointmentsData={monthlyAppointmentsData} />
         </Col>
         <Col span={8}>
-          <Card title="Total Appointments Now" bordered={false} style={{ marginBottom: '16px' }}>
+          <Card
+            title='Total Appointments Now'
+            bordered={false}
+            style={{ marginBottom: '16px' }}>
             {dashboardData.totalAppointmentsInMonthNow || 0}
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="Total Appointments In Year Now" bordered={false} style={{ marginBottom: '16px' }}>
+          <Card
+            title='Total Appointments In Year Now'
+            bordered={false}
+            style={{ marginBottom: '16px' }}>
             {dashboardData.totalAppointmentsInYearNow || 0}
           </Card>
         </Col>

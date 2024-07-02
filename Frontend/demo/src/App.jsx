@@ -27,6 +27,11 @@ import { CustomerList } from './admin/pages/CustomerList/CustomerList';
 import ManagerList from './admin/pages/ManagerList/ManagerList';
 import StaffList from './admin/pages/StaffList/StaffList';
 import DentistListAmin from './admin/pages/DentistListAmin/DentistListAmin';
+import { Pages } from './admin/pages';
+import { CustomerListDash } from './staff/pages/DashBoard/components/CustomerList/CustomerList';
+import CustomerInfo from './staff/pages/DashBoard/components/CustomerList/components/CustomerInfo/CustomerInfo';
+
+
 
 const App = () => {
   return (
@@ -63,13 +68,15 @@ const App = () => {
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
           <Route path='profile' element={<Profile />} />
+          <Route path='customer-list' element={<CustomerListDash />} />
+          <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
         </Route>
 
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
-        {/* <Route path='/customer-list' element={<CustomerList />} /> */}
+        
 
-        <Route path='/admin'>
+        <Route path='/admin' element={<Pages />}>
           <Route path='customer-list-admin' element={<CustomerList />} />
           <Route path='dentist-list-admin' element={<DentistListAmin />} />
           <Route path='manager-list' element={<ManagerList />} />
