@@ -9,14 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class TimeSlotService {
-    private TimeSlotRepository timeSlotRepository;
-
-    public Optional<TimeSlot> findTimeSlotByID(String timeSlotID) {
-        return timeSlotRepository.findById(timeSlotID);
-    }
+    private final TimeSlotRepository timeSlotRepository;
 
     public List<TimeSlot> findByClinic(Clinic clinic) {
         return timeSlotRepository.findByClinic(clinic);
