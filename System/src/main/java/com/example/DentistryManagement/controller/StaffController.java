@@ -63,7 +63,7 @@ public class StaffController {
         try {
             userService.findByMail(userService.mailExtract()).
                     ifPresent(
-                        user -> userService.updateUser(userDTO, user)
+                            user -> userService.updateUser(userDTO, user)
                     );
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
@@ -460,10 +460,10 @@ public class StaffController {
 
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerID, @RequestParam String serviceId) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         try {
             Client staff = userService.findClientByMail(userService.mailExtract());
-            Client customer = userService.findUserById(customerID);
+            Client customer = userService.findClientByMail(customerMail);
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
