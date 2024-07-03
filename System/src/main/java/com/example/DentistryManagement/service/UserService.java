@@ -283,7 +283,6 @@ public class UserService {
 
     public void updateUser(UserDTO userDTO, Client updatedUser) {
         try {
-            updatedUser.setMail(userDTO.getMail());
             updatedUser.setName(userDTO.getName());
             updatedUser.setPhone(userDTO.getPhone());
             updatedUser.setBirthday(userDTO.getBirthday());

@@ -15,7 +15,27 @@ const TimetableServices = {
       throw error;
     }
   },
-  
+ // ShowScheduleServices.js
+
+
+
+
+  getAllDentists: async () => {
+    try {
+      const responseData = await api.get('/staff/show-set-schedule');
+      return responseData.data.dentistList;
+    } catch (error) {
+      notification.error({
+        message: 'Failed to fetch dentist list',
+        description: error.message,
+      });
+      throw error;
+    }
+  },
 };
+
+
+ 
+
 
 export default TimetableServices;

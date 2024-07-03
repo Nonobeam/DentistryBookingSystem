@@ -1,9 +1,11 @@
+// Schedule.js
+
 import React, { useState, useEffect } from 'react';
-import { Button, DatePicker, Input, TimePicker, Table, Modal, Form, Select } from 'antd';
+import { Button, DatePicker, Input, TimePicker, Table, Modal, Form, Select, notification } from 'antd';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
+import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
-// const { Column } = Table;
 const { RangePicker: DateRangePicker } = DatePicker;
 const { RangePicker: TimeRangePicker } = TimePicker;
 const { Option } = Select;
@@ -18,17 +20,30 @@ const Schedule = () => {
   const [editTask, setEditTask] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [dentistList, setDentistList] = useState([]);
 
   useEffect(() => {
     // Load scheduled tasks from local storage on component mount
     const storedTasks = JSON.parse(localStorage.getItem('scheduledTasks')) || [];
     setScheduledTasks(storedTasks);
+
+    // Load dentist list from API on component mount
+    fetchDentistList();
   }, []);
 
   useEffect(() => {
     // Save scheduled tasks to local storage whenever scheduledTasks state changes
     localStorage.setItem('scheduledTasks', JSON.stringify(scheduledTasks));
   }, [scheduledTasks]);
+
+  const fetchDentistList = async () => {
+    try {
+      const dentists = await TimetableServices.getAllDentists();
+      setDentistList(dentists);
+    } catch (error) {
+      console.error('Error fetching dentist list:', error);
+    }
+  };
 
   const handleDateRangeChange = (dates) => {
     setSelectedDateRange(dates);
