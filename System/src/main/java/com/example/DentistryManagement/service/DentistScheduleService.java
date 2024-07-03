@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.HashSet;
@@ -73,7 +74,10 @@ public class DentistScheduleService {
         while (!date.isAfter(endDate)) {
             DentistSchedule schedule = new DentistSchedule();
 
-            TimeSlot timeSlot = timeSlotRepository.findBySlotNumberAndClinicAndDate(slotNumber, clinic, newestStartDate).orElseThrow(() -> new RuntimeException("Time slot not found"));
+            TimeSlot timeSlot = timeSlotRepository.findTopBySlotNumberAndClinicAndDate(slotNumber, clinic.getClinicID(), newestStartDate,PageRequest.of(0, 1)).get(0);
+            if(timeSlot == null){
+                throw new RuntimeException();
+            }
 
             if (!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date)) {
                 schedule.setDentist(dentist);
