@@ -20,6 +20,7 @@ public class ClinicDTO {
     private LocalTime closeTime;
     private LocalTime breakStartTime;
     private LocalTime breakEndTime;
+    private int status;
 
     public ClinicDTO clinicMapping(Clinic clinic) {
         ClinicDTO clinicDTO = new ClinicDTO();
@@ -32,7 +33,7 @@ public class ClinicDTO {
         clinicDTO.setCloseTime(clinic.getCloseTime());
         clinicDTO.setBreakStartTime(clinic.getBreakStartTime());
         clinicDTO.setBreakEndTime(clinic.getBreakEndTime());
-
+        clinicDTO.setStatus(clinic.getStatus());
         return clinicDTO;
     }
 }

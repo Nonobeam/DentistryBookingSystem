@@ -145,8 +145,8 @@ public class ManagerController {
     }
 
 
-    @PostMapping
-    public ResponseEntity<Clinic> createClinic(
+    @PostMapping("/create-clinic")
+    public ResponseEntity<?> createClinic(
             @RequestParam String name,
             @RequestParam String phone,
             @RequestParam String address,
@@ -156,6 +156,12 @@ public class ManagerController {
             @RequestParam LocalTime breakStartTime,
             @RequestParam LocalTime breakEndTime,
             @RequestParam int status) {
+
+        if(!clinicService.checkSlotDurationValid(slotDuration)){
+            return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
+        }
+
+        Client manager = userService.findClientByMail(userService.mailExtract());
 
         Clinic clinic = Clinic.builder()
                 .name(name)
@@ -167,9 +173,15 @@ public class ManagerController {
                 .breakStartTime(breakStartTime)
                 .breakEndTime(breakEndTime)
                 .status(status)
+                .user(manager)
                 .build();
 
         Clinic createdClinic = clinicService.save(clinic);
+
+        timeSlotService.createAndSaveTimeSlots(LocalDate.now(), createdClinic,
+                createdClinic.getOpenTime(), createdClinic.getCloseTime(),
+                createdClinic.getBreakStartTime(), createdClinic.getBreakEndTime(), createdClinic.getSlotDuration());
+
         return ResponseEntity.ok(createdClinic);
     }
 
@@ -188,6 +200,7 @@ public class ManagerController {
             updateClinic.setPhone(clinicDTO.getPhone());
             updateClinic.setAddress(clinicDTO.getAddress());
             updateClinic.setName(clinicDTO.getName());
+            updateClinic.setStatus(clinicDTO.getStatus());
 
             //Check changes in clinic schedule
             if( !updateClinic.getSlotDuration().equals(clinicDTO.getSlotDuration()) ||
