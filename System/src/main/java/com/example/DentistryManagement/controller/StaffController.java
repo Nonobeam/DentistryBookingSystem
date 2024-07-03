@@ -5,10 +5,7 @@ import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Dependent;
-import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -251,6 +248,10 @@ public class StaffController {
             Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
             //Check for the newest Date;
             LocalDate startUpdateTimeSlotDate = timeSlotService.startUpdateTimeSlotDate(dentist.getClinic().getClinicID());
+            if (startUpdateTimeSlotDate == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find any time slot for this clinic's name: " + dentist.getClinic().getName()));
+            }
+
             if (startUpdateTimeSlotDate.isAfter(startDate) && startUpdateTimeSlotDate.isBefore(endDate)) {
                 return new ResponseEntity<>(new ErrorResponseDTO("400", "Must be done this separately. The schedule is must after or before the update timeslot date " + startUpdateTimeSlotDate), HttpStatus.BAD_REQUEST);
             }
@@ -462,13 +463,14 @@ public class StaffController {
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         try {
+            // Current user
             Client staff = userService.findClientByMail(userService.mailExtract());
             Client customer = userService.findClientByMail(customerMail);
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
-            if (customer == null || customer.getStatus() == 0) {
+            if (customer == null || customer.getStatus() == 0 || customer.getRole() != Role.CUSTOMER) {
                 ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
                 logger.error("Customer not found in system");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -248,29 +249,27 @@ public class AuthenticationService {
         return jwtService.generateToken(user);
     }
 
-//----------------------------------- LOGIN -----------------------------------
+    //----------------------------------- LOGIN -----------------------------------
 
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getMail(),
-                        request.getPassword()
-                )
-        );
-        Client user = null;
         try {
-            user = userRepository.findByMail(request.getMail())
-                    .orElseThrow();
-        } catch (Exception e) {
-            logger.error(e.toString());
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getMail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException e) {
+            throw new Error("Cannot find user");
         }
 
-        System.out.println("User" + user);
+        Client user = userRepository.findByMail(request.getMail())
+                .orElseThrow();
+
         var jwtToken = jwtService.generateToken(user);
         logger.info("Token in service: {}", jwtToken);
 
-        assert user != null;
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .role(user.getRole())
