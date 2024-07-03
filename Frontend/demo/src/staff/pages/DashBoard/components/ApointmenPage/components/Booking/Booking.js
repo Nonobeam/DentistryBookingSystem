@@ -127,7 +127,7 @@ export const Booking = () => {
         <Select onChange={handleScheduleChange} loading={loading} disabled={!selectedService || !selectedDate}>
           {schedules.map((schedule) => (
             <Select.Option key={schedule.scheduleID} value={schedule.scheduleID}>
-              {`${schedule.timeslot.startTime} - Time Slot: ${schedule.timeslot.slotNumber}`} {/* Example format assuming timeslot properties */}
+              {`${schedule.timeslot.startTime} - Time Slot: ${schedule.timeslot.slotNumber}`} Example format assuming timeslot properties
             </Select.Option>
           ))}
         </Select>
