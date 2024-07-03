@@ -112,6 +112,7 @@ public class DentistController {
                 notification.setTime(Time.valueOf(currentTime));
                 notification.setStatus(0);
 
+
                 insertedNotification = notificationService.insertNotification(notification);
 
             }

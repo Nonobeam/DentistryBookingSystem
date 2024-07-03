@@ -31,13 +31,11 @@ public class TimeSlotService {
         LocalDate result;
         TimeSlot timeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
         result = timeSlot.getDate();
-        if (result != null) {
-            return result;
-        }
-        return null;
+        return result;
     }
 
-    public void createAndSaveTimeSlots(LocalDate date, Clinic clinic, LocalTime startTime, LocalTime endTime, LocalTime startBreakTime, LocalTime endBreakTime, LocalTime slotDuration) {
+    public void createAndSaveTimeSlots(LocalDate date, Clinic clinic, LocalTime startTime, LocalTime endTime,
+                                       LocalTime startBreakTime, LocalTime endBreakTime, LocalTime slotDuration) {
         List<TimeSlot> timeSlots = new ArrayList<>();
         LocalTime currentTime = startTime;
         int slotNumber = 1;
