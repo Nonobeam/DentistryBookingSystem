@@ -51,8 +51,19 @@ const Login = () => {
 
       console.log('Token:', localStorage.getItem('token'));
       console.log('Role:', role);
-      setErrorMessage(''); // Clear previous error message
-      navigate('/'); // Navigate back to homepage
+      setErrorMessage('');
+
+      if (role === 'CUSTOMER') {
+        navigate('/');
+      }
+      if (role === 'STAFF') {
+        navigate('/staff');
+      }
+      if (role === 'ADMIN') {
+        navigate('/admin');
+      }
+      
+      
     } catch (error) {
       console.error('Failed to login:', error);
       if (error.response && error.response.status === 403) {

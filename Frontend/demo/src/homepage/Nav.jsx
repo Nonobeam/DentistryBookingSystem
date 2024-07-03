@@ -11,7 +11,8 @@ const NavBar = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expirationTime = localStorage.getItem("expirationTime");
-
+    
+    console.log('time:', expirationTime);
     if (!token || new Date().getTime() > expirationTime) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
@@ -53,6 +54,7 @@ const NavBar = () => {
   ];
 
   return (
+    <>
     <Header
       style={{
         display: "flex",
@@ -110,6 +112,7 @@ const NavBar = () => {
         )}
       </div>
     </Header>
+    </>
   );
 };
 
