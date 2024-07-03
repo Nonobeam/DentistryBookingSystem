@@ -31,6 +31,7 @@ import { Pages } from './admin/pages';
 import { CustomerListDash } from './staff/pages/DashBoard/components/CustomerList/CustomerList';
 import CustomerInfo from './staff/pages/DashBoard/components/CustomerList/components/CustomerInfo/CustomerInfo';
 import History from './homepage/History';
+import UserProfile from './account/UserProfile';
 
 
 
@@ -49,6 +50,13 @@ const App = () => {
         <Route path='/history' element={
             <RoleBasedRoute
               element={<History />}
+              requiredRole={['CUSTOMER']}
+            />
+          }
+        />
+        <Route path='/profile' element={
+            <RoleBasedRoute
+              element={<UserProfile />}
               requiredRole={['CUSTOMER']}
             />
           }
