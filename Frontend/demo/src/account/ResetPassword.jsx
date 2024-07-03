@@ -14,18 +14,16 @@ const ResetPassword = () => {
   const onFinish = async (values) => {
     const { password } = values;
     try {
-      const response = await axios.post(`http://localhost:8080/user/resetPassword/${token}?password=${password}`);
-      console.log('Response:', response);
-      setSuccessMessage("Your password has been reset successfully. Please log in.");
+      await axios.post(`http://localhost:8080/user/resetPassword/${token}?password=${password}`);
+      setSuccessMessage("Your password has been reset successfully. Redirecting to login page...");
       setErrorMessage("");
 
       setTimeout(() => {
         navigate('/login');
-      }, 3000); // Redirect to login page after 3 seconds
+      }, 3000);
     } 
     catch (error) {
-      console.error('Failed to reset password:', error);
-      setErrorMessage("An error occurred. Please try again later.");
+      setErrorMessage(error.response?.data || "An error occurred. Please try again later.");
       setSuccessMessage("");
     }
   };
@@ -85,6 +83,11 @@ const ResetPassword = () => {
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
               Reset Password
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button type="default" style={{ width: '100%' }} href='/forgot'>
+              Send reset link again?
             </Button>
           </Form.Item>
         </Form>
