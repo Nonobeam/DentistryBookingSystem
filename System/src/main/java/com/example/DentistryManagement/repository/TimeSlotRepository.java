@@ -8,12 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 @Repository
 public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
-    Optional<TimeSlot> findBySlotNumberAndClinicAndDate(int timeSlot, Clinic clinic, LocalDate date);
+    @Query("SELECT t FROM TimeSlot t WHERE t.clinic.clinicID = :clinicID and t.date = :date and t.slotNumber = :slotNumber")
+    List<TimeSlot> findTopBySlotNumberAndClinicAndDate(@Param("slotNumber") int slotNumber, @Param("clinicID") String clinic, @Param("date") LocalDate date, Pageable pageable);
     List<TimeSlot> findByClinic(Clinic clinic);
 
     @Query("SELECT t FROM TimeSlot t WHERE t.clinic.clinicID = :clinicID ORDER BY t.date DESC, t.startTime DESC")

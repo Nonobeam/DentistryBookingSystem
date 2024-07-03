@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Layout, Menu, Button, Typography, Dropdown } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -7,6 +7,21 @@ const { Title } = Typography;
 
 const NavBar = () => {
   const location = useLocation();
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expirationTime = localStorage.getItem("expirationTime");
+    
+    console.log('time:', expirationTime);
+    if (!token || new Date().getTime() > expirationTime) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("expirationTime");
+    }
+  }, []);
+
+  const token = localStorage.getItem("token");
+
   const pathToKey = {
     '/': '1',
     '/booking': '2',
@@ -15,8 +30,6 @@ const NavBar = () => {
   };
   const currentKey = pathToKey[location.pathname];
 
-  const token = localStorage.getItem("token");
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -24,18 +37,24 @@ const NavBar = () => {
     window.location.href = '/'; // Redirect to the homepage after logout
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="1">
-        <Link to="/profile">Profile</Link>
-      </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
-        Logout
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    {
+      key: '1',
+      label: <Link to="/history">Appointment History</Link>
+    },
+    {
+      key: '2',
+      label: <Link to="/profile">Profile</Link>
+    },
+    {
+      key: '3',
+      label: 'Logout',
+      onClick: handleLogout
+    },
+  ];
 
   return (
+    <>
     <Header
       style={{
         display: "flex",
@@ -67,19 +86,20 @@ const NavBar = () => {
             lineHeight: "40px",
             width: "100%"
           }}
-        > 
-          <Menu.Item key="1"><Link to="/">Home</Link></Menu.Item>
-          <Menu.Item key="2"><Link to="/booking">Booking</Link></Menu.Item>
-          <Menu.Item key="3"><Link to="/educational">Educational</Link></Menu.Item>
-          <Menu.Item key="4"><Link to="/services">Services</Link></Menu.Item>
-        </Menu>
+          items={[
+            { key: '1', label: <Link to="/">Home</Link> },
+            { key: '2', label: <Link to="/booking">Booking</Link> },
+            { key: '3', label: <Link to="/educational">Educational</Link> },
+            { key: '4', label: <Link to="/services">Services</Link> }
+          ]}
+        />
       </div>
 
       <div
         style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
       >
         {token ? (
-          <Dropdown overlay={menu} placement="bottomRight">
+          <Dropdown menu={{ items: menuItems }} placement="bottomRight">
             <Button>My Account</Button>
           </Dropdown>
         ) : (
@@ -92,6 +112,7 @@ const NavBar = () => {
         )}
       </div>
     </Header>
+    </>
   );
 };
 

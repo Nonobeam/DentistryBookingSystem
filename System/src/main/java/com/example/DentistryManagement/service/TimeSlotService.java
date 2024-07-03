@@ -34,7 +34,8 @@ public class TimeSlotService {
         return result;
     }
 
-    public void createAndSaveTimeSlots(LocalDate date, Clinic clinic, LocalTime startTime, LocalTime endTime, LocalTime startBreakTime, LocalTime endBreakTime, LocalTime slotDuration) {
+    public void createAndSaveTimeSlots(LocalDate date, Clinic clinic, LocalTime startTime, LocalTime endTime,
+                                       LocalTime startBreakTime, LocalTime endBreakTime, LocalTime slotDuration) {
         List<TimeSlot> timeSlots = new ArrayList<>();
         LocalTime currentTime = startTime;
         int slotNumber = 1;
