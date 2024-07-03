@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Layout, Menu, Button, Typography, Dropdown } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -6,16 +6,21 @@ const { Header } = Layout;
 const { Title } = Typography;
 
 const NavBar = () => {
-  const token = localStorage.getItem("token");
-  const expirationTime = localStorage.getItem("expirationTime");
-
-  if (!token || new Date().getTime() > expirationTime) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("expirationTime");
-  }
-
   const location = useLocation();
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expirationTime = localStorage.getItem("expirationTime");
+
+    if (!token || new Date().getTime() > expirationTime) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("expirationTime");
+    }
+  }, []);
+
+  const token = localStorage.getItem("token");
+
   const pathToKey = {
     '/': '1',
     '/booking': '2',
@@ -34,13 +39,17 @@ const NavBar = () => {
   const menuItems = [
     {
       key: '1',
-      label: <Link to="/profile">Profile</Link>
+      label: <Link to="/history">Appointment History</Link>
     },
     {
       key: '2',
+      label: <Link to="/profile">Profile</Link>
+    },
+    {
+      key: '3',
       label: 'Logout',
       onClick: handleLogout
-    }
+    },
   ];
 
   return (
