@@ -168,6 +168,7 @@ public class UserController {
     @PostMapping("/booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
         try {
+            // Current user
             Client customer = userService.findClientByMail(userService.mailExtract());
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
@@ -279,9 +280,9 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword() {
+    public ResponseEntity<?> forgotPassword(@RequestParam String mail) {
         try {
-            Client user = userService.findClientByMail(userService.mailExtract());
+            Client user = userService.findClientByMail(mail);
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
@@ -304,7 +305,11 @@ public class UserController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
+            Client currentUser = userService.findByMail(userService.mailExtract()).orElse(null);
+            if (currentUser == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
+            }
+            userService.updateUser(userDTO, currentUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

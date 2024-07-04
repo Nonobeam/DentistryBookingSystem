@@ -14,8 +14,7 @@ const Signup = () => {
     console.log("Success:", values);
     try {
       const response = await axios.post(API_URL, {
-        firstName: values.firstName,
-        lastName: values.lastName,
+        name: values.firstName,
         phone: values.phoneNumber,
         mail: values.email,
         password: values.password,
@@ -24,11 +23,10 @@ const Signup = () => {
 
       if (response.status === 200) { 
         setErrorMessage(""); 
-        setSuccessMessage("Registration successful. Please check your email to confirm your account. The link will expire in 24 hours. If you don't see the email, check your spam folder.");
+        setSuccessMessage("Registration successful. Please check your email to confirm your account. It may in your spam folder.");
       }
     } catch (error) {
-      console.error("Failed to register:", error);
-      setErrorMessage("Email already exists in the system.");
+      setErrorMessage("Your email or phone is already registered. Please login or use a different email or phone number.");
     }
   };
 
@@ -74,27 +72,14 @@ const Signup = () => {
             <Form.Item
               name="firstName"
               rules={[
-                { required: true, message: "Please input your first name!" },
+                { required: true, message: "Please input your name!" },
                 {
                   pattern: /^[A-Za-z]+$/,
-                  message: "First name must contain only letters!",
+                  message: "Name must contain only letters!",
                 },
               ]}
             >
-              <Input placeholder="First Name" />
-            </Form.Item>
-
-            <Form.Item
-              name="lastName"
-              rules={[
-                { required: true, message: "Please input your last name!" },
-                {
-                  pattern: /^[A-Za-z]+$/,
-                  message: "Last name must contain only letters!",
-                },
-              ]}
-            >
-              <Input placeholder="Last Name" />
+              <Input placeholder="Name" />
             </Form.Item>
 
             <Form.Item

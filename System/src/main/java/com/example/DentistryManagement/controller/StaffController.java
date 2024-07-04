@@ -251,6 +251,10 @@ public class StaffController {
             Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
             //Check for the newest Date;
             LocalDate startUpdateTimeSlotDate = timeSlotService.startUpdateTimeSlotDate(dentist.getClinic().getClinicID());
+            if (startUpdateTimeSlotDate == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find any time slot for this clinic's name: " + dentist.getClinic().getName()));
+            }
+
             if (startUpdateTimeSlotDate.isAfter(startDate) && startUpdateTimeSlotDate.isBefore(endDate)) {
                 return new ResponseEntity<>(new ErrorResponseDTO("400", "Must be done this separately. The schedule is must after or before the update timeslot date " + startUpdateTimeSlotDate), HttpStatus.BAD_REQUEST);
             }
@@ -462,6 +466,7 @@ public class StaffController {
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerID, @RequestParam String serviceId) {
         try {
+            // Current user
             Client staff = userService.findClientByMail(userService.mailExtract());
             Client customer = userService.findUserById(customerID);
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;

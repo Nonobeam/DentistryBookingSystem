@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,16 +54,12 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(
             @RequestBody AuthenticationRequest request) {
-        AuthenticationResponse response = authenticationService.authenticate(request);
-        if (response == null || response.getToken() == null) {
-            ErrorResponseDTO error = new ErrorResponseDTO();
-            error.setCode("403");
-            error.setMessage("Wrong mail or password");
-            logger.error("Wrong mail or password");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        try {
+            AuthenticationResponse response = authenticationService.authenticate(request);
+            return ResponseEntity.ok(response);
+        } catch (Error e) {
+            return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
         }
-
-        return ResponseEntity.ok(response);
     }
 
 

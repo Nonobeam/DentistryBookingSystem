@@ -6,7 +6,7 @@ export const CardTask = ({ data }) => {
     <Card bordered={false}>
       {data.map((task, idx) => (
         <Card key={idx} type='inner' title={task.time}>
-          {task.task}
+          {task.task}  {task.dentistName}
         </Card>
       ))}
     </Card>

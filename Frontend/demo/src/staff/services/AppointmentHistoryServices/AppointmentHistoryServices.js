@@ -4,9 +4,11 @@ import api from '../../config/axios/axios';
 export const AppointmentHistoryServices = {
   getAll: async (date, search) => {
     try {
-      const responseData = await api.get(
-        `staff/appointment-history?date=${date}&search=${search}`
-      );
+      let endPoint = `staff/appointment-history`;
+      if (date && search) {
+        endPoint = `staff/appointment-history?date=${date}&search=${search}`;
+      }
+      const responseData = await api.get(endPoint);
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -58,7 +60,7 @@ export const AppointmentHistoryServices = {
   }) => {
     try {
       const responseData = await api.post(
-        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerMail=${customerMail}&serviceId=${serviceId}`
+        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerID=${customerMail}&serviceId=${serviceId}`
       );
       return responseData.data;
     } catch (error) {
@@ -68,7 +70,7 @@ export const AppointmentHistoryServices = {
       });
     }
   },
-  patchBooking: async ({ appointmentId, status }) => {
+  patchAppointment: async ({ appointmentId, status }) => {
     try {
       const responseData = await api.patch(
         `staff/appointment-history/${appointmentId}?status=${status}`
