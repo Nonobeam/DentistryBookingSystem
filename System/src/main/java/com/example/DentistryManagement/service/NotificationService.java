@@ -33,7 +33,7 @@ public class NotificationService {
 
     public List<Notification> receiveNotice(String staffMail) {
         try {
-            return notificationRepository.getNotificationByDentist_StaffUserMail(staffMail);
+            return notificationRepository.getNotificationByDentist_StaffUserMailAndStatus(staffMail,1);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching all users: " + e.getMessage(), e);
         }

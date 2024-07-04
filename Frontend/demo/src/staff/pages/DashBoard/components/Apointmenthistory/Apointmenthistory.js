@@ -1,5 +1,7 @@
+// components/AppointmentHistory.js
+
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Dropdown, Menu, Button, Modal, message } from 'antd';
+import { Card, Table, Dropdown, Button, Modal, message, Menu } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
 const AppointmentHistory = () => {
@@ -25,7 +27,6 @@ const AppointmentHistory = () => {
         status: status,
       });
       message.success(`Updated status to ${status} for treatment ID ${record.id}`);
-      setApiData(response);
       fetchData(); // Refresh data after update
       console.log('Updated status:', status);
     } catch (error) {
@@ -33,18 +34,21 @@ const AppointmentHistory = () => {
     }
   };
 
-  const handleDelete = (record) => {
+  const handleDelete = async (record) => {
     Modal.confirm({
       title: 'Confirm Delete',
       content: `Are you sure you want to delete treatment ID ${record.id}?`,
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk() {
-        // Perform deletion
-        message.success(`Deleted treatment ID ${record.id}`);
-        // Assuming you have deleted the record, update the table data
-        fetchData(); // Refresh data after deletion
+      async onOk() {
+        try {
+         const response = await AppointmentHistoryServices.deleteAppointment({ appointmentId: record.id });
+          message.success(`Deleted treatment ID ${record.id}`);
+          fetchData(); // Refresh data after deletion
+        } catch (error) {
+          console.error('Error deleting appointment:', error);
+        }
       },
       onCancel() {
         console.log('Cancel');
@@ -114,11 +118,6 @@ const AppointmentHistory = () => {
   const styles = {
     card: {
       marginBottom: '20px',
-    },
-    treatment: {
-      backgroundColor: '#f0f0f0',
-      padding: '5px 10px',
-      borderRadius: '5px',
     },
   };
 

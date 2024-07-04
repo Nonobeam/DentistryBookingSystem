@@ -5,10 +5,7 @@ import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Dependent;
-import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -102,10 +99,10 @@ public class StaffController {
 
 
     @Operation(summary = "Set Service for dentists")
-    @PostMapping("/set-service/{dentistID}")
-    public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
+    @PostMapping("/set-service/{dentistMail}")
+    public ResponseEntity<?> updateDentistService(@PathVariable String dentistMail, @RequestParam String serviceID) {
         try {
-            Dentist dentist = dentistService.findDentistByID(dentistID);
+            Dentist dentist = dentistService.findDentistByMail(dentistMail);
             Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
             dentistService.save(dentist);
@@ -574,14 +571,16 @@ public class StaffController {
 
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) int year) {
+    public ResponseEntity<?> getDashBoardData(
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "year", required = false) Integer year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             if (date == null) date = LocalDate.now();
-            if (year == -1) year = LocalDate.now().getYear();
+            if (year == null) year = LocalDate.now().getYear();
             Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
