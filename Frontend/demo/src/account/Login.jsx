@@ -63,7 +63,9 @@ const Login = () => {
         navigate('/admin');
       }
       
-      
+      if (role === 'DENTIST') {
+        navigate('/dentist');
+      }
     } catch (error) {
       console.error('Failed to login:', error);
       if (error.response && error.response.status === 403) {
