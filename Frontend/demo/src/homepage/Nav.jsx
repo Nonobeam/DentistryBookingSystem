@@ -7,12 +7,12 @@ const { Title } = Typography;
 
 const NavBar = () => {
   const location = useLocation();
-  
+  const expirationTime = localStorage.getItem("expirationTime");
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expirationTime = localStorage.getItem("expirationTime");
     
-    console.log('time:', expirationTime);
     if (!token || new Date().getTime() > expirationTime) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
@@ -98,7 +98,7 @@ const NavBar = () => {
       <div
         style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
       >
-        {token ? (
+        {new Date().getTime() < expirationTime ? (
           <Dropdown menu={{ items: menuItems }} placement="bottomRight">
             <Button>My Account</Button>
           </Dropdown>

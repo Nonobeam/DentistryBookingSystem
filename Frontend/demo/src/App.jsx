@@ -32,6 +32,9 @@ import { CustomerListDash } from './staff/pages/DashBoard/components/CustomerLis
 import CustomerInfo from './staff/pages/DashBoard/components/CustomerList/components/CustomerInfo/CustomerInfo';
 import History from './homepage/History';
 import UserProfile from './account/UserProfile';
+import TodayAppointments from './dentist/TodayAppointments';
+import DenHistory from './dentist/DenHistory';
+import DenProfile from './dentist/DenProfile';
 
 
 
@@ -69,6 +72,12 @@ const App = () => {
         <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path='/confirm' element={<ConfirmAccount />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
+
+        <Route path='/dentist'>
+          <Route path='' element={<TodayAppointments />} />
+          <Route path='history' element={<DenHistory />} />
+          <Route path='profile' element={<DenProfile />} />
+        </Route>
 
         <Route path='/staff' element={<DashBoard />}>
           <Route path='' element={<AdminHomePage />} />
