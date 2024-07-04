@@ -574,14 +574,16 @@ public class StaffController {
 
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) int year) {
+    public ResponseEntity<?> getDashBoardData(
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "year", required = false) Integer year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             if (date == null) date = LocalDate.now();
-            if (year == -1) year = LocalDate.now().getYear();
+            if (year == null) year = LocalDate.now().getYear();
             Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
