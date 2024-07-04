@@ -19,7 +19,7 @@ const AdminHomePage = () => {
       <Row gutter={16}>
         <Col span={8}>
           <Card
-            onClick={() => handleNavigate(' /staff/timetable')}
+            onClick={() => handleNavigate('/staff/timetable')}
             hoverable
             cover={
               <img
