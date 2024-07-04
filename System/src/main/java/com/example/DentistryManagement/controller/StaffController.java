@@ -60,7 +60,7 @@ public class StaffController {
         try {
             userService.findByMail(userService.mailExtract()).
                     ifPresent(
-                            user -> userService.updateUser(userDTO, user)
+                        user -> userService.updateUser(userDTO, user)
                     );
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
@@ -136,6 +136,7 @@ public class StaffController {
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
+
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
@@ -469,7 +470,7 @@ public class StaffController {
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
-            if (customer == null || customer.getStatus() == 0 || customer.getRole() != Role.CUSTOMER) {
+            if (customer == null || customer.getStatus() == 0) {
                 ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
                 logger.error("Customer not found in system");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
@@ -570,7 +571,9 @@ public class StaffController {
 
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) Integer year) {
+    public ResponseEntity<?> getDashBoardData(
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "year", required = false) Integer year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {

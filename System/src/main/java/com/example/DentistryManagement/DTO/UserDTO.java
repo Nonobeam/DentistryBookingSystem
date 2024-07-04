@@ -14,6 +14,4 @@ public class UserDTO {
     private String mail;
     private LocalDate birthday;
     private int status;
-
-
 }

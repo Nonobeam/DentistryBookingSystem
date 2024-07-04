@@ -34,15 +34,15 @@ export const FeatureAction = () => {
         >
           Thêm form
         </Button>
-        <Button
+        {/* <Button
           style={{ backgroundColor: '#1890ff', color: '#fff' }}
           type='primary'
           icon={<FiDownload />}
         >
           Tải về  
-        </Button>
+        </Button> */}
       </Flex>
-      <Flex>
+      {/* <Flex>
         <Dropdown menu={menuProps}>
           <Button style={{ backgroundColor: '#1890ff', color: '#fff' }}>
             <Space>
@@ -57,7 +57,7 @@ export const FeatureAction = () => {
             </Space>
           </Button>
         </Dropdown>
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 };

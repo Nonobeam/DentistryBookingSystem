@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
-import { FaUserCircle, FaCog } from 'react-icons/fa';
+import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-// import { CardNotification as Notification } from '../../pages/DashBoard/components/CarNotification/CarNotification';
 import { Button, Dropdown, Menu } from 'antd';
-import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
+ // Đường dẫn tới NotificationDropdown
 
-const NotificationDropdown = ({ onClose }) => {
+import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
+import NotificationDropdown from '../../pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
+
+export const AppHeader = () => {
+  const [showBellDropdown, setShowBellDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -20,34 +25,6 @@ const NotificationDropdown = ({ onClose }) => {
     };
     fetchNotifications();
   }, []);
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '50px',
-        right: '20px',
-        padding: '10px',
-        background: '#fff',
-        color: '#000',
-        zIndex: 999,
-        boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)', // Add box shadow for better visibility
-        borderRadius: '5px',
-        // Add border radius for rounded corners
-      }}>
-      {/* {notifications.map((notification) => (
-        <Notification
-          key={notification.notificationID}
-          content={notification.message}
-        />
-      ))} */}
-    </div>
-  );
-};
-
-export const AppHeader = () => {
-  const [showBellDropdown, setShowBellDropdown] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const handleBellIconClick = () => {
     setShowBellDropdown(!showBellDropdown); // Toggle bell dropdown visibility
@@ -86,7 +63,8 @@ export const AppHeader = () => {
         alignItems: 'center',
         gap: '20px',
         color: '#fff',
-      }}>
+      }}
+    >
       <input
         style={{
           border: 'none',
@@ -106,7 +84,24 @@ export const AppHeader = () => {
           onClick={handleBellIconClick}
         />
         {showBellDropdown && (
-          <NotificationDropdown onClose={() => setShowBellDropdown(false)} />
+          <div
+            style={{
+              position: 'absolute',
+              top: '40px',
+              right: '10px',
+              minWidth: '300px', // Adjust the width as needed
+              background: '#fff',
+              boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
+              borderRadius: '8px',
+              padding: '10px',
+              zIndex: 999,
+            }}
+          >
+            <NotificationDropdown
+              notifications={notifications}
+              onClose={() => setShowBellDropdown(false)}
+            />
+          </div>
         )}
       </div>
       <Dropdown overlay={menu} placement='bottomRight' trigger={['click']}>
