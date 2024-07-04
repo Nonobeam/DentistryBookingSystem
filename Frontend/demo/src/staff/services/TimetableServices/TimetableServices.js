@@ -23,7 +23,7 @@ const TimetableServices = {
   getAllDentists: async () => {
     try {
       const responseData = await api.get('/staff/show-set-schedule');
-      return responseData.data.dentistList;
+      return responseData.data;
     } catch (error) {
       notification.error({
         message: 'Failed to fetch dentist list',
@@ -32,7 +32,20 @@ const TimetableServices = {
       throw error;
     }
   },
+  setSchedule: async ({dentistMail,startDate,endDate,slotNumber}) => {
+    try {
+      const responseData = await api.post(`/staff/set-schedule?dentistMail=${dentistMail}&startDate=${startDate}&endDate=${endDate}&slotNumber=${slotNumber}`);
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Failed to set schedule',
+        description: error.message,
+      });
+      throw error;
+    }
+  },
 };
+
 
 
  

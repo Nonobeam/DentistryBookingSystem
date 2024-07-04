@@ -60,7 +60,7 @@ export const AppointmentHistoryServices = {
   }) => {
     try {
       const responseData = await api.post(
-        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerMail=${customerMail}&serviceId=${serviceId}`
+        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerID=${customerMail}&serviceId=${serviceId}`
       );
       return responseData.data;
     } catch (error) {
