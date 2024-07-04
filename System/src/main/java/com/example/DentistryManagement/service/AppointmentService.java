@@ -122,7 +122,7 @@ public class AppointmentService {
     public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffMail) {
         try {
             Staff staffClient = staffRepository.findStaffByUserMail(staffMail);
-            List<Appointment> appointments = appointmentRepository.findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, name, name);
+            List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
             for (Appointment appointment : appointments) {
                 if (appointment.getClinic().getClinicID().equals(staffClient.getClinic().getClinicID())) {
@@ -135,9 +135,9 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByDentist(LocalDate date, String name, Dentist dentist) {
+    public List<Appointment> searchAppointmentByDentist(String name, Dentist dentist) {
         try {
-            List<Appointment> appointments = appointmentRepository.findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(date, name, name);
+            List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
             for (Appointment appointment : appointments) {
                 if (appointment.getDentist() == dentist) {
@@ -342,6 +342,7 @@ public class AppointmentService {
                         } else
                             appointment.setUser(appointmentEntity.getUser().getName());
                     }
+                    appointment.setCustomerID(appointmentEntity.getUser().getUserID());
 
                     return appointment;
                 })
@@ -357,7 +358,7 @@ public class AppointmentService {
      * @param services        Input Services
      * @param dependent       Input Dependent dependent
      */
-    public void createAppointment(@Nullable Client staff, Client customer , DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
+    public void createAppointment(@Nullable Client staff, Client customer, DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
         Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
                 .user(customer)
                 .clinic(dentistSchedule.getClinic())
