@@ -87,4 +87,20 @@ export const AppointmentHistoryServices = {
       });
     }
   },
+  deteleateAppointment: async ({ appointmentId }) => {
+    try {
+      const responseData = await api.delete(
+        `staff/delete-booking/${appointmentId}`
+      );
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        onClick: () => {
+          console.log('Notification Clicked!');
+        },
+      });
+    }
+  },
 };

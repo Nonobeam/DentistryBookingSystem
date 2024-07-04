@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
 
-    List<Notification> getNotificationByDentist_StaffUserMail(String staffMail);
+    List<Notification> getNotificationByDentist_StaffUserMailAndStatus(String staffMail,int status);
 
     List<Notification> getNotificationsByDentistAndStatus(Dentist dentist, int status);
 
