@@ -17,7 +17,9 @@ export const Booking = () => {
       try {
         if (selectedDate) {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllServices(formattedDate);
+          const data = await AppointmentHistoryServices.getAllServices(
+            formattedDate
+          );
           setServices(data); // Assuming data is an array of service objects
         }
       } catch (error) {
@@ -39,10 +41,12 @@ export const Booking = () => {
       if (selectedService && selectedDate) {
         try {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllAvailableSchedule({
-            workDate: formattedDate,
-            servicesID: selectedService,
-          });
+          const data = await AppointmentHistoryServices.getAllAvailableSchedule(
+            {
+              workDate: formattedDate,
+              servicesID: selectedService,
+            }
+          );
           setSchedules(data);
         } catch (error) {
           notification.error({
@@ -64,7 +68,8 @@ export const Booking = () => {
     try {
       const { dependentID, customerMail } = values;
       const serviceId = selectedService;
-      const scheduleId = selectedSchedule ? selectedSchedule.scheduleID : null; // Get schedule ID from selected schedule
+      const scheduleId = selectedSchedule ? selectedSchedule : null; // Get schedule ID from selected schedule
+      console.log('Selected Schedule ID:', scheduleId);
       await AppointmentHistoryServices.makeBooking({
         dependentID: dependentID || null, // Pass null if dependentID is not provided
         customerMail,
@@ -96,8 +101,8 @@ export const Booking = () => {
   };
 
   const handleScheduleChange = (value) => {
-    const selected = schedules.find(schedule => schedule.scheduleID === value);
-    setSelectedSchedule(selected);
+    console.log('Selected Schedule:', value);
+    setSelectedSchedule(value);
   };
 
   return (
@@ -124,10 +129,15 @@ export const Booking = () => {
         name='schedule'
         label='Select Schedule'
         rules={[{ required: true, message: 'Please select a schedule' }]}>
-        <Select onChange={handleScheduleChange} loading={loading} disabled={!selectedService || !selectedDate}>
+        <Select
+          onChange={handleScheduleChange}
+          loading={loading}
+          disabled={!selectedService || !selectedDate}>
           {schedules.map((schedule) => (
-            <Select.Option key={schedule.scheduleID} value={schedule.scheduleID}>
-              {`${schedule.timeslot.startTime} - Time Slot: ${schedule.timeslot.slotNumber}`} Example format assuming timeslot properties
+            <Select.Option
+              key={schedule.dentistScheduleID}
+              value={schedule.dentistScheduleID}>
+              {`${schedule.startTime}`}
             </Select.Option>
           ))}
         </Select>
@@ -138,9 +148,7 @@ export const Booking = () => {
         rules={[{ required: true, message: 'Please enter customer email' }]}>
         <Input />
       </Form.Item>
-      <Form.Item
-        name='dependentID'
-        label='Dependent ID'>
+      <Form.Item name='dependentID' label='Dependent ID'>
         <Input />
       </Form.Item>
       <Form.Item>
@@ -151,4 +159,3 @@ export const Booking = () => {
     </Form>
   );
 };
-
