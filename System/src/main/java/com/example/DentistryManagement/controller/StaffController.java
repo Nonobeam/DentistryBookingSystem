@@ -99,10 +99,10 @@ public class StaffController {
 
 
     @Operation(summary = "Set Service for dentists")
-    @PostMapping("/set-service/{dentistID}")
-    public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
+    @PostMapping("/set-service/{dentistMail}")
+    public ResponseEntity<?> updateDentistService(@PathVariable String dentistMail, @RequestParam String serviceID) {
         try {
-            Dentist dentist = dentistService.findDentistByID(dentistID);
+            Dentist dentist = dentistService.findDentistByMail(dentistMail);
             Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
             dentistService.save(dentist);
@@ -136,7 +136,6 @@ public class StaffController {
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
-
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
@@ -461,11 +460,11 @@ public class StaffController {
 
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerID, @RequestParam String serviceId) {
         try {
             // Current user
             Client staff = userService.findClientByMail(userService.mailExtract());
-            Client customer = userService.findClientByMail(customerMail);
+            Client customer = userService.findUserById(customerID);
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
@@ -571,14 +570,14 @@ public class StaffController {
 
     @Operation(summary = "Staff Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) int year) {
+    public ResponseEntity<?> getDashBoardData(@RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "year", required = false) Integer year) {
         try {
             Staff staff = userService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             if (date == null) date = LocalDate.now();
-            if (year == -1) year = LocalDate.now().getYear();
+            if (year == null) year = LocalDate.now().getYear();
             Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
             Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
