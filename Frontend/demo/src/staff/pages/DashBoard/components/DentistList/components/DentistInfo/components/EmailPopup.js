@@ -30,7 +30,7 @@ export const EmailPopup = () => {
           backgroundColor: 'blue',
           borderColor: 'blue',
         }}>
-        Notify Email
+        Set Services
       </Button>
     </Popover>
   );

@@ -10,25 +10,21 @@ const columns = [
     title: 'Full Name',
     dataIndex: 'name',
     key: 'name',
-    sorter: true,
   },
   {
     title: 'Birthday',
     dataIndex: 'birthday',
     key: 'birthday',
-    sorter: true,
   },
   {
     title: 'Number',
     dataIndex: 'phone',
     key: 'phone',
-    sorter: true,
   },
   {
     title: 'Email',
     dataIndex: 'mail',
     key: 'mail',
-    sorter: true,
   },
   {
     title: 'Action',
@@ -52,20 +48,6 @@ export const DentistList = () => {
     fetchData();
   }, []);
 
-  const handleTableChange = (pagination, filters, sorter) => {
-    // Handle table sort change
-    const { field, order } = sorter;
-    const sortedData = [...apiData];
-    sortedData.sort((a, b) => {
-      if (order === 'ascend') {
-        return a[field].toString().localeCompare(b[field].toString());
-      } else {
-        return b[field].toString().localeCompare(a[field].toString());
-      }
-    });
-    setApiData(sortedData);
-  };
-
   return (
     <div>
       <h1>DashBoard Dentist</h1>
@@ -73,7 +55,7 @@ export const DentistList = () => {
         <FeatureAction />
       </Flex>
       <Flex>
-        <TableList dataSource={apiData} columns={columns} onChange={handleTableChange} />
+        <TableList dataSource={apiData} columns={columns} />
       </Flex>
     </div>
   );

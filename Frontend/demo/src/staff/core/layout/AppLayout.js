@@ -48,9 +48,6 @@ export const AppLayout = ({ content }) => {
           }}>
           {content}
         </Content>
-        <Footer style={{ textAlign: 'center', backgroundColor: '#fff' }}>
-          <AppFooter />
-        </Footer>
       </Layout>
     </Layout>
   );
