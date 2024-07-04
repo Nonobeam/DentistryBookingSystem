@@ -5,10 +5,7 @@ import com.example.DentistryManagement.Mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Dependent;
-import com.example.DentistryManagement.core.user.Staff;
+import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -102,10 +99,10 @@ public class StaffController {
 
 
     @Operation(summary = "Set Service for dentists")
-    @PostMapping("/set-service/{dentistID}")
-    public ResponseEntity<?> updateDentistService(@PathVariable String dentistID, @RequestParam String serviceID) {
+    @PostMapping("/set-service/{dentistMail}")
+    public ResponseEntity<?> updateDentistService(@PathVariable String dentistMail, @RequestParam String serviceID) {
         try {
-            Dentist dentist = dentistService.findDentistByID(dentistID);
+            Dentist dentist = dentistService.findDentistByMail(dentistMail);
             Services service = serviceService.findServiceByID(serviceID);
             dentist.getServicesList().add(service);
             dentistService.save(dentist);
