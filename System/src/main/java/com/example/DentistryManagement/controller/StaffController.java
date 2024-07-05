@@ -136,7 +136,7 @@ public class StaffController {
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
-
+                            clientDTO.setId(client.getUserID());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
@@ -331,6 +331,7 @@ public class StaffController {
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
                             clientDTO.setBirthday(client.getBirthday());
+                            clientDTO.setId(client.getUserID());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());

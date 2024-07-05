@@ -41,7 +41,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findAppointmentsByDateBetweenAndDentistStaff(LocalDate startDate, LocalDate endDate, Staff staff);
 
-    List<Appointment> findByDateOrUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(LocalDate date, String name1, String dependentName);
+    List<Appointment> findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(String name1, String dependentName);
 
     Optional<List<Appointment>> findAppointmentsByUser(Client client);
 
