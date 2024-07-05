@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Layout, Table, Button, Modal, Input, message, Spin } from "antd";
+import { Layout, Table, Button, message, Spin } from "antd";
 import moment from "moment";
 import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
@@ -14,7 +14,6 @@ const PatientInfo = () => {
   const [loading, setLoading] = useState(true);
   const [reminderModalVisible, setReminderModalVisible] = useState(false);
   const [reminderMessage, setReminderMessage] = useState("");
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
     fetchPatientInfo();
@@ -40,27 +39,6 @@ const PatientInfo = () => {
     setLoading(false);
   };
 
-  const handleSendReminder = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:8080/api/v1/dentist/reminder`,
-        {
-          customerID: selectedAppointment.customerID,
-          message: reminderMessage
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      message.success("Reminder sent successfully");
-      setReminderModalVisible(false);
-    } catch (error) {
-      message.error(error.response?.data || "An error occurred");
-    }
-  };
 
   const columns = [
     {
@@ -136,21 +114,7 @@ const PatientInfo = () => {
         );
       },
     },
-    {
-      title: "",
-      key: "action",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => {
-            setSelectedAppointment(record);
-            setReminderModalVisible(true);
-          }}
-        >
-          Remind
-        </Button>
-      ),
-    },
+    
   ];
 
   return (
@@ -184,19 +148,7 @@ const PatientInfo = () => {
                   style={{ marginBottom: 20 }}
                 />
 
-                <Modal
-                  title="Send Reminder"
-                  visible={reminderModalVisible}
-                  onOk={handleSendReminder}
-                  onCancel={() => setReminderModalVisible(false)}
-                >
-                  <Input.TextArea
-                    rows={4}
-                    value={reminderMessage}
-                    onChange={(e) => setReminderMessage(e.target.value)}
-                    placeholder="Type your reminder message here..."
-                  />
-                </Modal>
+                
               </>
             )}
           </div>
