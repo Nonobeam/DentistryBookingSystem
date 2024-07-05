@@ -315,7 +315,7 @@ public class StaffController {
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients;
+            HashSet<Client> clients;
 
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchCustomerInClinicByStaff(mail, search);
