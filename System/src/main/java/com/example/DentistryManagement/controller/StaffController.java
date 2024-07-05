@@ -136,7 +136,7 @@ public class StaffController {
                             clientDTO.setMail(client.getMail());
                             clientDTO.setName(client.getName());
                             clientDTO.setBirthday(client.getBirthday());
-
+                            clientDTO.setId(client.getUserID());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());
@@ -315,7 +315,7 @@ public class StaffController {
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
-            List<Client> clients;
+            HashSet<Client> clients;
 
             if (search != null && !search.isEmpty()) {
                 clients = userService.searchCustomerInClinicByStaff(mail, search);
@@ -331,6 +331,7 @@ public class StaffController {
                             clientDTO.setPhone(client.getPhone());
                             clientDTO.setMail(client.getMail());
                             clientDTO.setBirthday(client.getBirthday());
+                            clientDTO.setId(client.getUserID());
                             return clientDTO;
                         })
                         .collect(Collectors.toList());

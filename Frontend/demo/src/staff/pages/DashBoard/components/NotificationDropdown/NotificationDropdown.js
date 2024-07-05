@@ -1,47 +1,95 @@
-import React from 'react';
-import { Menu } from 'antd';
+// NotificationDropdown.jsx
 
-const NotificationDropdown = ({ notifications, onClose }) => {
-  const handleMenuClick = (notificationId) => {
-    // Implement your logic when a notification is clicked, e.g., mark as read
-    console.log(`Notification ${notificationId} clicked`);
-    // Close the dropdown or perform any other action
-    onClose();
+import React, { useState } from 'react';
+import { Menu, Modal, Form, Input, Button } from 'antd';
+import { PersonalServices } from '../../../../services/PersonalServices/PersonalServices';
+
+const { Item: FormItem } = Form;
+
+const NotificationDropdown = ({ notifications, onNotificationClick }) => {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+
+  const handleMenuClick = (notification) => {
+    setSelectedNotification(notification);
+    setShowForm(true);
+    onNotificationClick(notification); // Notify parent component about the click
   };
 
+  const handleCancel = () => {
+    setShowForm(false);
+    setSelectedNotification(null);
+  };
+
+  const handleFormSubmit = async (values) => {
+    try {
+      const { email, subject, message } = values;
+      const notificationID = selectedNotification.notificationID;
+      await PersonalServices.updateNotificationStaff({
+        notificationID,
+        mail: email,
+        subject,
+        text: message,
+      });
+      console.log('Email sent successfully!');
+      setShowForm(false);
+      setSelectedNotification(null);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      // Handle error (e.g., show error message to the user)
+    }
+  };
   return (
-    <Menu
-      style={{
-        marginTop: '8px', // Adjust spacing from the top
-        boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)', // Box shadow for dropdown
-        borderRadius: '8px', // Rounded corners
-        minWidth: '400px', // Minimum width of the dropdown
-      }}
-    >
-      {notifications.map((notification) => (
-        <Menu.Item
-          key={notification.notificationID}
-          onClick={() => handleMenuClick(notification.notificationID)}
-          style={{
-            padding: '12px', // Padding around each notification item
-            borderBottom: '1px solid #f0f0f0', // Bottom border for separation
-            cursor: 'pointer', // Pointer cursor on hover
-            whiteSpace: 'normal', // Wrap long text in multiple lines
-          }}
-        >
-          <span
-            style={{
-              display: 'block',
-              fontSize: '14px',
-              lineHeight: '18px',
-              color: '#333', // Text color
-            }}
+    <>
+      <Menu>
+        {notifications.map((notification) => (
+          <Menu.Item
+            key={notification.notificationID}
+            onClick={() => handleMenuClick(notification)}
           >
             {notification.message}
-          </span>
-        </Menu.Item>
-      ))}
-    </Menu>
+          </Menu.Item>
+        ))}
+      </Menu>
+
+      {selectedNotification && (
+        <Modal
+          title="Send Email"
+          visible={showForm}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          <Form onFinish={handleFormSubmit}>
+            <FormItem
+              label="Email"
+              name="email"
+              rules={[{ required: true, message: 'Please input your email!' }]}
+            >
+              <Input placeholder="Enter email" />
+            </FormItem>
+            <FormItem
+              label="Subject"
+              name="subject"
+              rules={[{ required: true, message: 'Please input the subject!' }]}
+            >
+              <Input placeholder="Enter subject" />
+            </FormItem>
+            <FormItem
+              label="Message"
+              name="message"
+              rules={[{ required: true, message: 'Please input the message!' }]}
+            >
+              <Input.TextArea rows={4} placeholder="Enter message" />
+            </FormItem>
+            <FormItem>
+              <Button type="primary" htmlType="submit">
+                Send
+              </Button>
+            </FormItem>
+          </Form>
+        </Modal>
+      )}
+    </>
   );
 };
 

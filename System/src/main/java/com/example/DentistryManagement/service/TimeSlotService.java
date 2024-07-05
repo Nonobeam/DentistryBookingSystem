@@ -24,7 +24,7 @@ public class TimeSlotService {
     }
 
     public List<TimeSlot> findByClinic(Clinic clinic) {
-        return timeSlotRepository.findByClinic(clinic);
+        return timeSlotRepository.findByClinicOrderByStartTimeAsc(clinic);
     }
 
     public LocalDate startUpdateTimeSlotDate(String clinicID) {

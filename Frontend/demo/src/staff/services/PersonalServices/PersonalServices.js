@@ -25,4 +25,12 @@ export const PersonalServices = {
       console.log(err);
     }
   },
+  updateNotificationStaff: async ({notificationID, mail, subject, text}) => {
+    try {
+      const response = await api.post(`/staff/send-mail?${notificationID }?mail=${mail}&subject=${subject}&text=${text}`);
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };

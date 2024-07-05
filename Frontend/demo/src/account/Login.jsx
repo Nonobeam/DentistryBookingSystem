@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Typography, Alert } from 'antd';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -63,7 +63,9 @@ const Login = () => {
         navigate('/admin');
       }
       
-      
+      if (role === 'DENTIST') {
+        navigate('/dentist');
+      }
     } catch (error) {
       console.error('Failed to login:', error);
       if (error.response && error.response.status === 403) {
@@ -151,6 +153,7 @@ const Login = () => {
         }}>
         <img
           src='https://www.dpinc.net/wp-content/uploads/2021/03/9-scaled.jpg'
+          alt='Dental Clinic'
           style={{ height: '100%' }}></img>
       </div>
     </div>
