@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin } from "antd";
+import { Form, Input, Button, DatePicker, message, Spin, Layout } from "antd";
 import moment from "moment";
-import NavBar from "../homepage/Nav";
+import Sidebar from "./Sidebar";
 
-const UserProfile = () => {
+const { Header, Content } = Layout;
+
+
+const DenProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -16,7 +19,7 @@ const UserProfile = () => {
   const fetchUserInfo = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/user/info", {
+      const response = await axios.get("http://localhost:8080/api/v1/dentist/info", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -38,15 +41,16 @@ const UserProfile = () => {
   const handleUpdate = async (values) => {
     try {
       const token = localStorage.getItem("token");
+      console.log(values.birthday)
       const response = await axios.put(
-        "http://localhost:8080/user/info/update",
+        "http://localhost:8080/api/v1/dentist/info/update",
         {
-          name: values.name,
+            name: values.name,
             phone: values.phone,
             mail: user.mail,
             birthday: values.birthday.format("YYYY-MM-DD"),
-          id: user.id,
-          status: user.status
+            id: user.id,
+            status: user.status
         },
         {
           headers: {
@@ -62,15 +66,19 @@ const UserProfile = () => {
   };
 
   return (
-    <>
-    <NavBar />
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px", textAlign: "center" }}>
-      <h1>User Profile</h1>
+    <Layout style={{ minHeight: "100vh" }}>
+    <Sidebar />
+    <Layout style={{ margin: "0 auto", textAlign: "center" }}>
+    <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+        <Content style={{ margin: '20px 16px 20px 20px' }}>
+      
+      <h1>Profile</h1>
       {loading ? (
         <Spin />
       ) : (
         <Form
           form={form}
+          style={{ maxWidth: "600px", margin: "0 auto" }}
           layout="vertical"
           onFinish={handleUpdate}
           initialValues={{
@@ -101,16 +109,18 @@ const UserProfile = () => {
           >
             <Input disabled />
           </Form.Item>
+
           <Form.Item
             name="birthday"
             label="Birthday"
             rules={[{ required: true, message: "Please select your birthday" }]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="password" label="Password">
+
+          {/* <Form.Item name="password" label="Password">
             <Input.Password />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Profile
@@ -118,9 +128,10 @@ const UserProfile = () => {
           </Form.Item>
         </Form>
       )}
-    </div>
-    </>
+    </Content>
+    </Layout>
+    </Layout>
   );
 };
 
-export default UserProfile;
+export default DenProfile;
