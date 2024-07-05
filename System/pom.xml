@@ -93,6 +93,8 @@
 			<artifactId>tomcat-embed-core</artifactId>
 			<version>10.1.20</version>
 		</dependency>
+
+		<!-- Junit test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -102,6 +104,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-test</artifactId>
 			<version>3.2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

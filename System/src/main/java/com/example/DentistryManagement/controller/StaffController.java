@@ -211,14 +211,20 @@ public class StaffController {
 
     @Operation(summary = "Show dentists and timeslots for choosing set schedule")
     @GetMapping("/show-set-schedule")
-    public ResponseEntity<?> showDentistsAndDentistsTimeSlots() {
+    public ResponseEntity<?> showDentistsAndDentistsTimeSlots(@RequestParam LocalDate date) {
         try {
-            String mail = userService.mailExtract();
-            List<Client> dentistList;
+            // Initial 2 return lists
             List<UserDTO> dentistListDTO = new ArrayList<>();
             List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>();
-            dentistList = userService.findDentistByStaff(mail);
+
+            // Get current staff account
+            List<Client> dentistList;
             Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Clinic clinic = staff.getClinic();
+            // Get all dentists by theirs Staff
+            dentistList = userService.findDentistByStaff(userService.mailExtract());
+
+            // Put all dentists in dentistList  ---->  dentistListDTO
             if (!dentistList.isEmpty()) {
                 dentistListDTO = dentistList.stream()
                         .map(client -> {
@@ -230,7 +236,21 @@ public class StaffController {
                         })
                         .collect(Collectors.toList());
             }
-            List<TimeSlot> timeSlotList = timeSlotService.findByClinic(staff.getClinic());
+
+            // Get new and old time slot date
+            LocalDate newDate = timeSlotService.getNewTimeSlot(clinic);
+            LocalDate oldDate = timeSlotService.getOldTimeSlot(clinic);
+
+            // Initial value to find out which kind of date should be use (newDate ? oldDate)
+            LocalDate updateDate = null;
+            if (date.isAfter(newDate) || date.equals(newDate)) {
+                updateDate = newDate;
+            } else if (date.isBefore(oldDate) || date.equals(oldDate)) {
+                updateDate = oldDate;
+            }
+
+            // Put all time slot in clinic  ---->  timeslotListDTO
+            List<TimeSlot> timeSlotList = timeSlotService.getTimeSlotByDate(staff.getClinic(), updateDate);
             if (!timeSlotList.isEmpty()) {
                 timeSlotDTOS = timeSlotList.stream()
                         .map(timeSlot -> {
@@ -240,6 +260,8 @@ public class StaffController {
                             return timeSlotDTO;
                         }).collect(Collectors.toList());
             }
+
+
             SetScheduleRequestDTO setScheduleRequestDTO = new SetScheduleRequestDTO(dentistListDTO, timeSlotDTOS);
             return ResponseEntity.ok(setScheduleRequestDTO);
         } catch (Exception e) {
@@ -295,13 +317,14 @@ public class StaffController {
     @Operation(summary = "Delete Dentist Schedule")
     @DeleteMapping("/delete-schedule")
     public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
+                                                   @RequestParam LocalDate workDate,
+                                                   @RequestParam int numSlot) {
         try {
             dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
             return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", e.getMessage());
-            logger.error("ERROR: ", e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(error);
         }
     }

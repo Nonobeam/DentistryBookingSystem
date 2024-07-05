@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/manager")
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "Manager API")
 public class ManagerController {

@@ -28,6 +28,7 @@ import java.util.*;
 
 @RequestMapping("/user")
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "User API")
 public class UserController {

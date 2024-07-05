@@ -9,10 +9,9 @@ import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.repository.ServiceRepository;
-import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
+import com.example.DentistryManagement.service.ServiceService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,19 +31,19 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/boss")
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "Boss API")
 public class BossController {
-
-    private final ServiceRepository serviceRepository;
     private final UserService userService;
-    private final AuthenticationService authenticationService;
-    private final AppointmentService appointmentService;
     private final UserMapping userMapping;
+    private final ServiceService serviceService;
+    private final AppointmentService appointmentService;
+    private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-    private final UserRepository userRepository;
 
-    //----------------------------------- USER INFORMATION -----------------------------------
+
+    //----------------------------------- USER ACCOUNT -----------------------------------
 
     @Operation(summary = "Boss information")
     @GetMapping("/info")
@@ -58,7 +57,7 @@ public class BossController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userRepository.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
+            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -70,48 +69,6 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
-
-    @Operation(summary = "Add new service")
-    @PostMapping("/service/add")
-    public ResponseEntity<Services> addNewService(@RequestBody Services services) {
-        return ResponseEntity.ok(serviceRepository.save(services));
-    }
-
-    @Operation(summary = "All Manager")
-    @GetMapping("/all-manager")
-    public ResponseEntity<?> getAllManager() {
-        try {
-            List<Client> allManager = userService.findAllManager();
-            if (allManager != null && !allManager.isEmpty()) {
-                List<UserDTO> clientDTOs = allManager.stream()
-                        .map(userMapping::getUserDTOFromUser)
-                        .collect(Collectors.toList());
-
-                return ResponseEntity.ok(clientDTOs);
-            }
-            return ResponseEntity.ok("Not found any manager");
-        } catch (Error error) {
-            throw new Error("Error while getting manager " + error);
-        }
-    }
-
-
-    //--------------------------- REGISTER MANAGER ---------------------------
-
-    @Operation(summary = "Register a new manager member")
-    @PostMapping("/register/manager")
-    public ResponseEntity<AuthenticationResponse> registerManager(@RequestBody RegisterRequest request) {
-        try {
-            AuthenticationResponse response = authenticationService.registerManager(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
-        }
-    }
-
-
-    //--------------------------- MODIFY USER ---------------------------
 
 
     @Operation(summary = "Edit manager")
@@ -152,6 +109,96 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
+    //--------------------------- MANAGE MANAGER ---------------------------
+
+    @Operation(summary = "Register a new manager member")
+    @PostMapping("/register/manager")
+    public ResponseEntity<AuthenticationResponse> registerManager(@RequestBody RegisterRequest request) {
+        try {
+            AuthenticationResponse response = authenticationService.registerManager(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
+
+    @Operation(summary = "All Managers")
+    @GetMapping("/all-manager")
+    public ResponseEntity<?> getAllManager() {
+        try {
+            List<Client> allManager = userService.findAllManager();
+            if (allManager != null && !allManager.isEmpty()) {
+                List<UserDTO> clientDTOs = allManager.stream()
+                        .map(userMapping::getUserDTOFromUser)
+                        .collect(Collectors.toList());
+
+                return ResponseEntity.ok(clientDTOs);
+            }
+            return ResponseEntity.ok("Not found any manager");
+        } catch (Error error) {
+            throw new Error("Error while getting manager " + error);
+        }
+    }
+
+
+    @Operation(summary = "All Managers")
+    @GetMapping("/delete-manager")
+    public ResponseEntity<?> deleteManager(@RequestParam String managerId) {
+        try {
+            // Find the manager by id then update the status ---> 0
+            Client manager = userService.findUserById(managerId);
+            userService.updateUserStatus(manager, 0);
+            return ResponseEntity.ok("Delete successfully");
+        } catch (Error error) {
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            return ResponseEntity.status(400).body(errorResponseDTO);
+        }
+    }
+
+
+    //--------------------------- MANAGE CLINIC ---------------------------
+
+
+    @Operation(summary = "Add new service")
+    @PostMapping("/service/add")
+    public ResponseEntity<?> addNewService(@RequestBody Services services) {
+        try {
+            Services newService = serviceService.save(services);
+            return ResponseEntity.ok(newService);
+        } catch (Error error) {
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(errorResponseDTO);
+        }
+    }
+
+
+    @Operation(summary = "Show all services")
+    @PostMapping("/service/all")
+    public ResponseEntity<?> showAllServices() {
+        try {
+            List<Services> services = serviceService.getAll();
+            return ResponseEntity.ok(services);
+        } catch (Error error) {
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(errorResponseDTO);
+        }
+    }
+
+    // Hard delete due to the little size of table
+    @Operation(summary = "Delete service")
+    @PostMapping("/service/delete")
+    public ResponseEntity<?> deleteService(@RequestBody String servicesId) {
+        try {
+            serviceService.deleteServiceById(servicesId);
+            return ResponseEntity.ok("Delete successfully");
+        } catch (Error error) {
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(errorResponseDTO);
+        }
+    }
+
 
     @Operation(summary = "Boss dashboard")
     @GetMapping("/dashboard")
