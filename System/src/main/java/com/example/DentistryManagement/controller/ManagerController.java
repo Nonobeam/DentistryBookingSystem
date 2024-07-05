@@ -157,7 +157,7 @@ public class ManagerController {
             @RequestParam LocalTime breakEndTime,
             @RequestParam int status) {
 
-        if(!clinicService.checkSlotDurationValid(slotDuration)){
+        if (!clinicService.checkSlotDurationValid(slotDuration)) {
             return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
         }
 
@@ -192,7 +192,7 @@ public class ManagerController {
     @PutMapping("/editClinic")
     public ResponseEntity<?> editClinic(@RequestBody ClinicDTO clinicDTO) {
         Clinic updateClinic = clinicService.findClinicByID(clinicDTO.getId());
-        if(!clinicService.checkSlotDurationValid(clinicDTO.getSlotDuration())){
+        if (!clinicService.checkSlotDurationValid(clinicDTO.getSlotDuration())) {
             return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
         }
 
@@ -203,11 +203,11 @@ public class ManagerController {
             updateClinic.setStatus(clinicDTO.getStatus());
 
             //Check changes in clinic schedule
-            if( !updateClinic.getSlotDuration().equals(clinicDTO.getSlotDuration()) ||
-                !updateClinic.getOpenTime().equals(clinicDTO.getOpenTime()) ||
-                !updateClinic.getCloseTime().equals(clinicDTO.getCloseTime()) ||
-                !updateClinic.getBreakStartTime().equals(clinicDTO.getBreakStartTime()) ||
-                !updateClinic.getBreakEndTime().equals(clinicDTO.getBreakEndTime())) {
+            if (!updateClinic.getSlotDuration().equals(clinicDTO.getSlotDuration()) ||
+                    !updateClinic.getOpenTime().equals(clinicDTO.getOpenTime()) ||
+                    !updateClinic.getCloseTime().equals(clinicDTO.getCloseTime()) ||
+                    !updateClinic.getBreakStartTime().equals(clinicDTO.getBreakStartTime()) ||
+                    !updateClinic.getBreakEndTime().equals(clinicDTO.getBreakEndTime())) {
 
                 updateClinic.setSlotDuration(clinicDTO.getSlotDuration());
                 updateClinic.setOpenTime(clinicDTO.getOpenTime());
@@ -350,13 +350,13 @@ public class ManagerController {
 
     @Operation(summary = "Manager Dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashBoardData(@RequestParam("year") int year) {
+    public ResponseEntity<?> getDashBoardData(@RequestParam(required = false) Integer year) {
         try {
             Client manager = userService.findClientByMail(userService.mailExtract());
             if (manager == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-
+            if (year == null) year = LocalDate.now().getYear();
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);

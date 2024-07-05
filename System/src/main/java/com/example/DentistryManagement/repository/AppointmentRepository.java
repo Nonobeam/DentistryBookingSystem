@@ -43,25 +43,23 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(String name1, String dependentName);
 
-    Optional<List<Appointment>> findAppointmentsByUser(Client client);
-
-    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and (status = 1 or status =2)")
     int countAppointmentsByMonthPresentByBoss(int month, int year);
 
-    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and (status = 1 or status =2)")
     int countAppointmentsByYearPresentByBoss(int year);
 
-    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and dentist.staff =:staff")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and dentist.staff =:staff and (status = 1 or status =2)")
     int countAppointmentsByMonthPresentByStaff(int month, int year, Staff staff);
 
-    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and dentist.staff =:staff")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and dentist.staff =:staff and (status = 1 or status =2)")
     int countAppointmentsByYearPresentByStaff(int year, Staff staff);
 
 
-    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and clinic.user=:manager")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE MONTH(date) = :month AND YEAR(date) = :year and clinic.user=:manager and (status = 1 or status =2)")
     int countAppointmentsByMonthPresentByManager(int month, int year, Client manager);
 
-    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and clinic.user=:manager")
+    @Query("SELECT COUNT(*) FROM Appointment WHERE YEAR(date) = :year and clinic.user=:manager and (status = 1 or status =2)")
     int countAppointmentsByYearPresentByManager(int year, Client manager);
 
     List<Appointment> findAppointmentByUser_UserID(String customerID);
