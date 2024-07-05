@@ -37,6 +37,9 @@ import DenHistory from './dentist/DenHistory';
 import DenProfile from './dentist/DenProfile';
 import PatientInfo from './dentist/PatientInfo';
 import DentistSchedule from './dentist/DentistSchedule';
+import ManagerStaffList from './manager/ManagerStaffList';
+import ManagerDentistList from './manager/ManagerDentistList';
+import ManagerClinicList from './manager/ManagerClinicList';
 
 
 
@@ -71,6 +74,14 @@ const App = () => {
           <Route path='history' element={<RoleBasedRoute element={<DenHistory />} requiredRole={['DENTIST']}/>}/>
           <Route path='patient/:customerID' element={<RoleBasedRoute element={<PatientInfo />} requiredRole={['DENTIST']}/>}/>
           <Route path='schedule' element={<RoleBasedRoute element={<DentistSchedule />} requiredRole={['DENTIST']}/>}/> 
+        </Route>
+
+        {/* MANAGER PAGES */}
+        <Route path='/manager'>
+          {/* <Route path='' element={<RoleBasedRoute element={<ManagerList />} requiredRole={['MANAGER']}/>}/> */}
+          <Route path='staff' element={<RoleBasedRoute element={<ManagerStaffList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='clinic' element={<RoleBasedRoute element={<ManagerClinicList />} requiredRole={['MANAGER']}/>} />
         </Route>
 
           {/* STAFF PAGES */}
