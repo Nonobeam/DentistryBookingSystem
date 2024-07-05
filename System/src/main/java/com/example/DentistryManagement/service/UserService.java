@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,11 +88,11 @@ public class UserService {
     }
 
 
-    public List<Client> findCustomerInClinicByStaff(String mailStaff) {
+    public HashSet<Client> findCustomerInClinicByStaff(String mailStaff) {
         try {
             Staff staff = staffRepository.findStaffByUserMail(mailStaff);
             List<Appointment> appointmentList = appointmentRepository.findAppointmentByClinic(staff.getClinic());
-            List<Client> customerList = new ArrayList<>();
+            HashSet<Client> customerList = new HashSet<>();
             for (Appointment a : appointmentList) {
                 customerList.add(a.getUser());
             }
@@ -102,10 +103,10 @@ public class UserService {
     }
 
 
-    public List<Client> searchCustomerInClinicByStaff(String mailStaff, String search) {
+    public HashSet<Client> searchCustomerInClinicByStaff(String mailStaff, String search) {
         try {
-            List<Client> customerList = findCustomerInClinicByStaff(mailStaff);
-            List<Client> searchList = new ArrayList<>();
+            HashSet<Client> customerList = findCustomerInClinicByStaff(mailStaff);
+            HashSet<Client> searchList = new HashSet<>();
             for (Client c : customerList) {
                 if (c.getMail().contains(search) || c.getName().contains(search)) {
                     searchList.add(c);
