@@ -3,7 +3,7 @@ package com.example.DentistryManagement.service;
 import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;

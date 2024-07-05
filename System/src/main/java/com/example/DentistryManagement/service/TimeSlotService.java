@@ -27,11 +27,42 @@ public class TimeSlotService {
         return timeSlotRepository.findByClinicOrderByStartTimeAsc(clinic);
     }
 
+    // Find the start of process update date
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
         TimeSlot timeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
         result = timeSlot.getDate();
         return result;
+    }
+
+    public LocalDate getNewTimeSlot(Clinic clinic) {
+        List<LocalDate> timeSlots;
+        try {
+            timeSlots = timeSlotRepository.findDistinctTimeSlotOrderByClinicAndDateDesc(clinic);
+            return timeSlots.get(0);
+        } catch (Error error) {
+            throw error;
+        }
+    }
+
+    public LocalDate getOldTimeSlot(Clinic clinic) {
+        List<LocalDate> timeSlots;
+        try {
+            timeSlots = timeSlotRepository.findDistinctTimeSlotOrderByClinicAndDateDesc(clinic);
+            return timeSlots.get(1);
+        } catch (Error error) {
+            throw error;
+        }
+    }
+
+    public List<TimeSlot> getTimeSlotByDate(Clinic clinic, LocalDate date) {
+        List<TimeSlot> timeSlots;
+        try {
+            timeSlots = timeSlotRepository.findTimeSlotsByClinicAndDate(clinic, date);
+            return timeSlots;
+        } catch (Error error) {
+            throw error;
+        }
     }
 
     public void createAndSaveTimeSlots(LocalDate date, Clinic clinic, LocalTime startTime, LocalTime endTime,
