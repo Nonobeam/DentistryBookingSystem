@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.Mapping;
+package com.example.DentistryManagement.mapping;
 
 import com.example.DentistryManagement.DTO.DentistResponseDTO;
 import com.example.DentistryManagement.DTO.StaffResponseDTO;

@@ -1,6 +1,6 @@
 import React from "react";
-import { Route, Navigate } from "react-router-dom";
 import NotAuthorized from "./NotAuthorized";
+import Login from "./Login";
 
 const RoleBasedRoute = ({ element: Component, requiredRole, ...rest }) => {
   const token = localStorage.getItem("token");
@@ -12,7 +12,7 @@ const RoleBasedRoute = ({ element: Component, requiredRole, ...rest }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("expirationTime");
-    return <Navigate to="/login" />;
+    return <Login />;
   }
 
   if (requiredRole && !requiredRole.includes(role)) {

@@ -67,7 +67,7 @@ public class TimeTableResponseDTO {
             timeTableResponseDTO.setDentistName(appointment.getDentist().getUser().getName());
             timeTableResponseDTO.setCustomerName(appointment.getUser().getName());
             timeTableResponseDTO.setServiceName(appointment.getServices().getName());
-            timeTableResponseDTO.setStatus(appointment.getStatus());
+            timeTableResponseDTO.setStatus(0);
         }
 
         return timeTableResponseDTO;

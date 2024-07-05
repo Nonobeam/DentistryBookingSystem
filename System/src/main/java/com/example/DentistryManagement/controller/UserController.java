@@ -4,7 +4,7 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
@@ -28,6 +28,7 @@ import java.util.*;
 
 @RequestMapping("/user")
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "User API")
 public class UserController {

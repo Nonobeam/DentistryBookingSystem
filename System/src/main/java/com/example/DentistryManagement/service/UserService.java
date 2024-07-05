@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,11 +88,11 @@ public class UserService {
     }
 
 
-    public List<Client> findCustomerInClinicByStaff(String mailStaff) {
+    public HashSet<Client> findCustomerInClinicByStaff(String mailStaff) {
         try {
             Staff staff = staffRepository.findStaffByUserMail(mailStaff);
             List<Appointment> appointmentList = appointmentRepository.findAppointmentByClinic(staff.getClinic());
-            List<Client> customerList = new ArrayList<>();
+            HashSet<Client> customerList = new HashSet<>();
             for (Appointment a : appointmentList) {
                 customerList.add(a.getUser());
             }
@@ -102,10 +103,10 @@ public class UserService {
     }
 
 
-    public List<Client> searchCustomerInClinicByStaff(String mailStaff, String search) {
+    public HashSet<Client> searchCustomerInClinicByStaff(String mailStaff, String search) {
         try {
-            List<Client> customerList = findCustomerInClinicByStaff(mailStaff);
-            List<Client> searchList = new ArrayList<>();
+            HashSet<Client> customerList = findCustomerInClinicByStaff(mailStaff);
+            HashSet<Client> searchList = new HashSet<>();
             for (Client c : customerList) {
                 if (c.getMail().contains(search) || c.getName().contains(search)) {
                     searchList.add(c);
@@ -119,7 +120,7 @@ public class UserService {
 
     public List<Client> findAllCustomer() {
         try {
-            return userRepository.getClientsByRoleAndStatus(Role.CUSTOMER,1);
+            return userRepository.getClientsByRole(Role.CUSTOMER);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
@@ -129,7 +130,7 @@ public class UserService {
     public List<Client> findAllStaff() {
 
         try {
-            return userRepository.getClientsByRoleAndStatus(Role.STAFF,1);
+            return userRepository.getClientsByRole(Role.STAFF);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
@@ -137,7 +138,7 @@ public class UserService {
 
     public List<Client> findAllManager() {
         try {
-            return userRepository.getClientsByRoleAndStatus(Role.MANAGER,1);
+            return userRepository.getClientsByRole(Role.MANAGER);
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list: " + e.getMessage(), e);
         }
@@ -216,7 +217,7 @@ public class UserService {
 
     public List<Client> findDentistFollowSearching(String search) {
         try {
-            List<Dentist> dentistsList = dentistRepository.findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCaseAndUser_Status(search, search, search,1);
+            List<Dentist> dentistsList = dentistRepository.findByClinicNameContainingIgnoreCaseOrUser_MailContainingIgnoreCaseOrUser_NameContainingIgnoreCase(search, search, search);
             List<Client> dentistListFollowSearch = new ArrayList<>();
             for (Dentist d : dentistsList) {
                 dentistListFollowSearch.add(d.getUser());
@@ -231,7 +232,7 @@ public class UserService {
 
     public List<Client> findManagerFollowSearching(String search) {
         try {
-            return userRepository.findByRoleAndNameContainingIgnoreCaseAndStatus(Role.MANAGER, search,1);
+            return userRepository.findByRoleAndNameContainingIgnoreCase(Role.MANAGER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
@@ -255,7 +256,7 @@ public class UserService {
 
     public List<Client> findCustomerFollowSearching(String search) {
         try {
-            return userRepository.findByRoleAndNameContainingIgnoreCaseAndStatus(Role.CUSTOMER, search,1);
+            return userRepository.findByRoleAndNameContainingIgnoreCase(Role.CUSTOMER, search);
 
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);

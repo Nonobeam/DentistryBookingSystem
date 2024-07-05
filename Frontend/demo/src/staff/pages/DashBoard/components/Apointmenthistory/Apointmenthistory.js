@@ -1,5 +1,7 @@
+// components/AppointmentHistory.js
+
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Dropdown, Menu, Button, Modal, message } from 'antd';
+import { Card, Table, Dropdown, Button, Modal, message, Menu } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
 const AppointmentHistory = () => {
@@ -21,11 +23,12 @@ const AppointmentHistory = () => {
   const handleUpdateStatus = async (record, status) => {
     try {
       const response = await AppointmentHistoryServices.patchAppointment({
-        appointmentId: record.id,
+        appointmentId: record.appointmentId,
         status: status,
       });
-      message.success(`Updated status to ${status} for treatment ID ${record.id}`);
-      setApiData(response);
+      message.success(
+        `Updated status to ${status} for treatment ID ${record.appointmentId}`
+      );
       fetchData(); // Refresh data after update
       console.log('Updated status:', status);
     } catch (error) {
@@ -33,18 +36,24 @@ const AppointmentHistory = () => {
     }
   };
 
-  const handleDelete = (record) => {
+  const handleDelete = async (record) => {
     Modal.confirm({
       title: 'Confirm Delete',
-      content: `Are you sure you want to delete treatment ID ${record.id}?`,
+      content: `Are you sure you want to delete treatment ID ${record.appointmentId}?`,
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk() {
-        // Perform deletion
-        message.success(`Deleted treatment ID ${record.id}`);
-        // Assuming you have deleted the record, update the table data
-        fetchData(); // Refresh data after deletion
+      async onOk() {
+        try {
+          const response =
+            await AppointmentHistoryServices.deteleateAppointment({
+              appointmentId: record.appointmentId,
+            });
+          message.success(`Deleted treatment ID ${record.appointmentId}`);
+          fetchData(); // Refresh data after deletion
+        } catch (error) {
+          console.error('Error deleting appointment:', error);
+        }
       },
       onCancel() {
         console.log('Cancel');
@@ -55,6 +64,7 @@ const AppointmentHistory = () => {
   const handleMenuClick = (record, e) => {
     const action = e.key;
     if (action === '1' || action === '2') {
+      console.log(record);
       handleUpdateStatus(record, action);
     } else if (action === 'delete') {
       handleDelete(record);
@@ -114,11 +124,6 @@ const AppointmentHistory = () => {
   const styles = {
     card: {
       marginBottom: '20px',
-    },
-    treatment: {
-      backgroundColor: '#f0f0f0',
-      padding: '5px 10px',
-      borderRadius: '5px',
     },
   };
 

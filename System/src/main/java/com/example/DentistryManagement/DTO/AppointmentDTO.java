@@ -21,4 +21,5 @@ public class AppointmentDTO {
     private String dentist;
     private String services;
     private String clinic;
+    private String customerID;
 }

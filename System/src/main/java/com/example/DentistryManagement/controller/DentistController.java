@@ -1,7 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
@@ -196,13 +196,13 @@ public class DentistController {
     @Operation(summary = "Dentist")
 
     @GetMapping("/appointment-history/")
-    public ResponseEntity<?> appointmentHistory(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String name) {
+    public ResponseEntity<?> appointmentHistory(@RequestParam(required = false) String name) {
         try {
             String mail = userService.mailExtract();
             Dentist dentist = userService.findDentistByMail(mail);
             List<Appointment> appointmentList;
-            if (date != null || (name != null && !name.isEmpty())) {
-                appointmentList = appointmentService.searchAppointmentByDentist(date, name, dentist);
+            if (name != null && !name.isEmpty()) {
+                appointmentList = appointmentService.searchAppointmentByDentist(name, dentist);
             } else {
                 appointmentList = appointmentService.findAllAppointmentByDentist(dentist.getUser().getMail(), dentist.getClinic());
             }
