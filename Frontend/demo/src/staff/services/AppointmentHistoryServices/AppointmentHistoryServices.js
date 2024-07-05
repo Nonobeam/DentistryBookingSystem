@@ -89,7 +89,7 @@ export const AppointmentHistoryServices = {
   },
   deteleateAppointment: async ({ appointmentId }) => {
     try {
-      const responseData = await api.delete(
+      const responseData = await api.put(
         `staff/delete-booking/${appointmentId}`
       );
       return responseData.data;

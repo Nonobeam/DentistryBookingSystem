@@ -4,10 +4,8 @@ import { CiBellOn } from 'react-icons/ci';
 import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { Button, Dropdown, Menu } from 'antd';
- // Đường dẫn tới NotificationDropdown
-
-import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
 import NotificationDropdown from '../../pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
+import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
 
 export const AppHeader = () => {
   const [showBellDropdown, setShowBellDropdown] = useState(false);
@@ -27,16 +25,21 @@ export const AppHeader = () => {
   }, []);
 
   const handleBellIconClick = () => {
-    setShowBellDropdown(!showBellDropdown); // Toggle bell dropdown visibility
+    setShowBellDropdown(!showBellDropdown);
   };
 
   const handleUserIconClick = () => {
-    setShowUserDropdown(!showUserDropdown); // Toggle user dropdown visibility
+    setShowUserDropdown(!showUserDropdown);
   };
 
   const handleLogout = () => {
     // Logic for logout action
     console.log('Logging out...');
+  };
+
+  const handleNotificationClick = (notification) => {
+    // Logic to handle notification click
+    console.log('Notification clicked:', notification);
   };
 
   const menu = (
@@ -99,7 +102,7 @@ export const AppHeader = () => {
           >
             <NotificationDropdown
               notifications={notifications}
-              onClose={() => setShowBellDropdown(false)}
+              onNotificationClick={handleNotificationClick}
             />
           </div>
         )}
