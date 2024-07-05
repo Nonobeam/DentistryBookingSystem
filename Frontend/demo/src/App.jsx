@@ -35,6 +35,8 @@ import UserProfile from './account/UserProfile';
 import TodayAppointments from './dentist/TodayAppointments';
 import DenHistory from './dentist/DenHistory';
 import DenProfile from './dentist/DenProfile';
+import PatientInfo from './dentist/PatientInfo';
+import DentistSchedule from './dentist/DentistSchedule';
 
 
 
@@ -77,6 +79,8 @@ const App = () => {
           <Route path='' element={<TodayAppointments />} />
           <Route path='history' element={<DenHistory />} />
           <Route path='profile' element={<DenProfile />} />
+          <Route path='patient/:customerID' element={<PatientInfo />} />
+          <Route path='schedule' element={<DentistSchedule />} />
         </Route>
 
         <Route path='/staff' element={<DashBoard />}>

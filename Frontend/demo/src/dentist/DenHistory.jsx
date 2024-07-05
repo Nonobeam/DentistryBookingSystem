@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Layout, Table, Button, Modal, Select, Spin, message, DatePicker, Input } from "antd";
 import moment from "moment";
+import { useNavigate } from "react-router-dom"; // Assuming you're using react-router-dom for routing
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
@@ -16,6 +17,7 @@ const DenHistory = () => {
   const [newStatus, setNewStatus] = useState(null);
   const [filterDate, setFilterDate] = useState(null); 
   const [filterName, setFilterName] = useState(""); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAppointments();
@@ -49,13 +51,6 @@ const DenHistory = () => {
     setLoading(false);
   };
 
-  const handleChange = (dates, dateStrings) => {
-    if (dates && dates.length > 0) {
-      setFilterDate(dates[0]);
-    } else {
-      setFilterDate(null);
-    }
-  };
 
   const handleNameChange = (e) => {
     setFilterName(e.target.value);
@@ -85,7 +80,14 @@ const DenHistory = () => {
       title: "Patient Name",
       dataIndex: "user",
       key: "user",
-      render: (user) => user,
+      render: (_, record) => {
+        const patientName = record.dependent ? record.dependent : record.user;
+        return (
+          <a onClick={() => navigate(`/dentist/patient/${record.customerID}`)}>
+            {patientName}
+          </a>
+        );
+      },
     },
     {
       title: "Date",
@@ -100,7 +102,7 @@ const DenHistory = () => {
       dataIndex: "timeSlot",
       key: "timeSlot",
       render: (timeSlot) => timeSlot,
-      sorter: (a, b) => moment(a.timeSlot).unix() - moment(b.timeSlot).unix(),
+      sorter: (a, b) => moment(a.timeSlot, "HH:mm:ss").unix() - moment(b.timeSlot, "HH:mm:ss").unix(),
       defaultSortOrder: "descend",
     },
     {
@@ -108,12 +110,6 @@ const DenHistory = () => {
       dataIndex: "services",
       key: "services",
       render: (services) => services,
-    },
-    {
-      title: "Clinic",
-      dataIndex: "clinic",
-      key: "clinic",
-      render: (clinic) => clinic?.name || "N/A",
     },
     {
       title: "Dentist",
@@ -135,10 +131,10 @@ const DenHistory = () => {
           if (status === 2) {
             statusText = "Completed";
             statusColor = "green";
-          } else if (status == 1) {
+          } else if (status === 1) {
             statusText = "Upcoming";
             statusColor = "yellow";
-          } else if (status == 0){
+          } else if (status === 0){
             statusText = "Cancelled";
             statusColor = "red";
           }
@@ -193,7 +189,6 @@ const DenHistory = () => {
         <h1>Appointment History</h1>
 
             <div style={{ marginBottom: 16 }}>
-              <RangePicker onChange={handleChange} />
               <Input placeholder="Patient Name" value={filterName} onChange={handleNameChange} style={{ marginLeft: 10, width: 200 }} />
             </div>
 

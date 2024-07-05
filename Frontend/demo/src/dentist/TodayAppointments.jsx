@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Card, Col, Row, Button, message, Empty } from 'antd';
+import { Layout, Card, Col, Row, message, Empty } from 'antd';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 
@@ -53,7 +53,6 @@ const TodayAppointments = () => {
                 {appointments.map((appointment) => (
                   <Col span={6} key={appointment.appointmentId}>
                     <Card title={`${appointment.timeSlot}`} 
-                    // extra={<Button type="primary">Reminder</Button>}
                     >
                       <p>Patient: {appointment.user}</p>
                       <p>Service: {appointment.services}</p>

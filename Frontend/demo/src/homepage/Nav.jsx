@@ -20,8 +20,6 @@ const NavBar = () => {
     }
   }, []);
 
-  const token = localStorage.getItem("token");
-
   const pathToKey = {
     '/': '1',
     '/booking': '2',
