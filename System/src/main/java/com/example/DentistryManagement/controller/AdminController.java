@@ -3,7 +3,7 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.DentistResponseDTO;
 import com.example.DentistryManagement.DTO.StaffResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.UserService;

@@ -1,7 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
@@ -97,6 +97,33 @@ public class StaffController {
         }
     }
 
+    @Operation(summary = "Show all working dentist schedule")
+    @GetMapping("/dentist-schedule")
+    public ResponseEntity<?> getWorkingDentistSchedule() {
+        try {
+            // find current staff account
+            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            List<DentistSchedule> dentistSchedules = new ArrayList<>();
+            // Gt all dentists by current staff account
+            List<Dentist> dentists = dentistService.findDentistByStaff(staff);
+
+            // Get all dentistSchedule from the dentists
+            for (Dentist dentist : dentists) {
+                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList();
+                if (!dentistSchedule.isEmpty()) {
+                    dentistSchedules.addAll(dentistSchedule);
+                }
+            }
+
+            return ResponseEntity.ok(dentistSchedules);
+        } catch (Error error) {
+            // Get error return from service
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            logger.error(errorResponseDTO.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        }
+    }
+
 
     @Operation(summary = "Set Service for dentists")
     @PostMapping("/set-service/{dentistMail}")
@@ -117,7 +144,7 @@ public class StaffController {
 
     @Operation(summary = "Staff")
     @GetMapping("/dentistList")
-    public ResponseEntity<?> findAllDentistByStaff(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> findAllDentists(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
             List<Client> clients;
@@ -157,7 +184,7 @@ public class StaffController {
 
     @Operation(summary = "Staff")
     @GetMapping("/dentistList/{mail}")
-    public ResponseEntity<?> findDentistInformationByStaff(@PathVariable("mail") String dentistMail) {
+    public ResponseEntity<?> findDentistInformation(@PathVariable("mail") String dentistMail) {
         try {
             UserDTO userDTO = new UserDTO();
             Client client = userService.findClientByMail(dentistMail);
@@ -182,9 +209,9 @@ public class StaffController {
     }
 
 
-    @Operation(summary = "show dentist list timeslot for choosing set schedule")
+    @Operation(summary = "Show dentists and timeslots for choosing set schedule")
     @GetMapping("/show-set-schedule")
-    public ResponseEntity<?> showSetDentistSchedule() {
+    public ResponseEntity<?> showDentistsAndDentistsTimeSlots() {
         try {
             String mail = userService.mailExtract();
             List<Client> dentistList;
@@ -265,21 +292,19 @@ public class StaffController {
     }
 
 
-    // Missing check if available or not
-
-//    @Operation(summary = "Delete Dentist Schedule")
-//    @DeleteMapping("/delete-schedule")
-//    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-//                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
-//        try {
-//            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
-//            return ResponseEntity.ok("Schedule deleted successfully");
-//        } catch (Exception e) {
-//            ErrorResponseDTO error = new ErrorResponseDTO("500", e.getMessage());
-//            logger.error("Server_error", e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-//        }
-//    }
+    @Operation(summary = "Delete Dentist Schedule")
+    @DeleteMapping("/delete-schedule")
+    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
+                                                   @RequestParam LocalDate workDate, @RequestParam int numSlot) {
+        try {
+            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
+            return ResponseEntity.ok("Schedule deleted successfully");
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", e.getMessage());
+            logger.error("ERROR: ", e.getMessage());
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(error);
+        }
+    }
 
 
     //---------------------------MANAGE CUSTOMER---------------------------

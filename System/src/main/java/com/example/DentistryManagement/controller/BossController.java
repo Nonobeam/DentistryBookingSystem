@@ -2,7 +2,7 @@ package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.DashboardBoss;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.Mapping.UserMapping;
+import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
@@ -95,7 +95,9 @@ public class BossController {
             throw new Error("Error while getting manager " + error);
         }
     }
-    //---------------------------REGISTER MANAGER---------------------------
+
+
+    //--------------------------- REGISTER MANAGER ---------------------------
 
     @Operation(summary = "Register a new manager member")
     @PostMapping("/register/manager")
@@ -107,7 +109,9 @@ public class BossController {
             return ResponseEntity.status(400).body(null);
         }
     }
-//---------------------------MODIFY USER---------------------------
+
+
+    //--------------------------- MODIFY USER ---------------------------
 
 
     @Operation(summary = "Edit manager")
