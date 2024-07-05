@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { HomeOutlined, ScheduleOutlined, HistoryOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
+import { LuLogOut } from 'react-icons/lu';
 
 const { Sider } = Layout;
 
@@ -29,6 +30,17 @@ const Sidebar = () => {
       icon: <UserOutlined />,
       label: <Link to="/dentist/profile">Profile</Link>,
     },
+    {
+      key: '5',
+      label: 'Logout',
+      icon: <LuLogOut />,
+      onClick: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('expirationTime');
+        window.location.href = '/';
+      },
+    }
   ];
 
   // Determine the default selected key based on the current path

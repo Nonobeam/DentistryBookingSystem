@@ -44,45 +44,36 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* HOMEPAGES */}
         <Route exact path='/' element={<Homepage />} />
-        <Route path='/booking' element={
-            <RoleBasedRoute
-              element={<Booking />}
-              requiredRole={['CUSTOMER', 'MANAGER']}
-            />
-          }
-        />
-        <Route path='/history' element={
-            <RoleBasedRoute
-              element={<History />}
-              requiredRole={['CUSTOMER']}
-            />
-          }
-        />
-        <Route path='/profile' element={
-            <RoleBasedRoute
-              element={<UserProfile />}
-              requiredRole={['CUSTOMER']}
-            />
-          }
-        />
         <Route path='/educational' element={<Educational />} />
         <Route path='/services' element={<Services />} />
+
+        {/* ERROR PAGES */}
+        <Route path='/not-authorized' element={<NotAuthorized />} />
+
+        {/* AUTHORIZE PAGES */}
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/forgot' element={<ForgotPassword />} />
-        <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path='/confirm' element={<ConfirmAccount />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
 
+        {/* CUSTOMER'S PAGES */}
+        <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole={['CUSTOMER']}/>}/>
+        <Route path='/history' element={<RoleBasedRoute element={<History />} requiredRole={['CUSTOMER']}/>}/>
+        <Route path='/profile' element={<RoleBasedRoute element={<UserProfile />} requiredRole={['CUSTOMER']}/>}/>
+        
+          {/* DENTIST PAGES */}
         <Route path='/dentist'>
-          <Route path='' element={<TodayAppointments />} />
-          <Route path='history' element={<DenHistory />} />
-          <Route path='profile' element={<DenProfile />} />
-          <Route path='patient/:customerID' element={<PatientInfo />} />
-          <Route path='schedule' element={<DentistSchedule />} />
+          <Route path='' element={<RoleBasedRoute element={<TodayAppointments />} requiredRole={['DENTIST']}/>}/>
+          <Route path='profile' element={<RoleBasedRoute element={<DenProfile />} requiredRole={['DENTIST']}/>}/>
+          <Route path='history' element={<RoleBasedRoute element={<DenHistory />} requiredRole={['DENTIST']}/>}/>
+          <Route path='patient/:customerID' element={<RoleBasedRoute element={<PatientInfo />} requiredRole={['DENTIST']}/>}/>
+          <Route path='schedule' element={<RoleBasedRoute element={<DentistSchedule />} requiredRole={['DENTIST']}/>}/> 
         </Route>
 
+          {/* STAFF PAGES */}
         <Route path='/staff' element={<DashBoard />}>
           <Route path='' element={<AdminHomePage />} />
           <Route path='dentist-list' element={<DentistList />} />
@@ -102,7 +93,7 @@ const App = () => {
         <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
         
-
+          {/* ADMIN PAGES */}
         <Route path='/admin' element={<Pages />}>
           <Route path='customer-list-admin' element={<CustomerList />} />
           <Route path='dentist-list-admin' element={<DentistListAmin />} />
