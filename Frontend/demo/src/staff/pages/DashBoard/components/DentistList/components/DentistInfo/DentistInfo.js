@@ -25,19 +25,18 @@ export default function DentistInfo() {
       setInfo(response.appointment);
 
       if (Array.isArray(response.appointment)) {
-      //   const aData = response.appointment.map((item) => ({
-      //     ...item,
-      //     key: item.id,
-      //     date: item.date,
-      //     feedback: item.feedback,
-      //     booking: item.user.name,
-      //     services: item.services.name,
-      //     clinic: item.clinic.name,
-      //     dentist: item.dentist.user.name,
-      //     dependent: item.dependent.name ? item.dependent.name : item.user.name,
-      //   }));
-
-      //   setAppointmentData(aData);
+        //   const aData = response.appointment.map((item) => ({
+        //     ...item,
+        //     key: item.id,
+        //     date: item.date,
+        //     feedback: item.feedback,
+        //     booking: item.user.name,
+        //     services: item.services.name,
+        //     clinic: item.clinic.name,
+        //     dentist: item.dentist.user.name,
+        //     dependent: item.dependent.name ? item.dependent.name : item.user.name,
+        //   }));
+        //   setAppointmentData(aData);
       }
     } catch (error) {
       console.log('Error fetching data:', error);
@@ -106,7 +105,7 @@ export default function DentistInfo() {
         gap: '10px',
       }}>
       <h2>Dentist Information</h2>
-      <EmailPopup />
+      <EmailPopup user={user} />
       <div>
         <strong>Name:</strong> {user.name}
       </div>
