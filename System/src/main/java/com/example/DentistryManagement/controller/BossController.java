@@ -151,7 +151,7 @@ public class BossController {
 
     @Operation(summary = "Boss dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashboardData(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam("year") int year) {
+    public ResponseEntity<?> getDashboardData(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam Integer year) {
         try {
             Client boss = userService.findClientByMail(userService.mailExtract());
             if (boss == null) {
@@ -159,7 +159,7 @@ public class BossController {
             }
 
             if (date == null) date = LocalDate.now();
-            if (year == -1) year = LocalDate.now().getYear();
+            if (year == null) year = LocalDate.now().getYear();
             Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByClinic(date);
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getAppointmentsByClinicsForYear(year);
             int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByBoss();
