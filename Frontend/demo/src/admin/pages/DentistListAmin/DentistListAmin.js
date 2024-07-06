@@ -31,15 +31,15 @@ const AppointmentHistory = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <span>{status === 1 ? 'Active' : 'Inactive'}</span>
-      ),
+      render: (status) => <span>{status === 1 ? 'Active' : 'Inactive'}</span>,
     },
     {
       title: 'Action',
       dataIndex: 'x',
       key: 'x',
-      render: (_, record) => <Action record={record} />,
+      render: (_, record) => (
+        <Action data={apiData} setApiData={setApiData} record={record} />
+      ),
     },
   ];
 
@@ -65,13 +65,13 @@ const AppointmentHistory = () => {
 
   return (
     <div>
-      <Card title="Dentist List" style={cardStyle}>
+      <Card title='Dentist List' style={cardStyle}>
         <Table
           dataSource={apiData}
           columns={columns}
           pagination={false}
           bordered
-          size="small"
+          size='small'
           style={{ backgroundColor: 'white' }} // Background color for the table
         />
       </Card>
