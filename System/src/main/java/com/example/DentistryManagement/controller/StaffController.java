@@ -245,8 +245,10 @@ public class StaffController {
             LocalDate updateDate = null;
             if (date.isAfter(newDate) || date.equals(newDate)) {
                 updateDate = newDate;
-            } else if (date.isBefore(oldDate) || date.equals(oldDate)) {
+            } else if ((date.isAfter(oldDate) && date.isBefore(newDate))|| date.equals(oldDate)) {
                 updateDate = oldDate;
+            } else {
+                return ResponseEntity.status(400).body("Please choose a date after " + oldDate);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
