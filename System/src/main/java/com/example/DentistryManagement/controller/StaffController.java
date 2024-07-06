@@ -245,8 +245,10 @@ public class StaffController {
             LocalDate updateDate = null;
             if (date.isAfter(newDate) || date.equals(newDate)) {
                 updateDate = newDate;
-            } else if (date.isBefore(oldDate) || date.equals(oldDate)) {
+            } else if ((date.isAfter(oldDate) && date.isBefore(newDate))|| date.equals(oldDate)) {
                 updateDate = oldDate;
+            } else {
+                return ResponseEntity.status(400).body("Please choose a date after " + oldDate);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
@@ -510,11 +512,11 @@ public class StaffController {
 
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
-    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerID, @RequestParam String serviceId) {
+    public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         try {
             // Current user
             Client staff = userService.findClientByMail(userService.mailExtract());
-            Client customer = userService.findUserById(customerID);
+            Client customer = userService.findClientByMail(customerMail);
             Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);

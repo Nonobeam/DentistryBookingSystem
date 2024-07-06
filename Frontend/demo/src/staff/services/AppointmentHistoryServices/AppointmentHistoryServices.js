@@ -103,4 +103,18 @@ export const AppointmentHistoryServices = {
       });
     }
   },
+  getDependents: async (customerMail) => {
+    try {
+      const responseData = await api.get(`staff/dependentList/${customerMail}`);
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        onClick: () => {
+          console.log('Notification Clicked!');
+        },
+      });
+    }
+  },
 };
