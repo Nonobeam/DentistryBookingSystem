@@ -351,23 +351,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-@GetMapping("/get-service")
-    public ResponseEntity<?> getServices(Model modelMap) {
-        try {
-            List<Services> services = serviceService.findAllServices();
-            if (!services.isEmpty()) {
-                return ResponseEntity.ok(modelMap.addAttribute("services",services));
-            } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any service");
-                logger.error("Not found any service");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-            }
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
+
 
 
 }
