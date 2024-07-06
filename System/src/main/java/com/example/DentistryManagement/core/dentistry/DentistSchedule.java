@@ -37,7 +37,6 @@ public class DentistSchedule {
     @JoinColumn(name = "timeSlotID", nullable = false, referencedColumnName = "timeSlotID")
     private TimeSlot timeslot;
 
-    @JsonIgnore
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
     private int available;
 }
