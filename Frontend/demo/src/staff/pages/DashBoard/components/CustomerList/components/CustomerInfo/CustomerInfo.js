@@ -90,12 +90,7 @@ export default function CustomerInfo() {
       dataIndex: 'services',
       key: 'services',
     },
-    // {
-    //   title: 'Treatment',
-    //   dataIndex: 'treatment',
-    //   key: 'treatment',
-    //   render: (text) => <span style={styles.treatment}>{text}</span>,
-    // },
+    
   ];
 
   return (
@@ -108,7 +103,7 @@ export default function CustomerInfo() {
         gap: '10px',
       }}>
       <h2>Customer Information</h2>
-      <EmailPopup />
+      {/* <EmailPopup /> */}
       <div>
         <strong>Name:</strong> {user.name}
       </div>
