@@ -30,34 +30,37 @@ const Schedule = () => {
   const [form] = Form.useForm();
   const [dentistList, setDentistList] = useState([]);
 
-  useEffect(() => {
-    // Load scheduled tasks from local storage on component mount
-    const storedTasks =
-      JSON.parse(localStorage.getItem('scheduledTasks')) || [];
-    setScheduledTasks(storedTasks);
-
-    // Load dentist list from API on component mount
-    fetchDentistList();
-  }, []);
-
-  useEffect(() => {
-    // Save scheduled tasks to local storage whenever scheduledTasks state changes
-    localStorage.setItem('scheduledTasks', JSON.stringify(scheduledTasks));
-  }, [scheduledTasks]);
-
   const fetchDentistList = async () => {
     try {
       const dentistsList = await TimetableServices.getAllDentists();
       console.log(dentistsList);
-      setDentistList(dentistsList.dentistList);
-      setTimeSlotList(dentistsList.timeSlotList);
+      setDentistList(dentistsList);
+      // setTimeSlotList(dentistsList.timeSlotList);
     } catch (error) {
       console.error('Error fetching dentist list:', error);
     }
   };
 
+  const fetchDentistListAndTimeSlot = async () => {
+    try {
+      console.log(selectedDateRange);
+      // const dentistsList = await TimetableServices.getAllDentistsAndTimeSlot(
+      //   selectedDateRange
+      // // );
+      // console.log(dentistsList);
+      // setDentistList(dentistsList);
+      // setTimeSlotList(dentistsList.timeSlotList);
+    } catch (error) {
+      console.error('Error fetching dentist list:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDentistList();
+  }, []);
+
+
   const handleDateRangeChange = (dates) => {
-    console.log(dates);
     if (dates === null || dates.length === 0) {
       setSelectedDateRange([]);
     } else {
@@ -120,13 +123,34 @@ const Schedule = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'dentist',
       key: 'name',
+      render: (dentist) => dentist.user?.name,
     },
     {
       title: 'Mail',
-      dataIndex: 'mail',
+      dataIndex: 'dentist',
       key: 'mail',
+      render: (dentist) => dentist.user?.mail,
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'dentist',
+      key: 'phone',
+      render: (dentist) => dentist.user?.phone,
+    },
+    {
+      title: 'Birthday',
+      dataIndex: 'dentist',
+      key: 'birthday',
+      render: (dentist) => dentist.user?.birthday,
+    },
+    {
+      title: 'Time Slot',
+      dataIndex: 'timeslot',
+      key: 'timeslot',
+      render: (timeslot) =>
+        `${timeslot.startTime} - time slot: ${timeslot.slotNumber}`,
     },
   ];
 
@@ -173,7 +197,6 @@ const Schedule = () => {
       <Table
         dataSource={dentistList}
         columns={columns}
-        pagination={false}
         style={{ marginBottom: '20px' }}
       />
 
