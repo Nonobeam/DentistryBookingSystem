@@ -68,7 +68,7 @@ export const EmailPopup = ({ user }) => {
             onChange={handleServiceChange}
             value={selectedService}>
             {servicesData.map((service) => (
-              <Option key={service.id} value={service.id}>
+              <Option key={service.serviceID} value={service.serviceID}>
                 {service.name}
               </Option>
             ))}
