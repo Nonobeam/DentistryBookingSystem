@@ -34,11 +34,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private final NotificationService notificationService;
     @Value("${spring.confirmation.link.baseurl}")
     private String confirmationLinkBaseUrl;
 
     private final JwtService jwtService;
-    private final MailService mailService;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -221,7 +221,7 @@ public class AuthenticationService {
     private void sendConfirmationEmail(String email, String confirmationLink) {
         String subject = "Confirm your email";
         String text = "Please click the following link to confirm your email address: " + confirmationLink;
-        mailService.sendSimpleMessage(email, subject, text);
+        notificationService.sendSimpleMessage(email, subject, text);
     }
 
     @Transactional

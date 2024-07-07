@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Staff API")
 public class StaffController {
-    private final MailService emailService;
     private final UserService userService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
@@ -448,7 +447,7 @@ public class StaffController {
         Notification optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
         if (optionalNotification != null) {
 
-            emailService.sendSimpleMessage(mail, subject, text);
+            notificationService.sendSimpleMessage(mail, subject, text);
             optionalNotification.setStatus(1);
 
             notificationService.save(optionalNotification);

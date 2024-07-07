@@ -3,7 +3,6 @@ package com.example.DentistryManagement.service;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.mail.SimpleMailMessage;
@@ -16,19 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
     private String fromMail;
 
-    public void sendMail(String mail, Notification notificationStructure) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom(fromMail);
-        simpleMailMessage.setTo(mail);
-        simpleMailMessage.setText(notificationStructure.getMessage());
-
-        mailSender.send(simpleMailMessage);
+    public void sendSimpleMessage(String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromMail);
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
     }
 
     public List<Notification> receiveNotice(String staffMail) {

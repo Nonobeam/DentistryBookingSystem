@@ -125,7 +125,9 @@ public class AppointmentService {
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
             for (Appointment appointment : appointments) {
-                if (appointment.getClinic().getClinicID().equals(staffClient.getClinic().getClinicID())) {
+                String appointmentID = appointment.getAppointmentID();
+                String staffClinicID = staffClient.getClinic().getClinicID();
+                if (appointmentID.equals(staffClinicID) && appointment.getDate().equals(date)) {
                     filterAppointments.add(appointment);
                 }
             }
