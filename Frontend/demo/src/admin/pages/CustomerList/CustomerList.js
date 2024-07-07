@@ -37,7 +37,9 @@ export const CustomerList = () => {
       title: 'Action',
       dataIndex: 'x',
       key: 'x',
-      render: (_, record) => <Action record={record} />,
+      render: (_, record) => (
+        <Action data={apiData} setApiData={setApiData} record={record} />
+      ),
     },
   ];
 

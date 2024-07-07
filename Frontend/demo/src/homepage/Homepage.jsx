@@ -1,5 +1,6 @@
 import React from "react";
 import NavBar from "./Nav";
+import Map from "./Map";
 import "antd/dist/reset.css"
 
 import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
@@ -16,6 +17,12 @@ import {
 } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
+
+const locations = [
+  { lat: 10.762622, lng: 106.660172, name: "Branch 1" }, // Example location
+  { lat: 10.762622, lng: 106.680172, name: "Branch 2" }, // Example location
+  // Add more locations here
+];
 
 const Homepage = () => {
   return (
@@ -106,13 +113,7 @@ const Homepage = () => {
         <div className="branches-section" style={{ padding: "50px 0" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              {/* <img
-                src="https://via.placeholder.com/400"
-                alt="Map"
-                style={{ width: "100%" }}
-              /> */}
-              <div>
-                <iframe width="100%" height="400px" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" src="https://maps.google.com/maps?width=600&amp;height=600&amp;hl=en&amp;q=L%C6%B0u%20H%E1%BB%AFu%20Ph%C6%B0%E1%BB%9Bc,%20%C4%90%C3%B4ng%20Ho%C3%A0,%20D%C4%A9%20An,%20B%C3%ACnh%20D%C6%B0%C6%A1ng+(Sunflower%20Dentistry)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/">gps systems</a></iframe></div>
+              <Map locations={locations} />
             </Col>
             <Col xs={24} md={12}>
               <Title level={2}>Dentistry Branches</Title>
@@ -123,6 +124,8 @@ const Homepage = () => {
             </Col>
           </Row>
         </div>
+
+
         <div
           className="video-section"
           style={{ padding: "50px 0", background: "#f0f2f5" }}

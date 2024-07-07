@@ -1,7 +1,7 @@
-// BookingForm.js
 import React, { useState, useEffect } from 'react';
 import { Form, Select, Button, notification, DatePicker, Input } from 'antd';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
+import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
 
 export const Booking = () => {
   const [services, setServices] = useState([]);
@@ -9,7 +9,11 @@ export const Booking = () => {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); // State to hold selected date
   const [schedules, setSchedules] = useState([]);
-  const [selectedSchedule, setSelectedSchedule] = useState(null); // State to hold selected schedule
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [dependentID, setDependentID] = useState([]); // State to hold selected schedule
+  const [customerMail, setCustomerMail] = useState(''); // State to hold customer email
+  const [isValidMail, setIsValidMail] = useState(false); // State to track valid email
+  const [form] = Form.useForm(); // Form instance to control form validation
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -62,6 +66,37 @@ export const Booking = () => {
     fetchSchedules();
   }, [selectedService, selectedDate]);
 
+  const fetchDependents = async () => {
+    try {
+      const response = await AppointmentHistoryServices.getDependents(
+        customerMail
+      );
+      if (response) {
+        setDependentID(response);
+      } else {
+        setDependentID([]);
+      }
+    } catch (error) {
+      console.error('Error fetching dependents:', error);
+    }
+  };
+
+  const handleCustomerMailChange = (e) => {
+    const { value } = e.target;
+    setCustomerMail(value);
+    // Validate email format
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); // Updated regex
+    setIsValidMail(isValid && value.endsWith('.com'));
+  };
+
+  const handleBlur = async () => {
+    // Trigger API call when focus leaves email input
+    if (isValidMail && customerMail) {
+      await fetchDependents();
+      setLoading(false);
+    }
+  };
+
   const onFinish = async (values) => {
     console.log('Success:', values);
     setLoading(true);
@@ -81,6 +116,7 @@ export const Booking = () => {
         description: 'Your appointment has been booked successfully.',
       });
     } catch (error) {
+      console.error('Error booking appointment:', error);
       notification.error({
         message: 'Booking Failed',
         description: error.message,
@@ -106,7 +142,11 @@ export const Booking = () => {
   };
 
   return (
-    <Form layout='vertical' onFinish={onFinish}>
+    <Form
+      form={form}
+      layout='vertical'
+      onFinish={onFinish}
+      initialValues={{ customerMail }}>
       <Form.Item
         name='date'
         label='Select Date'
@@ -145,11 +185,30 @@ export const Booking = () => {
       <Form.Item
         name='customerMail'
         label='Customer Email'
-        rules={[{ required: true, message: 'Please enter customer email' }]}>
-        <Input />
+        rules={[
+          { required: true, message: 'Please enter customer email' },
+          { type: 'email', message: 'Please enter a valid email' },
+        ]}>
+        <Input
+          onChange={handleCustomerMailChange}
+          onBlur={handleBlur}
+          value={customerMail}
+        />
       </Form.Item>
-      <Form.Item name='dependentID' label='Dependent ID'>
-        <Input />
+      <Form.Item
+        name='dependentID'
+        label='Dependent ID'
+        loading={loading}
+        rules={[{ required: true, message: 'Please select a dependent' }]}>
+        <Select>
+          {dependentID.map((dependent) => (
+            <Select.Option
+              key={dependent.dependentID}
+              value={dependent.dependentID}>
+              {dependent.name}
+            </Select.Option>
+          ))}
+        </Select>
       </Form.Item>
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={loading}>

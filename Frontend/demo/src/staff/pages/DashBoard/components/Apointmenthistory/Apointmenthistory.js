@@ -1,5 +1,3 @@
-// components/AppointmentHistory.js
-
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Dropdown, Button, Modal, message, Menu } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
@@ -23,12 +21,13 @@ const AppointmentHistory = () => {
   const handleUpdateStatus = async (record, status) => {
     try {
       const response = await AppointmentHistoryServices.patchAppointment({
-        appointmentId: record.id,
+        appointmentId: record.appointmentId,
         status: status,
       });
-      message.success(`Updated status to ${status} for treatment ID ${record.id}`);
+      message.success(
+        `Updated status to ${getStatusName(status)} for treatment ID ${record.appointmentId}`
+      );
       fetchData(); // Refresh data after update
-      console.log('Updated status:', status);
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -37,14 +36,17 @@ const AppointmentHistory = () => {
   const handleDelete = async (record) => {
     Modal.confirm({
       title: 'Confirm Delete',
-      content: `Are you sure you want to delete treatment ID ${record.id}?`,
+      content: `Are you sure you want to delete treatment ID ${record.appointmentId}?`,
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
       async onOk() {
         try {
-         const response = await AppointmentHistoryServices.deleteAppointment({ appointmentId: record.id });
-          message.success(`Deleted treatment ID ${record.id}`);
+          const response =
+            await AppointmentHistoryServices.deteleateAppointment({
+              appointmentId: record.appointmentId,
+            });
+          message.success(`Deleted treatment ID ${record.appointmentId}`);
           fetchData(); // Refresh data after deletion
         } catch (error) {
           console.error('Error deleting appointment:', error);
@@ -65,10 +67,39 @@ const AppointmentHistory = () => {
     }
   };
 
+  const getStatusName = (status) => {
+    switch (parseInt(status)) {
+      case 1:
+        return 'Upcoming';
+      case 0:
+        return 'Cancelled';
+      case 2:
+        return 'Finished';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const getUserDisplayName = (record) => {
+    if (record.user) {
+      if (record.dependent !== null && record.dependent !== undefined) {
+        return `(User: ${record.user})   (Dependent: ${record.dependent})`;
+      } else {
+        return record.user;
+      }
+    } else {
+      return `Dependent: ${record.dependent || 'None'}`;
+    }
+  };
+  
+
+
+  
+
   const menu = (record) => (
     <Menu onClick={(e) => handleMenuClick(record, e)}>
-      <Menu.Item key='1'>Update to 1</Menu.Item>
-      <Menu.Item key='2'>Update to 2</Menu.Item>
+      <Menu.Item key='1'>Update to Upcoming</Menu.Item>
+      <Menu.Item key='2'>Update to Finished</Menu.Item>
       <Menu.Item key='delete'>Delete</Menu.Item>
     </Menu>
   );
@@ -83,6 +114,7 @@ const AppointmentHistory = () => {
       title: 'User',
       dataIndex: 'user',
       key: 'user',
+      render: (text, record) => getUserDisplayName(record),
     },
     {
       title: 'TimeSlot',
@@ -103,6 +135,7 @@ const AppointmentHistory = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status) => getStatusName(status),
     },
     {
       title: 'Actions',

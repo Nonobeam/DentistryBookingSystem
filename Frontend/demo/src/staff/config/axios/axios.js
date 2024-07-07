@@ -3,7 +3,7 @@ import axios from 'axios';
 // const token = localStorage.getItem('token');
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1/', // Replace with your actual base URL
+  baseURL: 'http://localhost:8080/api/v1/',
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const api = axios.create({
 });
 api.interceptors.request.use((config) => {
   const token =
-    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmcyIiwiaWF0IjoxNzIwMDgxNzMyLCJleHAiOjE3MjA2ODY1MzJ9.6REBdetsLNucucVN4cEd8T7V9lhn5cF4NiUS0glWsTI';
+    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmcyIiwiaWF0IjoxNzIwMjMwMjI1LCJleHAiOjE3MjA4MzUwMjV9.VGPebVndP9uoZZivT18hnJJg7vbPg_CKlWnXLQNUYqw';
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

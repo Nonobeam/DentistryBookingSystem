@@ -44,8 +44,4 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findUserByMail(String mail);
 
-
-    List<Client> getClientsByRoleAndStatus(Role role, int status);
-
-    List<Client> findByRoleAndNameContainingIgnoreCaseAndStatus(Role role, String search, int status);
 }

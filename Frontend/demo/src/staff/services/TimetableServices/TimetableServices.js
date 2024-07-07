@@ -2,10 +2,11 @@ import { notification } from 'antd';
 import api from '../../config/axios/axios';
 
 const TimetableServices = {
-  
   getAll: async ({ date, numDay }) => {
     try {
-      const responseData = await api.get(`staff/timetable/${date}?numDay=${numDay}`);
+      const responseData = await api.get(
+        `staff/timetable/${date}?numDay=${numDay}`
+      );
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -15,14 +16,11 @@ const TimetableServices = {
       throw error;
     }
   },
- // ShowScheduleServices.js
-
-
-
+  // ShowScheduleServices.js
 
   getAllDentists: async () => {
     try {
-      const responseData = await api.get('/staff/show-set-schedule');
+      const responseData = await api.get('/staff/dentist-schedule');
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -32,9 +30,25 @@ const TimetableServices = {
       throw error;
     }
   },
-  setSchedule: async ({dentistMail,startDate,endDate,slotNumber}) => {
+  getAllDentistsAndTimeSlot: async (start, end) => {
     try {
-      const responseData = await api.post(`/staff/set-schedule?dentistMail=${dentistMail}&startDate=${startDate}&endDate=${endDate}&slotNumber=${slotNumber}`);
+      const responseData = await api.get(
+        `/staff/show-set-schedule?startDate=${start}&endDate=${end}`
+      );
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Failed to fetch dentist list',
+        description: error.message,
+      });
+      throw error;
+    }
+  },
+  setSchedule: async ({ dentistMail, startDate, endDate, slotNumber }) => {
+    try {
+      const responseData = await api.post(
+        `/staff/set-schedule?dentistMail=${dentistMail}&startDate=${startDate}&endDate=${endDate}&slotNumber=${slotNumber}`
+      );
       return responseData.data;
     } catch (error) {
       notification.error({
@@ -45,10 +59,5 @@ const TimetableServices = {
     }
   },
 };
-
-
-
- 
-
 
 export default TimetableServices;

@@ -1,6 +1,6 @@
 import { Flex } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { FeatureAction } from './components/FeatureAction/FeatureAction';
+
 import { Action } from './components/Action/Action';
 import { CustomerServicess } from '../../../../services/CustomerServicess/CustomerServicess';
 import { TableList } from './components/TableList/TableList';
@@ -55,7 +55,7 @@ export const CustomerListDash = () => {
       <h1>CustomerList</h1>
       <Flex>
         {' '}
-        <FeatureAction />
+        
       </Flex>
       <Flex>
         <TableList dataSource={apiData} columns={columns} />

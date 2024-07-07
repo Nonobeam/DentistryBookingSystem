@@ -3,22 +3,23 @@ import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
 import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { Button, Dropdown, Menu } from 'antd';
- // Đường dẫn tới NotificationDropdown
-
-import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
+import { Button, Dropdown, Menu, message } from 'antd';
 import NotificationDropdown from '../../pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
+import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
 
 export const AppHeader = () => {
   const [showBellDropdown, setShowBellDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [searchValue, setSearchValue] = useState(''); // State for search input value
+  const [filteredNotifications, setFilteredNotifications] = useState([]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await PersonalServices.getNotificationStaff();
         setNotifications(response);
+        setFilteredNotifications(response); // Initialize filtered notifications with all notifications
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -26,26 +27,47 @@ export const AppHeader = () => {
     fetchNotifications();
   }, []);
 
+  // Function to handle search input change
+  const handleSearchInputChange = (e) => {
+    const { value } = e.target;
+    setSearchValue(value);
+
+    // Perform filtering based on search value
+    const filtered = notifications.filter((notification) =>
+      notification.title.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredNotifications(filtered);
+  };
+
   const handleBellIconClick = () => {
-    setShowBellDropdown(!showBellDropdown); // Toggle bell dropdown visibility
+    setShowBellDropdown(!showBellDropdown);
   };
 
   const handleUserIconClick = () => {
-    setShowUserDropdown(!showUserDropdown); // Toggle user dropdown visibility
+    setShowUserDropdown(!showUserDropdown);
   };
 
   const handleLogout = () => {
-    // Logic for logout action
+    // Perform logout action here
     console.log('Logging out...');
+
+    // Example: Clear token from localStorage and redirect to login page
+    localStorage.removeItem('accessToken'); // Remove access token or any other stored data
+    message.success('Logged out successfully'); // Show a success message (optional)
+    
+    // Redirect to login page
+    window.location.href = '/login';
+  };
+
+  const handleNotificationClick = (notification) => {
+    // Logic to handle notification click
+    console.log('Notification clicked:', notification);
   };
 
   const menu = (
     <Menu>
       <Menu.Item key='profile'>
         <Link to='/staff/profile'>Profile</Link>
-      </Menu.Item>
-      <Menu.Item key='settings'>
-        <Link to='/settings'>Settings</Link>
       </Menu.Item>
       <Menu.Item key='logout'>
         <Button type='link' onClick={handleLogout}>
@@ -75,6 +97,8 @@ export const AppHeader = () => {
         }}
         type='text'
         placeholder='Search'
+        value={searchValue}
+        onChange={handleSearchInputChange} // Handle input change
       />
       <BiSearch className='search-icon' style={{ cursor: 'pointer' }} />
       <div style={{ position: 'relative' }}>
@@ -98,8 +122,8 @@ export const AppHeader = () => {
             }}
           >
             <NotificationDropdown
-              notifications={notifications}
-              onClose={() => setShowBellDropdown(false)}
+              notifications={filteredNotifications} // Pass filtered notifications to dropdown
+              onNotificationClick={handleNotificationClick}
             />
           </div>
         )}
