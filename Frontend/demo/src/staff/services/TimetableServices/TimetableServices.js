@@ -58,6 +58,20 @@ const TimetableServices = {
       throw error;
     }
   },
+  deleteSchedule: async (scheduleID) => {
+    try {
+      const responseData = await api.delete(
+        `staff/delete-schedule/${scheduleID}`
+      );
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Failed to delete schedule',
+        description: error.message,
+      });
+      throw error;
+    }
+  },
 };
 
 export default TimetableServices;

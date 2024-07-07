@@ -1,5 +1,3 @@
-// Schedule.js
-
 import React, { useState, useEffect } from 'react';
 import {
   Button,
@@ -36,7 +34,6 @@ const Schedule = () => {
       const dentistsList = await TimetableServices.getAllDentists();
       console.log(dentistsList);
       setDentistList(dentistsList);
-      // setTimeSlotList(dentistsList.timeSlotList);
     } catch (error) {
       console.error('Error fetching dentist list:', error);
     }
@@ -121,18 +118,44 @@ const Schedule = () => {
       });
     }
 
-    // const updatedTasks = [...scheduledTasks, ...newTasks];
-    // setScheduledTasks(updatedTasks);
-
-    // Clear input fields after scheduling
     setSelectedDateRange([]);
-    setSelectedTimeRange([]);
+    setSelectedTimeRange(undefined);
     setDentistName('');
   };
 
   const handleCancel = () => {
     setModalVisible(false);
     form.resetFields();
+  };
+
+  const handleDelete = async (record) => {
+    const { scheduleID } = record;
+
+    try {
+      const response = await TimetableServices.deleteSchedule(scheduleID);
+      console.log(response);
+      if (response.code === '400') {
+        notification.error({
+          message: response.message,
+        });
+      } else {
+        setDentistList(
+          dentistList.filter((item) => item.scheduleID !== scheduleID)
+        );
+        notification.success({
+          message: 'Delete Successful',
+          description: 'The schedule has been deleted successfully.',
+        });
+      }
+
+      // Perform any necessary state updates after successful deletion
+      // For example, update scheduledTasks state or refetch data
+    } catch (error) {
+      notification.error({
+        message: 'Failed to delete schedule',
+        description: error.message,
+      });
+    }
   };
 
   const columns = [
@@ -158,7 +181,6 @@ const Schedule = () => {
       title: 'Work Date',
       dataIndex: 'workDate',
       key: 'workDate',
-      
     },
     {
       title: 'Time Slot',
@@ -166,6 +188,15 @@ const Schedule = () => {
       key: 'timeslot',
       render: (timeslot) =>
         `${timeslot.startTime} - slot number: ${timeslot.slotNumber}`,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <Button type='link' danger onClick={() => handleDelete(record)}>
+          Delete
+        </Button>
+      ),
     },
   ];
 
@@ -233,9 +264,6 @@ const Schedule = () => {
           <Button key='cancel' onClick={handleCancel}>
             Cancel
           </Button>,
-          // <Button key='update' type='primary' onClick={handleUpdate}>
-          //   Update
-          // </Button>,
         ]}>
         <Form form={form} layout='vertical'>
           <Form.Item

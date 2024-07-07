@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select, Button, notification, DatePicker, Input } from 'antd';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
+import moment from 'moment';
 
 export const Booking = () => {
   const [services, setServices] = useState([]);
@@ -109,7 +110,8 @@ export const Booking = () => {
         dependentID: dependentID || null, // Pass null if dependentID is not provided
         customerMail,
         serviceId,
-        dentistScheduleId: scheduleId, // Pass dentistScheduleId obtained from selectedSchedule
+        dentistScheduleId: scheduleId,
+         // Pass dentistScheduleId obtained from selectedSchedule
       });
       notification.success({
         message: 'Booking Successful',
@@ -141,6 +143,11 @@ export const Booking = () => {
     setSelectedSchedule(value);
   };
 
+  // Function to disable dates more than 2 months from today
+  const disabledDate = (current) => {
+    return current && current > moment().add(2, 'months');
+  };
+
   return (
     <Form
       form={form}
@@ -151,7 +158,7 @@ export const Booking = () => {
         name='date'
         label='Select Date'
         rules={[{ required: true, message: 'Please select a date' }]}>
-        <DatePicker onChange={handleDateChange} />
+        <DatePicker onChange={handleDateChange} disabledDate={disabledDate} />
       </Form.Item>
       <Form.Item
         name='service'

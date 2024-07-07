@@ -11,21 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
-
-    public Optional<TimeSlot> findTimeSlotByID(String timeSlotID) {
-        return timeSlotRepository.findById(timeSlotID);
-    }
-
-    public List<TimeSlot> findByClinic(Clinic clinic) {
-        return timeSlotRepository.findByClinicOrderByStartTimeAsc(clinic);
-    }
 
     // Find the start of process update date
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
