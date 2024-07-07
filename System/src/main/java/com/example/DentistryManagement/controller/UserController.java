@@ -10,7 +10,6 @@ import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
-import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @RequestMapping("/user")
 @RestController
@@ -36,15 +37,16 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-    private final DentistScheduleService dentistScheduleService;
+    private final UserMapping userMapping;
+    private final ClinicService clinicService;
+    private final ServiceService serviceService;
     private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
-    private final UserRepository userRepository;
-    private final ClinicService clinicService;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final AppointmentRepository appointmentRepository;
+    private final DentistScheduleService dentistScheduleService;
     private final Logger logger = LogManager.getLogger(UserController.class);
-    private final ServiceService serviceService;
-    private final UserMapping userMapping;
+
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
 
@@ -170,6 +172,13 @@ public class UserController {
     })
     @PostMapping("/booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
+        // Apply redis single-thread
+        String lockKey = "booking:lock:" + dentistScheduleId;
+        boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS);
+        if (!lockAcquired) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("409", "Booking in progress by another user"));
+        }
+
         try {
             // Current user
             Client customer = userService.findClientByMail(userService.mailExtract());
@@ -204,11 +213,10 @@ public class UserController {
             appointmentService.createAppointment(null, customer, dentistSchedule, services, dependent);
             return ResponseEntity.ok("Booking successfully");
         } catch (Error e) {
-            return ResponseEntity.badRequest().body(null);
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponseDTO);
+        } finally {
+            redisTemplate.delete(lockKey);
         }
     }
 
@@ -351,23 +359,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-@GetMapping("/get-service")
-    public ResponseEntity<?> getServices(Model modelMap) {
-        try {
-            List<Services> services = serviceService.findAllServices();
-            if (!services.isEmpty()) {
-                return ResponseEntity.ok(modelMap.addAttribute("services",services));
-            } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any service");
-                logger.error("Not found any service");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-            }
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
+
 
 
 }
