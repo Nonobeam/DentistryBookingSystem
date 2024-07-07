@@ -39,9 +39,12 @@ public class DentistScheduleService {
     }
 
 
-    public void deleteDentistSchedule(String dentistID, LocalDate workDate, int numSlot) {
-        Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
-        dentistScheduleRepository.deleteByDentistAndWorkDateAndTimeslot_SlotNumber(dentist, workDate, numSlot);
+    public void deleteDentistSchedule(String scheduleID) {
+        DentistSchedule dentistSchedule = dentistScheduleRepository.findById(scheduleID).orElse(null);
+        if (dentistSchedule != null) {
+            dentistScheduleRepository.delete(dentistSchedule);
+        } else throw new IllegalArgumentException("Schedule not found");
+
     }
 
 

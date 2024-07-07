@@ -325,12 +325,11 @@ public class StaffController {
 
 
     @Operation(summary = "Delete Dentist Schedule")
-    @DeleteMapping("/delete-schedule")
-    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate,
-                                                   @RequestParam int numSlot) {
+    @DeleteMapping("/delete-schedule/{scheduleID}")
+    public ResponseEntity<?> deleteDentistSchedule(@PathVariable String scheduleID
+                                                ) {
         try {
-            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
+            dentistScheduleService.deleteDentistSchedule(scheduleID);
             return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", e.getMessage());
