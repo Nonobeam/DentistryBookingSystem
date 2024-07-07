@@ -13,6 +13,7 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
   const handleSave = () => {
     // Handle save logic here, like sending data to backend
     console.log(formData);
+    
     setOpen(false);
   };
 

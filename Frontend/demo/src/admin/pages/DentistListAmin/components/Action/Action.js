@@ -7,7 +7,7 @@ import { ModalInfo } from '../ModalInfo/ModalInfo';
 import { useNavigate } from 'react-router-dom';
 import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
-export const Action = ({ record }) => {
+export const Action = ({ record, setApiData, data }) => {
   const navigator = useNavigate();
   const [info, setInfo] = React.useState(record);
   const [open, setOpen] = React.useState(false);
@@ -30,10 +30,9 @@ export const Action = ({ record }) => {
     setLoading(true);
   };
 
-
   const handleDelete = async () => {
     try {
-     const response = await CustomerServices.deleteCustomer(record.id);
+      const response = await CustomerServices.deleteCustomer(record.id);
       // setLoading(false);
       console.log(response);
     } catch (error) {
@@ -56,6 +55,8 @@ export const Action = ({ record }) => {
         setOpen={setOpen}
         loading={loading}
         showModal={showModal}
+        setApiData={setApiData}
+        data={data}
         info={info}
       />
     </>

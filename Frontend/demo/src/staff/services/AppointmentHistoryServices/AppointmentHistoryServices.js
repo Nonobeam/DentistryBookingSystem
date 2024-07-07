@@ -60,7 +60,7 @@ export const AppointmentHistoryServices = {
   }) => {
     try {
       const responseData = await api.post(
-        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerID=${customerMail}&serviceId=${serviceId}`
+        `staff/booking/make-booking/${dentistScheduleId}?dependentID=${dependentID}&customerMail=${customerMail}&serviceId=${serviceId}`
       );
       return responseData.data;
     } catch (error) {
@@ -89,9 +89,23 @@ export const AppointmentHistoryServices = {
   },
   deteleateAppointment: async ({ appointmentId }) => {
     try {
-      const responseData = await api.delete(
+      const responseData = await api.put(
         `staff/delete-booking/${appointmentId}`
       );
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        onClick: () => {
+          console.log('Notification Clicked!');
+        },
+      });
+    }
+  },
+  getDependents: async (customerMail) => {
+    try {
+      const responseData = await api.get(`staff/dependentList/${customerMail}`);
       return responseData.data;
     } catch (error) {
       notification.error({

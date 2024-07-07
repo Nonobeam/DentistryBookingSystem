@@ -72,7 +72,7 @@ export const AppSider = () => {
         backgroundColor: '#fff',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
         borderRight: 'none',
-        height: '100%',
+        height: '100vh',
       }}>
       <div className='demo-logo-vertical' style={{ height: '40px' }} />
       <Menu

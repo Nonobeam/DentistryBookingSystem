@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
-import { FaUserCircle, FaCog } from 'react-icons/fa';
+import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-// import { CardNotification as Notification } from '../../pages/DashBoard/components/CarNotification/CarNotification';
-import { Button, Dropdown, Menu } from 'antd';
-import { PersonalServices } from '../../../services/PersonalServices/PersonalServices';
+import { Button, Dropdown, Menu, message } from 'antd';
+import { PersonalServices } from '../../../../staff/services/PersonalServices/PersonalServices';
+import NotificationDropdown from '../../../../staff/pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
 
-const NotificationDropdown = ({ onClose }) => {
+
+
+export const AppHeader = () => {
+  const [showBellDropdown, setShowBellDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [searchValue, setSearchValue] = useState(''); // State for search input value
+  const [filteredNotifications, setFilteredNotifications] = useState([]);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await PersonalServices.getNotificationStaff();
         setNotifications(response);
+        setFilteredNotifications(response); // Initialize filtered notifications with all notifications
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -21,55 +29,45 @@ const NotificationDropdown = ({ onClose }) => {
     fetchNotifications();
   }, []);
 
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '50px',
-        right: '20px',
-        padding: '10px',
-        background: '#fff',
-        color: '#000',
-        zIndex: 999,
-        boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)', // Add box shadow for better visibility
-        borderRadius: '5px',
-        // Add border radius for rounded corners
-      }}>
-      {/* {notifications.map((notification) => (
-        <Notification
-          key={notification.notificationID}
-          content={notification.message}
-        />
-      ))} */}
-    </div>
-  );
-};
+  // Function to handle search input change
+  const handleSearchInputChange = (e) => {
+    const { value } = e.target;
+    setSearchValue(value);
 
-export const AppHeader = () => {
-  const [showBellDropdown, setShowBellDropdown] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
+    // Perform filtering based on search value
+    const filtered = notifications.filter((notification) =>
+      notification.title.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredNotifications(filtered);
+  };
 
   const handleBellIconClick = () => {
-    setShowBellDropdown(!showBellDropdown); // Toggle bell dropdown visibility
+    setShowBellDropdown(!showBellDropdown);
   };
 
   const handleUserIconClick = () => {
-    setShowUserDropdown(!showUserDropdown); // Toggle user dropdown visibility
+    setShowUserDropdown(!showUserDropdown);
   };
 
   const handleLogout = () => {
-    // Logic for logout action
+    // Perform logout action here
     console.log('Logging out...');
+
+    // Example: Clear token from localStorage and redirect to login page
+    localStorage.removeItem('accessToken'); // Remove access token or any other stored data
+    message.success('Logged out successfully'); // Show a success message (optional)
+    
+    // Redirect to login page
+    window.location.href = '/login';
+  };
+
+  const handleNotificationClick = (notification) => {
+    // Logic to handle notification click
+    console.log('Notification clicked:', notification);
   };
 
   const menu = (
     <Menu>
-      <Menu.Item key='profile'>
-        <Link to='/staff/profile'>Profile</Link>
-      </Menu.Item>
-      <Menu.Item key='settings'>
-        <Link to='/settings'>Settings</Link>
-      </Menu.Item>
       <Menu.Item key='logout'>
         <Button type='link' onClick={handleLogout}>
           Logout
@@ -86,7 +84,8 @@ export const AppHeader = () => {
         alignItems: 'center',
         gap: '20px',
         color: '#fff',
-      }}>
+      }}
+    >
       <input
         style={{
           border: 'none',
@@ -97,16 +96,31 @@ export const AppHeader = () => {
         }}
         type='text'
         placeholder='Search'
+        value={searchValue}
+        onChange={handleSearchInputChange} // Handle input change
       />
       <BiSearch className='search-icon' style={{ cursor: 'pointer' }} />
       <div style={{ position: 'relative' }}>
-        <CiBellOn
-          className='bell-icon'
-          style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-          onClick={handleBellIconClick}
-        />
+        
         {showBellDropdown && (
-          <NotificationDropdown onClose={() => setShowBellDropdown(false)} />
+          <div
+            style={{
+              position: 'absolute',
+              top: '40px',
+              right: '10px',
+              minWidth: '300px', // Adjust the width as needed
+              background: '#fff',
+              boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
+              borderRadius: '8px',
+              padding: '10px',
+              zIndex: 999,
+            }}
+          >
+            <NotificationDropdown 
+              notifications={filteredNotifications} // Pass filtered notifications to dropdown
+              onNotificationClick={handleNotificationClick}
+            />
+          </div>
         )}
       </div>
       <Dropdown overlay={menu} placement='bottomRight' trigger={['click']}>

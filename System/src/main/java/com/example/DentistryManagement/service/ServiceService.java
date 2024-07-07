@@ -47,4 +47,28 @@ public class ServiceService {
         return servicesHashSet;
 
     }
+
+    public List<Services> getAll() {
+        try {
+            return serviceRepository.getAll();
+        } catch (Error error) {
+            throw error;
+        }
+    }
+
+    public Services save(Services services) {
+        try {
+            return serviceRepository.save(services);
+        } catch (Error error) {
+            throw error;
+        }
+    }
+
+    public void deleteServiceById(String servicesId) {
+        try {
+            serviceRepository.deleteById(servicesId);
+        } catch (Error error) {
+            throw error;
+        }
+    }
 }

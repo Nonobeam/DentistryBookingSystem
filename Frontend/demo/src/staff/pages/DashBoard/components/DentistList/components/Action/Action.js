@@ -1,11 +1,7 @@
 import React from 'react';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { IoEyeOffOutline } from 'react-icons/io5';
-import { MdOutlineModeEdit } from 'react-icons/md';
-import { FiTrash2 } from 'react-icons/fi';
 import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
-import { StudentServices } from '../../../../../../services/StudentServices/StudentServices';
 import { useNavigate } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
 
@@ -36,20 +32,11 @@ export const Action = ({ record }) => {
     // console.log(record);
     navigator(`detail/${record.mail}`);
   };
-
-  const handleDelete = () => {};
-
   return (
     <>
       <Flex style={{ width: '80px' }} justify='space-between'>
         <div>
           <MdOutlineRemoveRedEye onClick={handleClickEye} />
-        </div>
-        <div>
-          <MdOutlineModeEdit onClick={handleUpdate} />
-        </div>
-        <div>
-          <FiTrash2 onClick={handleDelete} />
         </div>
       </Flex>
       <ModalInfo
