@@ -39,7 +39,6 @@ public class AuthenticationService {
     private String confirmationLinkBaseUrl;
 
     private final JwtService jwtService;
-    private final MailService mailService;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;

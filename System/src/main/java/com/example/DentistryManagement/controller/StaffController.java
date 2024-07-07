@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Staff API")
 public class StaffController {
-    private final MailService emailService;
     private final UserService userService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
