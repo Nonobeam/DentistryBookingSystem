@@ -51,7 +51,6 @@ public class DentistScheduleService {
      * @param endDate Input LocalDate endDate
      * @param slotNumber Input int slot (e.g: 1, 2, 3, 4.....)
      * @param clinicID Input String clinicID
-     * @return appointment
      */
     public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, int slotNumber, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
