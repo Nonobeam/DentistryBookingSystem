@@ -40,6 +40,7 @@ import DentistSchedule from './dentist/DentistSchedule';
 import ManagerStaffList from './manager/ManagerStaffList';
 import ManagerDentistList from './manager/ManagerDentistList';
 import ManagerClinicList from './manager/ManagerClinicList';
+import ManagerDashboard from './manager/ManagerDashboard';
 
 
 
@@ -78,9 +79,10 @@ const App = () => {
 
         {/* MANAGER PAGES */}
         <Route path='/manager'>
-          {/* <Route path='' element={<RoleBasedRoute element={<ManagerList />} requiredRole={['MANAGER']}/>}/> */}
+          <Route path='' element={<RoleBasedRoute element={<ManagerDashboard />} requiredRole={['MANAGER']}/>}/>
           <Route path='staff' element={<RoleBasedRoute element={<ManagerStaffList />} requiredRole={['MANAGER']}/>}/>
-          <Route path='dentist' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/:id' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
           <Route path='clinic' element={<RoleBasedRoute element={<ManagerClinicList />} requiredRole={['MANAGER']}/>} />
         </Route>
 
