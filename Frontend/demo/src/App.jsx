@@ -40,6 +40,7 @@ import ManagerStaffList from './manager/ManagerStaffList';
 import ManagerDentistList from './manager/ManagerDentistList';
 import ManagerClinicList from './manager/ManagerClinicList';
 import ManagerDashboard from './manager/ManagerDashboard';
+import ClinicDetail from './manager/ClinicDetail';
 
 
 
