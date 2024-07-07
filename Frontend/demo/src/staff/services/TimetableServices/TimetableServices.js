@@ -30,10 +30,10 @@ const TimetableServices = {
       throw error;
     }
   },
-  getAllDentistsAndTimeSlot: async (date) => {
+  getAllDentistsAndTimeSlot: async (start, end) => {
     try {
       const responseData = await api.get(
-        `/staff/show-set-schedule?date=${date}`
+        `/staff/show-set-schedule?startDate=${start}&endDate=${end}`
       );
       return responseData.data;
     } catch (error) {

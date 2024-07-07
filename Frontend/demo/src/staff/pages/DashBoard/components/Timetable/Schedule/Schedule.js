@@ -29,6 +29,7 @@ const Schedule = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [dentistList, setDentistList] = useState([]);
+  const [dentistListSchedule, setDentistListSchedule] = useState([]);
 
   const fetchDentistList = async () => {
     try {
@@ -43,13 +44,17 @@ const Schedule = () => {
 
   const fetchDentistListAndTimeSlot = async () => {
     try {
-      console.log(selectedDateRange);
-      // const dentistsList = await TimetableServices.getAllDentistsAndTimeSlot(
-      //   selectedDateRange
-      // // );
-      // console.log(dentistsList);
-      // setDentistList(dentistsList);
-      // setTimeSlotList(dentistsList.timeSlotList);
+      console.log(
+        selectedDateRange[0].format('YYYY-MM-DD'),
+        selectedDateRange[1].format('YYYY-MM-DD')
+      );
+      const dentistsList = await TimetableServices.getAllDentistsAndTimeSlot(
+        selectedDateRange[0].format('YYYY-MM-DD'),
+        selectedDateRange[1].format('YYYY-MM-DD')
+      );
+      console.log(dentistsList.dentistList);
+      setDentistListSchedule(dentistsList.dentistList);
+      setTimeSlotList(dentistsList.timeSlotList);
     } catch (error) {
       console.error('Error fetching dentist list:', error);
     }
@@ -59,6 +64,9 @@ const Schedule = () => {
     fetchDentistList();
   }, []);
 
+  useEffect(() => {
+    fetchDentistListAndTimeSlot();
+  }, [selectedDateRange]);
 
   const handleDateRangeChange = (dates) => {
     if (dates === null || dates.length === 0) {
@@ -90,20 +98,27 @@ const Schedule = () => {
       return;
     }
 
-    const response = await TimetableServices.setSchedule({
-      dentistMail: dentistName,
-      startDate: selectedDateRange[0].format('YYYY-MM-DD'),
-      endDate: selectedDateRange[1].format('YYYY-MM-DD'),
-      slotNumber: selectedTimeRange,
-    });
-    console.log(response);
-    if (response) {
-      notification.success({
-        message: 'Schedule Successfully',
-        description: 'Your schedule has been set successfully.',
+    try {
+      const response = await TimetableServices.setSchedule({
+        dentistMail: dentistName,
+        startDate: selectedDateRange[0].format('YYYY-MM-DD'),
+        endDate: selectedDateRange[1].format('YYYY-MM-DD'),
+        slotNumber: selectedTimeRange,
       });
-      setModalVisible(false);
-      form.resetFields();
+      console.log(response);
+      if (response) {
+        notification.success({
+          message: 'Schedule Successfully',
+          description: 'Your schedule has been set successfully.',
+        });
+        setModalVisible(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      notification.error({
+        message: 'Failed to set schedule',
+        description: error.message,
+      });
     }
 
     // const updatedTasks = [...scheduledTasks, ...newTasks];
@@ -140,19 +155,28 @@ const Schedule = () => {
       render: (dentist) => dentist.user?.phone,
     },
     {
-      title: 'Birthday',
-      dataIndex: 'dentist',
-      key: 'birthday',
-      render: (dentist) => dentist.user?.birthday,
+      title: 'Work Date',
+      dataIndex: 'workDate',
+      key: 'workDate',
+      
     },
     {
       title: 'Time Slot',
       dataIndex: 'timeslot',
       key: 'timeslot',
       render: (timeslot) =>
-        `${timeslot.startTime} - time slot: ${timeslot.slotNumber}`,
+        `${timeslot.startTime} - slot number: ${timeslot.slotNumber}`,
     },
   ];
+
+  const disabledDate = (current) => {
+    // Allow dates up to two months from today
+    return (
+      current &&
+      (current < moment().startOf('day') ||
+        current > moment().add(2, 'months').endOf('day'))
+    );
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -164,13 +188,14 @@ const Schedule = () => {
           style={{ marginRight: '10px' }}
           format='DD/MM/YYYY'
           placeholder={['Start Date', 'End Date']}
+          disabledDate={disabledDate}
         />
         <Select
           style={{ width: '200px', marginRight: '10px' }}
           placeholder='Select or Name'
           onChange={handleDentistChange}
           allowClear>
-          {dentistList.map((dentist) => (
+          {dentistListSchedule.map((dentist) => (
             <Option key={dentist.mail} value={dentist.mail}>
               {dentist.name}
             </Option>
