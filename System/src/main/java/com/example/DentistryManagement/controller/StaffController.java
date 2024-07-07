@@ -443,7 +443,7 @@ public class StaffController {
         Notification optionalNotification = notificationService.findNotificationByIDAndStatus(notificationID, 0);
         if (optionalNotification != null) {
 
-            emailService.sendSimpleMessage(mail, subject, text);
+            notificationService.sendSimpleMessage(mail, subject, text);
             optionalNotification.setStatus(1);
 
             notificationService.save(optionalNotification);
