@@ -159,7 +159,7 @@ public class UserController {
             availableSchedulesResponses.add(availableSchedulesResponse);
         }
 
-        return ResponseEntity.ok(availableSchedulesResponses);
+        return ResponseEntity.ok(availableSchedulesResponses.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)));
     }
 
 
