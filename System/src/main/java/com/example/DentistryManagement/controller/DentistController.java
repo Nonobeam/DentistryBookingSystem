@@ -158,9 +158,11 @@ public class DentistController {
             startDate.datesUntil(startDate.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
                 List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDateByDentist(startDate, numDay, dentist).stream()
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
+                        .sorted(Comparator.comparing(schedule-> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
                 List<Appointment> appointments = appointmentService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
+                        .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());
                 TimeTableResponseDTO timeTableResponseDTO = new TimeTableResponseDTO();
                 List<TimeTableResponseDTO> timeTableResponseDTOList = timeTableResponseDTO.getTimeTableResponseDTOList(dentistSchedules, appointments);

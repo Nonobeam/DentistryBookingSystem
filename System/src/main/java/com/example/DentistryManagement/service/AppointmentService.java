@@ -88,7 +88,7 @@ public class AppointmentService {
                     appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
                 }
             }
-            return appointmentsHistory;
+            return appointmentsHistory.stream().sorted(Comparator.comparing(Appointment::getDate).thenComparing(Appointment -> Appointment.getTimeSlot().getStartTime())).toList();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -346,6 +346,7 @@ public class AppointmentService {
 
                     return appointment;
                 })
+                .sorted(Comparator.comparing(AppointmentDTO::getDate))
                 .toList();
         return appointmentDTOList;
     }
