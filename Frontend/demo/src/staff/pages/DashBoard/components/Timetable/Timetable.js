@@ -133,7 +133,6 @@ export const TimeTable = () => {
                   {day.tasks.map((task, index) => (
                     <Card
                       key={index}
-                      style={{ marginBottom: '10px', backgroundColor: '#ffffff', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
                     >
                       <Meta
                         title={`Dentist: ${task.dentistName}`}
@@ -152,10 +151,11 @@ export const TimeTable = () => {
                 <p
                   style={{
                     textAlign: 'center',
-                    padding: '10px',
+                    padding: '1px',
                     fontWeight: 'bold',
                     background: '#f0f0f0',
                     marginBottom: '0',
+                    
                   }}
                 >
                   No tasks for this day
@@ -168,4 +168,3 @@ export const TimeTable = () => {
     </div>
   );
 };
-

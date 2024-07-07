@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Modal, Input, Form, Avatar } from 'antd';
+import { Button, Modal, Input, Form, Avatar, notification } from 'antd';
 import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
 const { TextArea } = Input;
 
-export const ModalInfo = ({ open, setOpen, info, showModal }) => {
+export const ModalInfo = ({ open, setOpen, info, data, setApiData }) => {
   const [formData, setFormData] = useState(info);
 
   const handleCancel = () => {
@@ -13,15 +13,25 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
 
   const handleSave = async () => {
     // Handle save logic here, like sending data to backend
-    console.log(formData);
+
     const response = await CustomerServices.updateCustomer(formData);
-    console.log(response);
+    if (response) {
+      setApiData(
+        data.map((item) => (item.id === formData.id ? formData : item))
+      );
+    } else {
+      notification.error({
+        message: 'Error',
+        description: 'Failed to update customer.',
+      });
+    }
     setOpen(false);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name !== 'mail') { // Ensure 'mail' field is not updated
+    if (name !== 'mail') {
+      // Ensure 'mail' field is not updated
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -39,8 +49,7 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
           <Button key='save' type='primary' onClick={handleSave}>
             Save
           </Button>,
-        ]}
-      >
+        ]}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Avatar size={120} src={formData.image} />
         </div>
@@ -49,7 +58,11 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
             <Input name='name' value={formData.name} onChange={handleChange} />
           </Form.Item>
           <Form.Item label='Date of Birth'>
-            <Input name='birthday' value={formData.birthday} onChange={handleChange} />
+            <Input
+              name='birthday'
+              value={formData.birthday}
+              onChange={handleChange}
+            />
           </Form.Item>
           <Form.Item label='Mail'>
             <Input
@@ -60,7 +73,11 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
             />
           </Form.Item>
           <Form.Item label='Phone'>
-            <Input name='phone' value={formData.phone} onChange={handleChange} />
+            <Input
+              name='phone'
+              value={formData.phone}
+              onChange={handleChange}
+            />
           </Form.Item>
         </Form>
       </Modal>

@@ -15,7 +15,6 @@ import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
 import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
-import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
 import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
@@ -89,8 +88,6 @@ const App = () => {
           <Route path='customer-list' element={<CustomerListDash />} />
           <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
         </Route>
-
-        <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
         
           {/* ADMIN PAGES */}

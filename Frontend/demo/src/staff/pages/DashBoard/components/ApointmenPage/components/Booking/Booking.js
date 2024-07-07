@@ -71,7 +71,11 @@ export const Booking = () => {
       const response = await AppointmentHistoryServices.getDependents(
         customerMail
       );
-      setDependentID(response);
+      if (response) {
+        setDependentID(response);
+      } else {
+        setDependentID([]);
+      }
     } catch (error) {
       console.error('Error fetching dependents:', error);
     }
@@ -112,6 +116,7 @@ export const Booking = () => {
         description: 'Your appointment has been booked successfully.',
       });
     } catch (error) {
+      console.error('Error booking appointment:', error);
       notification.error({
         message: 'Booking Failed',
         description: error.message,

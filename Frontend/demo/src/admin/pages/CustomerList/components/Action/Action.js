@@ -7,7 +7,7 @@ import { ModalInfo } from '../ModalInfo/ModalInfo';
 import { useNavigate } from 'react-router-dom';
 import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
-export const Action = ({ record }) => {
+export const Action = ({ record, data, setApiData }) => {
   const navigator = useNavigate();
   const [info, setInfo] = useState(record);
   const [open, setOpen] = useState(false);
@@ -70,6 +70,8 @@ export const Action = ({ record }) => {
         loading={loading}
         showModal={showModal}
         info={info}
+        data={data}
+        setApiData={setApiData}
       />
     </>
   );

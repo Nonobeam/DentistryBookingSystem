@@ -30,6 +30,20 @@ const TimetableServices = {
       throw error;
     }
   },
+  getAllDentistsAndTimeSlot: async (start, end) => {
+    try {
+      const responseData = await api.get(
+        `/staff/show-set-schedule?startDate=${start}&endDate=${end}`
+      );
+      return responseData.data;
+    } catch (error) {
+      notification.error({
+        message: 'Failed to fetch dentist list',
+        description: error.message,
+      });
+      throw error;
+    }
+  },
   setSchedule: async ({ dentistMail, startDate, endDate, slotNumber }) => {
     try {
       const responseData = await api.post(
