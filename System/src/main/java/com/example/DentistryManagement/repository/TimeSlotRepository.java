@@ -17,8 +17,6 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     @Query("SELECT t FROM TimeSlot t WHERE t.clinic.clinicID = :clinicID and t.date = :date and t.slotNumber = :slotNumber")
     List<TimeSlot> findTopBySlotNumberAndClinicAndDate(@Param("slotNumber") int slotNumber, @Param("clinicID") String clinic, @Param("date") LocalDate date, Pageable pageable);
 
-    List<TimeSlot> findByClinicOrderByStartTimeAsc(Clinic clinic);
-
     @Query("SELECT t FROM TimeSlot t WHERE t.clinic.clinicID = :clinicID ORDER BY t.date DESC, t.startTime DESC")
     List<TimeSlot> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
 

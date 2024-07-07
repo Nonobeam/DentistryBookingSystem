@@ -12,7 +12,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 
     List<Notification> getNotificationByDentist_StaffUserMailAndStatus(String staffMail,int status);
 
-    List<Notification> getNotificationsByDentistAndStatus(Dentist dentist, int status);
-
     Notification getNotificationByNotificationIDAndStatus(String notificationID, int status);
 }
