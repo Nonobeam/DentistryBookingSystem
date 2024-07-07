@@ -114,7 +114,11 @@ public class StaffController {
                 }
             }
 
-            return ResponseEntity.ok(dentistSchedules);
+            List<DentistSchedule> sortedDentistSchedules = dentistSchedules.stream()
+                    .sorted(Comparator.comparing(DentistSchedule::getWorkDate))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(sortedDentistSchedules);
         } catch (Error error) {
             // Get error return from service
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
@@ -261,7 +265,9 @@ public class StaffController {
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
                             timeSlotDTO.setSlotNumber(timeSlot.getSlotNumber());
                             return timeSlotDTO;
-                        }).collect(Collectors.toList());
+                        }).sorted(Comparator.comparingInt(TimeSlotDTO::getSlotNumber))
+                        .collect(Collectors.toList());
+
             }
 
 
@@ -318,12 +324,11 @@ public class StaffController {
 
 
     @Operation(summary = "Delete Dentist Schedule")
-    @DeleteMapping("/delete-schedule")
-    public ResponseEntity<?> deleteDentistSchedule(@RequestParam String dentistID,
-                                                   @RequestParam LocalDate workDate,
-                                                   @RequestParam int numSlot) {
+    @DeleteMapping("/delete-schedule/{scheduleID}")
+    public ResponseEntity<?> deleteDentistSchedule(@PathVariable String scheduleID
+                                                ) {
         try {
-            dentistScheduleService.deleteDentistSchedule(dentistID, workDate, numSlot);
+            dentistScheduleService.deleteDentistSchedule(scheduleID);
             return ResponseEntity.ok("Schedule deleted successfully");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", e.getMessage());
@@ -507,7 +512,7 @@ public class StaffController {
             availableSchedule.setWorkDate(workDate);
             availableSchedulesResponse.add(availableSchedule);
         }
-        return ResponseEntity.ok(availableSchedulesResponse);
+        return ResponseEntity.ok(availableSchedulesResponse.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
     }
 
 
@@ -522,7 +527,7 @@ public class StaffController {
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
-            if (customer == null || customer.getStatus() == 0) {
+            if (customer == null || customer.getStatus() == 0 || customer.getRole()!= Role.CUSTOMER) {
                 ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
                 logger.error("Customer not found in system");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
@@ -661,9 +666,11 @@ public class StaffController {
             date.datesUntil(date.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
                 List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDate(date, numDay, staff).stream()
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
+                        .sorted(Comparator.comparing(schedule-> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
                 List<Appointment> appointments = appointmentService.findAppointmentsByDateBetween(date, date.plusDays(numDay), staff).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
+                        .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());
                 TimeTableResponseDTO timeTableResponseDTO = new TimeTableResponseDTO();
                 List<TimeTableResponseDTO> timeTableResponseDTOList = timeTableResponseDTO.getTimeTableResponseDTOList(dentistSchedules, appointments);
