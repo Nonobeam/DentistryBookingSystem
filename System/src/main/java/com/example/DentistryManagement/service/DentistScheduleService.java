@@ -69,20 +69,25 @@ public class DentistScheduleService {
 
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
-            DentistSchedule schedule = new DentistSchedule();
-
             TimeSlot timeSlot = timeSlotRepository.findTopBySlotNumberAndClinicAndDate(slotNumber, clinic.getClinicID(), newestStartDate,PageRequest.of(0, 1)).get(0);
             if(timeSlot == null){
                 throw new RuntimeException();
             }
 
-            if (!dentistScheduleRepository.existsDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date)) {
+            DentistSchedule dentistSchedule = dentistScheduleRepository.findDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date);
+            // Find dentistSchedule if not exist create new, if exist change status to exist
+            if (dentistSchedule == null) {
+                DentistSchedule schedule = new DentistSchedule();
                 schedule.setDentist(dentist);
                 schedule.setWorkDate(date);
                 schedule.setTimeslot(timeSlot);
                 schedule.setClinic(clinic);
-                schedules.add(schedule);
                 schedule.setAvailable(1);
+                schedules.add(schedule);
+            } else {
+                // If exist set available --> 1
+                dentistSchedule.setAvailable(1);
+                dentistScheduleRepository.save(dentistSchedule);
             }
             date = date.plusDays(1);
         }
