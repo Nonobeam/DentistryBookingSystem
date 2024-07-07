@@ -60,7 +60,7 @@ public class StaffController {
         try {
             userService.findByMail(userService.mailExtract()).
                     ifPresent(
-                        user -> userService.updateUser(userDTO, user)
+                            user -> userService.updateUser(userDTO, user)
                     );
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
@@ -103,7 +103,7 @@ public class StaffController {
         try {
             // find current staff account
             Staff staff = userService.findStaffByMail(userService.mailExtract());
-            List<DentistSchedule> dentistSchedules = new ArrayList<>();
+            HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
             // Gt all dentists by current staff account
             List<Dentist> dentists = dentistService.findDentistByStaff(staff);
 
@@ -131,8 +131,10 @@ public class StaffController {
         try {
             Dentist dentist = dentistService.findDentistByMail(dentistMail);
             Services service = serviceService.findServiceByID(serviceID);
-            dentist.getServicesList().add(service);
-            dentistService.save(dentist);
+            if (!dentist.getServicesList().contains(service)) {
+                dentist.getServicesList().add(service);
+                dentistService.save(dentist);
+            }
             return ResponseEntity.ok("Set successful");
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -211,7 +213,7 @@ public class StaffController {
 
     @Operation(summary = "Show dentists and timeslots for choosing set schedule")
     @GetMapping("/show-set-schedule")
-    public ResponseEntity<?> showDentistsAndDentistsTimeSlots(@RequestParam LocalDate date) {
+    public ResponseEntity<?> showDentistsAndDentistsTimeSlots(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         try {
             // Initial 2 return lists
             List<UserDTO> dentistListDTO = new ArrayList<>();
@@ -242,13 +244,13 @@ public class StaffController {
             LocalDate oldDate = timeSlotService.getOldTimeSlot(clinic);
 
             // Initial value to find out which kind of date should be use (newDate ? oldDate)
-            LocalDate updateDate = null;
-            if (date.isAfter(newDate) || date.equals(newDate)) {
+            LocalDate updateDate;
+            if (endDate.isAfter(newDate) || endDate.equals(newDate) && (startDate.isAfter(newDate) || startDate.equals(newDate))) {
                 updateDate = newDate;
-            } else if ((date.isAfter(oldDate) && date.isBefore(newDate))|| date.equals(oldDate)) {
+            } else if ((endDate.isAfter(oldDate) && endDate.isBefore(newDate)) || endDate.equals(oldDate)) {
                 updateDate = oldDate;
             } else {
-                return ResponseEntity.status(400).body("Please choose a date after " + oldDate);
+                return ResponseEntity.status(400).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO

@@ -68,9 +68,6 @@ export const AppHeader = () => {
 
   const menu = (
     <Menu>
-      <Menu.Item key='profile'>
-        <Link to='/staff/profile'>Profile</Link>
-      </Menu.Item>
       <Menu.Item key='logout'>
         <Button type='link' onClick={handleLogout}>
           Logout
@@ -104,11 +101,7 @@ export const AppHeader = () => {
       />
       <BiSearch className='search-icon' style={{ cursor: 'pointer' }} />
       <div style={{ position: 'relative' }}>
-        <CiBellOn
-          className='bell-icon'
-          style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-          onClick={handleBellIconClick}
-        />
+        
         {showBellDropdown && (
           <div
             style={{
