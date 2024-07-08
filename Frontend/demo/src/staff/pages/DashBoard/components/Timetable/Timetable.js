@@ -141,6 +141,7 @@ export const TimeTable = () => {
                             <p>Customer: {task.customerName}</p>
                             <p>Service: {task.serviceName}</p>
                             <p>Status: {task.status}</p>
+                            <p>Start Time: {task.time}</p>
                           </div>
                         }
                       />
