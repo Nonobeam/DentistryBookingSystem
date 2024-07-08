@@ -36,6 +36,15 @@ import DenHistory from './dentist/DenHistory';
 import DenProfile from './dentist/DenProfile';
 import PatientInfo from './dentist/PatientInfo';
 import DentistSchedule from './dentist/DentistSchedule';
+import ManagerStaffList from './manager/ManagerStaffList';
+import ManagerDentistList from './manager/ManagerDentistList';
+import ManagerClinicList from './manager/ManagerClinicList';
+import ManagerDashboard from './manager/ManagerDashboard';
+import ClinicDetail from './manager/ClinicDetail';
+import BossDashboard from './boss/BossDashboard';
+import BossService from './boss/BossService';
+import BossManagerList from './boss/BossManagerList';
+import BossProfile from './boss/BossProfile';
 
 
 
@@ -70,6 +79,23 @@ const App = () => {
           <Route path='history' element={<RoleBasedRoute element={<DenHistory />} requiredRole={['DENTIST']}/>}/>
           <Route path='patient/:customerID' element={<RoleBasedRoute element={<PatientInfo />} requiredRole={['DENTIST']}/>}/>
           <Route path='schedule' element={<RoleBasedRoute element={<DentistSchedule />} requiredRole={['DENTIST']}/>}/> 
+        </Route>
+
+        {/* MANAGER PAGES */}
+        <Route path='/manager'>
+          <Route path='' element={<RoleBasedRoute element={<ManagerDashboard />} requiredRole={['MANAGER']}/>}/>
+          <Route path='staff' element={<RoleBasedRoute element={<ManagerStaffList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/:id' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='clinic' element={<RoleBasedRoute element={<ManagerClinicList />} requiredRole={['MANAGER']}/>} />
+        </Route>
+
+        {/* BOSS PAGES */}
+        <Route path='/boss'>
+          <Route path='' element={<RoleBasedRoute element={<BossDashboard />} requiredRole={['MANAGER']}/>}/>
+          <Route path='service' element={<RoleBasedRoute element={<BossService />} requiredRole={['MANAGER']}/>}/>
+          <Route path='manager' element={<RoleBasedRoute element={<BossManagerList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['MANAGER']}/>}/>
         </Route>
 
           {/* STAFF PAGES */}

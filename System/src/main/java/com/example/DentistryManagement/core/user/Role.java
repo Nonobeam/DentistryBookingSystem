@@ -49,6 +49,14 @@ public enum Role {
                     DELETE,
                     UPDATE
             )
+    ),
+    BOSS(
+            Set.of(
+                READ,
+                WRITE,
+                DELETE,
+                UPDATE
+            )
     );
 
     @Getter

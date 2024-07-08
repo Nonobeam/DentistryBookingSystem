@@ -3,9 +3,13 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.DentistResponseDTO;
 import com.example.DentistryManagement.DTO.StaffResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
+import com.example.DentistryManagement.auth.AuthenticationResponse;
+import com.example.DentistryManagement.auth.RegisterRequest;
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +31,22 @@ import java.util.stream.Collectors;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final UserMapping userMapping;
+    private final AuthenticationService authenticationService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+
+
+
+    @Operation(summary = "Register a new boss")
+    @PostMapping("/register/boss")
+    public ResponseEntity<?> registerStaff(@RequestBody RegisterRequest request) {
+        try {
+            AuthenticationResponse response = authenticationService.registerBoss(request);
+            return ResponseEntity.ok(response);
+        } catch (Error e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
 
 
     @Operation(summary = "Admin")
