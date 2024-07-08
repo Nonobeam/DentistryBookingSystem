@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, DatePicker, message, Spin } from "antd";
-import moment from "moment";
+import dayjs from "dayjs"; 
 import NavBar from "../homepage/Nav";
 
 const UserProfile = () => {
@@ -27,7 +27,7 @@ const UserProfile = () => {
         name: response.data.name,
         phone: response.data.phone,
         mail: response.data.mail,
-        birthday: moment(response.data.birthday)
+        birthday: dayjs(response.data.birthday)
       });
     } catch (error) {
       message.error("Failed to fetch user information");
@@ -77,7 +77,7 @@ const UserProfile = () => {
             name: user.name,
             phone: user.phone,
             mail: user.mail,
-            birthday: moment(user.birthday)
+            birthday: dayjs(user.birthday)
           }}
         >
           <Form.Item

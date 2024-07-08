@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin } from "antd";
-import moment from "moment";
+import { Layout, Form, Input, Button, DatePicker, message, Spin } from "antd";
+import dayjs from "dayjs";
 import BossSidebar from './BossSideBar';
+
+const { Content } = Layout;
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -27,7 +29,7 @@ const UserProfile = () => {
         name: response.data.name,
         phone: response.data.phone,
         mail: response.data.mail,
-        birthday: moment(response.data.birthday)
+        birthday: dayjs(response.data.birthday)
       });
     } catch (error) {
       message.error("Failed to fetch user information");
@@ -62,9 +64,11 @@ const UserProfile = () => {
   };
 
   return (
-    <>
-          <BossSidebar />
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px", textAlign: "center" }}>
+    <Layout style={{ minHeight: "100vh" }}>
+    <BossSidebar />
+
+    <Layout style={{ padding: '24px 24px' }}>
+        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
       <h1>User Profile</h1>
       {loading ? (
         <Spin />
@@ -77,7 +81,7 @@ const UserProfile = () => {
             name: user.name,
             phone: user.phone,
             mail: user.mail,
-            birthday: moment(user.birthday)
+            birthday: dayjs(user.birthday)
           }}
         >
           <Form.Item
@@ -108,9 +112,9 @@ const UserProfile = () => {
           >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="password" label="Password">
-            <Input.Password />
-          </Form.Item>
+          <Form.Item>
+          <a href="/forgot">Wanna change password?</a>
+         </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Profile
@@ -118,8 +122,9 @@ const UserProfile = () => {
           </Form.Item>
         </Form>
       )}
-    </div>
-    </>
+      </Content>
+    </Layout>
+    </Layout>
   );
 };
 

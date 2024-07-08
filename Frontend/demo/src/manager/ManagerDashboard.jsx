@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Bar } from '@ant-design/charts';
 import ManagerSidebar from './ManagerSidebar';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -30,7 +30,6 @@ const ManagerDashboard = () => {
         },
       });
       const data = response.data;
-      // Set dailyAppointments to 0 if it's null
       if (data.dailyAppointments === null) {
         data.dailyAppointments = 0;
       }
@@ -68,15 +67,39 @@ const ManagerDashboard = () => {
   };
 
   return (
-    <>
+    <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
+
       <Layout style={{ padding: '24px' }}>
+        
         <Content style={{ padding: '24px', margin: 0, minHeight: '85vh', backgroundColor: '#fff' }}>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Title level={2}>Manager Dashboard</Title>
             </Col>
-            <Col span={6}>
+            
+            <Col span={7}>
+              <Card bordered={false}>
+                <Title level={5} style={{ margin: 0 }}>Appointments Today</Title>
+                <Divider style={{ margin: '12px 0' }} />
+                <Title level={4} style={{ margin: 0 }}>{dashboardData.dailyAppointments}</Title>
+              </Card>
+            </Col>
+            <Col span={7}>
+              <Card bordered={false}>
+                <Title level={5} style={{ margin: 0 }}>This Month</Title>
+                <Divider style={{ margin: '12px 0' }} />
+                <Title level={4} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInMonthNow}</Title>
+              </Card>
+            </Col>
+            <Col span={7}>
+              <Card bordered={false}>
+                <Title level={5} style={{ margin: 0 }}>This Year</Title>
+                <Divider style={{ margin: '12px 0' }} />
+                <Title level={4} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInYearNow}</Title>
+              </Card>
+            </Col>
+            <Col span={3}>
               <Select
                 defaultValue={year}
                 style={{ width: '100%' }}
@@ -88,27 +111,6 @@ const ManagerDashboard = () => {
                   </Option>
                 ))}
               </Select>
-            </Col>
-            <Col span={6}>
-              <Card bordered={false}>
-                <Title level={4} style={{ margin: 0 }}>Daily Appointments</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={3} style={{ margin: 0 }}>{dashboardData.dailyAppointments}</Title>
-              </Card>
-            </Col>
-            <Col span={6}>
-              <Card bordered={false}>
-                <Title level={4} style={{ margin: 0 }}>Total Appointments This Month</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={3} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInMonthNow}</Title>
-              </Card>
-            </Col>
-            <Col span={6}>
-              <Card bordered={false}>
-                <Title level={4} style={{ margin: 0 }}>Total Appointments This Year</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={3} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInYearNow}</Title>
-              </Card>
             </Col>
           </Row>
           <Divider style={{ margin: '24px 0' }} />
@@ -123,7 +125,7 @@ const ManagerDashboard = () => {
           </Row>
         </Content>
       </Layout>
-    </>
+    </Layout>
   );
 };
 

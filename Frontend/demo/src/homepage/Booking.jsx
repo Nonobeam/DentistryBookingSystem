@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { Button, Checkbox, DatePicker, Form, Input, Modal, Radio, Select, Spin, Typography } from "antd";
 import axios from "axios";
-import { Form, Input, Button, Typography, Select, Radio, DatePicker, Checkbox, Spin, Modal } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "./Nav";
 
@@ -258,7 +258,7 @@ const Booking = () => {
         Modal.success({
           title: "Booking Successful",
           content: "Your booking has been reserved.",
-          onOk: () => navigate("/history"),
+          onOk: () => navigate("/History"),
         });
       }
     } catch (error) {

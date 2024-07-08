@@ -138,7 +138,7 @@ public class StaffController {
                 dentist.getServicesList().add(service);
                 dentistService.save(dentist);
             }
-            return ResponseEntity.ok("Set successful");
+            return ResponseEntity.ok(service.getName());
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);

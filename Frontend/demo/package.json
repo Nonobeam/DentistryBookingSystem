@@ -14,6 +14,7 @@
     "axios": "^1.7.2",
     "bizcharts": "^4.1.23",
     "chart.js": "^4.4.3",
+    "dayjs": "^1.11.11",
     "jsonschema": "^1.4.1",
     "moment": "^2.30.1",
     "react": "^18.3.1",

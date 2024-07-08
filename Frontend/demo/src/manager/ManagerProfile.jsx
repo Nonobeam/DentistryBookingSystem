@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, DatePicker, message, Spin, Layout } from "antd";
 import dayjs from "dayjs";
-import Sidebar from "./Sidebar";
+import ManagerSidebar from "./ManagerSidebar";
 
 const { Header, Content } = Layout;
 
 
-const DenProfile = () => {
+const ManagerProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -19,7 +19,7 @@ const DenProfile = () => {
   const fetchUserInfo = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/v1/dentist/info", {
+      const response = await axios.get("http://localhost:8080/api/v1/manager/info", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -40,34 +40,37 @@ const DenProfile = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const token = localStorage.getItem("token");
-      console.log(values.birthday)
-      const response = await axios.put(
-        "http://localhost:8080/api/v1/dentist/info/update",
-        {
-            name: values.name,
-            phone: values.phone,
-            mail: user.mail,
-            birthday: values.birthday.format("YYYY-MM-DD"),
-            id: user.id,
-            status: user.status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      setUser(response.data);
-      message.success("Profile updated successfully");
+        const token = localStorage.getItem("token");
+        
+        const response = await axios.get(
+            "http://localhost:8080/api/v1/manager/info/update",
+            {
+                params: {
+                    id: user.id,
+                    name: values.name,
+                    phone: values.phone,
+                    mail: user.mail,
+                    birthday: values.birthday.format("YYYY-MM-DD"),
+                    status: user.status
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        
+        setUser(response.data);
+        message.success("Profile updated successfully");
     } catch (error) {
-      message.error("Failed to update profile");
+        console.error("Failed to update profile", error);
+        message.error("Failed to update profile");
     }
-  };
+};
+
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-    <Sidebar />
+    <ManagerSidebar />
     <Layout style={{ margin: "0 auto", textAlign: "center" }}>
     <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
         <Content style={{ margin: '20px 16px 20px 20px' }}>
@@ -118,7 +121,7 @@ const DenProfile = () => {
             <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
 
-         <Form.Item>
+        <Form.Item>
           <a href="/forgot">Wanna change password?</a>
          </Form.Item>
           <Form.Item>
@@ -134,4 +137,4 @@ const DenProfile = () => {
   );
 };
 
-export default DenProfile;
+export default ManagerProfile;
