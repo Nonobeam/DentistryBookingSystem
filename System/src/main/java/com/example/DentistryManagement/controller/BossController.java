@@ -163,7 +163,7 @@ public class BossController {
 
     @Operation(summary = "Boss dashboard")
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashboardData(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam Integer year) {
+    public ResponseEntity<?> getDashboardData(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(required = false) Integer year) {
         try {
             Client boss = userService.findClientByMail(userService.mailExtract());
             if (boss == null) {

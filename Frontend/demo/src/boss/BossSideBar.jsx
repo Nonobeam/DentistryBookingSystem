@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { HomeOutlined, TeamOutlined, BarChartOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { LuLogOut } from 'react-icons/lu';
 
 const { Sider } = Layout;
 
@@ -34,6 +35,17 @@ const BossSidebar = () => {
             icon: <UserOutlined />,
             label: <Link to="/boss/profile">Profile</Link>,
           },
+          {
+            key: '5',
+            label: 'Logout',
+            icon: <LuLogOut />,
+            onClick: () => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('role');
+              localStorage.removeItem('expirationTime');
+              window.location.href = '/';
+            },
+          }
         ]}
       />
     </Sider>
