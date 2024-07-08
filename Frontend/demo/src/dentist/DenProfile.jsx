@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, DatePicker, message, Spin, Layout } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 
 const { Header, Content } = Layout;
@@ -30,7 +30,7 @@ const DenProfile = () => {
         name: response.data.name,
         phone: response.data.phone,
         mail: response.data.mail,
-        birthday: moment(response.data.birthday)
+        birthday: dayjs(response.data.birthday)
       });
     } catch (error) {
       message.error("Failed to fetch user information");
@@ -85,7 +85,7 @@ const DenProfile = () => {
             name: user.name,
             phone: user.phone,
             mail: user.mail,
-            birthday: moment(user.birthday)
+            birthday: dayjs(user.birthday)
           }}
         >
           <Form.Item
@@ -118,9 +118,9 @@ const DenProfile = () => {
             <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
 
-          {/* <Form.Item name="password" label="Password">
-            <Input.Password />
-          </Form.Item> */}
+         <Form.Item>
+          <a href="/forgot">Wanna change password?</a>
+         </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Profile

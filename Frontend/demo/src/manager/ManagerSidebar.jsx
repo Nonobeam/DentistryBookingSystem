@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import { HomeOutlined, TeamOutlined, MedicineBoxOutlined, BarChartOutlined} from '@ant-design/icons';
+import { HomeOutlined, TeamOutlined, MedicineBoxOutlined, BarChartOutlined, UserOutlined} from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { LuLogOut } from 'react-icons/lu';
 import { TiUserOutline } from 'react-icons/ti';
@@ -33,7 +33,7 @@ const ManagerSidebar = () => {
       label: <Link to="/manager/clinic">Clinic List</Link>,
     },{
       key: 'profile',
-      icon: <TiUserOutline />,
+      icon: <UserOutlined />,
       label: <Link to="/manager/profile">Profile</Link>,
     },{
       key: 'logout',
