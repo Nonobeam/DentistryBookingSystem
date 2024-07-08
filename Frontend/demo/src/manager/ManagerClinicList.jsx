@@ -3,7 +3,7 @@ import { Table, Layout, Modal, Form, Input, TimePicker, Button, Switch, Dropdown
 import axios from 'axios';
 import moment from 'moment';
 import ManagerSidebar from './ManagerSidebar';
-import { PiDotsThreeCircle } from 'react-icons/pi';
+import { DownOutlined } from '@ant-design/icons';
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -303,7 +303,7 @@ const ManagerClinicList = () => {
       render: (text, record) => (
         <Dropdown overlay={menu(record)}>
           <Button type="link">
-            <PiDotsThreeCircle />
+          <DownOutlined />
           </Button>
         </Dropdown>
       ),
@@ -393,7 +393,7 @@ const ManagerClinicList = () => {
       >
         <Form form={dentistForm} layout="vertical">
           <Form.Item name="staffId" label="Select Staff" rules={[{ required: true, message: 'Please select a staff member' }]}>
-            <Select>
+            <Select notFoundContent="There are no staff for this Clinic.">
               {staffList.map(staff => (
                 <Option key={staff.id} value={staff.id}>{staff.name}</Option>
               ))}
@@ -426,14 +426,14 @@ const ManagerClinicList = () => {
       >
         <Form form={setStaffForm} layout="vertical">
           <Form.Item name="staffId" label="Select Staff" rules={[{ required: true, message: 'Please select a staff member' }]}>
-            <Select>
+            <Select notFoundContent="There are no staff for this clinic.">
               {staffList.map(staff => (
                 <Option key={staff.id} value={staff.id}>{staff.name}</Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item name="dentistId" label="Select Dentist" rules={[{ required: true, message: 'Please select a dentist' }]}>
-            <Select>
+            <Select notFoundContent="There are no dentist for this clinic.">
               {dentistList.map(dentist => (
                 <Option key={dentist.id} value={dentist.id}>{dentist.name}</Option>
               ))}

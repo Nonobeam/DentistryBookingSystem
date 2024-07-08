@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Layout, Button, Modal, Form, Input, Select, message } from 'antd';
+import { Table, Layout, Button, Modal, Form, Input, Select, Dropdown, Menu, message } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
@@ -85,8 +86,9 @@ const ManagerDentistList = () => {
       setDentists(dentists.map(item => (item.id === updatedDentist.id ? updatedDentist : item)));
       setIsModalVisible(false);
       setEditingDentist(null);
+      message.success("Dentist updated successfully");
     } catch (error) {
-      console.error('There was an error updating the dentist data!', error);
+      message.error("Failed to update dentist");
     }
   };
 
@@ -131,6 +133,25 @@ const ManagerDentistList = () => {
     setDeleteModalVisible(true); // Show the delete confirmation modal
   };
 
+  const editMenu = (record) => (
+    <Menu>
+      <Menu.Item key="edit" onClick={() => showEditModal(record)}>
+        Edit
+      </Menu.Item>
+      <Menu.Item key="delete" onClick={() => showDeleteConfirmation(record.id)} danger>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
+  const actionsDropdown = (record) => (
+    <Dropdown overlay={editMenu(record)} placement="bottomLeft" trigger={['click']}>
+      <Button>
+        <DownOutlined />
+      </Button>
+    </Dropdown>
+  );
+
   const columns = [
     {
       title: 'Name',
@@ -163,25 +184,18 @@ const ManagerDentistList = () => {
       key: 'clinicName',
     },
     {
-      title: 'Actions',
+      title: '',
       key: 'actions',
-      render: (text, record) => (
-        <>
-          <Button onClick={() => showEditModal(record)}>Edit</Button>
-          <Button onClick={() => showDeleteConfirmation(record.id)} style={{ marginLeft: 8 }} type="danger">
-            Delete
-          </Button>
-        </>
-      )
+      render: (text, record) => actionsDropdown(record)
     }
   ];
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
-    <Layout style={{ padding: '24px 24px' }}>
-      <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-        <h2>Dentist List</h2>
+      <Layout style={{ padding: '24px 24px' }}>
+        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
+          <h2>Dentist List</h2>
           <Select
             placeholder="Select Staff"
             style={{ width: 200, marginBottom: 16 }}
@@ -194,9 +208,9 @@ const ManagerDentistList = () => {
               </Option>
             ))}
           </Select>
-        <Table columns={columns} dataSource={dentists} rowKey="id" />
-      </Content>
-    </Layout>
+          <Table columns={columns} dataSource={dentists} rowKey="id" />
+        </Content>
+      </Layout>
       <Modal
         title="Edit Dentist"
         open={isModalVisible}

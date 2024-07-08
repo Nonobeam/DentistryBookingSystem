@@ -3,6 +3,7 @@ import { Layout, Menu } from 'antd';
 import { HomeOutlined, TeamOutlined, MedicineBoxOutlined, BarChartOutlined} from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { LuLogOut } from 'react-icons/lu';
+import { TiUserOutline } from 'react-icons/ti';
 
 const { Sider } = Layout;
 
@@ -30,6 +31,10 @@ const ManagerSidebar = () => {
       key: 'clinic',
       icon: <HomeOutlined />,
       label: <Link to="/manager/clinic">Clinic List</Link>,
+    },{
+      key: 'profile',
+      icon: <TiUserOutline />,
+      label: <Link to="/manager/profile">Profile</Link>,
     },{
       key: 'logout',
       label: 'Logout',
