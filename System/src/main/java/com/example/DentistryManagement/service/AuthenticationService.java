@@ -73,7 +73,39 @@ public class AuthenticationService {
     }
 
 
-//----------------------------------- REGISTER -----------------------------------
+    //----------------------------------- REGISTER -----------------------------------
+
+    public AuthenticationResponse registerBoss(RegisterRequest request) {
+        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+            throw new Error("Phone or mail is already existed");
+        }
+
+        Client boss;
+        try {
+            boss = Client.builder()
+                    .name(request.getName())
+                    .phone(request.getPhone())
+                    .mail(request.getMail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(Role.BOSS)
+                    .birthday(request.getBirthday())
+                    .status(1)
+                    .build();
+        } catch (Exception e) {
+            throw new Error("Something went wrong while creating a new user, please check your input field");
+        }
+
+        // Save the boss
+        userRepository.save(boss);
+
+        var jwtToken = jwtService.generateToken(boss);
+        saveUserToken(boss, jwtToken);
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
+    }
+
 
     public AuthenticationResponse registerStaff(RegisterRequest request, Clinic clinic) {
         if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
