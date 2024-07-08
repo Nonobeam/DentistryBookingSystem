@@ -33,7 +33,7 @@ export const DentistServices = {
   setService: async (serviceID, dentistID) => {
     try {
       const responseData = await api.post(
-        `staff/set-service/?serviceID=${serviceID}&dentistID=${dentistID}`
+        `staff/set-service/${dentistID}?serviceID=${serviceID}`
       );
       return responseData.data;
     } catch (error) {

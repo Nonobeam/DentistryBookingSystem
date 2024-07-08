@@ -34,11 +34,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private final NotificationService notificationService;
     @Value("${spring.confirmation.link.baseurl}")
     private String confirmationLinkBaseUrl;
 
     private final JwtService jwtService;
-    private final MailService mailService;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -73,7 +73,39 @@ public class AuthenticationService {
     }
 
 
-//----------------------------------- REGISTER -----------------------------------
+    //----------------------------------- REGISTER -----------------------------------
+
+    public AuthenticationResponse registerBoss(RegisterRequest request) {
+        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+            throw new Error("Phone or mail is already existed");
+        }
+
+        Client boss;
+        try {
+            boss = Client.builder()
+                    .name(request.getName())
+                    .phone(request.getPhone())
+                    .mail(request.getMail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(Role.BOSS)
+                    .birthday(request.getBirthday())
+                    .status(1)
+                    .build();
+        } catch (Exception e) {
+            throw new Error("Something went wrong while creating a new user, please check your input field");
+        }
+
+        // Save the boss
+        userRepository.save(boss);
+
+        var jwtToken = jwtService.generateToken(boss);
+        saveUserToken(boss, jwtToken);
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
+    }
+
 
     public AuthenticationResponse registerStaff(RegisterRequest request, Clinic clinic) {
         if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
@@ -221,7 +253,7 @@ public class AuthenticationService {
     private void sendConfirmationEmail(String email, String confirmationLink) {
         String subject = "Confirm your email";
         String text = "Please click the following link to confirm your email address: " + confirmationLink;
-        mailService.sendSimpleMessage(email, subject, text);
+        notificationService.sendSimpleMessage(email, subject, text);
     }
 
     @Transactional

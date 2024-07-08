@@ -71,45 +71,6 @@ public class BossController {
     }
 
 
-    @Operation(summary = "Edit manager")
-    @PutMapping("/edit/{userID}")
-    public ResponseEntity<?> editUser(@PathVariable String userID, @RequestBody UserDTO userDTO) {
-        if (userService.isPresentUser(userID).isPresent()) {
-            Client updatedUser = userService.findUserById(userID);
-            userService.updateUser(userDTO, updatedUser);
-            return ResponseEntity.ok(updatedUser);
-        } else {
-            ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
-            logger.error("User could not be update");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-
-        }
-    }
-
-    @Operation(summary = "Delete user")
-    @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
-        try {
-
-            Optional<Client> optionalClient = userService.isPresentUser(id);
-            if (optionalClient.isPresent()) {
-                Client client = optionalClient.get();
-                userService.updateUserStatus(client, 0);
-                return ResponseEntity.ok("Delete user successfully");
-            } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "User not found");
-                logger.error("User not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-            }
-
-
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
     //--------------------------- MANAGE MANAGER ---------------------------
 
     @Operation(summary = "Register a new manager member")
@@ -144,11 +105,11 @@ public class BossController {
 
 
     @Operation(summary = "All Managers")
-    @GetMapping("/delete-manager")
-    public ResponseEntity<?> deleteManager(@RequestParam String managerId) {
+    @DeleteMapping("/delete-manager/{managerID}")
+    public ResponseEntity<?> deleteManager(@PathVariable String managerID) {
         try {
             // Find the manager by id then update the status ---> 0
-            Client manager = userService.findUserById(managerId);
+            Client manager = userService.findUserById(managerID);
             userService.updateUserStatus(manager, 0);
             return ResponseEntity.ok("Delete successfully");
         } catch (Error error) {
@@ -175,7 +136,7 @@ public class BossController {
 
 
     @Operation(summary = "Show all services")
-    @PostMapping("/service/all")
+    @GetMapping("/service/all")
     public ResponseEntity<?> showAllServices() {
         try {
             List<Services> services = serviceService.getAll();
@@ -188,10 +149,10 @@ public class BossController {
 
     // Hard delete due to the little size of table
     @Operation(summary = "Delete service")
-    @PostMapping("/service/delete")
-    public ResponseEntity<?> deleteService(@RequestBody String servicesId) {
+    @DeleteMapping("/service/delete/{serviceID}")
+    public ResponseEntity<?> deleteService(@PathVariable String serviceID) {
         try {
-            serviceService.deleteServiceById(servicesId);
+            serviceService.deleteServiceById(serviceID);
             return ResponseEntity.ok("Delete successfully");
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());

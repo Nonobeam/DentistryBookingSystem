@@ -3,7 +3,6 @@ package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
-import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
@@ -34,8 +33,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client client, int status);
 
     List<Appointment> findAppointmentsByDateBetweenAndClinicUser(LocalDate startOfWeek, LocalDate endOfWeek, Client manager);
-
-    List<Appointment> searchAppointmentByDateAndUser_NameOrDependent_Name(LocalDate date, String name, String dependentName);
 
     List<Appointment> findAppointmentsByDateAndDentist_Staff(LocalDate date, Staff staff);
 

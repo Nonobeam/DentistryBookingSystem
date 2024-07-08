@@ -31,8 +31,7 @@ spring:
         instance-connection-name: red-carver-425403-d9:asia-south2:sunflowerdentistry
   data:
     redis:
-      url: redis://default:*******@redis-18190.c1.asia-northeast1-1.gce.redns.redis-cloud.com:18190
-
+      url: redis://default:9YPndKjEv7ZQjaHLvgUaq3LQAIYSelBd@redis-18190.c1.asia-northeast1-1.gce.redns.redis-cloud.com:18190
 application:
   security:
     jwt:

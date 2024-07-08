@@ -17,11 +17,13 @@ public class ClinicWorkerDTO {
     private String mail;
     private String clinicName;
     private String clinicAddress;
+    private String id;
 
     public static ClinicWorkerDTO revertClientToWorkerDTO(Client client) {
         ClinicWorkerDTO clinicWorkerDTO = new ClinicWorkerDTO();
         clinicWorkerDTO.setName(client.getName());
         clinicWorkerDTO.setMail(client.getMail());
+        clinicWorkerDTO.setId(client.getUserID());
         if (client.getRole() == Role.STAFF) {
             clinicWorkerDTO.setClinicName(client.getStaff().getClinic().getName());
             clinicWorkerDTO.setClinicAddress(client.getStaff().getClinic().getAddress());

@@ -13,11 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<Client, String> {
 
-    Client findByUserID(String id);
-
     Optional<Client> findByMail(String mail);
-
-    Optional<List<Client>> findClientsByRoleAndStatus(Role role, int status);
 
     boolean existsByPhoneOrMailAndStatus(String phone, String mail, int status);
 
@@ -44,8 +40,4 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findUserByMail(String mail);
 
-
-    List<Client> getClientsByRoleAndStatus(Role role, int status);
-
-    List<Client> findByRoleAndNameContainingIgnoreCaseAndStatus(Role role, String search, int status);
 }

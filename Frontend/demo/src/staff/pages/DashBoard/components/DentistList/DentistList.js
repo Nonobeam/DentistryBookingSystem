@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Flex } from 'antd';
 import { TableList } from './components/Table/TableList';
-import { FeatureAction } from './components/FeatureAction/FeatureAction';
+
 import { Action } from './components/Action/Action';
 import { DentistServices } from '../../../../services/DentistServices/DentistServices';
 
@@ -50,10 +50,7 @@ export const DentistList = () => {
 
   return (
     <div>
-      <h1>DashBoard Dentist</h1>
-      <Flex>
-        <FeatureAction />
-      </Flex>
+      <h1>Dentist List</h1>
       <Flex>
         <TableList dataSource={apiData} columns={columns} />
       </Flex>

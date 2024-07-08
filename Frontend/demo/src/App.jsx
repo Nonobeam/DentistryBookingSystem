@@ -15,7 +15,6 @@ import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
 import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
-import EditForm from './staff/pages/DashBoard/components/EditForm/EditForm';
 import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
@@ -37,6 +36,15 @@ import DenHistory from './dentist/DenHistory';
 import DenProfile from './dentist/DenProfile';
 import PatientInfo from './dentist/PatientInfo';
 import DentistSchedule from './dentist/DentistSchedule';
+import ManagerStaffList from './manager/ManagerStaffList';
+import ManagerDentistList from './manager/ManagerDentistList';
+import ManagerClinicList from './manager/ManagerClinicList';
+import ManagerDashboard from './manager/ManagerDashboard';
+import ClinicDetail from './manager/ClinicDetail';
+import BossDashboard from './boss/BossDashboard';
+import BossService from './boss/BossService';
+import BossManagerList from './boss/BossManagerList';
+import BossProfile from './boss/BossProfile';
 
 
 
@@ -73,6 +81,23 @@ const App = () => {
           <Route path='schedule' element={<RoleBasedRoute element={<DentistSchedule />} requiredRole={['DENTIST']}/>}/> 
         </Route>
 
+        {/* MANAGER PAGES */}
+        <Route path='/manager'>
+          <Route path='' element={<RoleBasedRoute element={<ManagerDashboard />} requiredRole={['MANAGER']}/>}/>
+          <Route path='staff' element={<RoleBasedRoute element={<ManagerStaffList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='dentist/:id' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
+          <Route path='clinic' element={<RoleBasedRoute element={<ManagerClinicList />} requiredRole={['MANAGER']}/>} />
+        </Route>
+
+        {/* BOSS PAGES */}
+        <Route path='/boss'>
+          <Route path='' element={<RoleBasedRoute element={<BossDashboard />} requiredRole={['BOSS']}/>}/>
+          <Route path='service' element={<RoleBasedRoute element={<BossService />} requiredRole={['BOSS']}/>}/>
+          <Route path='manager' element={<RoleBasedRoute element={<BossManagerList />} requiredRole={['BOSS']}/>}/>
+          <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['BOSS']}/>}/>
+        </Route>
+
           {/* STAFF PAGES */}
         <Route path='/staff' element={<DashBoard />}>
           <Route path='' element={<AdminHomePage />} />
@@ -89,8 +114,6 @@ const App = () => {
           <Route path='customer-list' element={<CustomerListDash />} />
           <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
         </Route>
-
-        <Route path='/editform' element={<EditForm />} />
         <Route path='/schedule' element={<Schedule />} />
         
           {/* ADMIN PAGES */}

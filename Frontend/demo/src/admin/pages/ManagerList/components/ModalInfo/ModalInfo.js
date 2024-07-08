@@ -21,14 +21,16 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name !== 'mail') { // Ensure 'mail' field is not updated
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   return (
     <>
       <Modal
         title='Edit Information'
-        open={open}
+        visible={open} // Use 'visible' instead of 'open' for Modal component
         onCancel={handleCancel}
         footer={[
           <Button key='cancel' onClick={handleCancel}>
@@ -37,7 +39,8 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
           <Button key='save' type='primary' onClick={handleSave}>
             Save
           </Button>,
-        ]}>
+        ]}
+      >
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Avatar size={120} src={formData.image} />
         </div>
@@ -46,28 +49,18 @@ export const ModalInfo = ({ open, setOpen, info, showModal }) => {
             <Input name='name' value={formData.name} onChange={handleChange} />
           </Form.Item>
           <Form.Item label='Date of Birth'>
-            <Input
-              name='birthday'
-              value={formData.birthday}
-              onChange={handleChange}
-            />
+            <Input name='birthday' value={formData.birthday} onChange={handleChange} />
           </Form.Item>
-          <Form.Item label='mail'>
-            <Input name='mail' value={formData.mail} onChange={handleChange} />
+          <Form.Item label='Mail'>
+            <Input
+              name='mail'
+              value={formData.mail}
+              onChange={handleChange}
+              disabled // Make 'mail' field disabled
+            />
           </Form.Item>
           <Form.Item label='Phone'>
-            <Input
-              name='phone'
-              value={formData.phone}
-              onChange={handleChange}
-            />
-          </Form.Item>
-          <Form.Item label='Feedback'>
-            <TextArea
-              name='feedback'
-              value={formData.feedback}
-              onChange={handleChange}
-            />
+            <Input name='phone' value={formData.phone} onChange={handleChange} />
           </Form.Item>
         </Form>
       </Modal>

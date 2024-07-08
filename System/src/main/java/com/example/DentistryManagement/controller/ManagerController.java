@@ -54,7 +54,7 @@ public class ManagerController {
     }
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
@@ -232,12 +232,12 @@ public class ManagerController {
 
 
     @Operation(summary = "Set dentist for staff")
-    @PutMapping("/set-staff/{clinicID}")
+    @GetMapping("/set-staff/{clinicID}")
     public ResponseEntity<?> setUpStaffForDentistInClinic(@PathVariable String clinicID) {
         try {
             List<Client> staff = userService.findAllStaffInClinic(clinicID);
             List<ClinicWorkerDTO> staffList = ClinicWorkerDTO.fromClientList(staff);
-            List<Client> dentist = userService.findAllDentistInDentist(clinicID);
+            List<Client> dentist = userService.findAllDentistInClinic(clinicID);
             List<ClinicWorkerDTO> dentistList = ClinicWorkerDTO.fromClientList(dentist);
 
             ClinicWorkerResponseDTO responseDTO = new ClinicWorkerResponseDTO(staffList, dentistList);

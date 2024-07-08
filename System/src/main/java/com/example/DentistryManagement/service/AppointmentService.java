@@ -88,7 +88,7 @@ public class AppointmentService {
                     appointmentsHistory = appointmentRepository.findAppointmentByUser_UserIDAndDateAndStatus(userID, date, status);
                 }
             }
-            return appointmentsHistory;
+            return appointmentsHistory.stream().sorted(Comparator.comparing(Appointment::getDate).thenComparing(Appointment -> Appointment.getTimeSlot().getStartTime())).toList();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -125,7 +125,9 @@ public class AppointmentService {
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
             for (Appointment appointment : appointments) {
-                if (appointment.getClinic().getClinicID().equals(staffClient.getClinic().getClinicID())) {
+                String appointmentID = appointment.getAppointmentID();
+                String staffClinicID = staffClient.getClinic().getClinicID();
+                if (appointmentID.equals(staffClinicID) && appointment.getDate().equals(date)) {
                     filterAppointments.add(appointment);
                 }
             }
@@ -346,6 +348,7 @@ public class AppointmentService {
 
                     return appointment;
                 })
+                .sorted(Comparator.comparing(AppointmentDTO::getDate))
                 .toList();
         return appointmentDTOList;
     }

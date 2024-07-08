@@ -1,5 +1,3 @@
-// components/AppointmentHistory.js
-
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Dropdown, Button, Modal, message, Menu } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
@@ -27,10 +25,9 @@ const AppointmentHistory = () => {
         status: status,
       });
       message.success(
-        `Updated status to ${status} for treatment ID ${record.appointmentId}`
+        `Updated status to ${getStatusName(status)} for treatment ID ${record.appointmentId}`
       );
       fetchData(); // Refresh data after update
-      console.log('Updated status:', status);
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -64,17 +61,45 @@ const AppointmentHistory = () => {
   const handleMenuClick = (record, e) => {
     const action = e.key;
     if (action === '1' || action === '2') {
-      console.log(record);
       handleUpdateStatus(record, action);
     } else if (action === 'delete') {
       handleDelete(record);
     }
   };
 
+  const getStatusName = (status) => {
+    switch (parseInt(status)) {
+      case 1:
+        return 'Upcoming';
+      case 0:
+        return 'Cancelled';
+      case 2:
+        return 'Finished';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const getUserDisplayName = (record) => {
+    if (record.user) {
+      if (record.dependent !== null && record.dependent !== undefined) {
+        return `(User: ${record.user})   (Dependent: ${record.dependent})`;
+      } else {
+        return record.user;
+      }
+    } else {
+      return `Dependent: ${record.dependent || 'None'}`;
+    }
+  };
+  
+
+
+  
+
   const menu = (record) => (
     <Menu onClick={(e) => handleMenuClick(record, e)}>
-      <Menu.Item key='1'>Update to 1</Menu.Item>
-      <Menu.Item key='2'>Update to 2</Menu.Item>
+      <Menu.Item key='1'>Update to Upcoming</Menu.Item>
+      <Menu.Item key='2'>Update to Finished</Menu.Item>
       <Menu.Item key='delete'>Delete</Menu.Item>
     </Menu>
   );
@@ -89,6 +114,7 @@ const AppointmentHistory = () => {
       title: 'User',
       dataIndex: 'user',
       key: 'user',
+      render: (text, record) => getUserDisplayName(record),
     },
     {
       title: 'TimeSlot',
@@ -109,6 +135,7 @@ const AppointmentHistory = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status) => getStatusName(status),
     },
     {
       title: 'Actions',

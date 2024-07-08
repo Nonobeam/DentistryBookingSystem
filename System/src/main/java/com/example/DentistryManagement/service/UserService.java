@@ -315,10 +315,10 @@ public class UserService {
         }
     }
 
-    public List<Client> findAllDentistInDentist(String clinicID) {
+    public List<Client> findAllDentistInClinic(String clinicID) {
         try {
             List<Client> dentists = new ArrayList<>();
-            for (Dentist s : dentistRepository.findDentistsByClinic_ClinicIDAndStaff(clinicID, null)) {
+            for (Dentist s : dentistRepository.findDentistsByClinic_ClinicID(clinicID)) {
                 dentists.add(s.getUser());
             }
             return dentists;
