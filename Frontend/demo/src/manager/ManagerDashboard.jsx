@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Bar } from '@ant-design/charts';
 import ManagerSidebar from './ManagerSidebar';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -69,7 +69,9 @@ const ManagerDashboard = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
+
       <Layout style={{ padding: '24px' }}>
+        
         <Content style={{ padding: '24px', margin: 0, minHeight: '85vh', backgroundColor: '#fff' }}>
           <Row gutter={[16, 16]}>
             <Col span={24}>

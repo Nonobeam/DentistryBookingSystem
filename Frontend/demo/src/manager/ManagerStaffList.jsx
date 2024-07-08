@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 
 const ManagerStaffList = () => {
   const [staff, setStaff] = useState([]);
@@ -181,8 +181,11 @@ const ManagerStaffList = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
-      <Layout style={{ padding: '24px 24px' }}>
-        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
+
+      <Layout style={{ padding: '0 auto' }}>
+      <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+
+        <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
           <h2>Staff List</h2>
           <Spin spinning={loading}>
             <Table columns={columns} dataSource={staff} rowKey="id" />
@@ -234,7 +237,7 @@ const ManagerStaffList = () => {
               { type: 'email', message: 'Please enter a valid email' }
             ]}
           >
-            <Input />
+            <Input disabled/>
           </Form.Item>
           <Form.Item
             name="birthday"

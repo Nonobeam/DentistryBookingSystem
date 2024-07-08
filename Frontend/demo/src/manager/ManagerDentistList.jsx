@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 const { Option } = Select;
 
 const ManagerDentistList = () => {
@@ -223,8 +223,10 @@ const ManagerDentistList = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
-      <Layout style={{ padding: '24px 24px' }}>
-        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
+      <Layout style={{ padding: '0 auto' }}>
+      <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+
+        <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
           <h2>Dentist List</h2>
           <Spin spinning={loading}>
             <Select
