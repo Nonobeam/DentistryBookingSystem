@@ -50,7 +50,7 @@ public class PasswordResetTokenService {
     }
 
     public void sendPasswordResetEmail(String mail, String token) {
-        String url = "http://localhost:8080/resetPassword/" + token;
+        String url = "http://localhost:3000/resetPassword/" + token;
         SimpleMailMessage resetMessage = new SimpleMailMessage();
         resetMessage.setFrom(fromMail);
         resetMessage.setSubject("Password Reset Request");
