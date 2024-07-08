@@ -92,10 +92,10 @@ const App = () => {
 
         {/* BOSS PAGES */}
         <Route path='/boss'>
-          <Route path='' element={<RoleBasedRoute element={<BossDashboard />} requiredRole={['MANAGER']}/>}/>
-          <Route path='service' element={<RoleBasedRoute element={<BossService />} requiredRole={['MANAGER']}/>}/>
-          <Route path='manager' element={<RoleBasedRoute element={<BossManagerList />} requiredRole={['MANAGER']}/>}/>
-          <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['MANAGER']}/>}/>
+          <Route path='' element={<RoleBasedRoute element={<BossDashboard />} requiredRole={['BOSS']}/>}/>
+          <Route path='service' element={<RoleBasedRoute element={<BossService />} requiredRole={['BOSS']}/>}/>
+          <Route path='manager' element={<RoleBasedRoute element={<BossManagerList />} requiredRole={['BOSS']}/>}/>
+          <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['BOSS']}/>}/>
         </Route>
 
           {/* STAFF PAGES */}
