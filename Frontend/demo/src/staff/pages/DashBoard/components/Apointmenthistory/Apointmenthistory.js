@@ -81,15 +81,10 @@ const AppointmentHistory = () => {
   };
 
   const getUserDisplayName = (record) => {
-    if (record.user) {
-      if (record.dependent !== null && record.dependent !== undefined) {
-        return `(User: ${record.user})   (Dependent: ${record.dependent})`;
-      } else {
-        return record.user;
-      }
+    if (record.dependent) {
+        return `User: ${record.user} -Dependent: ${record.dependent}`;     
     } else {
-      return `Dependent: ${record.dependent || 'None'}`;
-    }
+      return `User: ${record.user}`   }
   };
   
 
@@ -140,11 +135,12 @@ const AppointmentHistory = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (text, record) => (
-        <Dropdown overlay={menu(record)}>
-          <Button>Actions</Button>
-        </Dropdown>
-      ),
+      render: (text, record) =>
+        record.status !== 0 ? (
+          <Dropdown overlay={menu(record)}>
+            <Button>Actions</Button>
+          </Dropdown>
+        ) : null,
     },
   ];
 

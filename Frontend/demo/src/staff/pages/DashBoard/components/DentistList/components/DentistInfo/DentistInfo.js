@@ -32,7 +32,7 @@
             dentist: item.dentist,
             services: item.services,
             clinic: item.clinic,
-            user: item.user || (item.dependent ? `Dependent: ${item.dependent}` : 'N/A'),
+            user: item.dependent ? `Customer: ${item.user}, Dependent: ${item.dependent}` : `Customer: ${item.user}`,
           }));
           setAppointmentData(aData);
         }

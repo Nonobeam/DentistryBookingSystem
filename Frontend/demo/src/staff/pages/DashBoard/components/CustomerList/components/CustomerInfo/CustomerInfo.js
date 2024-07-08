@@ -31,7 +31,9 @@ export default function CustomerInfo() {
           dentist: item.dentist,
           services: item.services,
           clinic: item.clinic,
-          user: response.userDTO ? response.userDTO.name : (item.dependent ? `Dependent: ${item.dependent}` : 'N/A'),
+          user: response.userDTO ? 
+          (item.dependent ? `User: ${response.userDTO.name}, Dependent: ${item.dependent}` : `User: ${response.userDTO.name}`)
+          : 'N/A',
         }));
         setAppointmentData(aData);
       }

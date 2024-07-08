@@ -119,7 +119,7 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffMail) {
+    public List<Appointment> searchAppointmentByStaff(String name, String staffMail) {
         try {
             Staff staffClient = staffRepository.findStaffByUserMail(staffMail);
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
@@ -127,7 +127,7 @@ public class AppointmentService {
             for (Appointment appointment : appointments) {
                 String appointmentID = appointment.getAppointmentID();
                 String staffClinicID = staffClient.getClinic().getClinicID();
-                if (appointmentID.equals(staffClinicID) && appointment.getDate().equals(date)) {
+                if (appointmentID.equals(staffClinicID)) {
                     filterAppointments.add(appointment);
                 }
             }
@@ -331,18 +331,13 @@ public class AppointmentService {
                     appointment.setDate(appointmentEntity.getDate());
                     appointment.setDentist(appointmentEntity.getDentist().getUser().getName());
                     appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                    appointment.setUser(appointmentEntity.getUser().getName());
+                    if (appointmentEntity.getDependent() != null) {
+                        appointment.setDependent(appointmentEntity.getDependent().getName());
+                        System.out.println(appointmentEntity.getDependent().getName());
+                    }
                     if (appointmentEntity.getStaff() != null) {
-                        if (appointmentEntity.getUser() != null) {
-                            appointment.setUser(appointmentEntity.getUser().getName());
-                        } else {
-                            appointment.setDependent(appointmentEntity.getDependent().getName());
-                        }
                         appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                    } else {
-                        if (appointmentEntity.getDependent() != null) {
-                            appointment.setDependent(appointmentEntity.getDependent().getName());
-                        } else
-                            appointment.setUser(appointmentEntity.getUser().getName());
                     }
                     appointment.setCustomerID(appointmentEntity.getUser().getUserID());
 
