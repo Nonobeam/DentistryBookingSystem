@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Layout, Calendar, DatePicker, Spin, message } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 import "./style.css";
 
@@ -9,8 +9,8 @@ const { Header, Content } = Layout;
 const { RangePicker } = DatePicker;
 
 const DentistSchedule = () => {
-  const initialStartDate = moment();
-  const initialEndDate = moment().add(30, "days");
+  const initialStartDate = dayjs();
+  const initialEndDate = dayjs().add(30, "days");
 
   const [loading, setLoading] = useState(true);
   const [scheduleData, setScheduleData] = useState({});
@@ -52,7 +52,7 @@ const DentistSchedule = () => {
       <ul className="events">
         {dayData.map(item => (
           <li key={item.id}>
-            <span>{moment(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"})
+            <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"})
           </li>
         ))}
       </ul>

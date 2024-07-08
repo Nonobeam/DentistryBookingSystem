@@ -12,11 +12,9 @@ const ForgotPassword = () => {
     console.log('Success:', values);
     try {
       const response = await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
-      console.log('Response:', response);
-      setSuccessMessage("The reset password email link has been sent to your email.");
+      setSuccessMessage("The reset password link has been sent to your email.");
       setErrorMessage(""); 
     } catch (error) {
-      console.error('Failed to send reset password email:', error);
       setErrorMessage("An error occurred. Please try again later.");
       setSuccessMessage(""); 
     }
