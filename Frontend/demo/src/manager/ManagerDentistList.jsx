@@ -177,7 +177,7 @@ const ManagerDentistList = () => {
   ];
 
   return (
-    <>
+    <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
     <Layout style={{ padding: '24px 24px' }}>
       <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
@@ -229,7 +229,7 @@ const ManagerDentistList = () => {
       >
         <p>Are you sure you want to delete this dentist?</p>
       </Modal>
-    </>
+    </Layout>
   );
 };
 

@@ -1,15 +1,21 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import { HomeOutlined, UserOutlined, TeamOutlined, MedicineBoxOutlined } from '@ant-design/icons';
+import { HomeOutlined, TeamOutlined, MedicineBoxOutlined, BarChartOutlined} from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
+import { LuLogOut } from 'react-icons/lu';
 
 const { Sider } = Layout;
 
 const ManagerSidebar = () => {
   const location = useLocation();
-  const selectedKey = location.pathname.split('/')[2] || 'staff';
+  const selectedKey = location.pathname.split('/')[2] || '';
 
   const items = [
+    {
+      key: '',
+      icon: <BarChartOutlined />,
+      label: <Link to="/manager">Dashboard</Link>,
+    },
     {
       key: 'staff',
       icon: <TeamOutlined />,
@@ -24,7 +30,17 @@ const ManagerSidebar = () => {
       key: 'clinic',
       icon: <HomeOutlined />,
       label: <Link to="/manager/clinic">Clinic List</Link>,
-    },
+    },{
+      key: 'logout',
+      label: 'Logout',
+      icon: <LuLogOut />,
+      onClick: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('expirationTime');
+        window.location.href = '/';
+      },
+    }
   ];
 
   return (
