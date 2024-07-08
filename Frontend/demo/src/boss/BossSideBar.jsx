@@ -1,25 +1,33 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
 import { HomeOutlined, TeamOutlined, BarChartOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LuLogOut } from 'react-icons/lu';
 
 const { Sider } = Layout;
 
 const BossSidebar = () => {
+  const location = useLocation();
+
+  const pathToKey = {
+    '/boss': '1',
+    '/boss/manager': '2',
+    '/boss/service': '3',
+    '/boss/profile': '4'
+  };
+
   return (
     <Sider width={250} className="site-layout-background">
       <Menu
         mode="inline"
-        defaultSelectedKeys={['1']}
+        defaultSelectedKeys={[pathToKey[location.pathname]]}
         style={{ height: '100%', borderRight: 0 }}
         items={[
-            {
-                key: '1',
-                icon: <BarChartOutlined />,
-                label: <Link to="/boss">Dashboard</Link>,
-              },
-          
+          {
+            key: '1',
+            icon: <BarChartOutlined />,
+            label: <Link to="/boss">Dashboard</Link>,
+          },
           {
             key: '2',
             icon: <TeamOutlined />,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Layout, Table, Button, Modal, Select, Spin, message, DatePicker, Input } from "antd";
 import moment from "moment";
-import { useNavigate } from "react-router-dom"; // Assuming you're using react-router-dom for routing
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
