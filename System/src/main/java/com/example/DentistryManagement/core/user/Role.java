@@ -52,10 +52,10 @@ public enum Role {
     ),
     BOSS(
             Set.of(
-            READ,
-            WRITE,
-            DELETE,
-            UPDATE
+                READ,
+                WRITE,
+                DELETE,
+                UPDATE
             )
     );
 
