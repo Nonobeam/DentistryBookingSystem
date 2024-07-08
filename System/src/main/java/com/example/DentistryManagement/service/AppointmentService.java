@@ -229,7 +229,7 @@ public class AppointmentService {
         for (Appointment appointment : appointments) {
             Clinic clinic = appointment.getClinic();
             ClinicDTO clinicDTO = new ClinicDTO().clinicMapping(clinic);
-            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + " Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
+            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + "- Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
         }
 
         return appointmentsByClinic;
@@ -251,7 +251,7 @@ public class AppointmentService {
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
-                    String clinicKey = clinic.getClinicID() + " " + clinic.getName();
+                    String clinicKey = clinic.getName() + "-" + clinic.getAddress();
                     yearlyAppointmentCounts.putIfAbsent(clinicKey, new HashMap<>());
                     Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicKey);
                     monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
@@ -279,7 +279,7 @@ public class AppointmentService {
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
-                    String clinicName = clinic.getName() + " " + clinic.getAddress();
+                    String clinicName = clinic.getName() + "-" + clinic.getAddress();
                     yearlyAppointmentCounts.putIfAbsent(clinicName, new HashMap<>());
                     Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicName);
                     monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
