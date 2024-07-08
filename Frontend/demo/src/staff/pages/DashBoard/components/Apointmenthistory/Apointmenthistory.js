@@ -82,9 +82,9 @@ const AppointmentHistory = () => {
 
   const getUserDisplayName = (record) => {
     if (record.dependent) {
-        return `User: ${record.user} -Dependent: ${record.dependent}`;     
+        return `Customer: ${record.user} -Dependent: ${record.dependent}`;     
     } else {
-      return `User: ${record.user}`   }
+      return `Customer: ${record.user}`   }
   };
   
 

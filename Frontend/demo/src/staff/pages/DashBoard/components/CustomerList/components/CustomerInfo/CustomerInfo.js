@@ -32,7 +32,7 @@ export default function CustomerInfo() {
           services: item.services,
           clinic: item.clinic,
           user: response.userDTO ? 
-          (item.dependent ? `User: ${response.userDTO.name}, Dependent: ${item.dependent}` : `User: ${response.userDTO.name}`)
+          (item.dependent ? `Customer: ${response.userDTO.name}, Dependent: ${item.dependent}` : `Customer: ${response.userDTO.name}`)
           : 'N/A',
         }));
         setAppointmentData(aData);
