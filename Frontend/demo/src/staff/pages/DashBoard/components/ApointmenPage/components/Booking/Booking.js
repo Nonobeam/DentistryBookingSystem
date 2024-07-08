@@ -102,7 +102,10 @@ export const Booking = () => {
     console.log('Success:', values);
     setLoading(true);
     try {
-      const { dependentID, customerMail } = values;
+      let { dependentID, customerMail } = values;
+      if (dependentID === '') {
+        dependentID = undefined
+      }
       const serviceId = selectedService;
       const scheduleId = selectedSchedule ? selectedSchedule : null; // Get schedule ID from selected schedule
       console.log('Selected Schedule ID:', scheduleId);
@@ -202,12 +205,13 @@ export const Booking = () => {
           value={customerMail}
         />
       </Form.Item>
-      <Form.Item
+     <Form.Item
         name='dependentID'
-        label='Dependent ID'
+        label='Dependent'
         loading={loading}
-        rules={[{ required: true, message: 'Please select a dependent' }]}>
+        rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select>
+          <Select.Option value=''></Select.Option>
           {dependentID.map((dependent) => (
             <Select.Option
               key={dependent.dependentID}
