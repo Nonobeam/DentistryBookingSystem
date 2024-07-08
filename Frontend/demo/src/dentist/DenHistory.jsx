@@ -81,7 +81,7 @@ const DenHistory = () => {
       dataIndex: "user",
       key: "user",
       render: (_, record) => {
-        const patientName = record.dependent ? record.dependent : record.user;
+        const patientName = record.dependent ? `Customer: ${record.user}, Dependent: ${record.dependent}` : `Customer: ${record.user}`;
         return (
           <a onClick={() => navigate(`/dentist/patient/${record.customerID}`)}>
             {patientName}
