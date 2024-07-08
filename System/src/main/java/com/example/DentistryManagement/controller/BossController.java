@@ -136,7 +136,7 @@ public class BossController {
 
 
     @Operation(summary = "Show all services")
-    @PostMapping("/service/all")
+    @GetMapping("/service/all")
     public ResponseEntity<?> showAllServices() {
         try {
             List<Services> services = serviceService.getAll();
@@ -149,10 +149,10 @@ public class BossController {
 
     // Hard delete due to the little size of table
     @Operation(summary = "Delete service")
-    @PostMapping("/service/delete")
-    public ResponseEntity<?> deleteService(@RequestBody String servicesId) {
+    @DeleteMapping("/service/delete/{serviceID}")
+    public ResponseEntity<?> deleteService(@PathVariable String serviceID) {
         try {
-            serviceService.deleteServiceById(servicesId);
+            serviceService.deleteServiceById(serviceID);
             return ResponseEntity.ok("Delete successfully");
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());

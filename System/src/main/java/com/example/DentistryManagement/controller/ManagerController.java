@@ -54,7 +54,7 @@ public class ManagerController {
     }
 
     @Operation(summary = "User update their profile")
-    @GetMapping("/info/update")
+    @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
             userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
