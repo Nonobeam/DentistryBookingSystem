@@ -9,6 +9,7 @@ const AppointmentsPage = () => {
       <ScheduleWork />
       <AppointmentHistory appointments={appointmentData} />
     </div>
+    
   );
 };
 

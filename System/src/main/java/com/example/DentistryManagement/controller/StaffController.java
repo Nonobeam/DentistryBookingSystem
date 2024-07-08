@@ -248,7 +248,7 @@ public class StaffController {
 
             // Initial value to find out which kind of date should be use (newDate ? oldDate)
             LocalDate updateDate;
-            if (endDate.isAfter(newDate) || endDate.equals(newDate) && (startDate.isAfter(newDate) || startDate.equals(newDate))) {
+            if ((endDate.isAfter(newDate) || endDate.equals(newDate)) && (startDate.isAfter(newDate) || startDate.equals(newDate))) {
                 updateDate = newDate;
             } else if ((endDate.isAfter(oldDate) && endDate.isBefore(newDate)) || endDate.equals(oldDate)) {
                 updateDate = oldDate;
@@ -326,7 +326,7 @@ public class StaffController {
     @Operation(summary = "Delete Dentist Schedule")
     @DeleteMapping("/delete-schedule/{scheduleID}")
     public ResponseEntity<?> deleteDentistSchedule(@PathVariable String scheduleID
-                                                ) {
+    ) {
         try {
             dentistScheduleService.deleteDentistSchedule(scheduleID);
             return ResponseEntity.ok("Schedule deleted successfully");
@@ -527,7 +527,7 @@ public class StaffController {
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
-            if (customer == null || customer.getStatus() == 0 || customer.getRole()!= Role.CUSTOMER) {
+            if (customer == null || customer.getStatus() == 0 || customer.getRole() != Role.CUSTOMER) {
                 ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found in system");
                 logger.error("Customer not found in system");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
@@ -666,7 +666,7 @@ public class StaffController {
             date.datesUntil(date.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
                 List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDate(date, numDay, staff).stream()
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
-                        .sorted(Comparator.comparing(schedule-> schedule.getTimeslot().getStartTime()))
+                        .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
                 List<Appointment> appointments = appointmentService.findAppointmentsByDateBetween(date, date.plusDays(numDay), staff).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))

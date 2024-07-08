@@ -15,7 +15,7 @@ const AdminHomePage = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Welcome, Admin!</h1>
+      <h1>Welcome, Staff!</h1>
       <Row gutter={16}>
         <Col span={8}>
           <Card
