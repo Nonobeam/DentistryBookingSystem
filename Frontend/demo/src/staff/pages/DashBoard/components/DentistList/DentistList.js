@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Flex } from 'antd';
+import { Flex, Spin } from 'antd'; // Spin là component của Ant Design để hiển thị loading
 import { TableList } from './components/Table/TableList';
-
 import { Action } from './components/Action/Action';
 import { DentistServices } from '../../../../services/DentistServices/DentistServices';
 
@@ -35,6 +34,7 @@ const columns = [
 
 export const DentistList = () => {
   const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true); // State để theo dõi trạng thái loading
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +43,8 @@ export const DentistList = () => {
         setApiData(response);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Kết thúc fetch data, đánh dấu là không còn loading nữa
       }
     };
     fetchData();
@@ -52,7 +54,11 @@ export const DentistList = () => {
     <div>
       <h1>Dentist List</h1>
       <Flex>
-        <TableList dataSource={apiData} columns={columns} />
+        {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
+          <Spin size="large" />
+        ) : (
+          <TableList dataSource={apiData} columns={columns} />
+        )}
       </Flex>
     </div>
   );
