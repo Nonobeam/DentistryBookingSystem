@@ -1,68 +1,45 @@
 import { Menu } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined } from '@ant-design/icons'; // Import các icon từ Ant Design
 
 const items = [
   {
     key: 'Dashboard',
-    label: (
-      <Link to='/staff/dashboard' style={{ color: '#333', textDecoration: 'none' }}>
-        Dashboard
-      </Link>
-    ),
+    label: 'Dashboard',
+    icon: <DashboardOutlined />,
+    link: '/staff/dashboard'
   },
   {
     key: 'DentistList',
-    label: (
-      <Link
-        to='/staff/dentist-list'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Dentist List
-      </Link>
-    ),
+    label: 'Dentist List',
+    icon: <UserOutlined />,
+    link: '/staff/dentist-list'
   },
-  
   {
     key: 'CustomerList',
-    label: (
-      <Link
-        to='/staff/customer-list'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Customer List
-      </Link>
-    ),
+    label: 'Customer List',
+    icon: <UserOutlined />,
+    link: '/staff/customer-list'
   },
   {
     key: 'AppointmentHistory',
-    label: (
-      <Link
-        to='/staff/appointment-history'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Appointment History
-      </Link>
-    ),
+    label: 'Appointment History',
+    icon: <HistoryOutlined />,
+    link: '/staff/appointment-history'
   },
   {
     key: 'Homepage',
-    label: (
-      <Link
-        to=''
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Home Page
-      </Link>
-    ),
+    label: 'Home Page',
+    icon: <HomeOutlined />,
+    link: ''
   },
   {
     key: 'Timetable',
-    label: (
-      <Link
-        to='/staff/timetable'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Timetable
-      </Link>
-    ),
+    label: 'Timetable',
+    icon: <ScheduleOutlined />,
+    link: '/staff/timetable'
   },
-  
 ];
 
 export const AppSider = () => {
@@ -70,18 +47,21 @@ export const AppSider = () => {
     <div
       style={{
         backgroundColor: '#fff',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
         borderRight: 'none',
         height: '100vh',
-      }}>
+      }}
+    >
       <div className='demo-logo-vertical' style={{ height: '40px' }} />
       <Menu
         mode='inline'
-        defaultSelectedKeys={['cardash']}
-        style={{ borderRight: 'none' }}>
+        defaultSelectedKeys={['Dashboard']}
+        style={{ borderRight: 'none' }}
+      >
         {items.map((item) => (
-          <Menu.Item key={item.key} style={{ margin: 0 }}>
-            {item.label}
+          <Menu.Item key={item.key} icon={item.icon} style={{ margin: 0 }}>
+            <Link to={item.link} style={{ color: '#333', textDecoration: 'none' }}>
+              {item.label}
+            </Link>
           </Menu.Item>
         ))}
       </Menu>
