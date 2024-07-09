@@ -4,6 +4,7 @@ import { Pie, Bar } from "@ant-design/plots";
 import axios from "axios";
 import BossSidebar from "./BossSideBar";
 import dayjs from "dayjs";
+import { type } from "@testing-library/user-event/dist/type";
 
 const { Content } = Layout;
 const { Option } = Select;

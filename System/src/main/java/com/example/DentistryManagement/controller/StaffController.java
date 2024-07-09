@@ -607,12 +607,12 @@ public class StaffController {
 
     @Operation(summary = "Staff")
     @GetMapping("/appointment-history")
-    public ResponseEntity<?> appointmentHistoryByStaff(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String search) {
+    public ResponseEntity<?> appointmentHistoryByStaff(@RequestParam(required = false) String search) {
         try {
             String mail = userService.mailExtract();
             List<Appointment> appointmentList;
-            if (date != null || (search != null && !search.isEmpty())) {
-                appointmentList = appointmentService.searchAppointmentByStaff(date, search, mail);
+            if (search != null && !search.isEmpty()) {
+                appointmentList = appointmentService.searchAppointmentByStaff(search, mail);
             } else appointmentList = appointmentService.findAppointmentInClinic(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             if (!appointmentDTOList.isEmpty()) {
