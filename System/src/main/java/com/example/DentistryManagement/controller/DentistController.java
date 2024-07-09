@@ -88,7 +88,6 @@ public class DentistController {
                 return ResponseEntity.ok(appointmentDtoList);
             } else return ResponseEntity.ok("Not found any appointment today");
 
-
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -158,7 +157,7 @@ public class DentistController {
             startDate.datesUntil(startDate.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
                 List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDateByDentist(startDate, numDay, dentist).stream()
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
-                        .sorted(Comparator.comparing(schedule-> schedule.getTimeslot().getStartTime()))
+                        .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
                 List<Appointment> appointments = appointmentService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))

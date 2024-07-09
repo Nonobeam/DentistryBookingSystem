@@ -253,9 +253,8 @@ public class StaffController {
             } else if ((endDate.isAfter(oldDate) && endDate.isBefore(newDate)) || endDate.equals(oldDate)) {
                 updateDate = oldDate;
             } else {
-                return ResponseEntity.status(400).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
+                return ResponseEntity.status(403).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
             }
-
             // Put all time slot in clinic  ---->  timeslotListDTO
             List<TimeSlot> timeSlotList = timeSlotService.getTimeSlotByDate(staff.getClinic(), updateDate);
             if (!timeSlotList.isEmpty()) {
@@ -603,7 +602,6 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
 
     @Operation(summary = "Staff")
     @GetMapping("/appointment-history")
