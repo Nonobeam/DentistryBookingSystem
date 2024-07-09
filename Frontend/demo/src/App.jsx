@@ -40,11 +40,11 @@ import ManagerStaffList from './manager/ManagerStaffList';
 import ManagerDentistList from './manager/ManagerDentistList';
 import ManagerClinicList from './manager/ManagerClinicList';
 import ManagerDashboard from './manager/ManagerDashboard';
-import ClinicDetail from './manager/ClinicDetail';
 import BossDashboard from './boss/BossDashboard';
 import BossService from './boss/BossService';
 import BossManagerList from './boss/BossManagerList';
 import BossProfile from './boss/BossProfile';
+import ManagerProfile from './manager/ManagerProfile';
 
 
 
@@ -88,6 +88,7 @@ const App = () => {
           <Route path='dentist/' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
           <Route path='dentist/:id' element={<RoleBasedRoute element={<ManagerDentistList />} requiredRole={['MANAGER']}/>}/>
           <Route path='clinic' element={<RoleBasedRoute element={<ManagerClinicList />} requiredRole={['MANAGER']}/>} />
+          <Route path='profile' element={<RoleBasedRoute element={<ManagerProfile />} requiredRole={['MANAGER']}/>}/>
         </Route>
 
         {/* BOSS PAGES */}

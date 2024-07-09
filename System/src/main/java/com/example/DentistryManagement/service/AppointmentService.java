@@ -119,7 +119,7 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByStaff(LocalDate date, String name, String staffMail) {
+    public List<Appointment> searchAppointmentByStaff(String name, String staffMail) {
         try {
             Staff staffClient = staffRepository.findStaffByUserMail(staffMail);
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
@@ -127,7 +127,7 @@ public class AppointmentService {
             for (Appointment appointment : appointments) {
                 String appointmentID = appointment.getAppointmentID();
                 String staffClinicID = staffClient.getClinic().getClinicID();
-                if (appointmentID.equals(staffClinicID) && appointment.getDate().equals(date)) {
+                if (appointmentID.equals(staffClinicID)) {
                     filterAppointments.add(appointment);
                 }
             }
@@ -229,7 +229,7 @@ public class AppointmentService {
         for (Appointment appointment : appointments) {
             Clinic clinic = appointment.getClinic();
             ClinicDTO clinicDTO = new ClinicDTO().clinicMapping(clinic);
-            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + " Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
+            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + "- Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
         }
 
         return appointmentsByClinic;
@@ -251,7 +251,7 @@ public class AppointmentService {
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
-                    String clinicKey = clinic.getClinicID() + " " + clinic.getName();
+                    String clinicKey = clinic.getName() + "-" + clinic.getAddress();
                     yearlyAppointmentCounts.putIfAbsent(clinicKey, new HashMap<>());
                     Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicKey);
                     monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
@@ -279,7 +279,7 @@ public class AppointmentService {
             if (!appointments.isEmpty()) {
                 for (Appointment appointment : appointments) {
                     Clinic clinic = appointment.getClinic();
-                    String clinicName = clinic.getName() + " " + clinic.getAddress();
+                    String clinicName = clinic.getName() + "-" + clinic.getAddress();
                     yearlyAppointmentCounts.putIfAbsent(clinicName, new HashMap<>());
                     Map<Integer, Long> monthlyCounts = yearlyAppointmentCounts.get(clinicName);
                     monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
@@ -331,18 +331,13 @@ public class AppointmentService {
                     appointment.setDate(appointmentEntity.getDate());
                     appointment.setDentist(appointmentEntity.getDentist().getUser().getName());
                     appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
+                    appointment.setUser(appointmentEntity.getUser().getName());
+                    if (appointmentEntity.getDependent() != null) {
+                        appointment.setDependent(appointmentEntity.getDependent().getName());
+                        System.out.println(appointmentEntity.getDependent().getName());
+                    }
                     if (appointmentEntity.getStaff() != null) {
-                        if (appointmentEntity.getUser() != null) {
-                            appointment.setUser(appointmentEntity.getUser().getName());
-                        } else {
-                            appointment.setDependent(appointmentEntity.getDependent().getName());
-                        }
                         appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                    } else {
-                        if (appointmentEntity.getDependent() != null) {
-                            appointment.setDependent(appointmentEntity.getDependent().getName());
-                        } else
-                            appointment.setUser(appointmentEntity.getUser().getName());
                     }
                     appointment.setCustomerID(appointmentEntity.getUser().getUserID());
 

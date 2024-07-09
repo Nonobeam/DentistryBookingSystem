@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { Button, DatePicker, Input, Layout, Modal, Select, Spin, Table, message } from "antd";
 import axios from "axios";
-import { Layout, Table, Button, Modal, Select, Spin, message, DatePicker, Input } from "antd";
 import moment from "moment";
-import { useNavigate } from "react-router-dom"; // Assuming you're using react-router-dom for routing
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
@@ -81,7 +81,7 @@ const DenHistory = () => {
       dataIndex: "user",
       key: "user",
       render: (_, record) => {
-        const patientName = record.dependent ? record.dependent : record.user;
+        const patientName = record.dependent ? `Customer: ${record.user}, Dependent: ${record.dependent}` : `Customer: ${record.user}`;
         return (
           <a onClick={() => navigate(`/dentist/patient/${record.customerID}`)}>
             {patientName}
