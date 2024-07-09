@@ -215,12 +215,14 @@ public class ManagerController {
                 updateClinic.setCloseTime(clinicDTO.getCloseTime());
                 updateClinic.setBreakStartTime(clinicDTO.getBreakStartTime());
                 updateClinic.setBreakEndTime(clinicDTO.getBreakEndTime());
-
+                if (timeSlotService.findFutureTimeSlot(updateClinic.getClinicID())) {
+                    timeSlotService.deleteFutureOldTimeSlot(updateClinic.getClinicID());
+                }
                 timeSlotService.createAndSaveTimeSlots(LocalDate.now().plusDays(60), updateClinic,
                         updateClinic.getOpenTime(), updateClinic.getCloseTime(),
                         updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
 
-                }
+            }
 
             clinicService.save(updateClinic);
             return ResponseEntity.ok(updateClinic);
