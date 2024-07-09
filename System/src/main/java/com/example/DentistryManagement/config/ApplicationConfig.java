@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationConfig{
+public class ApplicationConfig {
 
     private final UserRepository userRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username ->  userRepository.findByMail(username)
+        return username -> userRepository.findByMail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with mail" + username));
     }
 
