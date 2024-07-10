@@ -129,8 +129,10 @@ export const TimeTable = () => {
             flexWrap: 'wrap',
           }}
         >
-          {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
-            <Spin size="large" />
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+              <Spin size="large" />
+            </div>
           ) : (
             tasksForWeek.map((day, index) => (
               <div key={index} style={{ flex: 1, borderRight: '1px solid #ccc', marginBottom: '10px' }}>

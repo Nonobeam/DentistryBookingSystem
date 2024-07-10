@@ -151,17 +151,24 @@ const AppointmentHistory = () => {
     },
   ];
 
-  const styles = {
-    card: {
-      marginBottom: '20px',
-    },
+  const cardStyle = {
+    marginBottom: '20px',
+  };
+
+  const loadingStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'middle',
+    minHeight: '200px',
   };
 
   return (
     <div>
-      <Card title='Appointment History' style={styles.card}>
-        {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
-          <Spin size="large" />
+      <Card title='Appointment History' style={cardStyle}>
+        {loading ? (
+          <div style={loadingStyle}>
+            <Spin size="large" />
+          </div>
         ) : (
           <Table
             dataSource={apiData}

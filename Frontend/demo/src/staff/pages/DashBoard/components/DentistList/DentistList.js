@@ -53,7 +53,7 @@ export const DentistList = () => {
   return (
     <div>
       <h1>Dentist List</h1>
-      <Flex>
+      <Flex justify="center" align="middle" style={{ minHeight: '200px' }}>
         {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
           <Spin size="large" />
         ) : (
