@@ -10,6 +10,7 @@ import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.AuthenticationService;
+import com.example.DentistryManagement.service.TimeSlotService;
 import com.example.DentistryManagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +36,7 @@ public class AdminController {
     private final UserMapping userMapping;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-
+    private final TimeSlotService timeSlotService;
 
 
     @Operation(summary = "Register a new boss")
@@ -198,5 +200,10 @@ public class AdminController {
             logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
+    }
+
+    @GetMapping("/test-api")
+    public ResponseEntity<?> testApi(LocalDate appointmentDate, int slotNumber, String clinicId) {
+        return ResponseEntity.ok(timeSlotService.findNearestTimeSlot(appointmentDate, slotNumber, clinicId));
     }
 }
