@@ -1,8 +1,7 @@
 import React from "react";
 import NavBar from "./Nav";
 import Map from "./Map";
-import "antd/dist/reset.css"
-
+import "antd/dist/reset.css";
 import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
 import {
   UserOutlined,
@@ -19,30 +18,27 @@ import {
 const { Title, Paragraph } = Typography;
 
 const locations = [
-  { lat: 10.762622, lng: 106.660172, name: "Branch 1" }, // Example location
-  { lat: 10.762622, lng: 106.680172, name: "Branch 2" }, // Example location
-  // Add more locations here
+  { lat: 10.762622, lng: 106.660172, name: "Branch 1" },
+  { lat: 10.762622, lng: 106.680172, name: "Branch 2" },
 ];
 
 const Homepage = () => {
   return (
     <Layout className="layout">
-      
       <NavBar />
 
       <Layout.Content style={{ padding: "0 50px" }}>
-        <div className="hero-section" style={{ padding: "50px 0" }}>
+        <div className="hero-section" style={{ padding: "50px 0", textAlign: "center" }}>
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={12}>
-              <Title>Top Vietnam Dentistry</Title>
+              <Title>Welcome to Sunflower Dentistry</Title>
               <Paragraph>
-              Welcome to Sunflower Dentistry, where your smile matters most. 
-              Our expert team provides personalized dental care in a friendly environment.              
+                Where your smile matters most. Our expert team provides personalized dental care in a friendly environment.
               </Paragraph>
               <Button type="primary" style={{ marginRight: "10px" }}>
                 Schedule Your Appointment
               </Button>
-              <Button>Need Advise?</Button>
+              <Button>Need Advice?</Button>
             </Col>
             <Col xs={24} md={12}>
               <img
@@ -53,25 +49,15 @@ const Homepage = () => {
             </Col>
           </Row>
         </div>
-        <div
-          className="features-section"
-          style={{ padding: "50px 0", background: "#f0f2f5" }}
-        >
+
+        <div className="features-section" style={{ padding: "50px 0", background: "#f0f2f5" }}>
           <Title level={2} style={{ textAlign: "center" }}>
-            Things make Sunflower Dentistry different
+            What Makes Sunflower Dentistry Different?
           </Title>
-          <Paragraph
-            style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}
-          >
-            At Sunflower Dentistry, we stand out with our patient-centered approach, 
-            state-of-the-art technology, and a warm, welcoming atmosphere. 
-            Our experienced team is dedicated to personalized care, 
-            ensuring every visit is comfortable and tailored to your needs.
+          <Paragraph style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
+            At Sunflower Dentistry, we stand out with our patient-centered approach, state-of-the-art technology, and a warm, welcoming atmosphere. Our experienced team is dedicated to personalized care, ensuring every visit is comfortable and tailored to your needs.
           </Paragraph>
-          
-          
           <Row gutter={[16, 16]} justify="center" style={{ marginTop: "30px" }}>
-            
             <Col xs={24} sm={12} md={6}>
               <Card>
                 <SmileOutlined style={{ fontSize: "34px", color: "#1890ff" }} />
@@ -79,27 +65,21 @@ const Homepage = () => {
                 <Paragraph>Happy Customers</Paragraph>
               </Card>
             </Col>
-            
             <Col xs={24} sm={12} md={6}>
               <Card>
-                <ProjectOutlined
-                  style={{ fontSize: "34px", color: "#1890ff" }}
-                />
+                <ProjectOutlined style={{ fontSize: "34px", color: "#1890ff" }} />
                 <Title level={3}>6+</Title>
-                <Paragraph>Years Experieces</Paragraph>
+                <Paragraph>Years of Experience</Paragraph>
               </Card>
             </Col>
             
             <Col xs={24} sm={12} md={6}>
               <Card>
-                <FileDoneOutlined
-                  style={{ fontSize: "34px", color: "#1890ff" }}
-                />
+                <FileDoneOutlined style={{ fontSize: "34px", color: "#1890ff" }} />
                 <Title level={3}>80+</Title>
                 <Paragraph>Available Services</Paragraph>
               </Card>
             </Col>
-            
             <Col xs={24} sm={12} md={6}>
               <Card>
                 <MailOutlined style={{ fontSize: "34px", color: "#1890ff" }} />
@@ -109,37 +89,27 @@ const Homepage = () => {
             </Col>
           </Row>
         </div>
-        
+
         <div className="branches-section" style={{ padding: "50px 0" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Map locations={locations} />
             </Col>
             <Col xs={24} md={12}>
-              <Title level={2}>Dentistry Branches</Title>
+              <Title level={2}>Our Branches</Title>
               <Paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus non dui ac felis tincidunt aliquam.
+                Visit any of our branches for top-quality dental care. We are located at multiple convenient locations to serve you better.
               </Paragraph>
             </Col>
           </Row>
         </div>
 
-
-        <div
-          className="video-section"
-          style={{ padding: "50px 0", background: "#f0f2f5" }}
-        >
+        <div className="video-section" style={{ padding: "50px 0", background: "#f0f2f5" }}>
           <Title level={2} style={{ textAlign: "center" }}>
-            Why do you need a dentist?
+            Why Do You Need a Dentist?
           </Title>
-          <Paragraph
-            style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}
-          >
-            Regular dental visits are essential for maintaining oral health, 
-            preventing tooth decay, and catching issues early. 
-            A dentist ensures your smile stays healthy and bright through 
-            professional cleanings and expert care.
+          <Paragraph style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
+            Regular dental visits are essential for maintaining oral health, preventing tooth decay, and catching issues early. A dentist ensures your smile stays healthy and bright through professional cleanings and expert care.
           </Paragraph>
           <div style={{ textAlign: "center", marginTop: "30px" }}>
             <img
@@ -152,87 +122,57 @@ const Homepage = () => {
 
         <div className="dentists-section" style={{ padding: "50px 0" }}>
           <Title level={2} style={{ textAlign: "center" }}>
-            Experienced Dentists
+            Meet Our Experienced Dentists
           </Title>
           <Row gutter={[16, 16]} justify="center" style={{ marginTop: "30px" }}>
             <Col xs={24} sm={12} md={6}>
-              <Card
-                cover={
-                  <img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />
-                }
-              >
-                <Card.Meta
-                  title="Vo Ngoc Bao Thu"
-                  description="Wisdom Teeth"
-                />
+              <Card cover={<img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />}>
+                <Card.Meta title="Vo Ngoc Bao Thu" description="Wisdom Teeth Specialist" />
               </Card>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Card
-                cover={
-                  <img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />
-                }
-              >
-                <Card.Meta
-                  title="Nguyen Huu Phuc"
-                  description="Cravity Teeth"
-                />
+              <Card cover={<img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />}>
+                <Card.Meta title="Nguyen Huu Phuc" description="Cavity Treatment Specialist" />
               </Card>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Card
-                cover={
-                  <img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />
-                }
-              >
-                <Card.Meta 
-                  title="Ariana Grande" 
-                  description="Whitening Teeth" />
+              <Card cover={<img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />}>
+                <Card.Meta title="Ariana Grande" description="Teeth Whitening Specialist" />
               </Card>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Card
-                cover={
-                  <img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />
-                }
-              >
-                <Card.Meta
-                  title="Mono Hoang"
-                  description="Replace Teeth"
-                />
+              <Card cover={<img alt="Dentist" src="https://ukiahdental.com/wp-content/uploads/2023/01/ukiah-dental-dentist-profile-image.jpg" />}>
+                <Card.Meta title="Mono Hoang" description="Tooth Replacement Specialist" />
               </Card>
             </Col>
           </Row>
         </div>
       </Layout.Content>
-      <Layout.Footer style={{ textAlign: "center", backgroundColor: "cornflowerblue"}}>
+
+      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#bae7ff" }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Column One</Title>
-            <Paragraph>Twenty One</Paragraph>
-            <Paragraph>Thirty Two</Paragraph>
-            <Paragraph>Fourty Three</Paragraph>
-            <Paragraph>Fifty Four</Paragraph>
+            <Title level={4}>About Us</Title>
+            <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Column Two</Title>
-            <Paragraph>Sixty Five</Paragraph>
-            <Paragraph>Seventy Six</Paragraph>
-            <Paragraph>Eighty Seven</Paragraph>
-            <Paragraph>Ninety Eight</Paragraph>
+            <Title level={4}>Services</Title>
+            <Paragraph>General Dentistry</Paragraph>
+            <Paragraph>Orthodontics</Paragraph>
+            <Paragraph>Cosmetic Dentistry</Paragraph>
+            <Paragraph>Oral Surgery</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Column Three</Title>
-            <Paragraph>One Two</Paragraph>
-            <Paragraph>Three Four</Paragraph>
-            <Paragraph>Five Six</Paragraph>
-            <Paragraph>Seven Eight</Paragraph>
+            <Title level={4}>Contact</Title>
+            <Paragraph>123 Dental St.</Paragraph>
+            <Paragraph>Sun City, TX 12345</Paragraph>
+            <Paragraph>(123) 456-7890</Paragraph>
+            <Paragraph>info@sunflowerdentistry.com</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Title level={4}>Follow Us</Title>
             <Paragraph>
-              <FacebookOutlined /> <TwitterOutlined /> <YoutubeOutlined />{" "}
-              <LinkedinOutlined />
+              <FacebookOutlined /> <TwitterOutlined /> <YoutubeOutlined /> <LinkedinOutlined />
             </Paragraph>
           </Col>
         </Row>

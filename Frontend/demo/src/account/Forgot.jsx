@@ -1,14 +1,55 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, Alert } from 'antd';
+import { Form, Input, Button, Typography, Alert, Spin } from 'antd';
+import styled from 'styled-components';
 
 const { Title } = Typography;
 
+const ForgotPasswordContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+`;
+
+const ForgotPasswordBox = styled.div`
+  padding: 40px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+`;
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  background-color: #1890ff;
+  border: none;
+  &:hover {
+    background-color: #167acb;
+  }
+`;
+
+const ExtraLink = styled.div`
+  margin-top: 20px;
+  text-align: center;
+  a {
+    color: #1890ff;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 const ForgotPassword = () => {
+  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const onFinish = async (values) => {
+    setLoading(true);
     console.log('Success:', values);
     try {
       const response = await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
@@ -18,6 +59,7 @@ const ForgotPassword = () => {
       setErrorMessage("An error occurred. Please try again later.");
       setSuccessMessage(""); 
     }
+    setLoading(false);
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -25,10 +67,9 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ maxWidth: '500px', width: '100%', padding: '45px', backgroundColor: "ghostwhite", borderRadius: '20px' }}>
-        
-        <Title>Forgot your password?</Title>
+    <ForgotPasswordContainer>
+      <ForgotPasswordBox>
+        <Title level={2} style={{ color: '#1890ff' }}>Forgot your password?</Title>
         <p>We'll send you an email to help you reset your password.</p>
 
         {successMessage && (
@@ -55,18 +96,16 @@ const ForgotPassword = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              Send Reset Link
-            </Button>
+            <StyledButton type="primary" htmlType="submit">
+              {loading ? <Spin /> : 'Send Reset Link'}
+            </StyledButton>
           </Form.Item>
-
         </Form>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button href="/login">Login</Button>
-        </div>
-        
-      </div>
-    </div>
+        <ExtraLink>
+          <a href="/login">Return to Login</a>
+        </ExtraLink>
+      </ForgotPasswordBox>
+    </ForgotPasswordContainer>
   );
 };
 
