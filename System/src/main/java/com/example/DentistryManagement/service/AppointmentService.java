@@ -26,6 +26,7 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
     private final UserMapping userMapping;
+    private final TimeSlotRepository timeSlotRepository;
 
     public List<Appointment> findAppointmentInClinic(String staffMail) {
         try {
@@ -383,11 +384,5 @@ public class AppointmentService {
         appointmentRepository.save(appointmentBuilder.build());
     }
 
-    public LocalDate startUpdateTimeSlotDate(String clinicID) {
-        LocalDate result;
-        Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
-        result = appointment.getDate();
-        return result;
-    }
 
 }

@@ -2,6 +2,7 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
+import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
+    private final ClinicRepository clinicRepository;
 
     // Find the start of process update date
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
@@ -82,5 +84,22 @@ public class TimeSlotService {
         }
 
         timeSlotRepository.saveAll(timeSlots);
+    }
+
+    public boolean findFutureTimeSlot(String clinic) {
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicID(clinic);
+        for(TimeSlot timeSlot : timeSlots) {
+            if (timeSlot.getDate().isAfter(LocalDate.now())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void deleteFutureOldTimeSlot(String clinicID) {
+        Clinic clinic = clinicRepository.findByClinicID(clinicID);
+        List<LocalDate> timeSlots = timeSlotRepository.findDistinctTimeSlotOrderByClinicAndDateDesc(clinic);
+        LocalDate date = timeSlots.get(0);
+        timeSlotRepository.deleteTimeSlotsByDateAndClinic(date,clinic);
     }
 }

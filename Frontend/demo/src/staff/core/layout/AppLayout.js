@@ -1,9 +1,8 @@
 import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
-import { Content, Footer, Header } from 'antd/es/layout/layout';
+import { Content, Header } from 'antd/es/layout/layout';
 import React from 'react';
 import { AppHeader } from './AppHeader';
-import { AppFooter } from './AppFooter';
 import { AppSider } from './AppSider';
 
 const headerStyle = {
@@ -14,10 +13,10 @@ const headerStyle = {
 };
 
 const siderStyle = {
-  textAlign: 'center',
   lineHeight: '120px',
   color: '#333',
   backgroundColor: '#fff',
+  
 };
 
 export const AppLayout = ({ content }) => {
