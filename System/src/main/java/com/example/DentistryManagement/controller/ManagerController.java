@@ -41,6 +41,7 @@ public class ManagerController {
     private final AppointmentService appointmentService;
     private final UserMapping userMapping;
     private final TimeSlotService timeSlotService;
+    private final DentistScheduleService dentistScheduleService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -215,13 +216,16 @@ public class ManagerController {
                 updateClinic.setCloseTime(clinicDTO.getCloseTime());
                 updateClinic.setBreakStartTime(clinicDTO.getBreakStartTime());
                 updateClinic.setBreakEndTime(clinicDTO.getBreakEndTime());
-                if (timeSlotService.findFutureTimeSlot(updateClinic.getClinicID())) {
-                    timeSlotService.deleteFutureOldTimeSlot(updateClinic.getClinicID());
-                }
-                timeSlotService.createAndSaveTimeSlots(LocalDate.now().plusDays(60), updateClinic,
+
+                // Find the date that will apply new time slot
+                LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
+
+                // Delete all dentist-schedule after the apply date of new time slot
+                dentistScheduleService.deleteDentistSchedulesAfterDate(lastDate, clinicDTO.getId());
+
+                timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,
                         updateClinic.getOpenTime(), updateClinic.getCloseTime(),
                         updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
-
             }
 
             clinicService.save(updateClinic);

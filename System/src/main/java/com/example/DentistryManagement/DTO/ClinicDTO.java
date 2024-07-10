@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.DTO;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,10 +16,15 @@ public class ClinicDTO {
     private String phone;
     private String name;
     private String address;
+    @Schema(type = "String", pattern = "HH:mm:SS")
     private LocalTime slotDuration;
+    @Schema(type = "String", pattern = "HH:mm:SS")
     private LocalTime openTime;
+    @Schema(type = "String", pattern = "HH:mm:SS")
     private LocalTime closeTime;
+    @Schema(type = "String", pattern = "HH:mm:SS")
     private LocalTime breakStartTime;
+    @Schema(type = "String", pattern = "HH:mm:SS")
     private LocalTime breakEndTime;
     private int status;
 

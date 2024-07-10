@@ -255,6 +255,7 @@ public class StaffController {
             } else {
                 return ResponseEntity.status(403).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
             }
+
             // Put all time slot in clinic  ---->  timeslotListDTO
             List<TimeSlot> timeSlotList = timeSlotService.getTimeSlotByDate(staff.getClinic(), updateDate);
             if (!timeSlotList.isEmpty()) {
@@ -303,15 +304,7 @@ public class StaffController {
             }
 
             Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
-            //Check for the newest Date;
-            LocalDate startUpdateTimeSlotDate = timeSlotService.startUpdateTimeSlotDate(dentist.getClinic().getClinicID());
-            if (startUpdateTimeSlotDate == null) {
-                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find any time slot for this clinic's name: " + dentist.getClinic().getName()));
-            }
 
-            if (startUpdateTimeSlotDate.isAfter(startDate) && startUpdateTimeSlotDate.isBefore(endDate)) {
-                return new ResponseEntity<>(new ErrorResponseDTO("400", "Must be done this separately. The schedule is must after or before the update timeslot date " + startUpdateTimeSlotDate), HttpStatus.BAD_REQUEST);
-            }
             dentistScheduleService.setDentistSchedule(dentist.getDentistID(), startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
