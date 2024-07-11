@@ -1,5 +1,7 @@
 import React from "react";
 import NavBar from "./Nav";
+import styled from 'styled-components';
+
 import Map from "./Map";
 import "antd/dist/reset.css";
 import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
@@ -14,7 +16,12 @@ import {
   YoutubeOutlined,
   LinkedinOutlined,
 } from "@ant-design/icons";
-
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #1890ff;
+  color: white;
+  padding: 40px 0;
+`;
 const { Title, Paragraph } = Typography;
 
 const locations = [
@@ -148,6 +155,7 @@ const Homepage = () => {
         </div>
       </Layout.Content>
 
+
       <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={16} md={8}>
@@ -163,12 +171,16 @@ const Homepage = () => {
           <Col xs={24} sm={16} md={8}>
             <Title level={4}>Follow Us</Title>
             <Paragraph>
-              <FacebookOutlined /> <TwitterOutlined /> <YoutubeOutlined /> <LinkedinOutlined />
+              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
             </Paragraph>
           </Col>
         </Row>
-      </Layout.Footer>
+      </StyledFooter>
     </Layout>
+    
   );
 };
 
