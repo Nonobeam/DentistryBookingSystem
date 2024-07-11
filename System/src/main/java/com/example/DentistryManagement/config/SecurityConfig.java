@@ -44,7 +44,8 @@ public class SecurityConfig{
             "/swagger-ui/index.html#/**",
             "/user/forgotPassword",
             "/user/resetPassword",
-            "/user/resetPassword/**"
+            "/user/resetPassword/**",
+            "/api/v1/admin/test-api"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;

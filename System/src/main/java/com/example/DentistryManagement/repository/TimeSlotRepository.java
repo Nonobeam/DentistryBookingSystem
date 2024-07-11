@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Repository
 public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     // Find the slot number of process update date
@@ -26,7 +25,9 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     @Query("SELECT DISTINCT t.date FROM TimeSlot t WHERE t.clinic = :clinic ORDER BY t.date DESC")
     List<LocalDate> findDistinctTimeSlotOrderByClinicAndDateDesc(@Param("clinic") Clinic clinic);
 
-    List<TimeSlot> findTimeSlotsByClinic_ClinicID(String c);
+    List<TimeSlot> findTimeSlotsByClinic_ClinicIDAndSlotNumber(String clinicId, int slotNumber);
 
     void deleteTimeSlotsByDateAndClinic(LocalDate date, Clinic clinic);
+
+    List<TimeSlot> findTimeSlotsByClinic_ClinicID(String clinic);
 }
