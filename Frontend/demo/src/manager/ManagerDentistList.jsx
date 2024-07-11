@@ -211,17 +211,8 @@ const ManagerDentistList = () => {
       dataIndex: 'status',
       key: 'status',
       render: status => (
-        <span
-          style={{
-            backgroundColor: status === 1 ? '#52c41a' : '#f5222d', // Màu nền
-            color: 'white', // Màu chữ
-            padding: '4px 8px', // Đệm
-            borderRadius: '4px', // Bo góc
-            display: 'inline-block', // Hiển thị khối nội tuyến
-          }}
-        >
-          {status === 1 ? 'Active' : 'Inactive'}
-        </span>
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
+
       ),
         },
     {

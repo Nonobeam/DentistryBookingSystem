@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Dropdown, Button, Modal, message, Menu, Spin } from 'antd';
+import { Card, Table, Dropdown, Button, Modal, message, Menu, Spin,Tag} from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
 const AppointmentHistory = () => {
@@ -76,17 +76,16 @@ const AppointmentHistory = () => {
       handleDelete(record);
     }
   };
-
   const getStatusName = (status) => {
     switch (parseInt(status)) {
       case 1:
-        return 'Upcoming';
+        return <Tag color="blue">Upcoming</Tag>;
       case 0:
-        return 'Cancelled';
+        return <Tag color="red">Cancelled</Tag>;
       case 2:
-        return 'Finished';
+        return <Tag color="green">Finished</Tag>;
       default:
-        return 'Unknown';
+        return <Tag color="gray">Unknown</Tag>;
     }
   };
 

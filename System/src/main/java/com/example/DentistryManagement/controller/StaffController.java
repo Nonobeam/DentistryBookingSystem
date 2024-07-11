@@ -243,22 +243,29 @@ public class StaffController {
                         .collect(Collectors.toList());
             }
 
-            List<TimeSlot> timeSlotList = new ArrayList<>();
+            HashSet<TimeSlot> timeSlotList = new HashSet<>();
             LocalDate sub = startDate;
             while (sub.isEqual(endDate) || sub.isBefore(endDate)) {
-                TimeSlot timeSlot = timeSlotService.findNearestTimeSlot(sub, clinic.getClinicID());
-                timeSlotList.add(timeSlot);
+                LocalDate timeSlot = timeSlotService.findNearestTimeSlot(sub, clinic.getClinicID());
+                timeSlotList.addAll(timeSlotService.getTimeSlotByDate(clinic,timeSlot));
                 sub = sub.plusDays(1);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
-
+            for (TimeSlot timeSlot : timeSlotList) {
+                for (TimeSlot timeSlotDTO : timeSlotList) {
+                    if(timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" +timeSlot.getDate()+" or after "+ timeSlotDTO.getDate());
+                    }
+                }
+            }
             if (!timeSlotList.isEmpty()) {
                 timeSlotDTOS = timeSlotList.stream()
                         .map(timeSlot -> {
                             TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
                             timeSlotDTO.setSlotNumber(timeSlot.getSlotNumber());
+
                             return timeSlotDTO;
                         }).sorted(Comparator.comparingInt(TimeSlotDTO::getSlotNumber))
                         .collect(Collectors.toList());
