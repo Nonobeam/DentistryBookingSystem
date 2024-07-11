@@ -3,7 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { LuLogOut } from 'react-icons/lu';
 import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined } from '@ant-design/icons'; // Import các icon từ Ant Design
-import { LuLogOut } from 'react-icons/lu';
 
 const items = [
   {
@@ -52,7 +51,7 @@ const items = [
     link: '/staff/profile'
   },
   {
-    key: '5',
+    key: 'Logout',
 
     label: 'Logout',
     icon: <LuLogOut />,
@@ -82,7 +81,7 @@ export const AppSider = () => {
             <img
               src={require("../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
               alt="Logo"
-              style={{ height: "90px", paddingBottom: "10px", paddingLeft: "40px"}}
+              style={{ height: "130px", paddingBottom: "10px", paddingLeft: "40px"}}
             />
           </Link>
         </div>

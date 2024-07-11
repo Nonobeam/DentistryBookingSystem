@@ -110,28 +110,32 @@ const ManagerStaffList = () => {
     <Menu
       items={[
         {
-          key: 'edit',
-          label: 'Edit',
-          onClick: () => showEditModal(record)
-        },
-        {
           key: 'dentistList',
           label: 'Dentist List',
-          onClick: () => handleDentistList(record.id)
+          onClick: () => handleDentistList(record.id),
+          style:{ color: 'white',background: '#00BFFF' }
         },
+        {
+          key: 'edit',
+          label: 'Edit',
+          onClick: () => showEditModal(record),
+          style:{ color: 'green' },
+        },       
         {
           key: 'delete',
           label: 'Delete',
           onClick: () => showDeleteConfirmation(record.id),
-          danger: true
+          danger: true,
+          style:{ color: 'red' }
         }
+        
       ]}
     />
   );
 
   const actionsDropdown = (record) => (
-    <Dropdown overlay={actionsMenu(record)} placement="bottomLeft" trigger={['click']}>
-      <Button>
+    <Dropdown overlay={actionsMenu(record)} placement="bottomLeft" trigger={['click']} >
+      <Button size='60'>
         <DownOutlined />
       </Button>
     </Dropdown>
@@ -164,7 +168,11 @@ const ManagerStaffList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: status => (status === 1 ? 'Active' : 'Inactive')
+      render: status => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
+
+      ),
+    
     },
     {
       title: 'Clinic',
@@ -172,7 +180,7 @@ const ManagerStaffList = () => {
       key: 'clinicName',
     },
     {
-      title: '',
+      title: '      ',
       key: 'actions',
       render: (record) => actionsDropdown(record)
     }

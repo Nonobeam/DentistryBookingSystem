@@ -30,13 +30,13 @@ public class TimeSlotService {
                 .orElse(null);
     }
 
-    public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, String clinicId) {
+    public LocalDate findNearestTimeSlot(LocalDate appointmentDate, String clinicId) {
         List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicID(clinicId);
 
         return timeSlots.stream()
                 .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
                 .max(Comparator.comparing(TimeSlot::getDate))
-                .orElse(null);
+                .orElse(null).getDate();
     }
 
         // Find the start of process update date
