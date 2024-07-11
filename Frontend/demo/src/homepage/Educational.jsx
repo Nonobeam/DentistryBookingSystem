@@ -1,27 +1,41 @@
 import React from 'react';
 import styled from 'styled-components';
 import NavBar from './Nav';
-
+import "antd/dist/reset.css";
+import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
+import {
+ 
+  FacebookOutlined,
+  TwitterOutlined,
+  YoutubeOutlined,
+  LinkedinOutlined,
+} from "@ant-design/icons";
+const { Title, Paragraph } = Typography;
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #34495e;
+  color: white;
+  padding: 40px 0;
+`;
 // Styled components for the page layout
 const PageContainer = styled.div`
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  max-width: 100%;
+  margin: 0;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 `;
 
 const PageTitle = styled.h1`
   text-align: center;
   font-weight: bold;
-  color: #333;
+  color: #2980b9;
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
 `;
 
-const PageParagraph = styled.p`
-  text-align: justify;
-  line-height: 1.5;
-  font-weight: 500;
-  color: #555;
-`;
+
 
 const ArticleList = styled.ul`
   list-style-type: none;
@@ -32,10 +46,17 @@ const ArticleList = styled.ul`
 `;
 
 const ArticleItem = styled.li`
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const ArticleImage = styled.img`
@@ -51,22 +72,47 @@ const ArticleImage = styled.img`
 
 const ArticleLink = styled.a`
   display: block;
-  margin-top: 10px;
+  margin-top: 15px;
   font-weight: bold;
-  color: #007bff;
+  color: #3498db;
   text-decoration: none;
+  font-size: 1.2rem;
 
   &:hover {
-    text-decoration: underline;
+    color: #2980b9;
   }
 `;
-
+const IntroSection = styled.div`
+  background-color: #C6E2FF;
+  color: white;
+  padding: 40px;
+  border-radius: 15px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+`;
 const ArticleDescription = styled.p`
   margin-top: 10px;
   font-size: 0.9em;
   color: #777;
 `;
+const BackToTopButton = styled.button`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 
+  &:hover {
+    background-color: #2980b9;
+  }
+`;
 // Function to shuffle array randomly
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -78,6 +124,13 @@ function shuffleArray(array) {
 
 // Educational component
 const Educational = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   // Dummy article links array
   const articleLinks = shuffleArray([
     {
@@ -144,12 +197,14 @@ const Educational = () => {
 
   return (
     <>
+     
+
       <NavBar />
       <PageContainer>
-        <PageTitle>Educational Page</PageTitle>
-        <PageParagraph>
-          Welcome to our Educational Page dedicated to dental care! Here, you can explore a curated collection of articles that cover various aspects of maintaining good oral hygiene and preventing dental problems. Each article provides valuable insights and practical tips to help you take better care of your teeth and gums. Click on the links below to read more:
-        </PageParagraph>
+        <IntroSection>
+          <PageTitle>Discover Dental Care Excellence</PageTitle>
+       
+        </IntroSection>
         <ArticleList>
           {articleLinks.map((article, index) => (
             <ArticleItem key={index}>
@@ -161,7 +216,39 @@ const Educational = () => {
             </ArticleItem>
           ))}
         </ArticleList>
+        <BackToTopButton onClick={scrollToTop}>↑</BackToTopButton>
       </PageContainer>
+      <StyledFooter>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>About Us</Title>
+            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Services</Title>
+            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Contact</Title>
+            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
+            <Paragraph>
+              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+            </Paragraph>
+          </Col>
+        </Row>
+      </StyledFooter>
     </>
   );
 };

@@ -1,12 +1,28 @@
 import React, { useEffect, useState } from "react";
+import styled from 'styled-components';
+import { Layout, Menu, Row, Col, Card, Typography } from "antd";
+import "antd/dist/reset.css";
 import axios from "axios";
 import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import NavBar from "./Nav";
+import {
+  FacebookOutlined,
+  TwitterOutlined,
+  YoutubeOutlined,
+  LinkedinOutlined,
+} from "@ant-design/icons";
+const { Title, Paragraph } = Typography;
 
 const { Option } = Select;
 
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #34495e;
+  color: white;
+  padding: 40px 0;
+`;
 const History = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,7 +225,39 @@ const History = () => {
           <p>Are you sure you want to cancel this appointment? This action cannot be undo and you will have to reserve a new appointment.</p>
         </Modal>
       </div>
+      <StyledFooter>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>About Us</Title>
+            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Services</Title>
+            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Contact</Title>
+            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
+            <Paragraph>
+              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+            </Paragraph>
+          </Col>
+        </Row>
+      </StyledFooter>
     </div>
+    
   );
 };
 

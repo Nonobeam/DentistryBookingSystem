@@ -1,65 +1,88 @@
 import React from 'react';
+import styled from 'styled-components';
 import NavBar from './Nav';
+import "antd/dist/reset.css"
+import { Layout, Row, Col, Typography } from "antd";
+import {
+  FacebookOutlined,
+  TwitterOutlined,
+  YoutubeOutlined,
+  LinkedinOutlined,
+} from "@ant-design/icons";
+
+const { Title, Paragraph } = Typography;
+
+const PageContainer = styled.div`
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 20px;
+`;
+
+const IntroSection = styled.div`
+  background-color: #3498db;
+  color: white;
+  padding: 40px;
+  border-radius: 15px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+`;
+
+const PageTitle = styled.h1`
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+`;
+
+const ServiceList = styled.ul`
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  list-style-type: none;
+  padding: 0;
+`;
+
+const ServiceItem = styled.li`
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 280px;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const ServiceImage = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+`;
+
+const ServiceName = styled.div`
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #2c3e50;
+`;
+
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #34495e;
+  color: white;
+  padding: 40px 0;
+`;
 
 const Services = () => {
-  const styles = {
-    page: {
-      padding: '40px',
-      backgroundColor: '#f9f9f9',
-      textAlign: 'center',
-      fontFamily: 'Arial, Helvetica, sans-serif', // Thay đổi font chữ
-    },
-    title: {
-      color: '#2a9d8f',
-      fontSize: '3em',
-      marginBottom: '20px',
-      textTransform: 'uppercase',
-      letterSpacing: '2px',
-      fontWeight: 'bold',
-      fontFamily: 'Arial, Helvetica, sans-serif', // Thay đổi font chữ
-    },
-    listContainer: {
-      display: 'flex',
-      justifyContent: 'center',
-      gap: '20px',
-      flexWrap: 'wrap',
-      marginTop: '20px',
-    },
-    list: {
-      listStyleType: 'none',
-      padding: 0,
-      fontSize: '1.2em',
-    },
-    listItem: {
-      margin: '10px',
-      backgroundColor: '#ffffff',
-      padding: '20px',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      width: '250px',
-      textAlign: 'center',
-      fontFamily: 'Arial, Helvetica, sans-serif', // Thay đổi font chữ
-    },
-    listItemHover: {
-      transform: 'scale(1.05)',
-      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-    },
-    image: {
-      width: '100%',
-      height: '150px', // Đặt kích thước hình ảnh cố định
-      objectFit: 'cover', // Đảm bảo các hình ảnh không bị méo khi thay đổi kích thước
-      borderRadius: '10px 10px 0 0',
-    },
-    serviceName: {
-      marginTop: '10px',
-      fontWeight: 'bold',
-      fontSize: '1.2em',
-      fontFamily: 'Arial, Helvetica, sans-serif', // Thay đổi font chữ
-    },
-  };
-
-  const servicesTop = [
+  const services = [
     {
       name: 'Teeth Cleaning',
       imgSrc: 'https://i0.wp.com/glenburniedentalgroup.com/wp-content/uploads/2022/08/Cleaning-teeth.webp?fit=847%2C460&ssl=1',
@@ -72,9 +95,6 @@ const Services = () => {
       name: 'Root Canal Therapy',
       imgSrc: 'https://cdn-5ecc40d4c1ac18016c0585b8.closte.com/wp-content/uploads/2021/04/root-canal-procedure-step-by-step-1024x575.png',
     },
-  ];
-
-  const servicesBottom = [
     {
       name: 'Orthodontics (Braces)',
       imgSrc: 'https://www.clairechodds.com/wp-content/uploads/2021/08/clear-braces-mission-viejo.jpg',
@@ -92,49 +112,53 @@ const Services = () => {
   return (
     <>
       <NavBar />
-      <div style={styles.page}>
-        <h1 style={styles.title}>Some Dental Services In Our System</h1>
-        <div style={styles.listContainer}>
-          <ul style={styles.list}>
-            {servicesTop.map((service) => (
-              <li
-                key={service.name}
-                style={styles.listItem}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                }}
-              >
-                <img src={service.imgSrc} alt={service.name} style={styles.image} />
-                <div style={styles.serviceName}>{service.name}</div>
-              </li>
-            ))}
-          </ul>
-          <ul style={styles.list}>
-            {servicesBottom.map((service) => (
-              <li
-                key={service.name}
-                style={styles.listItem}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                }}
-              >
-                <img src={service.imgSrc} alt={service.name} style={styles.image} />
-                <div style={styles.serviceName}>{service.name}</div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <PageContainer>
+        <IntroSection>
+          <PageTitle>Our Popular Dental Services</PageTitle>
+          <Paragraph style={{ color: 'white', fontSize: '1.2em', textAlign: 'center' }}>
+            Discover our comprehensive range of dental services designed to keep your smile healthy and bright.
+          </Paragraph>
+        </IntroSection>
+        <ServiceList>
+          {services.map((service) => (
+            <ServiceItem key={service.name}>
+              <ServiceImage src={service.imgSrc} alt={service.name} />
+              <ServiceName>{service.name}</ServiceName>
+            </ServiceItem>
+          ))}
+        </ServiceList>
+      </PageContainer>
+      <StyledFooter>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>About Us</Title>
+            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Services</Title>
+            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Contact</Title>
+            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
+            <Paragraph>
+              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+            </Paragraph>
+          </Col>
+        </Row>
+      </StyledFooter>
     </>
   );
 };
