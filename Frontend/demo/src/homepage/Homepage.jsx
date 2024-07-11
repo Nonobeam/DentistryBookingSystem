@@ -35,10 +35,9 @@ const Homepage = () => {
               <Paragraph>
                 Where your smile matters most. Our expert team provides personalized dental care in a friendly environment.
               </Paragraph>
-              <Button type="primary" style={{ marginRight: "10px" }}>
+              <Button type="primary" style={{ marginRight: "10px" }} href="/booking">
                 Schedule Your Appointment
               </Button>
-              <Button>Need Advice?</Button>
             </Col>
             <Col xs={24} md={12}>
               <img
@@ -90,7 +89,7 @@ const Homepage = () => {
           </Row>
         </div>
 
-        <div className="branches-section" style={{ padding: "50px 0" }}>
+        {/* <div className="branches-section" style={{ padding: "50px 0" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Map locations={locations} />
@@ -102,7 +101,7 @@ const Homepage = () => {
               </Paragraph>
             </Col>
           </Row>
-        </div>
+        </div> */}
 
         <div className="video-section" style={{ padding: "50px 0", background: "#f0f2f5" }}>
           <Title level={2} style={{ textAlign: "center" }}>
@@ -149,27 +148,19 @@ const Homepage = () => {
         </div>
       </Layout.Content>
 
-      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#bae7ff" }}>
+      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={16} md={8}>
             <Title level={4}>About Us</Title>
             <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Services</Title>
-            <Paragraph>General Dentistry</Paragraph>
-            <Paragraph>Orthodontics</Paragraph>
-            <Paragraph>Cosmetic Dentistry</Paragraph>
-            <Paragraph>Oral Surgery</Paragraph>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={16} md={8}>
             <Title level={4}>Contact</Title>
             <Paragraph>123 Dental St.</Paragraph>
             <Paragraph>Sun City, TX 12345</Paragraph>
-            <Paragraph>(123) 456-7890</Paragraph>
             <Paragraph>info@sunflowerdentistry.com</Paragraph>
           </Col>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={16} md={8}>
             <Title level={4}>Follow Us</Title>
             <Paragraph>
               <FacebookOutlined /> <TwitterOutlined /> <YoutubeOutlined /> <LinkedinOutlined />
