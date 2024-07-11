@@ -18,7 +18,7 @@ import {
 } from "@ant-design/icons";
 const StyledFooter = styled(Layout.Footer)`
   text-align: center;
-  background-color: #34495e;
+  background-color: #1890ff;
   color: white;
   padding: 40px 0;
 `;

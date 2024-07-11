@@ -13,7 +13,7 @@ import {
 const { Title, Paragraph } = Typography;
 const StyledFooter = styled(Layout.Footer)`
   text-align: center;
-  background-color: #34495e;
+  background-color: #1890ff;
   color: white;
   padding: 40px 0;
 `;
@@ -193,7 +193,7 @@ const Educational = () => {
       url: 'https://www.nidirect.gov.uk/conditions/dental-problems',
       imageUrl: 'https://websterdds.com/wp-content/uploads/2021/05/dental-specialties.jpg'
     },
-  ];
+  ])
 
   return (
     <>

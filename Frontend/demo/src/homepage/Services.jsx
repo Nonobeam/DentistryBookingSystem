@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import styled from 'styled-components';
 import NavBar from './Nav';
 import "antd/dist/reset.css"
 import { Layout, Row, Col, Typography } from "antd";
@@ -77,7 +76,7 @@ const ServiceName = styled.div`
 
 const StyledFooter = styled(Layout.Footer)`
   text-align: center;
-  background-color: #34495e;
+  background-color: #1890ff;
   color: white;
   padding: 40px 0;
 `;
@@ -110,13 +109,12 @@ const Services = () => {
     },
   ];
 
-const Services = () => {
   return (
     <>
       <NavBar />
       <PageContainer>
         <IntroSection>
-          <PageTitle>Our Popular Dental Services</PageTitle>
+          <PageTitle>Our Dental Services</PageTitle>
           <Paragraph style={{ color: 'white', fontSize: '1.2em', textAlign: 'center' }}>
             Discover our comprehensive range of dental services designed to keep your smile healthy and bright.
           </Paragraph>
