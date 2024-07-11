@@ -26,7 +26,6 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
     private final UserMapping userMapping;
-    private final TimeSlotRepository timeSlotRepository;
 
     public List<Appointment> findAppointmentInClinic(String staffMail) {
         try {
@@ -177,7 +176,7 @@ public class AppointmentService {
             if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
                 Client dentist = appointment.getDentist().getUser();
                 UserDTO dentistDTO = userMapping.getUserDTOFromUser(dentist);
-                appointmentsByDentist.put("ID: " + dentistDTO.getId() + ",Name: " + dentistDTO.getName(), appointmentsByDentist.getOrDefault("ID: " + dentistDTO.getId() + ",Name: " + dentistDTO.getName(), 0) + 1);
+                appointmentsByDentist.put("Name: " + dentistDTO.getName(), appointmentsByDentist.getOrDefault("Name: " + dentistDTO.getName(), 0) + 1);
             }
         }
 
@@ -384,5 +383,11 @@ public class AppointmentService {
         appointmentRepository.save(appointmentBuilder.build());
     }
 
+    public LocalDate startUpdateTimeSlotDate(String clinicID) {
+        LocalDate result;
+        Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
+        result = appointment.getDate();
+        return result;
+    }
 
 }
