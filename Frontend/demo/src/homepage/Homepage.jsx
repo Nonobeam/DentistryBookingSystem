@@ -1,5 +1,7 @@
 import React from "react";
 import NavBar from "./Nav";
+import styled from 'styled-components';
+
 import Map from "./Map";
 import "antd/dist/reset.css";
 import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
@@ -14,7 +16,12 @@ import {
   YoutubeOutlined,
   LinkedinOutlined,
 } from "@ant-design/icons";
-
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #1890ff;
+  color: white;
+  padding: 40px 0;
+`;
 const { Title, Paragraph } = Typography;
 
 const locations = [
@@ -148,36 +155,39 @@ const Homepage = () => {
           </Row>
         </div>
       </Layout.Content>
-
-      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#bae7ff" }}>
+      <StyledFooter>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>About Us</Title>
-            <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
+            <Title level={4} style={{ color: 'white' }}>About Us</Title>
+            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Services</Title>
-            <Paragraph>General Dentistry</Paragraph>
-            <Paragraph>Orthodontics</Paragraph>
-            <Paragraph>Cosmetic Dentistry</Paragraph>
-            <Paragraph>Oral Surgery</Paragraph>
+            <Title level={4} style={{ color: 'white' }}>Services</Title>
+            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Contact</Title>
-            <Paragraph>123 Dental St.</Paragraph>
-            <Paragraph>Sun City, TX 12345</Paragraph>
-            <Paragraph>(123) 456-7890</Paragraph>
-            <Paragraph>info@sunflowerdentistry.com</Paragraph>
+            <Title level={4} style={{ color: 'white' }}>Contact</Title>
+            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
+            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Title level={4}>Follow Us</Title>
+            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
             <Paragraph>
-              <FacebookOutlined /> <TwitterOutlined /> <YoutubeOutlined /> <LinkedinOutlined />
+              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
             </Paragraph>
           </Col>
         </Row>
-      </Layout.Footer>
+      </StyledFooter>
     </Layout>
+    
   );
 };
 
