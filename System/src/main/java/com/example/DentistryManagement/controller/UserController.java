@@ -299,12 +299,13 @@ public class UserController {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
                 tokenService.sendPasswordResetEmail(user.getMail(), token);
+                return ResponseEntity.ok("Password reset link has been sent to your email");
+            } else {
+                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+                logger.error("Not found user");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
-            return ResponseEntity.ok("Password reset link has been sent to your email");
-        } catch (Error e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
-            logger.error("Not found user", e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
             logger.error("Server_error", e);
@@ -360,7 +361,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
 
 
 }

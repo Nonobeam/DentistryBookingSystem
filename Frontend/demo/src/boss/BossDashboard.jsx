@@ -4,7 +4,6 @@ import { Pie, Bar } from "@ant-design/plots";
 import axios from "axios";
 import BossSidebar from "./BossSideBar";
 import dayjs from "dayjs";
-import { type } from "@testing-library/user-event/dist/type";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -49,7 +48,7 @@ const BossDashboard = () => {
   };
 
   const renderPieChart = () => {
-    if (selectedDate === null) {
+    if (!dashboardData || !dashboardData.dailyAppointments) {
       return <Empty description="Choose a date" />;
     }
 
@@ -114,8 +113,6 @@ const BossDashboard = () => {
     return <Bar {...config} />;
   };
 
-  
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <BossSidebar />
@@ -123,7 +120,6 @@ const BossDashboard = () => {
         <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
           <h2>Dashboard</h2>
           <Row gutter={16} style={{ marginBottom: 16 }}>
-
             <Col span={9}>
               <Card>
                 <h3>Total appointments of the month</h3>
@@ -136,12 +132,11 @@ const BossDashboard = () => {
                 <p>{dashboardData?.totalAppointmentsInYearNow || 0}</p>
               </Card>
             </Col>
-
             <Col span={6}>
               <DatePicker
                 value={selectedDate}
                 onChange={(date) => setSelectedDate(date)}
-                style={{ width: "100%", marginBottom: 32, marginTop: 10}}
+                style={{ width: "100%", marginBottom: 32, marginTop: 10 }}
               />
               <Select
                 value={selectedYear}
@@ -158,10 +153,7 @@ const BossDashboard = () => {
           </Row>
 
           {loading ? (
-            <Spin
-              size="medium"
-              style={{ display: "block", margin: "20px auto" }}
-            />
+            <Spin size="medium" style={{ display: "block", margin: "20px auto" }} />
           ) : (
             <>
               <Row gutter={16}>
