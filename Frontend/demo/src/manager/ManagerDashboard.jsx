@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Select, Card, Row, Col, Typography, Divider } from 'antd';
+import { Layout, Select, Card, Row, Col, Typography, Divider, Spin, Empty } from 'antd';
 import axios from 'axios';
 import { Bar } from '@ant-design/charts';
 import ManagerSidebar from './ManagerSidebar';
@@ -16,12 +16,14 @@ const ManagerDashboard = () => {
     totalAppointmentsInMonthNow: 0,
     totalAppointmentsInYearNow: 0,
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboardData(year);
   }, [year]);
 
   const fetchDashboardData = async (year) => {
+    setLoading(true);
     const token = localStorage.getItem('token');
     try {
       const response = await axios.get(`http://localhost:8080/api/v1/manager/dashboard?year=${year}`, {
@@ -36,6 +38,8 @@ const ManagerDashboard = () => {
       setDashboardData(data);
     } catch (error) {
       console.error('There was an error fetching the dashboard data!', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,32 +75,39 @@ const ManagerDashboard = () => {
       <ManagerSidebar />
 
       <Layout style={{ padding: '24px' }}>
-        
         <Content style={{ padding: '24px', margin: 0, minHeight: '85vh', backgroundColor: '#fff' }}>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Title level={2}>Manager Dashboard</Title>
             </Col>
-            
             <Col span={7}>
-              <Card bordered={false}>
-                <Title level={5} style={{ margin: 0 }}>Appointments Today</Title>
+              <Card
+                bordered={false}
+                style={{ backgroundColor: '#f0f9ff', textAlign: 'center', padding: '16px 0' }}
+              >
+                <Title level={5}>Appointments Today</Title>
                 <Divider style={{ margin: '12px 0' }} />
-                <Title level={4} style={{ margin: 0 }}>{dashboardData.dailyAppointments}</Title>
+                <Title level={4}>{dashboardData.dailyAppointments}</Title>
               </Card>
             </Col>
             <Col span={7}>
-              <Card bordered={false}>
-                <Title level={5} style={{ margin: 0 }}>This Month</Title>
+              <Card
+                bordered={false}
+                style={{ backgroundColor: '#fcffe6', textAlign: 'center', padding: '16px 0' }}
+              >
+                <Title level={5}>This Month</Title>
                 <Divider style={{ margin: '12px 0' }} />
-                <Title level={4} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInMonthNow}</Title>
+                <Title level={4}>{dashboardData.totalAppointmentsInMonthNow}</Title>
               </Card>
             </Col>
             <Col span={7}>
-              <Card bordered={false}>
-                <Title level={5} style={{ margin: 0 }}>This Year</Title>
+              <Card
+                bordered={false}
+                style={{ backgroundColor: '#ffffb8', textAlign: 'center', padding: '16px 0' }}
+              >
+                <Title level={5}>This Year</Title>
                 <Divider style={{ margin: '12px 0' }} />
-                <Title level={4} style={{ margin: 0 }}>{dashboardData.totalAppointmentsInYearNow}</Title>
+                <Title level={4}>{dashboardData.totalAppointmentsInYearNow}</Title>
               </Card>
             </Col>
             <Col span={3}>
@@ -116,10 +127,16 @@ const ManagerDashboard = () => {
           <Divider style={{ margin: '24px 0' }} />
           <Row gutter={[16, 16]}>
             <Col span={24}>
-              <Card>
+              <Card loading={loading}>
                 <Title level={4}>Monthly Appointments by Clinic</Title>
                 <Divider style={{ margin: '12px 0' }} />
-                <Bar {...barConfig} />
+                {(
+                  barData.length > 0 ? (
+                    <Bar {...barConfig} />
+                  ) : (
+                    <Empty description="No data available" />
+                  )
+                )}
               </Card>
             </Col>
           </Row>

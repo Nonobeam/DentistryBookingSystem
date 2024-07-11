@@ -71,9 +71,9 @@ const ManagerProfile = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
     <ManagerSidebar />
-    <Layout style={{ margin: "0 auto", textAlign: "center" }}>
+    <Layout style={{ margin: "10 auto", textAlign: 'left'}}>
     <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
-        <Content style={{ margin: '20px 16px 20px 20px' }}>
+        <Content style={{ margin: '20px 30px 20px 20px', padding: '24px' }}>
       
       <h1>Profile</h1>
       {loading ? (
@@ -81,7 +81,7 @@ const ManagerProfile = () => {
       ) : (
         <Form
           form={form}
-          style={{ maxWidth: "600px", margin: "0 auto" }}
+          style={{  margin: "0 auto" }}
           layout="vertical"
           onFinish={handleUpdate}
           initialValues={{

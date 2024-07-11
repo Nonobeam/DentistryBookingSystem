@@ -186,7 +186,7 @@ const ManagerStaffList = () => {
       <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
 
         <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
-          <h2>Staff List</h2>
+          <h1>Staff List</h1>
           <Spin spinning={loading}>
             <Table columns={columns} dataSource={staff} rowKey="id" />
           </Spin>
