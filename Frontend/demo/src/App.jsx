@@ -1,5 +1,6 @@
 import React from 'react';
 import 'antd/dist/reset.css';
+import './styles.css'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Signup from './account/Signup';
@@ -52,6 +53,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="*" element={<NotAuthorized />} />
         {/* HOMEPAGES */}
         <Route exact path='/' element={<Homepage />} />
         <Route path='/educational' element={<Educational />} />

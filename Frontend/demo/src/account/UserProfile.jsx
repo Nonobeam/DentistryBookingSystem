@@ -108,9 +108,9 @@ const UserProfile = () => {
           >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="password" label="Password">
-            <Input.Password />
-          </Form.Item>
+          <Form.Item>
+          <a href="/forgot">Wanna change password?</a>
+         </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Profile
