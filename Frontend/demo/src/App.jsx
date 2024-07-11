@@ -103,14 +103,13 @@ const App = () => {
 
           {/* STAFF PAGES */}
         <Route path='/staff' element={<DashBoard />}>
-          <Route path='' element={<AdminHomePage />} />
           <Route path='dentist-list' element={<DentistList />} />
           <Route
             path='dentist-list/detail/:dentistID'
             element={<DentistInfo />}
           />
 
-          <Route path='dashboard' element={<CarDash />} />
+          <Route path='' element={<CarDash />} />
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
           <Route path='profile' element={<Profile />} />

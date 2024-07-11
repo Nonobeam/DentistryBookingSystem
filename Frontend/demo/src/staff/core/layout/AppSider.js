@@ -2,13 +2,14 @@ import { Menu } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined } from '@ant-design/icons'; // Import các icon từ Ant Design
+import { LuLogOut } from 'react-icons/lu';
 
 const items = [
   {
     key: 'Dashboard',
     label: 'Dashboard',
     icon: <DashboardOutlined />,
-    link: '/staff/dashboard'
+    link: '/staff'
   },
   {
     key: 'DentistList',
@@ -40,6 +41,22 @@ const items = [
     icon: <ScheduleOutlined />,
     link: '/staff/timetable'
   },
+  {
+    key: 'Profile',
+    label: 'Profile',
+    icon: <UserOutlined />,
+    link: '/staff/profile'
+  },
+  {
+    key: '5',
+    label: 'Logout',
+    icon: <LuLogOut />,
+    onClick: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('expirationTime');
+    },
+  }
 ];
 
 export const AppSider = () => {
@@ -51,7 +68,16 @@ export const AppSider = () => {
         height: '100vh',
       }}
     >
-      <div className='demo-logo-vertical' style={{ height: '40px' }} />
+      <div className='demo-logo-vertical' style={{ height: '0px' }} />
+      <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
+          <Link to="/">
+            <img
+              src={require("../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+              alt="Logo"
+              style={{ height: "90px", paddingBottom: "10px", paddingLeft: "40px"}}
+            />
+          </Link>
+        </div>
       <Menu
         mode='inline'
         defaultSelectedKeys={['Dashboard']}
