@@ -83,11 +83,11 @@ const BossServiceList = () => {
       key: 'name',
     },
     {
-      title: 'Action',
+      title: '',
       key: 'action',
       render: (text, record) =>
         
-          <Button type="danger" onClick={() => {
+          <Button style={{color: 'red'}} onClick={() => {
             setSelectedService(record);
             setDeleteModalVisible(true);
           }}>Delete</Button>
@@ -112,7 +112,7 @@ const BossServiceList = () => {
           />
           <Modal
             title="Confirm Delete"
-            visible={deleteModalVisible}
+            open={deleteModalVisible}
             onOk={() => handleDeleteService(selectedService.serviceID)}
             onCancel={() => setDeleteModalVisible(false)}
             okText="Accept"
@@ -122,7 +122,7 @@ const BossServiceList = () => {
           </Modal>
           <Modal
             title="Create new service"
-            visible={createFormVisible}
+            open={createFormVisible}
             onCancel={() => {
               setCreateFormVisible(false);
               form.resetFields();

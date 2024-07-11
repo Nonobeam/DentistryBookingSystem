@@ -243,7 +243,7 @@ const ManagerDentistList = () => {
       <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
 
         <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
-          <h2>Dentist List</h2>
+          <h1>Dentist List</h1>
           <Spin spinning={loading}>
             <Select
               placeholder="Select Staff"

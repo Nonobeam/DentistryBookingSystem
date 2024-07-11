@@ -48,8 +48,11 @@ const BossDashboard = () => {
   };
 
   const renderPieChart = () => {
-    if (!dashboardData || !dashboardData.dailyAppointments ) {
-      return <Empty description="Choose a date" />;
+    if (!selectedDate){
+      return <Empty description="Choose a date to see daily appointments" />;
+    }
+    if (!dashboardData || Object.keys(dashboardData.dailyAppointments).length === 0) {
+      return <Empty description="No daily appointments data available" />;
     }
 
     const data = Object.entries(dashboardData.dailyAppointments).map(
@@ -60,7 +63,7 @@ const BossDashboard = () => {
     );
 
     if (data.length === 0) {
-      return <Empty description="This date doesn't have any appointments" />;
+      return <Empty description="No appointments for the selected date" />;
     }
 
     const config = {
@@ -84,7 +87,7 @@ const BossDashboard = () => {
   };
 
   const renderBarChart = () => {
-    if (!dashboardData || !dashboardData.monthlyAppointments) {
+    if (!dashboardData || Object.keys(dashboardData.monthlyAppointments).length === 0) {
       return <Empty description="No monthly appointments data available" />;
     }
 
@@ -100,6 +103,10 @@ const BossDashboard = () => {
         });
       }
     );
+
+    if (data.length === 0) {
+      return <Empty description="No monthly appointments data available" />;
+    }
 
     const config = {
       data,
@@ -120,7 +127,7 @@ const BossDashboard = () => {
       <BossSidebar />
       <Layout style={{ padding: "24px 24px" }}>
         <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-          <h2>Dashboard</h2>
+          <h1>Dashboard</h1>
           <Row gutter={16} style={{ marginBottom: 16 }}>
             <Col span={9}>
               <Card style={{ borderLeft: "5px solid #1890ff" }}>

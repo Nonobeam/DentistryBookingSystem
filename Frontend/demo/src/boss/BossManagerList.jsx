@@ -16,7 +16,6 @@ const BossManagerList = () => {
 
   useEffect(() => {
     fetchManagers();
-    
   }, []);
 
   const fetchManagers = async () => {
@@ -46,12 +45,12 @@ const BossManagerList = () => {
         }
       });
       message.success('Manager deleted successfully');
-      fetchManagers(); // Refresh manager list after deletion
+      fetchManagers(); 
     } catch (error) {
       console.error('Error deleting manager:', error);
       message.error('Failed to delete manager');
     }
-    setDeleteModalVisible(false); // Close delete confirmation modal
+    setDeleteModalVisible(false); 
   };
 
   const handleCreateManager = async (values) => {
@@ -63,9 +62,9 @@ const BossManagerList = () => {
         }
       });
       message.success('Manager created successfully');
-      setCreateFormVisible(false); // Close create form modal
-      form.resetFields(); // Reset form fields
-      fetchManagers(); // Refresh manager list after creation
+      setCreateFormVisible(false);
+      form.resetFields(); 
+      fetchManagers(); 
     } catch (error) {
       console.error('Error creating manager:', error);
       message.error('Failed to create manager');
@@ -82,14 +81,15 @@ const BossManagerList = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <span>{status === 1 ? 'Active' : 'Inactive'}</span>
+        <span style={{ color: status === 1 ? 'green' : 'yellow' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
       ),
-    },    {
-      title: 'Action',
+    },
+    {
+      title: '',
       key: 'action',
       render: (text, record) =>
         record.status === 1 ? (
-          <Button type="danger" onClick={() => {
+          <Button style={{color: 'red'}} onClick={() => {
             setSelectedManager(record);
             setDeleteModalVisible(true);
           }}>Delete</Button>
@@ -102,7 +102,7 @@ const BossManagerList = () => {
       <BossSidebar />
       <Layout style={{ padding: '24px 24px' }}>
         <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-          <h2>Manager List</h2>
+          <h1>Manager List</h1>
           <Button type="primary" style={{ marginBottom: 16 }} onClick={() => setCreateFormVisible(true)}>
             Create Manager
           </Button>
@@ -114,7 +114,7 @@ const BossManagerList = () => {
           />
           <Modal
             title="Confirm Delete"
-            visible={deleteModalVisible}
+            open={deleteModalVisible}
             onOk={() => handleDeleteManager(selectedManager.id)}
             onCancel={() => setDeleteModalVisible(false)}
             okText="Accept"
