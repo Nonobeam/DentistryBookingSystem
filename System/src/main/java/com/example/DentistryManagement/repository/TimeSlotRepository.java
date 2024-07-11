@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Repository
 public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     // Find the slot number of process update date

@@ -217,6 +217,7 @@ public class ManagerController {
                 timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,
                         updateClinic.getOpenTime(), updateClinic.getCloseTime(),
                         updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
+
             }
 
             clinicService.save(updateClinic);
