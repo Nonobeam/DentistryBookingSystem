@@ -48,7 +48,7 @@ const BossDashboard = () => {
   };
 
   const renderPieChart = () => {
-    if (!dashboardData || !dashboardData.dailyAppointments) {
+    if (!dashboardData || !dashboardData.dailyAppointments ) {
       return <Empty description="Choose a date" />;
     }
 
@@ -84,7 +84,9 @@ const BossDashboard = () => {
   };
 
   const renderBarChart = () => {
-    if (!dashboardData || !dashboardData.monthlyAppointments) return null;
+    if (!dashboardData || !dashboardData.monthlyAppointments) {
+      return <Empty description="No monthly appointments data available" />;
+    }
 
     const data = [];
     Object.entries(dashboardData.monthlyAppointments).forEach(
@@ -121,15 +123,19 @@ const BossDashboard = () => {
           <h2>Dashboard</h2>
           <Row gutter={16} style={{ marginBottom: 16 }}>
             <Col span={9}>
-              <Card>
+              <Card style={{ borderLeft: "5px solid #1890ff" }}>
                 <h3>Total appointments of the month</h3>
-                <p>{dashboardData?.totalAppointmentsInMonthNow || 0}</p>
+                <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+                  {dashboardData?.totalAppointmentsInMonthNow || 0}
+                </p>
               </Card>
             </Col>
             <Col span={9}>
-              <Card>
+              <Card style={{ borderLeft: "5px solid #ff4d4f" }}>
                 <h3>Total appointments of the year</h3>
-                <p>{dashboardData?.totalAppointmentsInYearNow || 0}</p>
+                <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+                  {dashboardData?.totalAppointmentsInYearNow || 0}
+                </p>
               </Card>
             </Col>
             <Col span={6}>
@@ -152,20 +158,18 @@ const BossDashboard = () => {
             </Col>
           </Row>
 
-          {loading ? (
-            <Spin size="medium" style={{ display: "block", margin: "20px auto" }} />
-          ) : (
+          
             <>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Card title="Daily Appointments">{renderPieChart()}</Card>
+                  <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
                 </Col>
                 <Col span={12}>
-                  <Card title="Monthly Appointments">{renderBarChart()}</Card>
+                  <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
                 </Col>
               </Row>
             </>
-          )}
+          
         </Content>
       </Layout>
     </Layout>
