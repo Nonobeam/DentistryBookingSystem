@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,22 +243,16 @@ public class StaffController {
                         .collect(Collectors.toList());
             }
 
-            // Get new and old time slot date
-            LocalDate newDate = timeSlotService.getNewTimeSlot(clinic);
-            LocalDate oldDate = timeSlotService.getOldTimeSlot(clinic);
-
-            // Initial value to find out which kind of date should be use (newDate ? oldDate)
-            LocalDate updateDate;
-            if ((endDate.isAfter(newDate) || endDate.equals(newDate)) && (startDate.isAfter(newDate) || startDate.equals(newDate))) {
-                updateDate = newDate;
-            } else if ((endDate.isAfter(oldDate) && endDate.isBefore(newDate)) || endDate.equals(oldDate)) {
-                updateDate = oldDate;
-            } else {
-                return ResponseEntity.status(403).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
+            List<TimeSlot> timeSlotList = new ArrayList<>();
+            LocalDate sub = startDate;
+            while (sub.isEqual(endDate) || sub.isBefore(endDate)) {
+                TimeSlot timeSlot = timeSlotService.findNearestTimeSlot(sub, clinic.getClinicID());
+                timeSlotList.add(timeSlot);
+                sub = sub.plusDays(1);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
-            List<TimeSlot> timeSlotList = timeSlotService.getTimeSlotByDate(staff.getClinic(), updateDate);
+
             if (!timeSlotList.isEmpty()) {
                 timeSlotDTOS = timeSlotList.stream()
                         .map(timeSlot -> {

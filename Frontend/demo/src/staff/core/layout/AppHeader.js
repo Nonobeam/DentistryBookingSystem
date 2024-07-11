@@ -30,13 +30,12 @@ export const AppHeader = () => {
     setShowBellDropdown(!showBellDropdown);
   };
 
-  
+
 
   const handleNotificationClick = (notification) => {
     console.log('Notification clicked:', notification);
   };
 
-  
 
   return (
     <div
@@ -76,7 +75,7 @@ export const AppHeader = () => {
           </div>
         )}
       </div>
-    
+
     </div>
   );
 };

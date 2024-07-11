@@ -12,11 +12,10 @@ import Booking from './homepage/Booking';
 import Homepage from './homepage/Homepage';
 import { DashBoard } from './staff/pages/DashBoard';
 import { DentistList } from './staff/pages/DashBoard/components/DentistList/DentistList';
-import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
+import { StaffDashboard } from './staff/pages/DashBoard/components/StaffDash/StaffDashboard';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
 import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
-import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
 import RoleBasedRoute from './account/RoleBasedRoute';
@@ -74,7 +73,7 @@ const App = () => {
         <Route path='/history' element={<RoleBasedRoute element={<History />} requiredRole={['CUSTOMER']}/>}/>
         <Route path='/profile' element={<RoleBasedRoute element={<UserProfile />} requiredRole={['CUSTOMER']}/>}/>
         
-          {/* DENTIST PAGES */}
+        {/* DENTIST PAGES */}
         <Route path='/dentist'>
           <Route path='' element={<RoleBasedRoute element={<TodayAppointments />} requiredRole={['DENTIST']}/>}/>
           <Route path='profile' element={<RoleBasedRoute element={<DenProfile />} requiredRole={['DENTIST']}/>}/>
@@ -101,8 +100,9 @@ const App = () => {
           <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['BOSS']}/>}/>
         </Route>
 
-          {/* STAFF PAGES */}
+        {/* STAFF PAGES */}
         <Route path='/staff' element={<DashBoard />}>
+
           <Route path='dentist-list' element={<DentistList />} />
           <Route
             path='dentist-list/detail/:dentistID'
@@ -110,6 +110,7 @@ const App = () => {
           />
 
           <Route path='' element={<CarDash />} />
+
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
           <Route path='profile' element={<Profile />} />

@@ -1,17 +1,20 @@
 import { Menu } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { LuLogOut } from 'react-icons/lu';
 import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined } from '@ant-design/icons'; // Import các icon từ Ant Design
 import { LuLogOut } from 'react-icons/lu';
 
 const items = [
   {
+
     key: 'Dashboard',
     label: 'Dashboard',
     icon: <DashboardOutlined />,
     link: '/staff'
   },
   {
+
     key: 'DentistList',
     label: 'Dentist List',
     icon: <UserOutlined />,
@@ -30,9 +33,9 @@ const items = [
     link: '/staff/appointment-history'
   },
   {
-    key: 'Homepage',
-    label: 'Home Page',
-    icon: <HomeOutlined />,
+    key: 'Dasboard',
+    label: 'Dash board',
+    icon: <DashboardOutlined />,
     link: ''
   },
   {
@@ -40,6 +43,7 @@ const items = [
     label: 'Timetable',
     icon: <ScheduleOutlined />,
     link: '/staff/timetable'
+
   },
   {
     key: 'Profile',
@@ -49,12 +53,16 @@ const items = [
   },
   {
     key: '5',
+
     label: 'Logout',
     icon: <LuLogOut />,
     onClick: () => {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('expirationTime');
+
+      window.location.href = '/';
+
     },
   }
 ];
@@ -84,7 +92,7 @@ export const AppSider = () => {
         style={{ borderRight: 'none' }}
       >
         {items.map((item) => (
-          <Menu.Item key={item.key} icon={item.icon} style={{ margin: 0 }}>
+          <Menu.Item key={item.key} icon={item.icon} style={{ margin: 0 }} onClick={item.onClick}>
             <Link to={item.link} style={{ color: '#333', textDecoration: 'none' }}>
               {item.label}
             </Link>
