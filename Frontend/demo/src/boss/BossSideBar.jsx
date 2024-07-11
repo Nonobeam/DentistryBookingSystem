@@ -18,6 +18,17 @@ const BossSidebar = () => {
 
   return (
     <Sider width={250} className="site-layout-background">
+      
+      <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
+          <Link to="/">
+            <img
+              src={require("../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+              alt="Logo"
+              style={{ height: "120px", paddingBottom: "10px", paddingLeft: "50px"}}
+            />
+          </Link>
+        </div>
+
       <Menu
         mode="inline"
         defaultSelectedKeys={[pathToKey[location.pathname]]}

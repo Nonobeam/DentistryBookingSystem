@@ -155,8 +155,9 @@ const Homepage = () => {
         </div>
       </Layout.Content>
 
-
+      <StyledFooter >
       <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
+
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={16} md={8}>
             <Title level={4}>About Us</Title>
@@ -178,9 +179,12 @@ const Homepage = () => {
             </Paragraph>
           </Col>
         </Row>
-      </StyledFooter>
+        </Layout.Footer>
+        </StyledFooter>
+
+
     </Layout>
-    
+
   );
 };
 
