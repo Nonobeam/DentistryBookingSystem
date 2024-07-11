@@ -43,10 +43,6 @@ export const AppHeader = () => {
     setShowBellDropdown(!showBellDropdown);
   };
 
-  const handleUserIconClick = () => {
-    setShowUserDropdown(!showUserDropdown);
-  };
-
   const handleLogout = () => {
     // Perform logout action here
     console.log('Logging out...');
@@ -63,19 +59,6 @@ export const AppHeader = () => {
     // Logic to handle notification click
     console.log('Notification clicked:', notification);
   };
-
-  const menu = (
-    <Menu>
-      <Menu.Item key='profile'>
-        <Link to='/staff/profile'>Profile</Link>
-      </Menu.Item>
-      <Menu.Item key='logout'>
-        <Button type='link' onClick={handleLogout}>
-          Logout
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
 
   return (
     <div
@@ -128,15 +111,6 @@ export const AppHeader = () => {
           </div>
         )}
       </div>
-      <Dropdown overlay={menu} placement='bottomRight' trigger={['click']}>
-        <div>
-          <FaUserCircle
-            className='user-icon'
-            style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-            onClick={handleUserIconClick}
-          />
-        </div>
-      </Dropdown>
     </div>
   );
 };

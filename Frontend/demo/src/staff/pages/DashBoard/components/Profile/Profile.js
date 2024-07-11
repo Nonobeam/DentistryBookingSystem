@@ -44,13 +44,6 @@ export const Profile = () => {
       <h2 style={{ marginBottom: '20px', borderBottom: '2px solid #007bff', paddingBottom: '10px' }}>Profile</h2>
       {successMessage && <h3 style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</h3>}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <div>
-          <img
-            src='https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/422851969_122093528078209283_1563823667936309736_n.jpg?stp=dst-jpg_p526x296&_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_ohc=ZmcFG5-dxFQQ7kNvgHyKPMH&_nc_ht=scontent.fsgn5-12.fna&oh=00_AYDjkUA-WAFjo0TS8y4UH_ZYkG5BZTWAJO0aRjMJbClgLg&oe=666CCB4F'
-            alt='Profile'
-            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-          />
-        </div>
         <div style={{ flex: 1 }}>
           {editMode ? (
             <>
