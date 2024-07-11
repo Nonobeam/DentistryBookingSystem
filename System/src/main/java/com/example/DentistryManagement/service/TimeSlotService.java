@@ -20,9 +20,18 @@ import java.util.logging.Logger;
 public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
 
-
+    // Find the nearest Time Slot
     public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, int slotNumber, String clinicId) {
         List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicIDAndSlotNumber(clinicId, slotNumber);
+
+        return timeSlots.stream()
+                .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
+                .max(Comparator.comparing(TimeSlot::getDate))
+                .orElse(null);
+    }
+
+    public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, String clinicId) {
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicID(clinicId);
 
         return timeSlots.stream()
                 .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
