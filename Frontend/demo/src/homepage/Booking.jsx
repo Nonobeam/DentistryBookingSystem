@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Form, Input, Button, Typography, Select, Checkbox, DatePicker, Modal, Spin, Radio, Alert } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Select,
+  Checkbox,
+  DatePicker,
+  Modal,
+  Spin,
+  Radio,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import NavBar from "./Nav";
 import styled from "styled-components";
-import { BiAddToQueue, BiPlusCircle } from "react-icons/bi";
-import { PiPlugCharging } from "react-icons/pi";
-import { CgAdd } from "react-icons/cg";
-import { GrAdd } from "react-icons/gr";
 import { IoAddCircleOutline } from "react-icons/io5";
+import {
+  UserOutlined,
+  HomeOutlined,
+  CalendarOutlined,
+  AppstoreOutlined,
+  ClockCircleOutlined,
+  UserSwitchOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -29,6 +45,14 @@ const BookingFormWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+// const BookingFormWrapper = styled.div`
+//   width: 450px;
+//   background-color: #f0f8ff;
+//   padding: 30px;
+//   border-radius: 20px;
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+// `;
 
 const Booking = () => {
   const [form] = Form.useForm();
@@ -64,11 +88,14 @@ const Booking = () => {
     const fetchClinics = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/user/all-clinic", {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const response = await axios.get(
+          "http://localhost:8080/user/all-clinic",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
         setClinics(response.data);
       } catch (error) {
         console.error("Failed to fetch clinics:", error);
@@ -85,12 +112,15 @@ const Booking = () => {
         setLoadingServices(true);
         try {
           const token = localStorage.getItem("token");
-          const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const response = await axios.get(`http://localhost:8080/user/all-service/${selectedBranch}?bookDate=${formattedDate}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
+          const formattedDate = selectedDate.format("YYYY-MM-DD");
+          const response = await axios.get(
+            `http://localhost:8080/user/all-service/${selectedBranch}?bookDate=${formattedDate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
+          );
           const servicesArray = Object.values(response.data); // Transform the response object into an array
           setServices(servicesArray);
           setIsServiceDisabled(false);
@@ -110,21 +140,31 @@ const Booking = () => {
         setLoadingTimeSlots(true);
         try {
           const token = localStorage.getItem("token");
-          const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const response = await axios.get(`http://localhost:8080/user/${selectedBranch}/available-schedules?workDate=${formattedDate}&servicesId=${selectedService}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
+          const formattedDate = selectedDate.format("YYYY-MM-DD");
+          const response = await axios.get(
+            `http://localhost:8080/user/${selectedBranch}/available-schedules?workDate=${formattedDate}&servicesId=${selectedService}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
+          );
           const schedules = response.data;
           const timeSlotsMap = new Map();
-          schedules.forEach(schedule => {
+          schedules.forEach((schedule) => {
             if (!timeSlotsMap.has(schedule.startTime)) {
               timeSlotsMap.set(schedule.startTime, []);
             }
-            timeSlotsMap.get(schedule.startTime).push({ dentistName: schedule.dentistName, dentistScheduleID: schedule.dentistScheduleID });
+            timeSlotsMap
+              .get(schedule.startTime)
+              .push({
+                dentistName: schedule.dentistName,
+                dentistScheduleID: schedule.dentistScheduleID,
+              });
           });
-          setTimeSlots(Array.from(timeSlotsMap, ([time, dentists]) => ({ time, dentists })));
+          setTimeSlots(
+            Array.from(timeSlotsMap, ([time, dentists]) => ({ time, dentists }))
+          );
           setIsTimeSlotDisabled(false);
         } catch (error) {
           console.error("Failed to fetch time slots:", error);
@@ -142,11 +182,14 @@ const Booking = () => {
         setLoadingPatients(true);
         try {
           const token = localStorage.getItem("token");
-          const response = await axios.get("http://localhost:8080/user/dependentList", {
-            headers: {
-              Authorization: `Bearer ${token}`
+          const response = await axios.get(
+            "http://localhost:8080/user/dependentList",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
+          );
           setPatients(response.data);
         } catch (error) {
           console.error("Failed to fetch patients:", error);
@@ -208,7 +251,7 @@ const Booking = () => {
   };
 
   const handleTimeSlotChange = (time) => {
-    const selectedSlot = timeSlots.find(slot => slot.time === time);
+    const selectedSlot = timeSlots.find((slot) => slot.time === time);
     setSelectedTimeSlot(time);
     setSelectedDentist(null);
 
@@ -227,14 +270,18 @@ const Booking = () => {
   const handleNewDependent = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("http://localhost:8080/user/dependentNew", {
-        name: newDependentName,
-        birthday: newDependentBirthday.format('YYYY-MM-DD')
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.post(
+        "http://localhost:8080/user/dependentNew",
+        {
+          name: newDependentName,
+          birthday: newDependentBirthday.format("YYYY-MM-DD"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       if (response.status === 200) {
         Modal.success({
@@ -243,14 +290,15 @@ const Booking = () => {
           onOk: () => {
             setModalVisible(false);
             window.location.reload();
-          }
+          },
         });
       }
     } catch (error) {
       console.error("Failed to add dependent:", error);
       Modal.error({
         title: "Add Dependent Failed",
-        content: "There was an issue adding the dependent. Please try again later."
+        content:
+          "There was an issue adding the dependent. Please try again later.",
       });
     }
   };
@@ -258,19 +306,31 @@ const Booking = () => {
   const onFinish = async (values) => {
     try {
       const token = localStorage.getItem("token");
-      const selectedSlot = timeSlots.find(slot => slot.time === selectedTimeSlot);
-      const selectedDentistObj = selectedSlot.dentists.find(dentist => dentist.dentistName === selectedDentist);
-      const dentistScheduleID = selectedDentist === "random"
-        ? selectedSlot.dentists[Math.floor(Math.random() * selectedSlot.dentists.length)].dentistScheduleID
-        : selectedDentistObj.dentistScheduleID;
-      const url = `http://localhost:8080/user/booking/${dentistScheduleID}?serviceId=${selectedService}` +
-          (selectedFor === "others" ? `&dependentID=${selectedDependant}` : "");
+      const selectedSlot = timeSlots.find(
+        (slot) => slot.time === selectedTimeSlot
+      );
+      const selectedDentistObj = selectedSlot.dentists.find(
+        (dentist) => dentist.dentistName === selectedDentist
+      );
+      const dentistScheduleID =
+        selectedDentist === "random"
+          ? selectedSlot.dentists[
+              Math.floor(Math.random() * selectedSlot.dentists.length)
+            ].dentistScheduleID
+          : selectedDentistObj.dentistScheduleID;
+      const url =
+        `http://localhost:8080/user/booking/${dentistScheduleID}?serviceId=${selectedService}` +
+        (selectedFor === "others" ? `&dependentID=${selectedDependant}` : "");
 
-      const response = await axios.post(url, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         Modal.success({
@@ -283,7 +343,9 @@ const Booking = () => {
       console.error("Booking failed:", error);
       Modal.error({
         title: "Booking Failed",
-        content: error.response?.data?.message || "An error occurred. Please try again later.",
+        content:
+          error.response?.data?.message ||
+          "An error occurred. Please try again later.",
         onOk: () => window.location.reload(),
       });
     }
@@ -294,7 +356,10 @@ const Booking = () => {
     const maxDate = new Date(today);
     maxDate.setMonth(maxDate.getMonth() + 2);
 
-    return current < today.setHours(0, 0, 0, 0) || current > maxDate.setHours(23, 59, 59, 999);
+    return (
+      current < today.setHours(0, 0, 0, 0) ||
+      current > maxDate.setHours(23, 59, 59, 999)
+    );
   };
 
   const disableDatesAfterToday = (current) => {
@@ -319,26 +384,38 @@ const Booking = () => {
 
             {selectedFor === "others" && (
               <>
-              <Button type="link" onClick={() => setModalVisible(true)}>
-                      <IoAddCircleOutline /> Create new 
+                <Button type="link" onClick={() => setModalVisible(true)}>
+                  <IoAddCircleOutline /> Create new
                 </Button>
                 <Form.Item
                   name="patient"
-                  rules={[{ required: true, message: "Please select a patient!" }]}
+                  rules={[
+                    { required: true, message: "Please select a patient!" },
+                  ]}
                 >
+                  <div>
+                    <UserOutlined style={{ marginRight: 8 }} />
+                    <span style={{ color: "red" }}>*</span> Dependent:
+                  </div>
                   {loadingPatients ? (
                     <Spin size="small" />
                   ) : (
-                    <Select placeholder="Select patient" onChange={handleDependantChange}>
+                    <Select
+                      placeholder="Select patient"
+                      onChange={handleDependantChange}
+                      notFoundContent="You don't have any dependent."
+                    >
                       {patients.map((patient) => (
-                        <Option key={patient.dependentID} value={patient.dependentID}>
+                        <Option
+                          key={patient.dependentID}
+                          value={patient.dependentID}
+                        >
                           {patient.name} ({patient.birthday})
                         </Option>
                       ))}
                     </Select>
                   )}
                 </Form.Item>
-                
               </>
             )}
 
@@ -346,10 +423,17 @@ const Booking = () => {
               name="clinic"
               rules={[{ required: true, message: "Please select a branch!" }]}
             >
+              <div>
+                <HomeOutlined style={{ marginRight: 8 }} />
+                <span style={{ color: "red" }}>*</span> Branch:
+              </div>
               {loadingClinics ? (
                 <Spin size="small" />
               ) : (
-                <Select placeholder="Choose branch" onChange={handleBranchChange}>
+                <Select
+                  placeholder="Choose branch"
+                  onChange={handleBranchChange}
+                >
                   {clinics.map((clinic) => (
                     <Option key={clinic.clinicID} value={clinic.clinicID}>
                       {clinic.name}
@@ -363,6 +447,10 @@ const Booking = () => {
               name="date"
               rules={[{ required: true, message: "Please choose a date!" }]}
             >
+              <div>
+                <CalendarOutlined style={{ marginRight: 8 }} />
+                <span style={{ color: "red" }}>*</span> Date:
+              </div>
               <DatePicker
                 placeholder="Select Date"
                 style={{ width: "100%" }}
@@ -377,10 +465,18 @@ const Booking = () => {
               name="service"
               rules={[{ required: true, message: "Please select a service!" }]}
             >
+              <div>
+                <AppstoreOutlined style={{ marginRight: 8 }} />
+                <span style={{ color: "red" }}>*</span> Service:
+              </div>
               {loadingServices ? (
                 <Spin size="small" />
               ) : (
-                <Select placeholder="Choose service" disabled={isServiceDisabled} onChange={handleServiceChange}>
+                <Select
+                  placeholder="Choose service"
+                  disabled={isServiceDisabled}
+                  onChange={handleServiceChange}
+                >
                   {services.length === 0 && !loadingServices && (
                     <Option value="" disabled>
                       No services available for selected date.
@@ -397,12 +493,22 @@ const Booking = () => {
 
             <Form.Item
               name="time"
-              rules={[{ required: true, message: "Please choose a time slot!" }]}
+              rules={[
+                { required: true, message: "Please choose a time slot!" },
+              ]}
             >
+              <div>
+                <ClockCircleOutlined style={{ marginRight: 8 }} />
+                <span style={{ color: "red" }}>*</span> Time Slot:
+              </div>
               {loadingTimeSlots ? (
                 <Spin size="small" />
               ) : (
-                <Select placeholder="Choose timeslot" disabled={isTimeSlotDisabled} onChange={handleTimeSlotChange}>
+                <Select
+                  placeholder="Choose timeslot"
+                  disabled={isTimeSlotDisabled}
+                  onChange={handleTimeSlotChange}
+                >
                   {timeSlots.map((slot, index) => (
                     <Option key={index} value={slot.time}>
                       {slot.time}
@@ -413,7 +519,15 @@ const Booking = () => {
             </Form.Item>
 
             <Form.Item name="dentist">
-              <Select placeholder="Choose dentist" disabled={isDentistDisabled} onChange={handleDentistChange}>
+              <div>
+                <UserSwitchOutlined style={{ marginRight: 8 }} />
+                Dentist:
+              </div>
+              <Select
+                placeholder="Choose dentist"
+                disabled={isDentistDisabled}
+                onChange={handleDentistChange}
+              >
                 <Option value="random">Random</Option>
                 {dentists.map((dentist, index) => (
                   <Option key={index} value={dentist.dentistName}>
@@ -435,9 +549,7 @@ const Booking = () => {
                 },
               ]}
             >
-              <Checkbox>
-                I have checked everything before submit
-              </Checkbox>
+              <Checkbox>I have checked everything before submit</Checkbox>
             </Form.Item>
 
             <Form.Item>
@@ -468,14 +580,17 @@ const Booking = () => {
       >
         <Form layout="vertical">
           <Form.Item label="Name" required>
-            <Input value={newDependentName} onChange={(e) => setNewDependentName(e.target.value)} />
+            <Input
+              value={newDependentName}
+              onChange={(e) => setNewDependentName(e.target.value)}
+            />
           </Form.Item>
           <Form.Item label="Birthday" required>
             <DatePicker
               style={{ width: "100%" }}
               disabledDate={disableDatesAfterToday}
               onChange={(date) => setNewDependentBirthday(date)}
-              format="YYYY-MM-DD"
+              format="DD-MM-YYYY"
             />
           </Form.Item>
         </Form>
