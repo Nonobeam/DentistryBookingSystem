@@ -42,10 +42,9 @@ const Homepage = () => {
               <Paragraph>
                 Where your smile matters most. Our expert team provides personalized dental care in a friendly environment.
               </Paragraph>
-              <Button type="primary" style={{ marginRight: "10px" }}>
+              <Button type="primary" style={{ marginRight: "10px" }} href="/booking">
                 Schedule Your Appointment
               </Button>
-              <Button>Need Advice?</Button>
             </Col>
             <Col xs={24} md={12}>
               <img
@@ -97,7 +96,7 @@ const Homepage = () => {
           </Row>
         </div>
 
-        <div className="branches-section" style={{ padding: "50px 0" }}>
+        {/* <div className="branches-section" style={{ padding: "50px 0" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
               <Map locations={locations} />
@@ -109,7 +108,7 @@ const Homepage = () => {
               </Paragraph>
             </Col>
           </Row>
-        </div>
+        </div> */}
 
         <div className="video-section" style={{ padding: "50px 0", background: "#f0f2f5" }}>
           <Title level={2} style={{ textAlign: "center" }}>
@@ -155,28 +154,22 @@ const Homepage = () => {
           </Row>
         </div>
       </Layout.Content>
-      <StyledFooter>
+
+
+      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>About Us</Title>
-            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
+          <Col xs={24} sm={16} md={8}>
+            <Title level={4}>About Us</Title>
+            <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Services</Title>
-            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
+          <Col xs={24} sm={16} md={8}>
+            <Title level={4}>Contact</Title>
+            <Paragraph>123 Dental St.</Paragraph>
+            <Paragraph>Sun City, TX 12345</Paragraph>
+            <Paragraph>info@sunflowerdentistry.com</Paragraph>
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Contact</Title>
-            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
+          <Col xs={24} sm={16} md={8}>
+            <Title level={4}>Follow Us</Title>
             <Paragraph>
               <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
               <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
