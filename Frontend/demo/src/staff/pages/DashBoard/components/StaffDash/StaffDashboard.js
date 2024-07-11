@@ -5,7 +5,7 @@ import { ChartMonthly } from './ChartMonthly/ChartMonthly';
 import { DashBoardServices } from '../../../../services/DashBoardServices/DashBoardServices';
 import moment from 'moment'; // Import moment for date formatting
 
-export const CarDash = () => {
+export const StaffDashboard = () => {
   const [dashboardData, setDashboardData] = useState({});
   const [inputDate, setInputDate] = useState('');
   const [inputYear, setInputYear] = useState('');
