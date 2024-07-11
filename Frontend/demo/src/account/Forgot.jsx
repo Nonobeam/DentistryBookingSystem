@@ -34,7 +34,7 @@ const StyledButton = styled(Button)`
 
 const ExtraLink = styled.div`
   margin-top: 20px;
-  text-align: center;
+  text-align: right;
   a {
     color: #1890ff;
     &:hover {
@@ -49,15 +49,15 @@ const ForgotPassword = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const onFinish = async (values) => {
+    setSuccessMessage("");
+    setErrorMessage(""); 
     setLoading(true);
     console.log('Success:', values);
     try {
       const response = await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
       setSuccessMessage("The reset password link has been sent to your email.");
-      setErrorMessage(""); 
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
-      setSuccessMessage(""); 
+      setErrorMessage( error.response?.data?.message || "An error occurred. Please try again later.");
     }
     setLoading(false);
   };
@@ -96,13 +96,15 @@ const ForgotPassword = () => {
           </Form.Item>
 
           <Form.Item>
-            <StyledButton type="primary" htmlType="submit">
-              {loading ? <Spin /> : 'Send Reset Link'}
+            <StyledButton type="primary" htmlType="submit" loading={loading}>
+              Send Reset Link
             </StyledButton>
           </Form.Item>
         </Form>
         <ExtraLink>
-          <a href="/login">Return to Login</a>
+          <Button href='/login'>
+              Return to Login
+          </Button>
         </ExtraLink>
       </ForgotPasswordBox>
     </ForgotPasswordContainer>

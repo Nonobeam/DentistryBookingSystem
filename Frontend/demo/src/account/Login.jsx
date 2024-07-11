@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, Alert, Spin } from 'antd';
+import { Form, Input, Button, Typography, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -152,8 +152,8 @@ const Login = () => {
           </Form.Item>
 
           <Form.Item>
-            <StyledButton type='primary' htmlType='submit'>
-              {loading ? <Spin /> : 'Log In'}
+            <StyledButton type='primary' htmlType='submit' loading={loading}>
+                  Log In
             </StyledButton>
           </Form.Item>
         </Form>

@@ -52,6 +52,8 @@ const Signup = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
     try {
       const response = await axios.post(API_URL, {
         name: values.firstName,
@@ -62,8 +64,8 @@ const Signup = () => {
       });
 
       if (response.status === 200) {
-        setErrorMessage("");
-        setSuccessMessage("Registration successful. Please check your email to confirm your account. It may be in your spam folder.");
+        
+        setSuccessMessage("Registration successful. Please check your email to confirm your account.");
       }
     } catch (error) {
       setErrorMessage("Your email or phone is already registered. Please login or use a different email or phone number.");
@@ -106,7 +108,7 @@ const Signup = () => {
             rules={[
               { required: true, message: "Please input your name!" },
               {
-                pattern: /^[A-Za-z]+$/,
+                pattern: /([a-zA-Z\s]+)/,
                 message: "Name must contain only letters!",
               },
             ]}
@@ -176,8 +178,8 @@ const Signup = () => {
           </Form.Item>
 
           <Form.Item>
-            <StyledButton type="primary" htmlType="submit">
-              {loading ? <Spin /> : 'Sign Up'}
+            <StyledButton type="primary" htmlType="submit" loading={loading}>
+              Sign Up
             </StyledButton>
           </Form.Item>
           <ExtraLink>
