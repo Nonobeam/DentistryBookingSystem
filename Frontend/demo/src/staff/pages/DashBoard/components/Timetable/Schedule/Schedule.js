@@ -20,6 +20,8 @@ const { RangePicker: TimeRangePicker } = TimePicker;
 const { Option } = Select;
 
 const Schedule = () => {
+const [loading, setLoading] = useState(true);
+
   const [selectedDateRange, setSelectedDateRange] = useState([]);
   const [selectedTimeRange, setSelectedTimeRange] = useState(undefined);
   const [timeSlotList, setTimeSlotList] = useState([]);
@@ -32,11 +34,14 @@ const Schedule = () => {
 
   const fetchDentistList = async () => {
     try {
+      setLoading(true);
       const dentistsList = await TimetableServices.getAllDentists();
       console.log(dentistsList);
       setDentistList(dentistsList);
     } catch (error) {
       console.error('Error fetching dentist list:', error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -212,8 +217,21 @@ const Schedule = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Schedule Doctor's Work</h1>
-      <Link to='/staff/timetable' style={{ marginBottom: '20px', display: 'block' }}>
+<h1 style={{ 
+  fontSize: '40px', 
+  color: 'white', 
+  fontWeight: 'bold', 
+  textAlign: 'center',
+  alignItems:'center',
+  border: '2px solid #ccc',  // Đường viền 2px, màu xám nhạt
+  padding: '10px',           // Khoảng cách nội bộ 10px
+  borderRadius: '5px',
+  background:'#009ACD',
+  height:'100px',
+    lineHeight: '80px'
+        // Đường viền cong góc 5px
+}}>Schedule Dentist's Schedule</h1>
+<Link to='/staff/timetable' style={{ marginBottom: '20px', display: 'block' }}>
         <Button type='primary' icon={<LeftOutlined />}>
           Back to Timetable
         </Button>

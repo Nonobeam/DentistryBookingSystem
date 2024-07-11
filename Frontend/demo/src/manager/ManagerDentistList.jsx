@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
 
+
 const { Header, Content } = Layout;
 const { Option } = Select;
 
@@ -107,12 +108,12 @@ const ManagerDentistList = () => {
     }
   };
 
-  const handleStaffFilter = async (staffId) => {
-    history(`/manager/dentist/${staffId}`);
+  const handleStaffFilter = async (staffID) => {
+    history(`/manager/dentist/${staffID}`);
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/manager/${staffId}/all-dentists`, {
+      const response = await axios.get(`http://localhost:8080/api/v1/manager/${staffID}/all-dentists`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -160,13 +161,16 @@ const ManagerDentistList = () => {
         {
           key: 'edit',
           label: 'Edit',
-          onClick: () => showEditModal(record)
+          onClick: () => showEditModal(record),
+          style:{ color: 'green' }
+
         },
         {
           key: 'delete',
           label: 'Delete',
           onClick: () => showDeleteConfirmation(record.id),
-          danger: true
+          danger: true,
+          style:{ color: 'red' }
         }
       ]}
     />
@@ -206,8 +210,20 @@ const ManagerDentistList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: status => (status === 1 ? 'Active' : 'Inactive'),
-    },
+      render: status => (
+        <span
+          style={{
+            backgroundColor: status === 1 ? '#52c41a' : '#f5222d', // Màu nền
+            color: 'white', // Màu chữ
+            padding: '4px 8px', // Đệm
+            borderRadius: '4px', // Bo góc
+            display: 'inline-block', // Hiển thị khối nội tuyến
+          }}
+        >
+          {status === 1 ? 'Active' : 'Inactive'}
+        </span>
+      ),
+        },
     {
       title: 'Clinic',
       dataIndex: 'clinicName',
