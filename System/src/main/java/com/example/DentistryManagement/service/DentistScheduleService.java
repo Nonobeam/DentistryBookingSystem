@@ -25,6 +25,7 @@ public class DentistScheduleService {
     private final ServiceRepository serviceRepository;
     private final DentistRepository dentistRepository;
     private final ClinicRepository clinicRepository;
+    private final TimeSlotService timeSlotService;
 
     public HashSet<DentistSchedule> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
         Services service = serviceRepository.findById(serviceId).orElse(null);
@@ -58,23 +59,14 @@ public class DentistScheduleService {
     public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, int slotNumber, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
         Clinic clinic = clinicRepository.findById(clinicID).orElseThrow(() -> new RuntimeException("Clinic not found"));
-        TimeSlot newestTimeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
-        LocalDate newestStartDate = newestTimeSlot.getDate();
-
-        // Check if slotNumber exist or not
-        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinicAndDate(clinic, newestStartDate);
-        boolean slotNumberExists = timeSlots.stream().anyMatch(timeSlot -> timeSlot.getSlotNumber() == slotNumber);
-        if (!slotNumberExists) {
-            throw new Error("Slot number " + slotNumber + " not found for clinic ID " + clinicID + "in date" + newestStartDate);
-        }
 
         List<DentistSchedule> schedules = new ArrayList<>();
 
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
-            TimeSlot timeSlot = timeSlotRepository.findTopBySlotNumberAndClinicAndDate(slotNumber, clinic.getClinicID(), newestStartDate,PageRequest.of(0, 1)).get(0);
+            TimeSlot timeSlot = timeSlotService.findNearestTimeSlot(date, slotNumber, clinicID);
             if(timeSlot == null){
-                throw new RuntimeException();
+                throw new Error("Time slot for date " + date + "is not be set.");
             }
 
             DentistSchedule dentistSchedule = dentistScheduleRepository.findDentistScheduleByDentist_DentistIDAndTimeslotAndWorkDate(dentistID, timeSlot, date);
@@ -120,4 +112,11 @@ public class DentistScheduleService {
 
     }
 
+    public void deleteDentistSchedulesAfterDate(LocalDate workDate, String clinicId) {
+        try {
+            dentistScheduleRepository.deleteByWorkDateAfterAndClinicId(workDate, clinicId);
+        } catch (Error error) {
+            throw error;
+        }
+    }
 }

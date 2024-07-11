@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,7 +20,17 @@ import java.util.logging.Logger;
 public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
 
-    // Find the start of process update date
+
+    public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, int slotNumber, String clinicId) {
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicIDAndSlotNumber(clinicId, slotNumber);
+
+        return timeSlots.stream()
+                .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
+                .max(Comparator.comparing(TimeSlot::getDate))
+                .orElse(null);
+    }
+
+        // Find the start of process update date
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
         TimeSlot timeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);

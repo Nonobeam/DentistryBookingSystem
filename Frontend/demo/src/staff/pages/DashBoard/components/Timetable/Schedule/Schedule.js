@@ -11,7 +11,8 @@ import {
   notification,
 } from 'antd';
 import moment from 'moment';
-import { v4 as uuidv4 } from 'uuid';
+import { Link } from 'react-router-dom';
+import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined icon from Ant Design
 import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
 const { RangePicker: DateRangePicker } = DatePicker;
@@ -212,6 +213,11 @@ const Schedule = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Schedule Doctor's Work</h1>
+      <Link to='/staff/timetable' style={{ marginBottom: '20px', display: 'block' }}>
+        <Button type='primary' icon={<LeftOutlined />}>
+          Back to Timetable
+        </Button>
+      </Link>
       <div style={{ marginBottom: '20px' }}>
         <DateRangePicker
           value={selectedDateRange}
