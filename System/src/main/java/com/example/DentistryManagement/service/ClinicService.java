@@ -24,7 +24,7 @@ public class ClinicService {
 
     public List<Clinic> findAllClinicsByStatus(int status) {
         try {
-            return clinicRepository.findClinicByStatus(status);
+            return clinicRepository.findClinicsByStatus(status);
         } catch (Error e) {
             throw e;
         }
