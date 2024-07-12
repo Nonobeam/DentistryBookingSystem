@@ -73,7 +73,7 @@ export const AppointmentHistoryServices = {
   patchAppointment: async ({ appointmentId, status }) => {
     try {
       const responseData = await api.patch(
-        `staff/appointment-history/${appointmentId}?status=${status}`
+        `user/appointment-history/${appointmentId}?status=${status}`
       );
 
       return responseData.data;

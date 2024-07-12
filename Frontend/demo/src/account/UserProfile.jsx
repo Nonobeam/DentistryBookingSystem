@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { Button, DatePicker, Form, Input, message, Spin } from "antd";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin } from "antd";
-import dayjs from "dayjs"; 
+import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 import NavBar from "../homepage/Nav";
 
 const UserProfile = () => {
@@ -108,9 +108,9 @@ const UserProfile = () => {
           >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="password" label="Password">
-            <Input.Password />
-          </Form.Item>
+          <Form.Item>
+          <a href="/forgot">Wanna change password?</a>
+         </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Profile
