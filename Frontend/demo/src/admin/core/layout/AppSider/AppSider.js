@@ -52,7 +52,7 @@ export const AppSider = () => {
     <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
         <Link to="/">
           <img
-            src={require("G:/fu/kif 5/swp/New folder/thu/DentistryBookingSystem/Frontend/demo/src/img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+            src={require("../../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
             alt="Logo"
             style={{ height: "140px", paddingBottom: "10px", paddingLeft: "15px"}}
           />
