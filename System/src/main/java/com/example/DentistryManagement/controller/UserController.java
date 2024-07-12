@@ -163,6 +163,22 @@ public class UserController {
         return ResponseEntity.ok(availableSchedulesResponses.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
     }
 
+    @Operation(summary = "Check if user reach maxed booking")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/booking")
+    public boolean checkMaxedBooking(){
+        Client customer = userService.findClientByMail(userService.mailExtract());
+        if (appointmentService.findAppointmentsByUserAndStatus(customer,1).map(List::size).orElse(5) >= 5) {
+            return true;
+        }
+        return false;
+    }
+
 
     @Operation(summary = "Booking")
     @ApiResponses(value = {

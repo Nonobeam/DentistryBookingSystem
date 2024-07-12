@@ -513,6 +513,15 @@ public class StaffController {
         return ResponseEntity.ok(availableSchedulesResponse.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
     }
 
+    @Operation(summary = "Check if customer's mail reach max booking")
+    @GetMapping("/booking")
+    public boolean checkMaxedBooking(@RequestParam String mail){
+        Client customer = userService.findClientByMail(mail);
+        if (appointmentService.findAppointmentsByUserAndStatus(customer,1).map(List::size).orElse(5) >= 5) {
+            return true;
+        }
+        return false;
+    }
 
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
