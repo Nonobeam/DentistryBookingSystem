@@ -9,7 +9,7 @@ const headerStyle = {
   textAlign: 'center',
   color: '#fff',
   lineHeight: '64px',
-  backgroundColor: '#fff',
+  backgroundColor: '#1890ff',
 };
 
 const siderStyle = {
@@ -43,7 +43,7 @@ export const AppLayout = ({ content }) => {
           style={{
             padding: '0 24px',
             minHeight: 280,
-            backgroundColor: '#fff',
+            backgroundColor: '#F5F5F5',
           }}>
           {content}
         </Content>

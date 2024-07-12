@@ -1,4 +1,5 @@
 import { notification } from 'antd';
+import React, { useState, useEffect } from 'react';
 import api from '../../config/axios/axios';
 
 const TimetableServices = {
@@ -24,7 +25,7 @@ const TimetableServices = {
       return responseData.data;
     } catch (error) {
       notification.error({
-        message: 'Failed to fetch dentist list',
+        message: 'Failed to fetch schedule list',
         description: error.message,
       });
       throw error;

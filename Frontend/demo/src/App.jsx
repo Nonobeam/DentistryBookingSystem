@@ -15,7 +15,7 @@ import { DentistList } from './staff/pages/DashBoard/components/DentistList/Dent
 import { StaffDashboard } from './staff/pages/DashBoard/components/StaffDash/StaffDashboard';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
-import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
+import StaffProfile from './staff/pages/DashBoard/components/Profile/Profile';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
 import RoleBasedRoute from './account/RoleBasedRoute';
@@ -45,7 +45,6 @@ import BossService from './boss/BossService';
 import BossManagerList from './boss/BossManagerList';
 import BossProfile from './boss/BossProfile';
 import ManagerProfile from './manager/ManagerProfile';
-
 
 
 const App = () => {
@@ -109,11 +108,11 @@ const App = () => {
             element={<DentistInfo />}
           />
 
-          <Route path='' element={<CarDash />} />
+          <Route path='' element={<StaffDashboard/>} />
 
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
-          <Route path='profile' element={<Profile />} />
+          <Route path='profile' element={<StaffProfile/>} />
           <Route path='customer-list' element={<CustomerListDash />} />
           <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
         </Route>

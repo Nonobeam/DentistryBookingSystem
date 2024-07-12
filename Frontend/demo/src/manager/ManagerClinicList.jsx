@@ -338,7 +338,9 @@ const ManagerClinicList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: status => (status === 1 ? 'Active' : 'Inactive'),
+      render: (status) => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
+      ),
     },
     {
       title: '',

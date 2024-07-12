@@ -44,7 +44,7 @@ export const AppHeader = () => {
         justifyContent: 'flex-end',
         alignItems: 'center',
         gap: '20px',
-        color: '#fff',
+        color: '#1890ff',
       }}
     >
       
@@ -61,7 +61,7 @@ export const AppHeader = () => {
               top: '40px',
               right: '10px',
               minWidth: '300px', // Adjust the width as needed
-              background: '#fff',
+              background: '#F5F5F5',
               boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
               borderRadius: '8px',
               padding: '10px',
