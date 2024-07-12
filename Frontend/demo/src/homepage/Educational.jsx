@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import NavBar from './Nav';
 import "antd/dist/reset.css";
-import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
+import { Layout, Row, Col, Typography } from "antd";
 import {
  
   FacebookOutlined,

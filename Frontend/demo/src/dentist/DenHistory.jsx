@@ -192,17 +192,16 @@ const DenHistory = () => {
               <Input placeholder="Patient Name" value={filterName} onChange={handleNameChange} style={{ marginLeft: 10, width: 200 }} />
             </div>
 
-        {loading ? (
-          <Spin />
-        ) : (
+       
           <Table
             columns={columns}
             dataSource={appointments}
             rowKey="appointmentId"
             pagination={{ pageSize: 10 }}
             style={{ marginBottom: 20 }}
+            loading={loading}
           />
-        )}
+        
         <Modal
           title="Change Appointment Status"
               open={statusModalVisible}
