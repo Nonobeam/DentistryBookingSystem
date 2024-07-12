@@ -113,7 +113,7 @@ public class UserController {
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
-            return ResponseEntity.ok(clinicService.findAll());
+            return ResponseEntity.ok(clinicService.findAllClinicsByStatus(1));
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }

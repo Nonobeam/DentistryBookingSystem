@@ -12,8 +12,7 @@ const PatientInfo = () => {
   const [patientInfo, setPatientInfo] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reminderModalVisible, setReminderModalVisible] = useState(false);
-  const [reminderMessage, setReminderMessage] = useState("");
+
 
   useEffect(() => {
     fetchPatientInfo();

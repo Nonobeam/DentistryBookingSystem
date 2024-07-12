@@ -34,17 +34,18 @@ import java.util.stream.Collectors;
 @Tag(name = "Staff API")
 public class StaffController {
     private final UserService userService;
+    private final UserMapping userMapping;
+    private final StaffService staffService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
+    private final TimeSlotService timeSlotService;
+    private final DentistRepository dentistRepository;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final DentistScheduleService dentistScheduleService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-    private final DentistRepository dentistRepository;
-    private final TimeSlotService timeSlotService;
-    private final StaffService staffService;
-    private final UserMapping userMapping;
+
 
     //----------------------------------- USER INFORMATION -----------------------------------
 
