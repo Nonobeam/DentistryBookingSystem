@@ -29,25 +29,7 @@ export const AppHeader = () => {
     fetchNotifications();
   }, []);
 
-  // Function to handle search input change
-  const handleSearchInputChange = (e) => {
-    const { value } = e.target;
-    setSearchValue(value);
-
-    // Perform filtering based on search value
-    const filtered = notifications.filter((notification) =>
-      notification.title.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredNotifications(filtered);
-  };
-
-  const handleBellIconClick = () => {
-    setShowBellDropdown(!showBellDropdown);
-  };
-
-  const handleUserIconClick = () => {
-    setShowUserDropdown(!showUserDropdown);
-  };
+  
 
   const handleLogout = () => {
     // Perform logout action here
@@ -55,7 +37,6 @@ export const AppHeader = () => {
 
     // Example: Clear token from localStorage and redirect to login page
     localStorage.removeItem('accessToken'); // Remove access token or any other stored data
-    message.success('Logged out successfully'); // Show a success message (optional)
     
     // Redirect to login page
     window.location.href = '/login';
@@ -66,40 +47,10 @@ export const AppHeader = () => {
     console.log('Notification clicked:', notification);
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item key='logout'>
-        <Button type='link' onClick={handleLogout}>
-          Logout
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
+  
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        gap: '20px',
-        color: '#fff',
-      }}
-    >
-      <input
-        style={{
-          border: 'none',
-          width: '140px',
-          background: 'transparent',
-          padding: '5px',
-          outline: 'none',
-        }}
-        type='text'
-        placeholder='Search'
-        value={searchValue}
-        onChange={handleSearchInputChange} // Handle input change
-      />
-      <BiSearch className='search-icon' style={{ cursor: 'pointer' }} />
+    
       <div style={{ position: 'relative' }}>
         
         {showBellDropdown && (
@@ -123,15 +74,6 @@ export const AppHeader = () => {
           </div>
         )}
       </div>
-      <Dropdown overlay={menu} placement='bottomRight' trigger={['click']}>
-        <div>
-          <FaUserCircle
-            className='user-icon'
-            style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
-            onClick={handleUserIconClick}
-          />
-        </div>
-      </Dropdown>
-    </div>
+      
   );
 };

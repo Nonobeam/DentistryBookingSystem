@@ -83,6 +83,7 @@ const UserProfile = () => {
             mail: user.mail,
             birthday: dayjs(user.birthday)
           }}
+          loading={loading}
         >
           <Form.Item
             name="name"

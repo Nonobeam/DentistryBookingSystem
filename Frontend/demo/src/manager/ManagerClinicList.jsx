@@ -52,10 +52,7 @@ const ManagerClinicList = () => {
     return `${hours}:${minutes}`;
   };
 
-  const formatSlot = (timeString) => {
-    const [hours, minutes, seconds] = timeString.split(':');
-    return `${minutes}:${seconds}`;
-  };
+
 
   const fetchAllStaff = async (clinic) => {
     setLoading(true);
@@ -88,19 +85,18 @@ const ManagerClinicList = () => {
       const values = createForm.getFieldsValue();
       const token = localStorage.getItem("token");
 
-      const payload = {
-        name: values.name,
-        phone: values.phone,
-        address: values.address,
-        slotDuration: values.slotDuration.format('HH:mm:ss'),
-        openTime: values.openTime.format('HH:mm:ss'),
-        closeTime: values.closeTime.format('HH:mm:ss'),
-        breakStartTime: values.breakStartTime.format('HH:mm:ss'),
-        breakEndTime: values.breakEndTime.format('HH:mm:ss'),
-        status: values.status ? 1 : 0
-      };
-
-      await axios.post(`http://localhost:8080/api/v1/manager/create-clinic?name=${payload.name}&phone=${payload.phone}&address=${payload.address}&slotDuration=${payload.slotDuration}&openTime=${payload.openTime}&closeTime=${payload.closeTime}&breakStartTime=${payload.breakStartTime}&breakEndTime=${payload.breakEndTime}&status=${payload.status}`, {}, {
+      
+      await axios.post(`http://localhost:8080/api/v1/manager/create-clinic`, {
+        "name": values.name,
+        "phone": values.phone,
+        "address": values.address,
+        "slotDuration": values.slotDuration.format('HH:mm:ss'),
+        "openTime": values.openTime.format('HH:mm:ss'),
+        "closeTime" : values.closeTime.format('HH:mm:ss'),
+        "breakStartTime": values.breakStartTime.format('HH:mm:ss'),
+        "breakEndTime": values.breakEndTime.format('HH:mm:ss'),
+        "status": values.status ? 1 : 0
+      }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -312,7 +308,7 @@ const ManagerClinicList = () => {
       title: 'Slot',
       dataIndex: 'slotDuration',
       key: 'slotDuration',
-      render: slot => formatSlot(slot),
+      render: slot => formatTime(slot),
     },
     {
       title: 'Open',
@@ -342,7 +338,9 @@ const ManagerClinicList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: status => (status === 1 ? 'Active' : 'Inactive'),
+      render: (status) => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
+      ),
     },
     {
       title: '',
@@ -365,7 +363,7 @@ const ManagerClinicList = () => {
         <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
 
         <Content style={{ margin: '24px 16px', padding: '0 26px' }}>
-          <h2>Clinic List</h2>
+          <h1>Clinic List</h1>
           <Button type="primary" onClick={showCreateModal} style={{ marginBottom: '16px' }}>
             Create Clinic
           </Button>
@@ -418,7 +416,7 @@ const ManagerClinicList = () => {
                 <Input />
               </Form.Item>
               <Form.Item label="Slot Duration" name="slotDuration" rules={[{ required: true, message: 'Please select slot duration' }]}>
-                <TimePicker format="mm:ss" />
+                <TimePicker format="HH:mm:ss" />
               </Form.Item>
               <Form.Item label="Open Time" name="openTime" rules={[{ required: true, message: 'Please select open time' }]}>
                 <TimePicker format="HH:mm:ss" />

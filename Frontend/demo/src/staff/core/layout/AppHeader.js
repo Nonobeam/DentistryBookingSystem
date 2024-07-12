@@ -9,9 +9,7 @@ import { PersonalServices } from '../../services/PersonalServices/PersonalServic
 
 export const AppHeader = () => {
   const [showBellDropdown, setShowBellDropdown] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [searchValue, setSearchValue] = useState(''); // State for search input value
   const [filteredNotifications, setFilteredNotifications] = useState([]);
 
   useEffect(() => {
@@ -27,38 +25,17 @@ export const AppHeader = () => {
     fetchNotifications();
   }, []);
 
-  // Function to handle search input change
-  const handleSearchInputChange = (e) => {
-    const { value } = e.target;
-    setSearchValue(value);
-
-    // Perform filtering based on search value
-    const filtered = notifications.filter((notification) =>
-      notification.title.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredNotifications(filtered);
-  };
-
+  
   const handleBellIconClick = () => {
     setShowBellDropdown(!showBellDropdown);
   };
 
-  const handleLogout = () => {
-    // Perform logout action here
-    console.log('Logging out...');
 
-    // Example: Clear token from localStorage and redirect to login page
-    localStorage.removeItem('accessToken'); // Remove access token or any other stored data
-    message.success('Logged out successfully'); // Show a success message (optional)
-    
-    // Redirect to login page
-    window.location.href = '/login';
-  };
 
   const handleNotificationClick = (notification) => {
-    // Logic to handle notification click
     console.log('Notification clicked:', notification);
   };
+
 
   return (
     <div
@@ -67,23 +44,10 @@ export const AppHeader = () => {
         justifyContent: 'flex-end',
         alignItems: 'center',
         gap: '20px',
-        color: '#fff',
+        color: '#1890ff',
       }}
     >
-      <input
-        style={{
-          border: 'none',
-          width: '140px',
-          background: 'transparent',
-          padding: '5px',
-          outline: 'none',
-        }}
-        type='text'
-        placeholder='Search'
-        value={searchValue}
-        onChange={handleSearchInputChange} // Handle input change
-      />
-      <BiSearch className='search-icon' style={{ cursor: 'pointer' }} />
+      
       <div style={{ position: 'relative' }}>
         <CiBellOn
           className='bell-icon'
@@ -97,7 +61,7 @@ export const AppHeader = () => {
               top: '40px',
               right: '10px',
               minWidth: '300px', // Adjust the width as needed
-              background: '#fff',
+              background: '#F5F5F5',
               boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
               borderRadius: '8px',
               padding: '10px',
@@ -111,6 +75,7 @@ export const AppHeader = () => {
           </div>
         )}
       </div>
+
     </div>
   );
 };

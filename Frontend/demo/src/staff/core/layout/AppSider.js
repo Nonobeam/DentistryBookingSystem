@@ -6,6 +6,14 @@ import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, Schedul
 
 const items = [
   {
+
+    key: 'Dashboard',
+    label: 'Dashboard',
+    icon: <DashboardOutlined />,
+    link: '/staff'
+  },
+  {
+
     key: 'DentistList',
     label: 'Dentist List',
     icon: <UserOutlined />,
@@ -34,19 +42,26 @@ const items = [
     label: 'Timetable',
     icon: <ScheduleOutlined />,
     link: '/staff/timetable'
-  },{
-    key: 'profile',
+
+  },
+  {
+    key: 'Profile',
+    label: 'Profile',
     icon: <UserOutlined />,
-    label: <Link to="/staff/profile">Profile</Link>,
-  },{
-    key: 'logout',
+    link: '/staff/profile'
+  },
+  {
+    key: 'Logout',
+
     label: 'Logout',
     icon: <LuLogOut />,
     onClick: () => {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('expirationTime');
+
       window.location.href = '/';
+
     },
   }
 ];
@@ -60,7 +75,16 @@ export const AppSider = () => {
         height: '100vh',
       }}
     >
-      <div className='demo-logo-vertical' style={{ height: '40px' }} />
+      <div className='demo-logo-vertical' style={{ height: '0px' }} />
+      <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
+          <Link to="/">
+            <img
+              src={require("../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+              alt="Logo"
+              style={{ height: "130px", paddingBottom: "10px", paddingLeft: "40px"}}
+            />
+          </Link>
+        </div>
       <Menu
         mode='inline'
         defaultSelectedKeys={['Dashboard']}
