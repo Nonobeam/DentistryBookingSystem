@@ -1,5 +1,6 @@
 import React from 'react';
 import 'antd/dist/reset.css';
+import './styles.css'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Signup from './account/Signup';
@@ -11,11 +12,10 @@ import Booking from './homepage/Booking';
 import Homepage from './homepage/Homepage';
 import { DashBoard } from './staff/pages/DashBoard';
 import { DentistList } from './staff/pages/DashBoard/components/DentistList/DentistList';
-import { CarDash } from './staff/pages/DashBoard/components/CarDash/CarDash';
+import { StaffDashboard } from './staff/pages/DashBoard/components/StaffDash/StaffDashboard';
 import AppointmentsPage from './staff/pages/DashBoard/components/ApointmenPage/ApointmenPage';
 import { TimeTable } from './staff/pages/DashBoard/components/Timetable/Timetable';
-import { Profile } from './staff/pages/DashBoard/components/Profile/Profile';
-import AdminHomePage from './staff/pages/DashBoard/components/AdminHomePage/AdminHomePage';
+import StaffProfile from './staff/pages/DashBoard/components/Profile/Profile';
 import Schedule from './staff/pages/DashBoard/components/Timetable/Schedule/Schedule';
 import DentistInfo from './staff/pages/DashBoard/components/DentistList/components/DentistInfo/DentistInfo';
 import RoleBasedRoute from './account/RoleBasedRoute';
@@ -47,11 +47,11 @@ import BossProfile from './boss/BossProfile';
 import ManagerProfile from './manager/ManagerProfile';
 
 
-
 const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="*" element={<NotAuthorized />} />
         {/* HOMEPAGES */}
         <Route exact path='/' element={<Homepage />} />
         <Route path='/educational' element={<Educational />} />
@@ -72,7 +72,7 @@ const App = () => {
         <Route path='/history' element={<RoleBasedRoute element={<History />} requiredRole={['CUSTOMER']}/>}/>
         <Route path='/profile' element={<RoleBasedRoute element={<UserProfile />} requiredRole={['CUSTOMER']}/>}/>
         
-          {/* DENTIST PAGES */}
+        {/* DENTIST PAGES */}
         <Route path='/dentist'>
           <Route path='' element={<RoleBasedRoute element={<TodayAppointments />} requiredRole={['DENTIST']}/>}/>
           <Route path='profile' element={<RoleBasedRoute element={<DenProfile />} requiredRole={['DENTIST']}/>}/>
@@ -99,19 +99,20 @@ const App = () => {
           <Route path='profile' element={<RoleBasedRoute element={<BossProfile />} requiredRole={['BOSS']}/>}/>
         </Route>
 
-          {/* STAFF PAGES */}
+        {/* STAFF PAGES */}
         <Route path='/staff' element={<DashBoard />}>
-          <Route path='' element={<AdminHomePage />} />
+
           <Route path='dentist-list' element={<DentistList />} />
           <Route
             path='dentist-list/detail/:dentistID'
             element={<DentistInfo />}
           />
 
-          <Route path='dashboard' element={<CarDash />} />
+          <Route path='' element={<StaffDashboard/>} />
+
           <Route path='appointment-history' element={<AppointmentsPage />} />
           <Route path='timetable' element={<TimeTable />} />
-          <Route path='profile' element={<Profile />} />
+          <Route path='profile' element={<StaffProfile/>} />
           <Route path='customer-list' element={<CustomerListDash />} />
           <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
         </Route>

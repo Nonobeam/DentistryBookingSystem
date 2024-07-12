@@ -12,4 +12,5 @@ import java.time.LocalTime;
 public class TimeSlotDTO {
     private int slotNumber;
     private LocalTime startTime;
+
 }

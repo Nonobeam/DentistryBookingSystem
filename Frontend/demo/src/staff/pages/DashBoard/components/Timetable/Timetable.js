@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import { Button, Card } from 'antd';
+import { Button, Card, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import TimetableServices from '../../../../services/TimetableServices/TimetableServices';
 
@@ -9,7 +9,8 @@ const { Meta } = Card;
 export const TimeTable = () => {
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
   const [firstDayOfWeek, setFirstDayOfWeek] = useState(moment().startOf('week'));
-  const [tasksFromApi, setTasksFromApi] = useState({}); // Initialize as an object
+  const [tasksFromApi, setTasksFromApi] = useState({});
+  const [loading, setLoading] = useState(false); // State để theo dõi trạng thái loading
 
   useEffect(() => {
     fetchTimetableData();
@@ -17,6 +18,7 @@ export const TimeTable = () => {
 
   const fetchTimetableData = async () => {
     try {
+      setLoading(true); // Bắt đầu fetch dữ liệu, hiển thị biểu tượng loading
       const formattedDate = firstDayOfWeek.format('YYYY-MM-DD');
       const response = await TimetableServices.getAll({
         date: formattedDate,
@@ -25,6 +27,8 @@ export const TimeTable = () => {
       setTasksFromApi(response);
     } catch (error) {
       console.error('Error fetching timetable data:', error);
+    } finally {
+      setLoading(false); // Kết thúc fetch dữ liệu, ẩn biểu tượng loading
     }
   };
 
@@ -53,17 +57,17 @@ export const TimeTable = () => {
     const tasksForWeek = [];
 
     weekDates.forEach((date) => {
-      const tasksForDay = tasksFromApi[date] || []; // Get tasks for the current date from tasksFromApi
+      const tasksForDay = tasksFromApi[date] || [];
 
       tasksForWeek.push({
         date: date,
         day: moment(date).format('ddd'),
         tasks: tasksForDay.map((task) => ({
-          time: moment(task.time, 'HH:mm:ss').format('HH:mm'), // Format time if needed
+          time: moment(task.time, 'HH:mm:ss').format('HH:mm'),
           dentistName: task.dentistName,
           customerName: task.customerName || 'N/A',
           serviceName: task.serviceName || 'N/A',
-          status: task.status === 1 ? 'arranged' : 'On appointment', // Assuming status 1 is arranged, 0 is On appointment
+          status: task.status === 1 ? 'arranged' : 'On appointment',
         })),
       });
     });
@@ -76,29 +80,73 @@ export const TimeTable = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1 style={{ textAlign: 'center', backgroundColor: '#f0f0f0', padding: '10px' }}>Weekly Task Manager</h1>
+      <h1 style={{ 
+        textAlign: 'center', 
+        backgroundColor: '#1890ff', 
+        padding: '20px', 
+        color: 'white',
+        border: '2px',
+        borderRadius: '5px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px'
+      }}>
+        Weekly Task Manager
+      </h1>
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
         <Link to='/schedule'>
-          <Button style={{ marginRight: '10px' }}>Schedule</Button>
+          <Button 
+            style={{ 
+              marginRight: '10px', 
+              backgroundColor: '#1890ff', 
+              color: 'white', 
+              borderColor: '#1890ff',
+              borderRadius: '5px',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            Schedule
+          </Button>
         </Link>
-        <Button onClick={previousWeek} style={{ marginRight: '10px' }}>
+        <Button 
+          onClick={previousWeek} 
+          style={{ 
+            marginRight: '10px', 
+            backgroundColor: '#1890ff', 
+            color: 'white', 
+            borderColor: '#1890ff',
+            borderRadius: '5px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}
+        >
           Previous Week
         </Button>
-        <Button onClick={nextWeek}>Next Week</Button>
+        <Button 
+          onClick={nextWeek} 
+          style={{ 
+            backgroundColor: '#1890ff', 
+            color: 'white', 
+            borderColor: '#1890ff',
+            borderRadius: '5px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          Next Week
+        </Button>
       </div>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          border: '1px solid #ccc',
           marginTop: '20px',
-          padding: '10px',
-          gap: '10px',
+          padding: '20px',
+          gap: '20px',
           borderRadius: '10px',
           overflow: 'hidden',
+          backgroundColor: '#F5F5F5',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
         }}
       >
-        <div style={{ display: 'flex', borderBottom: '1px solid #ccc' }}>
+        <div style={{ display: 'flex' }}>
           {weekDates.map((date, index) => (
             <div
               key={index}
@@ -106,10 +154,9 @@ export const TimeTable = () => {
                 flex: 1,
                 textAlign: 'center',
                 padding: '10px',
-                borderRight: '1px solid #ccc',
-                borderBottom: '1px solid #ccc',
                 fontWeight: 'bold',
-                background: index % 2 === 0 ? '#f0f0f0' : '#fff',
+                background: index % 2 === 0 ? '#E3EFFF' : '#FFFFFF',
+                color: '#001F3F'
               }}
             >
               <h3>{moment(date).format('DD/MM')}</h3>
@@ -121,49 +168,59 @@ export const TimeTable = () => {
           style={{
             display: 'flex',
             padding: '10px',
-            gap: '10px',
+            gap: '20px',
             flexWrap: 'wrap',
           }}
         >
-          {tasksForWeek.map((day, index) => (
-            <div key={index} style={{ flex: 1, borderRight: '1px solid #ccc', marginBottom: '10px' }}>
-              <h3 style={{ textAlign: 'center', backgroundColor: '#f0f0f0', padding: '10px' }}>{day.day}</h3>
-              {day.tasks.length > 0 ? (
-                <div>
-                  {day.tasks.map((task, index) => (
-                    <Card
-                      key={index}
-                    >
-                      <Meta
-                        title={`Dentist: ${task.dentistName}`}
-                        description={
-                          <div>
-                            <p>Customer: {task.customerName}</p>
-                            <p>Service: {task.serviceName}</p>
-                            <p>Status: {task.status}</p>
-                            <p>Start Time: {task.time}</p>
-                          </div>
-                        }
-                      />
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <p
-                  style={{
-                    textAlign: 'center',
-                    padding: '1px',
-                    fontWeight: 'bold',
-                    background: '#f0f0f0',
-                    marginBottom: '0',
-                    
-                  }}
-                >
-                  No tasks for this day
-                </p>
-              )}
-            </div>
-          ))}
+          {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
+            <Spin size="large" />
+          ) : (
+            tasksForWeek.map((day, index) => (
+              <div key={index} style={{ flex: 1, marginBottom: '20px' }}>
+                <h3 style={{ textAlign: 'center', backgroundColor: '#E3EFFF', padding: '10px', color: '#1890ff' }}>{day.day}</h3>
+                {day.tasks.length > 0 ? (
+                  <div>
+                    {day.tasks.map((task, index) => (
+                      <Card 
+                        key={index} 
+                        style={{ 
+                          marginBottom: '10px', 
+                          borderColor: '#001F3F', 
+                          borderRadius: '10px',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                        }}
+                      >
+                        <Meta
+                          title={`Dentist: ${task.dentistName}`}
+                          description={
+                            <div style={{ color: '#1890ff' }}>
+                              <p>Customer: {task.customerName}</p>
+                              <p>Service: {task.serviceName}</p>
+                              <p>Status: {task.status}</p>
+                              <p>Start Time: {task.time}</p>
+                            </div>
+                          }
+                        />
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      textAlign: 'center',
+                      padding: '10px',
+                      fontWeight: 'bold',
+                      background: '#E3EFFF',
+                      marginBottom: '0',
+                      color: '#1890ff'
+                    }}
+                  >
+                    No tasks for this day
+                  </p>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

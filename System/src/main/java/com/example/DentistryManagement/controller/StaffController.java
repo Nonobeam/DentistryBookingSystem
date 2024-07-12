@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,28 +243,29 @@ public class StaffController {
                         .collect(Collectors.toList());
             }
 
-            // Get new and old time slot date
-            LocalDate newDate = timeSlotService.getNewTimeSlot(clinic);
-            LocalDate oldDate = timeSlotService.getOldTimeSlot(clinic);
-
-            // Initial value to find out which kind of date should be use (newDate ? oldDate)
-            LocalDate updateDate;
-            if ((endDate.isAfter(newDate) || endDate.equals(newDate)) && (startDate.isAfter(newDate) || startDate.equals(newDate))) {
-                updateDate = newDate;
-            } else if ((endDate.isAfter(oldDate) && endDate.isBefore(newDate)) || endDate.equals(oldDate)) {
-                updateDate = oldDate;
-            } else {
-                return ResponseEntity.status(400).body("The new date of new time slot is " + newDate + " please choose specific range date before " + oldDate + " or after " + newDate);
+            HashSet<TimeSlot> timeSlotList = new HashSet<>();
+            LocalDate sub = startDate;
+            while (sub.isEqual(endDate) || sub.isBefore(endDate)) {
+                LocalDate timeSlot = timeSlotService.findNearestTimeSlot(sub, clinic.getClinicID());
+                timeSlotList.addAll(timeSlotService.getTimeSlotByDate(clinic,timeSlot));
+                sub = sub.plusDays(1);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
-            List<TimeSlot> timeSlotList = timeSlotService.getTimeSlotByDate(staff.getClinic(), updateDate);
+            for (TimeSlot timeSlot : timeSlotList) {
+                for (TimeSlot timeSlotDTO : timeSlotList) {
+                    if(timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" +timeSlot.getDate()+" or after "+ timeSlotDTO.getDate());
+                    }
+                }
+            }
             if (!timeSlotList.isEmpty()) {
                 timeSlotDTOS = timeSlotList.stream()
                         .map(timeSlot -> {
                             TimeSlotDTO timeSlotDTO = new TimeSlotDTO();
                             timeSlotDTO.setStartTime(timeSlot.getStartTime());
                             timeSlotDTO.setSlotNumber(timeSlot.getSlotNumber());
+
                             return timeSlotDTO;
                         }).sorted(Comparator.comparingInt(TimeSlotDTO::getSlotNumber))
                         .collect(Collectors.toList());
@@ -304,15 +306,7 @@ public class StaffController {
             }
 
             Dentist dentist = dentistRepository.findDentistByUserMail(dentistMail);
-            //Check for the newest Date;
-            LocalDate startUpdateTimeSlotDate = timeSlotService.startUpdateTimeSlotDate(dentist.getClinic().getClinicID());
-            if (startUpdateTimeSlotDate == null) {
-                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find any time slot for this clinic's name: " + dentist.getClinic().getName()));
-            }
 
-            if (startUpdateTimeSlotDate.isAfter(startDate) && startUpdateTimeSlotDate.isBefore(endDate)) {
-                return new ResponseEntity<>(new ErrorResponseDTO("400", "Must be done this separately. The schedule is must after or before the update timeslot date " + startUpdateTimeSlotDate), HttpStatus.BAD_REQUEST);
-            }
             dentistScheduleService.setDentistSchedule(dentist.getDentistID(), startDate, endDate, slotNumber, clinic.getClinicID());
             return ResponseEntity.ok("Schedule set successfully");
         } catch (Exception e) {
@@ -603,7 +597,6 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
 
     @Operation(summary = "Staff")
     @GetMapping("/appointment-history")

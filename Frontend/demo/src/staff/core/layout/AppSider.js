@@ -1,68 +1,69 @@
 import { Menu } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { LuLogOut } from 'react-icons/lu';
+import { DashboardOutlined, UserOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined } from '@ant-design/icons'; // Import các icon từ Ant Design
 
 const items = [
   {
+
     key: 'Dashboard',
-    label: (
-      <Link to='/staff/dashboard' style={{ color: '#333', textDecoration: 'none' }}>
-        Dashboard
-      </Link>
-    ),
+    label: 'Dashboard',
+    icon: <DashboardOutlined />,
+    link: '/staff'
   },
   {
+
     key: 'DentistList',
-    label: (
-      <Link
-        to='/staff/dentist-list'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Dentist List
-      </Link>
-    ),
+    label: 'Dentist List',
+    icon: <UserOutlined />,
+    link: '/staff/dentist-list'
   },
-  
   {
     key: 'CustomerList',
-    label: (
-      <Link
-        to='/staff/customer-list'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Customer List
-      </Link>
-    ),
+    label: 'Customer List',
+    icon: <UserOutlined />,
+    link: '/staff/customer-list'
   },
   {
     key: 'AppointmentHistory',
-    label: (
-      <Link
-        to='/staff/appointment-history'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Appointment History
-      </Link>
-    ),
+    label: 'Appointment History',
+    icon: <HistoryOutlined />,
+    link: '/staff/appointment-history'
   },
   {
-    key: 'Homepage',
-    label: (
-      <Link
-        to=''
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Home Page
-      </Link>
-    ),
+    key: 'Dasboard',
+    label: 'Dash board',
+    icon: <DashboardOutlined />,
+    link: ''
   },
   {
     key: 'Timetable',
-    label: (
-      <Link
-        to='/staff/timetable'
-        style={{ color: '#333', textDecoration: 'none' }}>
-        Timetable
-      </Link>
-    ),
+    label: 'Timetable',
+    icon: <ScheduleOutlined />,
+    link: '/staff/timetable'
+
   },
-  
+  {
+    key: 'Profile',
+    label: 'Profile',
+    icon: <UserOutlined />,
+    link: '/staff/profile'
+  },
+  {
+    key: 'Logout',
+
+    label: 'Logout',
+    icon: <LuLogOut />,
+    onClick: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('expirationTime');
+
+      window.location.href = '/';
+
+    },
+  }
 ];
 
 export const AppSider = () => {
@@ -70,18 +71,30 @@ export const AppSider = () => {
     <div
       style={{
         backgroundColor: '#fff',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
         borderRight: 'none',
         height: '100vh',
-      }}>
-      <div className='demo-logo-vertical' style={{ height: '40px' }} />
+      }}
+    >
+      <div className='demo-logo-vertical' style={{ height: '0px' }} />
+      <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
+          <Link to="/">
+            <img
+              src={require("../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+              alt="Logo"
+              style={{ height: "130px", paddingBottom: "10px", paddingLeft: "40px"}}
+            />
+          </Link>
+        </div>
       <Menu
         mode='inline'
-        defaultSelectedKeys={['cardash']}
-        style={{ borderRight: 'none' }}>
+        defaultSelectedKeys={['Dashboard']}
+        style={{ borderRight: 'none' }}
+      >
         {items.map((item) => (
-          <Menu.Item key={item.key} style={{ margin: 0 }}>
-            {item.label}
+          <Menu.Item key={item.key} icon={item.icon} style={{ margin: 0 }} onClick={item.onClick}>
+            <Link to={item.link} style={{ color: '#333', textDecoration: 'none' }}>
+              {item.label}
+            </Link>
           </Menu.Item>
         ))}
       </Menu>

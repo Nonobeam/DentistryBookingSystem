@@ -1,12 +1,28 @@
 import React, { useEffect, useState } from "react";
+import styled from 'styled-components';
+import { Layout, Menu, Row, Col, Card, Typography } from "antd";
+import "antd/dist/reset.css";
 import axios from "axios";
 import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import NavBar from "./Nav";
+import {
+  FacebookOutlined,
+  TwitterOutlined,
+  YoutubeOutlined,
+  LinkedinOutlined,
+} from "@ant-design/icons";
+const { Title, Paragraph } = Typography;
 
 const { Option } = Select;
 
+const StyledFooter = styled(Layout.Footer)`
+  text-align: center;
+  background-color: #1890ff;
+  color: white;
+  padding: 40px 0;
+`;
 const History = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,40 +122,40 @@ const History = () => {
     },
     {
       title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (status, record) => {
-      let statusText = "";
-      let statusColor = "";
-      if (status === 0) {
-        statusText = "Cancelled";
-        statusColor = "red";
-      } else {
-        const appointmentDate = moment(record.date);
-        const currentDate = moment();
-        if (appointmentDate.isBefore(currentDate, "day")) {
-          statusText = "Finished";
-          statusColor = "green";
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) => {
+        let statusText = "";
+        let statusColor = "";
+        if (status === 0) {
+          statusText = "Cancelled";
+          statusColor = "red";
         } else {
-          statusText = "Upcoming";
-          statusColor = "yellow";
+          const appointmentDate = moment(record.date);
+          const currentDate = moment();
+          if (appointmentDate.isBefore(currentDate, "day")) {
+            statusText = "Finished";
+            statusColor = "green";
+          } else {
+            statusText = "Upcoming";
+            statusColor = "yellow";
+          }
         }
-      }
-      return (
-        <span
-          style={{
-            backgroundColor: statusColor,
-            color: "black",
-            padding: "4px 8px",
-            borderRadius: "18px",
-            display: "inline-block",
-            minWidth: "70px",
-            textAlign: "center"
-          }}
-        >
-          {statusText}
-        </span>
-      );
+        return (
+          <span
+            style={{
+              backgroundColor: statusColor,
+              color: "black",
+              padding: "4px 8px",
+              borderRadius: "10px",
+              display: "inline-block",
+              minWidth: "70px",
+              textAlign: "center"
+            }}
+          >
+            {statusText}
+          </span>
+        );
       },
     },
     {
@@ -167,49 +183,57 @@ const History = () => {
     },
   ];
 
+  const locale = {
+    emptyText: 'There are no appointments.',
+  };
+
   return (
     <div>
       <NavBar />
-      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px", textAlign: "center" }}>
-        <h1>Appointment History</h1>
-        <Form layout="inline" style={{ justifyContent: "center", marginBottom: 16 }}>
-          <Form.Item label="Date">
+      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px" }}>
+        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Appointment History</h1>
+        <Form layout="inline" style={{ justifyContent: "center", marginBottom: "20px" }}>
+          <Form.Item label="Filter by Date">
             <DatePicker onChange={(date) => setFilterDate(date)} />
           </Form.Item>
-          <Form.Item label="Status">
-            <Select style={{ width: 120 }} onChange={(value) => setFilterStatus(value)} allowClear>
+          <Form.Item label="Filter by Status">
+            <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
               <Option value={0}>Cancelled</Option>
               <Option value={1}>Active</Option>
             </Select>
           </Form.Item>
           <Form.Item>
-           <Button type="primary" style={{ marginBottom: 16}} onClick={() => history("/booking")}>
+            <Button type="primary" style={{ marginLeft: "10px" }} onClick={() => history("/booking")}>
               New Appointment
-          </Button>
+            </Button>
           </Form.Item>
         </Form>
-        
-        {loading ? (
-          <Spin />
-        ) : (
-          <Table
-            columns={columns}
-            dataSource={appointments}
-            rowKey="appointmentID"
-            pagination={{ pageSize: 10 }}
-            style={{ marginBottom: 20 }}
-          />
-        )}
+
+        <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+            <Table
+              columns={columns}
+              dataSource={appointments}
+              rowKey="appointmentID"
+              pagination={{ pageSize: 10 }}
+              locale={locale}
+              loading={loading}
+            />
+          
+        </div>
+
         <Modal
           title="Cancel Appointment"
           open={cancelModalVisible}
           onOk={handleCancel}
           onCancel={() => setCancelModalVisible(false)}
+          okText="Yes, Cancel"
+          cancelText="No"
         >
-          <p>Are you sure you want to cancel this appointment? This action cannot be undo and you will have to reserve a new appointment.</p>
+          <p>Are you sure you want to cancel this appointment? This action cannot be undone.</p>
         </Modal>
       </div>
     </div>
+    
   );
 };
 

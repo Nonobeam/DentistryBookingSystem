@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Dropdown, Button, Modal, message, Menu } from 'antd';
+import { Card, Table, Dropdown, Button, Modal, message, Menu, Spin,Tag} from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
 const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true); // State để theo dõi trạng thái loading
 
   useEffect(() => {
     fetchData();
@@ -11,15 +12,19 @@ const AppointmentHistory = () => {
 
   const fetchData = async () => {
     try {
+      setLoading(true); // Bắt đầu fetch dữ liệu, hiển thị biểu tượng loading
       const response = await AppointmentHistoryServices.getAll();
       setApiData(response);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Kết thúc fetch dữ liệu, ẩn biểu tượng loading
     }
   };
 
   const handleUpdateStatus = async (record, status) => {
     try {
+      setLoading(true); // Bắt đầu update, hiển thị biểu tượng loading
       const response = await AppointmentHistoryServices.patchAppointment({
         appointmentId: record.appointmentId,
         status: status,
@@ -30,6 +35,8 @@ const AppointmentHistory = () => {
       fetchData(); // Refresh data after update
     } catch (error) {
       console.error('Error updating status:', error);
+    } finally {
+      setLoading(false); // Kết thúc update, ẩn biểu tượng loading
     }
   };
 
@@ -42,6 +49,7 @@ const AppointmentHistory = () => {
       cancelText: 'Cancel',
       async onOk() {
         try {
+          setLoading(true); // Bắt đầu delete, hiển thị biểu tượng loading
           const response =
             await AppointmentHistoryServices.deteleateAppointment({
               appointmentId: record.appointmentId,
@@ -50,6 +58,8 @@ const AppointmentHistory = () => {
           fetchData(); // Refresh data after deletion
         } catch (error) {
           console.error('Error deleting appointment:', error);
+        } finally {
+          setLoading(false); // Kết thúc delete, ẩn biểu tượng loading
         }
       },
       onCancel() {
@@ -66,30 +76,26 @@ const AppointmentHistory = () => {
       handleDelete(record);
     }
   };
-
   const getStatusName = (status) => {
     switch (parseInt(status)) {
       case 1:
-        return 'Upcoming';
+        return <Tag color="blue">Upcoming</Tag>;
       case 0:
-        return 'Cancelled';
+        return <Tag color="red">Cancelled</Tag>;
       case 2:
-        return 'Finished';
+        return <Tag color="green">Finished</Tag>;
       default:
-        return 'Unknown';
+        return <Tag color="gray">Unknown</Tag>;
     }
   };
 
   const getUserDisplayName = (record) => {
     if (record.dependent) {
-        return `Customer: ${record.user} -Dependent: ${record.dependent}`;     
+      return `Customer: ${record.user} - Dependent: ${record.dependent}`;
     } else {
-      return `Customer: ${record.user}`   }
+      return `Customer: ${record.user}`;
+    }
   };
-  
-
-
-  
 
   const menu = (record) => (
     <Menu onClick={(e) => handleMenuClick(record, e)}>
@@ -153,13 +159,17 @@ const AppointmentHistory = () => {
   return (
     <div>
       <Card title='Appointment History' style={styles.card}>
-        <Table
-          dataSource={apiData}
-          columns={columns}
-          pagination={false}
-          bordered
-          size='small'
-        />
+        {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
+          <Spin size="large" />
+        ) : (
+          <Table
+            dataSource={apiData}
+            columns={columns}
+            pagination={false}
+            bordered
+            size='small'
+          />
+        )}
       </Card>
     </div>
   );

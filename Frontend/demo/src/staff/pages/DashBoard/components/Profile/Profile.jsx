@@ -3,9 +3,8 @@ import axios from "axios";
 import { Form, Input, Button, DatePicker, message, Spin, Card, Row, Col } from "antd";
 import { UserOutlined, PhoneOutlined, MailOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs"; 
-import NavBar from "../homepage/Nav";
 
-const UserProfile = () => {
+const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -64,7 +63,6 @@ const UserProfile = () => {
 
   return (
     <>
-      <NavBar />
       <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
         <Card
           title="Profile"
@@ -133,4 +131,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default Profile;

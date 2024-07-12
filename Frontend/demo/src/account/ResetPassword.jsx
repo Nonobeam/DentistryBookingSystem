@@ -1,9 +1,37 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Alert } from 'antd';
+import { Form, Input, Button, Typography, Alert, Spin } from 'antd';
+import styled from 'styled-components';
 
 const { Title } = Typography;
+
+const ResetPasswordContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+`;
+
+const ResetPasswordBox = styled.div`
+  padding: 40px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+`;
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  background-color: #1890ff;
+  border: none;
+  &:hover {
+    background-color: #167acb;
+  }
+`;
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -33,9 +61,9 @@ const ResetPassword = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ maxWidth: '500px', width: '100%', padding: '45px', backgroundColor: "ghostwhite", borderRadius: '20px' }}>
-        <Title>Reset your password</Title>
+    <ResetPasswordContainer>
+      <ResetPasswordBox>
+        <Title level={2} style={{ color: '#1890ff' }}>Reset your password</Title>
         <p>Please enter your new password below.</p>
 
         {successMessage && (
@@ -81,9 +109,9 @@ const ResetPassword = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+            <StyledButton type="primary" htmlType="submit">
               Reset Password
-            </Button>
+            </StyledButton>
           </Form.Item>
           <Form.Item>
             <Button type="default" style={{ width: '100%' }} href='/forgot'>
@@ -91,8 +119,8 @@ const ResetPassword = () => {
             </Button>
           </Form.Item>
         </Form>
-      </div>
-    </div>
+      </ResetPasswordBox>
+    </ResetPasswordContainer>
   );
 };
 

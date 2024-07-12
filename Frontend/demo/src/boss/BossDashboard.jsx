@@ -4,7 +4,6 @@ import { Pie, Bar } from "@ant-design/plots";
 import axios from "axios";
 import BossSidebar from "./BossSideBar";
 import dayjs from "dayjs";
-import { type } from "@testing-library/user-event/dist/type";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -49,8 +48,11 @@ const BossDashboard = () => {
   };
 
   const renderPieChart = () => {
-    if (selectedDate === null) {
-      return <Empty description="Choose a date" />;
+    if (!selectedDate){
+      return <Empty description="Choose a date to see daily appointments" />;
+    }
+    if (!dashboardData || Object.keys(dashboardData.dailyAppointments).length === 0) {
+      return <Empty description="No daily appointments data available" />;
     }
 
     const data = Object.entries(dashboardData.dailyAppointments).map(
@@ -61,7 +63,7 @@ const BossDashboard = () => {
     );
 
     if (data.length === 0) {
-      return <Empty description="This date doesn't have any appointments" />;
+      return <Empty description="No appointments for the selected date" />;
     }
 
     const config = {
@@ -85,7 +87,9 @@ const BossDashboard = () => {
   };
 
   const renderBarChart = () => {
-    if (!dashboardData || !dashboardData.monthlyAppointments) return null;
+    if (!dashboardData || Object.keys(dashboardData.monthlyAppointments).length === 0) {
+      return <Empty description="No monthly appointments data available" />;
+    }
 
     const data = [];
     Object.entries(dashboardData.monthlyAppointments).forEach(
@@ -99,6 +103,10 @@ const BossDashboard = () => {
         });
       }
     );
+
+    if (data.length === 0) {
+      return <Empty description="No monthly appointments data available" />;
+    }
 
     const config = {
       data,
@@ -114,34 +122,34 @@ const BossDashboard = () => {
     return <Bar {...config} />;
   };
 
-  
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <BossSidebar />
       <Layout style={{ padding: "24px 24px" }}>
         <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-          <h2>Dashboard</h2>
+          <h1>Dashboard</h1>
           <Row gutter={16} style={{ marginBottom: 16 }}>
-
             <Col span={9}>
-              <Card>
+              <Card style={{ borderLeft: "5px solid #1890ff" }}>
                 <h3>Total appointments of the month</h3>
-                <p>{dashboardData?.totalAppointmentsInMonthNow || 0}</p>
+                <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+                  {dashboardData?.totalAppointmentsInMonthNow || 0}
+                </p>
               </Card>
             </Col>
             <Col span={9}>
-              <Card>
+              <Card style={{ borderLeft: "5px solid #ff4d4f" }}>
                 <h3>Total appointments of the year</h3>
-                <p>{dashboardData?.totalAppointmentsInYearNow || 0}</p>
+                <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+                  {dashboardData?.totalAppointmentsInYearNow || 0}
+                </p>
               </Card>
             </Col>
-
             <Col span={6}>
               <DatePicker
                 value={selectedDate}
                 onChange={(date) => setSelectedDate(date)}
-                style={{ width: "100%", marginBottom: 32, marginTop: 10}}
+                style={{ width: "100%", marginBottom: 32, marginTop: 10 }}
               />
               <Select
                 value={selectedYear}
@@ -157,23 +165,18 @@ const BossDashboard = () => {
             </Col>
           </Row>
 
-          {loading ? (
-            <Spin
-              size="medium"
-              style={{ display: "block", margin: "20px auto" }}
-            />
-          ) : (
+          
             <>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Card title="Daily Appointments">{renderPieChart()}</Card>
+                  <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
                 </Col>
                 <Col span={12}>
-                  <Card title="Monthly Appointments">{renderBarChart()}</Card>
+                  <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
                 </Col>
               </Row>
             </>
-          )}
+          
         </Content>
       </Layout>
     </Layout>
