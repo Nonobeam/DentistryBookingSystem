@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
-import { Layout, Menu, Row, Col, Card, Typography } from "antd";
+import { Layout, Typography } from "antd";
 import "antd/dist/reset.css";
 import axios from "axios";
 import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import NavBar from "./Nav";
-import {
-  FacebookOutlined,
-  TwitterOutlined,
-  YoutubeOutlined,
-  LinkedinOutlined,
-} from "@ant-design/icons";
+
 const { Title, Paragraph } = Typography;
 
 const { Option } = Select;

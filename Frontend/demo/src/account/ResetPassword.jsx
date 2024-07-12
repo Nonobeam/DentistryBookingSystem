@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Alert, Spin } from 'antd';
+import { Form, Input, Button, Typography, Alert } from 'antd';
 import styled from 'styled-components';
 
 const { Title } = Typography;
