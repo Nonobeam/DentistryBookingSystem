@@ -25,7 +25,7 @@ public class DentistService {
     public List<Dentist> findDentistByStaff(Staff staff) {
         List<Dentist> dentists;
         try {
-            dentists = dentistRepository.findAllByStaff(staff);
+            dentists = dentistRepository.findAllByStaff_StaffID(staff.getStaffID());
             return dentists;
         } catch (Error error) {
             throw error;

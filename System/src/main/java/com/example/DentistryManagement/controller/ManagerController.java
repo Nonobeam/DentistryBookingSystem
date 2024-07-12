@@ -41,6 +41,7 @@ public class ManagerController {
     private final AppointmentService appointmentService;
     private final UserMapping userMapping;
     private final TimeSlotService timeSlotService;
+    private final DentistScheduleService dentistScheduleService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -147,33 +148,24 @@ public class ManagerController {
 
 
     @PostMapping("/create-clinic")
-    public ResponseEntity<?> createClinic(
-            @RequestParam String name,
-            @RequestParam String phone,
-            @RequestParam String address,
-            @RequestParam LocalTime slotDuration,
-            @RequestParam LocalTime openTime,
-            @RequestParam LocalTime closeTime,
-            @RequestParam LocalTime breakStartTime,
-            @RequestParam LocalTime breakEndTime,
-            @RequestParam int status) {
+    public ResponseEntity<?> createClinic(@RequestBody ClinicDTO clinicDTO) {
 
-        if (!clinicService.checkSlotDurationValid(slotDuration)) {
+        if (!clinicService.checkSlotDurationValid(clinicDTO.getSlotDuration())) {
             return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
         }
 
         Client manager = userService.findClientByMail(userService.mailExtract());
 
         Clinic clinic = Clinic.builder()
-                .name(name)
-                .phone(phone)
-                .address(address)
-                .slotDuration(slotDuration)
-                .openTime(openTime)
-                .closeTime(closeTime)
-                .breakStartTime(breakStartTime)
-                .breakEndTime(breakEndTime)
-                .status(status)
+                .name(clinicDTO.getName())
+                .phone(clinicDTO.getPhone())
+                .address(clinicDTO.getAddress())
+                .slotDuration(clinicDTO.getSlotDuration())
+                .openTime(clinicDTO.getOpenTime())
+                .closeTime(clinicDTO.getCloseTime())
+                .breakStartTime(clinicDTO.getBreakStartTime())
+                .breakEndTime(clinicDTO.getBreakEndTime())
+                .status(clinicDTO.getStatus())
                 .user(manager)
                 .build();
 
@@ -215,10 +207,14 @@ public class ManagerController {
                 updateClinic.setCloseTime(clinicDTO.getCloseTime());
                 updateClinic.setBreakStartTime(clinicDTO.getBreakStartTime());
                 updateClinic.setBreakEndTime(clinicDTO.getBreakEndTime());
-                if (timeSlotService.findFutureTimeSlot(updateClinic.getClinicID())) {
-                    timeSlotService.deleteFutureOldTimeSlot(updateClinic.getClinicID());
-                }
-                timeSlotService.createAndSaveTimeSlots(LocalDate.now().plusDays(60), updateClinic,
+
+                // Find the date that will apply new time slot
+                LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
+
+                // Delete all dentist-schedule after the apply date of new time slot
+                dentistScheduleService.deleteDentistSchedulesAfterDate(lastDate, clinicDTO.getId());
+
+                timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,
                         updateClinic.getOpenTime(), updateClinic.getCloseTime(),
                         updateClinic.getBreakStartTime(), updateClinic.getBreakEndTime(), updateClinic.getSlotDuration());
 

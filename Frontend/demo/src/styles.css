@@ -1,31 +1,84 @@
-.logo {
-  float: left;
+.layout {
+  font-family: 'Arial', sans-serif;
 }
 
 .hero-section {
-  text-align: left;
-}
-
-.features-section {
+  /* background: linear-gradient(to right, #bae7ff, #91d5ff); */
+  color: #fff;
   text-align: center;
 }
 
-.branches-section,
-.video-section,
-.dentists-section {
-  text-align: left;
-}
-
-footer {
-  background: #001529;
-  color: white;
+.features-section {
+  background: #e6f7ff;
   padding: 50px 0;
 }
 
-footer .ant-typography {
-  color: white;
+.branches-section {
+  padding: 50px 0;
 }
 
-footer .ant-row {
-  text-align: left;
+.video-section {
+  background: #f6fcfe;
+  padding: 50px 0;
+}
+
+.dentists-section {
+  padding: 50px 0;
+}
+
+.ant-layout-footer {
+  background-color: #bae7ff;
+  color: #000;
+  padding: 40px 50px;
+}
+
+.ant-layout-footer .ant-typography-title {
+  color: #0050b3;
+}
+
+.ant-typography-title,
+.ant-typography-paragraph {
+  margin-bottom: 16px;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ant-card-meta-title {
+  font-weight: bold;
+  color: #0050b3;
+}
+
+.ant-card-meta-description {
+  color: #666;
+}
+
+.ant-layout-header {
+  background-color: #1890ff;
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ant-menu-dark {
+  background-color: #1890ff;
+  border-bottom: none;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #0050b3;
+}
+
+.ant-menu-dark .ant-menu-item {
+  color: #fff;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: #40a9ff;
 }

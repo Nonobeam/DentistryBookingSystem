@@ -2,7 +2,6 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
-import com.example.DentistryManagement.repository.ClinicRepository;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,9 +19,27 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
-    private final ClinicRepository clinicRepository;
 
-    // Find the start of process update date
+    // Find the nearest Time Slot
+    public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, int slotNumber, String clinicId) {
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicIDAndSlotNumber(clinicId, slotNumber);
+
+        return timeSlots.stream()
+                .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
+                .max(Comparator.comparing(TimeSlot::getDate))
+                .orElse(null);
+    }
+
+    public LocalDate findNearestTimeSlot(LocalDate appointmentDate, String clinicId) {
+        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicID(clinicId);
+
+        return timeSlots.stream()
+                .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
+                .max(Comparator.comparing(TimeSlot::getDate))
+                .orElse(null).getDate();
+    }
+
+        // Find the start of process update date
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
         TimeSlot timeSlot = timeSlotRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
@@ -86,20 +105,5 @@ public class TimeSlotService {
         timeSlotRepository.saveAll(timeSlots);
     }
 
-    public boolean findFutureTimeSlot(String clinic) {
-        List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicID(clinic);
-        for(TimeSlot timeSlot : timeSlots) {
-            if (timeSlot.getDate().isAfter(LocalDate.now())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public void deleteFutureOldTimeSlot(String clinicID) {
-        Clinic clinic = clinicRepository.findByClinicID(clinicID);
-        List<LocalDate> timeSlots = timeSlotRepository.findDistinctTimeSlotOrderByClinicAndDateDesc(clinic);
-        LocalDate date = timeSlots.get(0);
-        timeSlotRepository.deleteTimeSlotsByDateAndClinic(date,clinic);
-    }
 }

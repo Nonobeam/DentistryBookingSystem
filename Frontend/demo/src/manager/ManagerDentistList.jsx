@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
 
+
 const { Header, Content } = Layout;
 const { Option } = Select;
 
@@ -107,12 +108,12 @@ const ManagerDentistList = () => {
     }
   };
 
-  const handleStaffFilter = async (staffId) => {
-    history(`/manager/dentist/${staffId}`);
+  const handleStaffFilter = async (staffID) => {
+    history(`/manager/dentist/${staffID}`);
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/manager/${staffId}/all-dentists`, {
+      const response = await axios.get(`http://localhost:8080/api/v1/manager/${staffID}/all-dentists`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -160,13 +161,16 @@ const ManagerDentistList = () => {
         {
           key: 'edit',
           label: 'Edit',
-          onClick: () => showEditModal(record)
+          onClick: () => showEditModal(record),
+          style:{ color: 'green' }
+
         },
         {
           key: 'delete',
           label: 'Delete',
           onClick: () => showDeleteConfirmation(record.id),
-          danger: true
+          danger: true,
+          style:{ color: 'red' }
         }
       ]}
     />
@@ -206,8 +210,11 @@ const ManagerDentistList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: status => (status === 1 ? 'Active' : 'Inactive'),
-    },
+      render: status => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
+
+      ),
+        },
     {
       title: 'Clinic',
       dataIndex: 'clinicName',
@@ -227,7 +234,7 @@ const ManagerDentistList = () => {
       <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
 
         <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
-          <h2>Dentist List</h2>
+          <h1>Dentist List</h1>
           <Spin spinning={loading}>
             <Select
               placeholder="Select Staff"
