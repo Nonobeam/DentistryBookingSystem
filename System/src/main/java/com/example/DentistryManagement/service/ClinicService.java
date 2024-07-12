@@ -2,6 +2,7 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.repository.ClinicRepository;
+import jnr.a64asm.LABEL_STATE;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,14 @@ public class ClinicService {
             return clinicRepository.findAll();
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching clinic: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Clinic> findAllClinicsByStatus(int status) {
+        try {
+            return clinicRepository.findClinicsByStatus(status);
+        } catch (Error e) {
+            throw e;
         }
     }
 

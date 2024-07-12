@@ -16,6 +16,7 @@ import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/staff")
@@ -32,16 +34,18 @@ import java.util.stream.Collectors;
 @Tag(name = "Staff API")
 public class StaffController {
     private final UserService userService;
+    private final UserMapping userMapping;
+    private final StaffService staffService;
     private final ServiceService serviceService;
     private final DentistService dentistService;
+    private final TimeSlotService timeSlotService;
+    private final DentistRepository dentistRepository;
     private final AppointmentService appointmentService;
     private final NotificationService notificationService;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final DentistScheduleService dentistScheduleService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-    private final DentistRepository dentistRepository;
-    private final TimeSlotService timeSlotService;
-    private final StaffService staffService;
-    private final UserMapping userMapping;
+
 
     //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -513,6 +517,13 @@ public class StaffController {
     @Operation(summary = "Booking")
     @PostMapping("/booking/make-booking/{dentistScheduleId}")
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
+        // Apply redis single-thread
+        String lockKey = "booking:lock:" + dentistScheduleId;
+        boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS);
+        if (!lockAcquired) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("409", "Booking in progress by another user"));
+        }
+
         try {
             // Current user
             Client staff = userService.findClientByMail(userService.mailExtract());
