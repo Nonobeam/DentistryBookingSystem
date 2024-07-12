@@ -7,6 +7,6 @@ import java.util.List;
 public interface ClinicRepository extends JpaRepository<Clinic, String> {
     Clinic findByClinicID(String clinicID);
     List<Clinic> findClinicByUserMail(String mail);
-    List<Clinic> findClinicsByStatus(int status);
+    List<Clinic> findClinicByStatus(int status);
 
 }

@@ -515,8 +515,8 @@ public class StaffController {
 
     @Operation(summary = "Check maxed booking")
     @GetMapping("/booking")
-    public boolean checkMaxedBooking(){
-        Client customer =  userService.findClientByMail(userService.mailExtract());
+    public boolean checkMaxedBooking(@RequestParam String mail){
+        Client customer =  userService.findClientByMail(mail);
         if (appointmentService.findAppointmentsByUserAndStatus(customer,1).map(List::size).orElse(5) >= 5) {
             return true;
         }
