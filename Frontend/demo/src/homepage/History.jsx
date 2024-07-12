@@ -1,12 +1,12 @@
+import React, { useEffect, useState } from "react";
+import styled from 'styled-components';
 import { Layout, Typography } from "antd";
 import "antd/dist/reset.css";
 import axios from "axios";
-import moment from "moment";
-import { default as React, default as React, useEffect, useState } from "react";
+import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import styled from 'styled-components';
+import moment from "moment";
 import NavBar from "./Nav";
-
 const { Title, Paragraph } = Typography;
 
 const { Option } = Select;

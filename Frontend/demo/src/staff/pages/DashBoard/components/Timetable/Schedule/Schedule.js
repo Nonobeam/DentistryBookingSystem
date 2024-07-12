@@ -1,19 +1,19 @@
-import { LeftOutlined } from "@ant-design/icons"; // Import the LeftOutlined icon from Ant Design
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   DatePicker,
-  Form,
   Input,
-  Modal,
-  Select,
-  Table,
   TimePicker,
+  Table,
+  Modal,
+  Form,
+  Select,
   notification,
-} from "antd";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import TimetableServices from "../../../../../services/TimetableServices/TimetableServices";
+} from 'antd';
+import moment from 'moment';
+import { Link } from 'react-router-dom';
+import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined icon from Ant Design
+import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
 const { RangePicker: DateRangePicker } = DatePicker;
 const { RangePicker: TimeRangePicker } = TimePicker;
