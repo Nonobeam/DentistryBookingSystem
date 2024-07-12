@@ -31,6 +31,11 @@ public class AppointmentService {
         LocalDate result;
         Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
         result = appointment.getDate();
+
+        if (appointment == null) {
+            return LocalDate.now().plusDays(1);
+        }
+
         return result;
     }
 
