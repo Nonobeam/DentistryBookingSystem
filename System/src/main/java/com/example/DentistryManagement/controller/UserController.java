@@ -280,7 +280,7 @@ public class UserController {
              @RequestParam(required = false) Integer status) {
         try {
             Client user = userService.findClientByMail(userService.mailExtract());
-            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsByUserAndByDateOrByStatus(user, workDate, status);
+            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsByUserAndByDateOrStatus(user, workDate, status);
             return ResponseEntity.ok(appointmentList);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

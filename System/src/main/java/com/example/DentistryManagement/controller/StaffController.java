@@ -627,7 +627,7 @@ public class StaffController {
             String mail = userService.mailExtract();
             List<Appointment> appointmentList;
             if (search != null && !search.isEmpty()) {
-                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndByStaffMail(search, mail);
+                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndStaffMail(search, mail);
             } else appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             if (!appointmentDTOList.isEmpty()) {
@@ -653,8 +653,8 @@ public class StaffController {
             }
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getAppointmentsByDateAndByDentist(date, staff);
-            Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndByStaff(staff, year);
+            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getAppointmentsByDateAndDentist(date, staff);
+            Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndStaff(staff, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByStaff(staff);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByStaff(staff);
 
@@ -683,7 +683,7 @@ public class StaffController {
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
                         .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
-                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateBetween(date, date.plusDays(numDay), staff).stream()
+                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateAndStaff(date, date.plusDays(numDay), staff).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
                         .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());

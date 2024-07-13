@@ -162,7 +162,7 @@ public class DentistController {
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
                         .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
-                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
+                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateAndDentist(startDate, startDate.plusDays(numDay), dentist).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
                         .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());
@@ -206,7 +206,7 @@ public class DentistController {
             Dentist dentist = userService.findDentistByMail(mail);
             List<Appointment> appointmentList;
             if (name != null && !name.isEmpty()) {
-                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndByDentist(name, dentist);
+                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndDentist(name, dentist);
             } else {
                 appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByCustomerMail(dentist.getUser().getMail(), dentist.getClinic());
             }

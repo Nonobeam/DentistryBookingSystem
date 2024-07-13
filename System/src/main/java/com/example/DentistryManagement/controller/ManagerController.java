@@ -358,7 +358,7 @@ public class ManagerController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getClinicAppointmentsForYear(manager, year);
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndManager(manager, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByManager(manager);
 
