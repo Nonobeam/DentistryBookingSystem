@@ -3,7 +3,7 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.auth.AuthenticationRequest;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;

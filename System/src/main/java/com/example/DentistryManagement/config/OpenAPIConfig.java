@@ -34,7 +34,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         in = SecuritySchemeIn.HEADER
 )
 @Configuration
-public class SwaggerConfig implements WebMvcConfigurer {
+public class OpenAPIConfig implements WebMvcConfigurer {
 
 }
 
