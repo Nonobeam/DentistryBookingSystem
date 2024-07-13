@@ -3,16 +3,18 @@ package com.example.DentistryManagement.controller;
 import com.example.DentistryManagement.DTO.*;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.DentistRepository;
 import com.example.DentistryManagement.service.*;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,8 @@ public class StaffController {
     private final RedisTemplate<String, Object> redisTemplate;
     private final DentistScheduleService dentistScheduleService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final AppointmentAnalyticService appointmentAnalyticService;
+    private final AppointmentBookingService appointmentBookingService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -204,7 +208,7 @@ public class StaffController {
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
 
-            List<Appointment> appointmentList = appointmentService.findAllAppointmentByDentist(client.getMail(), staff.getClinic());
+            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByCustomerMail(client.getMail(), staff.getClinic());
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
 
             UserAppointDTO userAppointDTO = new UserAppointDTO();
@@ -416,7 +420,7 @@ public class StaffController {
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
             userDTO.setBirthday(client.getBirthday());
-            List<Appointment> appointmentList = appointmentService.customerAppointment(client.getUserID(), staffMail);
+            List<Appointment> appointmentList = appointmentAnalyticService.getCustomerAppointmentsInAClinicByStaffMailAndCustomerId(client.getUserID(), staffMail);
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
@@ -517,10 +521,7 @@ public class StaffController {
     @GetMapping("/booking")
     public boolean checkMaxedBooking(@RequestParam String mail){
         Client customer =  userService.findClientByMail(mail);
-        if (appointmentService.findAppointmentsByUserAndStatus(customer,1).map(List::size).orElse(5) >= 5) {
-            return true;
-        }
-        return false;
+        return appointmentAnalyticService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
 
@@ -529,7 +530,7 @@ public class StaffController {
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String customerMail, @RequestParam String serviceId) {
         // Apply redis single-thread
         String lockKey = "booking:lock:" + dentistScheduleId;
-        boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS);
+        boolean lockAcquired = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS));
         if (!lockAcquired) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("409", "Booking in progress by another user"));
         }
@@ -558,15 +559,15 @@ public class StaffController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Service not found"));
             }
 
-            if (appointmentService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
+            if (appointmentAnalyticService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Reach the limit of personal appointment. 5/5"));
             }
 
-            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
+            if (appointmentAnalyticService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "You cannot book another appointment right now. The clinic is full right now!"));
             }
 
-            appointmentService.createAppointment(staff, customer, dentistSchedule, services, dependent);
+            appointmentBookingService.createAppointment(staff, customer, dentistSchedule, services, dependent);
             return ResponseEntity.ok("Booking successfully");
         } catch (Error e) {
             return ResponseEntity.badRequest().body(null);
@@ -581,7 +582,7 @@ public class StaffController {
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             if (appointment.getStatus() == 0) {
@@ -608,7 +609,7 @@ public class StaffController {
     public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentId") String appointmentId, @RequestParam("status") int status) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
@@ -626,8 +627,8 @@ public class StaffController {
             String mail = userService.mailExtract();
             List<Appointment> appointmentList;
             if (search != null && !search.isEmpty()) {
-                appointmentList = appointmentService.searchAppointmentByStaff(search, mail);
-            } else appointmentList = appointmentService.findAppointmentInClinic(mail);
+                appointmentList = appointmentAnalyticService.searchAppointmentByStaff(search, mail);
+            } else appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             if (!appointmentDTOList.isEmpty()) {
                 return ResponseEntity.ok(appointmentDTOList);
@@ -652,10 +653,10 @@ public class StaffController {
             }
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, Integer> dailyAppointments = appointmentService.getDailyAppointmentsByDentist(date, staff);
-            Map<Integer, Long> monthlyAppointments = appointmentService.getAppointmentsByStaffForYear(staff, year);
-            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByStaff(staff);
-            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByStaff(staff);
+            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getDailyAppointmentsByDentist(date, staff);
+            Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByStaffForYear(staff, year);
+            int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByStaff(staff);
+            int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByStaff(staff);
 
             DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
 
@@ -682,7 +683,7 @@ public class StaffController {
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
                         .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
-                List<Appointment> appointments = appointmentService.findAppointmentsByDateBetween(date, date.plusDays(numDay), staff).stream()
+                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateBetween(date, date.plusDays(numDay), staff).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
                         .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());

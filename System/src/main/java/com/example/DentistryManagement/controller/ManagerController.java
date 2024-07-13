@@ -5,11 +5,13 @@ import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Clinic;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.*;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class ManagerController {
     private final UserMapping userMapping;
     private final TimeSlotService timeSlotService;
     private final DentistScheduleService dentistScheduleService;
+    private final AppointmentAnalyticService appointmentAnalyticService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -356,9 +358,9 @@ public class ManagerController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getClinicAppointmentsForYear(manager, year);
-            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByManager(manager);
-            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByManager(manager);
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getClinicAppointmentsForYear(manager, year);
+            int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByManager(manager);
+            int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByManager(manager);
 
             DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
             return ResponseEntity.ok(dashboardResponse);

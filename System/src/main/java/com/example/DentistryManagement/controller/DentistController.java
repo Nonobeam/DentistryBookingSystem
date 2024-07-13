@@ -4,12 +4,14 @@ import com.example.DentistryManagement.DTO.*;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.notification.Notification;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class DentistController {
     private final UserRepository userRepository;
     private final DentistScheduleService dentistScheduleService;
     private final UserMapping userMapping;
+    private final AppointmentAnalyticService appointmentAnalyticService;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -79,7 +82,7 @@ public class DentistController {
     public ResponseEntity<?> appointmentList() {
         try {
             String mail = userService.mailExtract();
-            List<Appointment> appointlist = appointmentService.findAppointmentByDentist(mail);
+            List<Appointment> appointlist = appointmentAnalyticService.getAppointmentsByDentistMail(mail);
             List<AppointmentDTO> appointmentDtoList = new ArrayList<>();
             if (!appointlist.isEmpty()) {
                 appointmentDtoList = appointmentService.appointmentDTOList(appointlist);
@@ -134,7 +137,7 @@ public class DentistController {
             userDTO.setMail(client.getMail());
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userDTO.setBirthday(client.getBirthday());
-            List<Appointment> appointmentList = appointmentService.customerAppointmentFollowDentist(client.getUserID(), userService.mailExtract());
+            List<Appointment> appointmentList = appointmentAnalyticService.customerAppointmentFollowDentist(client.getUserID(), userService.mailExtract());
             if (!appointmentList.isEmpty()) {
                 List<AppointmentDTO> appointmentDtoList = appointmentService.appointmentDTOList(appointmentList);
                 userAppointDTO.setAppointment(appointmentDtoList);
@@ -159,7 +162,7 @@ public class DentistController {
                         .filter(schedule -> schedule.getWorkDate().equals(currentDate))
                         .sorted(Comparator.comparing(schedule -> schedule.getTimeslot().getStartTime()))
                         .collect(Collectors.toList());
-                List<Appointment> appointments = appointmentService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
+                List<Appointment> appointments = appointmentAnalyticService.findAppointmentsByDateBetweenDentist(startDate, startDate.plusDays(numDay), dentist).stream()
                         .filter(appointment -> appointment.getDate().equals(currentDate))
                         .sorted(Comparator.comparing(appointment -> appointment.getTimeSlot().getStartTime()))
                         .collect(Collectors.toList());
@@ -182,7 +185,7 @@ public class DentistController {
     public ResponseEntity<?> setAppointmentStatus(@RequestParam int status, @PathVariable String appointmentId) {
 
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
             return ResponseEntity.ok(appointment);
@@ -203,9 +206,9 @@ public class DentistController {
             Dentist dentist = userService.findDentistByMail(mail);
             List<Appointment> appointmentList;
             if (name != null && !name.isEmpty()) {
-                appointmentList = appointmentService.searchAppointmentByDentist(name, dentist);
+                appointmentList = appointmentAnalyticService.searchAppointmentByDentist(name, dentist);
             } else {
-                appointmentList = appointmentService.findAllAppointmentByDentist(dentist.getUser().getMail(), dentist.getClinic());
+                appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByCustomerMail(dentist.getUser().getMail(), dentist.getClinic());
             }
             List<AppointmentDTO> appointmentDtoList = appointmentService.appointmentDTOList(appointmentList);
             if (!appointmentDtoList.isEmpty()) {

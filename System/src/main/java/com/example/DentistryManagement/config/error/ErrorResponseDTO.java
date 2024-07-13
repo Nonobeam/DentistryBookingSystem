@@ -1,4 +1,4 @@
-package com.example.DentistryManagement.core.error;
+package com.example.DentistryManagement.config.error;
 
 import lombok.*;
 

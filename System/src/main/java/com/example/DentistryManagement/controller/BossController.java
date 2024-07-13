@@ -7,9 +7,10 @@ import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Services;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.service.AppointmentService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ServiceService;
 import com.example.DentistryManagement.service.UserService;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/boss")
@@ -41,6 +41,7 @@ public class BossController {
     private final AppointmentService appointmentService;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final AppointmentAnalyticService appointmentAnalyticService;
 
 
     //----------------------------------- USER ACCOUNT -----------------------------------
@@ -172,10 +173,10 @@ public class BossController {
 
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByClinic(date);
-            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getAppointmentsByClinicsForYear(year);
-            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByBoss();
-            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByBoss();
+            Map<String, List<Appointment>> dailyAppointments = appointmentAnalyticService.getDailyAppointmentsByClinic(date);
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByClinicsForYear(year);
+            int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByBoss();
+            int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByBoss();
 
             DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
 
