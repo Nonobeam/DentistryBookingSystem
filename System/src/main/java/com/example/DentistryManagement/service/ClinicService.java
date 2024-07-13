@@ -2,7 +2,6 @@ package com.example.DentistryManagement.service;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.repository.ClinicRepository;
-import jnr.a64asm.LABEL_STATE;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;

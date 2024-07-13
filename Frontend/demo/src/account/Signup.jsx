@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Form, Input, Button, Checkbox, Typography, DatePicker, Alert, Spin } from "antd";
+import { Form, Input, Button, Checkbox, Typography, DatePicker, Alert } from "antd";
 import styled from "styled-components";
 
 const { Title } = Typography;

@@ -100,7 +100,7 @@ const BossServiceList = () => {
       <BossSidebar />
       <Layout style={{ padding: '24px 24px' }}>
         <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
-          <h2>Service List</h2>
+          <h1>Service List</h1>
           <Button type="primary" style={{ marginBottom: 16 }} onClick={() => setCreateFormVisible(true)}>
             Create new service
           </Button>

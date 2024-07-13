@@ -126,7 +126,7 @@ const BossManagerList = () => {
           </Modal>
           <Modal
             title="Create Manager"
-            visible={createFormVisible}
+            open={createFormVisible}
             onCancel={() => {
               setCreateFormVisible(false);
               form.resetFields();

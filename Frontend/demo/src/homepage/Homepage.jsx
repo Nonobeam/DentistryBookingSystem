@@ -2,11 +2,9 @@ import React from "react";
 import NavBar from "./Nav";
 import styled from 'styled-components';
 
-import Map from "./Map";
 import "antd/dist/reset.css";
-import { Layout, Menu, Button, Row, Col, Card, Typography } from "antd";
+import { Layout, Button, Row, Col, Card, Typography } from "antd";
 import {
-  UserOutlined,
   SmileOutlined,
   ProjectOutlined,
   FileDoneOutlined,

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin, Card, Row, Col } from "antd";
+import { Form, Input, Button, DatePicker, message, Spin, Card } from "antd";
 import { UserOutlined, PhoneOutlined, MailOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs"; 
 import NavBar from "../homepage/Nav";
@@ -10,11 +10,8 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:8080/user/info", {
@@ -34,7 +31,11 @@ const UserProfile = () => {
       message.error("Failed to fetch user information");
       setLoading(false);
     }
-  };
+  }, [form]);
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, [fetchUserInfo]);
 
   const handleUpdate = async (values) => {
     try {

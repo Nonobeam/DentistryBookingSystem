@@ -66,6 +66,8 @@ const Login = () => {
   }, [location.state]);
 
   const onFinish = async (values) => {
+    setErrorMessage('');
+    setSuccessMessage('');
     setLoading(true);
     try {
       const response = await axios.post(
@@ -90,7 +92,6 @@ const Login = () => {
       localStorage.setItem('role', role);
       localStorage.setItem('expirationTime', expirationTime);
 
-      setErrorMessage('');
       setLoading(false);
 
       if (role === 'CUSTOMER') navigate('/');
