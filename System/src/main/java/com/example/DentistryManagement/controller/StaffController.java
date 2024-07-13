@@ -521,7 +521,7 @@ public class StaffController {
     @GetMapping("/booking")
     public boolean checkMaxedBooking(@RequestParam String mail){
         Client customer =  userService.findClientByMail(mail);
-        return appointmentAnalyticService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
+        return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
 
@@ -559,7 +559,7 @@ public class StaffController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Service not found"));
             }
 
-            if (appointmentAnalyticService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
+            if (appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Reach the limit of personal appointment. 5/5"));
             }
 
@@ -582,7 +582,7 @@ public class StaffController {
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
-            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             if (appointment.getStatus() == 0) {
@@ -609,7 +609,7 @@ public class StaffController {
     public ResponseEntity<?> setAppointmentStatus(@PathVariable("appointmentId") String appointmentId, @RequestParam("status") int status) {
 
         try {
-            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             appointment.setStatus(status);
             return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
 
@@ -627,7 +627,7 @@ public class StaffController {
             String mail = userService.mailExtract();
             List<Appointment> appointmentList;
             if (search != null && !search.isEmpty()) {
-                appointmentList = appointmentAnalyticService.searchAppointmentByStaff(search, mail);
+                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndByStaffMail(search, mail);
             } else appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             if (!appointmentDTOList.isEmpty()) {
@@ -653,8 +653,8 @@ public class StaffController {
             }
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getDailyAppointmentsByDentist(date, staff);
-            Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByStaffForYear(staff, year);
+            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getAppointmentsByDateAndByDentist(date, staff);
+            Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndByStaff(staff, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByStaff(staff);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByStaff(staff);
 

@@ -185,7 +185,7 @@ public class DentistController {
     public ResponseEntity<?> setAppointmentStatus(@RequestParam int status, @PathVariable String appointmentId) {
 
         try {
-            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             appointment.setStatus(status);
             appointment = appointmentService.AppointmentUpdate(appointment);
             return ResponseEntity.ok(appointment);
@@ -206,7 +206,7 @@ public class DentistController {
             Dentist dentist = userService.findDentistByMail(mail);
             List<Appointment> appointmentList;
             if (name != null && !name.isEmpty()) {
-                appointmentList = appointmentAnalyticService.searchAppointmentByDentist(name, dentist);
+                appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndByDentist(name, dentist);
             } else {
                 appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByCustomerMail(dentist.getUser().getMail(), dentist.getClinic());
             }

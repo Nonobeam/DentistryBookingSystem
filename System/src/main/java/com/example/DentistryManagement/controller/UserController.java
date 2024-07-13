@@ -13,7 +13,6 @@ import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
-import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -42,7 +41,6 @@ public class UserController {
     private final UserMapping userMapping;
     private final ClinicService clinicService;
     private final ServiceService serviceService;
-    private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final AppointmentRepository appointmentRepository;
@@ -175,10 +173,7 @@ public class UserController {
     @GetMapping("/booking")
     public boolean checkMaxedBooking(){
         Client customer =  userService.findClientByMail(userService.mailExtract());
-        if (appointmentAnalyticService.findAppointmentsByUserAndStatus(customer,1).map(List::size).orElse(5) >= 5) {
-            return true;
-        }
-        return false;
+        return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
     @Operation(summary = "Booking")
@@ -192,7 +187,7 @@ public class UserController {
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
         // Apply redis single-thread
         String lockKey = "booking:lock:" + dentistScheduleId;
-        boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS);
+        boolean lockAcquired = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS));
         if (!lockAcquired) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("409", "Booking in progress by another user"));
         }
@@ -220,7 +215,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Service not found"));
             }
 
-            if (appointmentAnalyticService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
+            if (appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Reach the limit of personal appointment. 5/5"));
             }
 
@@ -248,7 +243,7 @@ public class UserController {
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
-            Appointment appointment = appointmentAnalyticService.findAppointmentById(appointmentId);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             String dentistScheduleId = appointment.getDentistScheduleId();
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
             //Check for duplicate cancelled just in case
