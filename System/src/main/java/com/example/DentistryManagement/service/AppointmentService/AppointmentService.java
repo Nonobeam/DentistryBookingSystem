@@ -35,13 +35,6 @@ public class AppointmentService {
         return result;
     }
 
-    public Appointment AppointmentUpdate(Appointment appointment) {
-        try {
-            return appointmentRepository.save(appointment);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
-        }
-    }
 
     public Appointment save(Appointment appointment) {
         return appointmentRepository.save(appointment);
@@ -74,7 +67,5 @@ public class AppointmentService {
                 .toList();
         return appointmentDTOList;
     }
-
-
 
 }

@@ -11,6 +11,7 @@ import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -49,6 +50,7 @@ public class StaffController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentAnalyticService appointmentAnalyticService;
     private final AppointmentBookingService appointmentBookingService;
+    private final AppointmentUpdateService appointmentUpdateService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -611,7 +613,7 @@ public class StaffController {
         try {
             Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             appointment.setStatus(status);
-            return ResponseEntity.ok(appointmentService.AppointmentUpdate(appointment));
+            return ResponseEntity.ok(appointmentUpdateService.UpdateAppointment(appointment));
 
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");

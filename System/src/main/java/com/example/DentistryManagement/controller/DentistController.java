@@ -12,6 +12,7 @@ import com.example.DentistryManagement.repository.UserRepository;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class DentistController {
     private final DentistScheduleService dentistScheduleService;
     private final UserMapping userMapping;
     private final AppointmentAnalyticService appointmentAnalyticService;
+    private final AppointmentUpdateService appointmentUpdateService;
 
 //----------------------------------- USER INFORMATION -----------------------------------
 
@@ -187,7 +189,7 @@ public class DentistController {
         try {
             Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
             appointment.setStatus(status);
-            appointment = appointmentService.AppointmentUpdate(appointment);
+            appointment = appointmentUpdateService.UpdateAppointment(appointment);
             return ResponseEntity.ok(appointment);
 
         } catch (Exception e) {

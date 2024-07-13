@@ -13,6 +13,7 @@ import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentDeleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -48,6 +49,7 @@ public class UserController {
     private final Logger logger = LogManager.getLogger(UserController.class);
     private final AppointmentAnalyticService appointmentAnalyticService;
     private final AppointmentBookingService appointmentBookingService;
+    private final AppointmentDeleteService appointmentDeleteService;
 
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
@@ -243,17 +245,7 @@ public class UserController {
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
-            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentId);
-            String dentistScheduleId = appointment.getDentistScheduleId();
-            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
-            //Check for duplicate cancelled just in case
-            if (appointment.getStatus() == 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
-            }
-            appointment.setStatus(0);
-            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
-            unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
-            appointmentRepository.save(appointment);
+            appointmentDeleteService.deleteAppointment(appointmentId);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "Appointment can not be deleted");

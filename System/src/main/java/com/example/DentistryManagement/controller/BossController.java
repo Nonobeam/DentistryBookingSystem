@@ -38,7 +38,6 @@ public class BossController {
     private final UserService userService;
     private final UserMapping userMapping;
     private final ServiceService serviceService;
-    private final AppointmentService appointmentService;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentAnalyticService appointmentAnalyticService;
