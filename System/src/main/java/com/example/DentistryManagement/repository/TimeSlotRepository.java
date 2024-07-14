@@ -30,4 +30,6 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     void deleteTimeSlotsByDateAndClinic(LocalDate date, Clinic clinic);
 
     List<TimeSlot> findTimeSlotsByClinic_ClinicID(String clinic);
+
+    TimeSlot findTimeSlotByTimeSlotID(String timeSlotID);
 }

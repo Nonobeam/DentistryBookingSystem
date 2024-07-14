@@ -1,32 +1,19 @@
 package com.example.DentistryManagement.service.AppointmentService;
 
 import com.example.DentistryManagement.DTO.AppointmentDTO;
-import com.example.DentistryManagement.DTO.ClinicDTO;
-import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Dependent;
-import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
-import com.example.DentistryManagement.service.DentistScheduleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
-    private final DentistScheduleService dentistScheduleService;
     private final AppointmentRepository appointmentRepository;
-    private final StaffRepository staffRepository;
-    private final UserMapping userMapping;
 
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
