@@ -11,6 +11,7 @@ import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
+import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
@@ -53,6 +54,7 @@ public class UserController {
     private final AppointmentAnalyticService appointmentAnalyticService;
     private final AppointmentBookingService appointmentBookingService;
     private final AppointmentDeleteService appointmentDeleteService;
+    private final AppointmentRepository appointmentRepository;
 
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
@@ -298,7 +300,7 @@ public class UserController {
     public ResponseEntity<?> getAppointmentFeedback
             () {
         try {
-            Client user = userService.findClientByMail(userService.mailExtract());
+            Client user = userService.findUserByMail(userService.mailExtract());
             List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentByUnFeedback(user);
             return ResponseEntity.ok(appointmentList);
         } catch (Error e) {
@@ -323,7 +325,7 @@ public class UserController {
     public ResponseEntity<?>putAppointmentFeedback
             (@PathVariable String appointmentID, @RequestBody AppointmentFeedbackDTO appointmentDTO) {
         try {
-            Client user = userService.findClientByMail(userService.mailExtract());
+            Client user = userService.findUserByMail(userService.mailExtract());
             Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
             appointment.setFeedback(appointmentDTO.getFeedback());
            appointment.setStarAppointment(appointmentDTO.getStarAppointment());
