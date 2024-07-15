@@ -12,6 +12,7 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ServiceService;
+import com.example.DentistryManagement.service.UserService.UserManagerService;
 import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Boss API")
 public class BossController {
     private final UserService userService;
+    private final UserManagerService managerService;
     private final UserMapping userMapping;
     private final ServiceService serviceService;
     private final AuthenticationService authenticationService;
@@ -56,13 +58,18 @@ public class BossController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
+            Client updateUser = userService.findUserByMail(userService.mailExtract());
+            if (updateUser != null) {
+                userService.updateUser(userDTO, updateUser);
+            }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -86,7 +93,7 @@ public class BossController {
     @GetMapping("/all-manager")
     public ResponseEntity<?> getAllManager() {
         try {
-            List<Client> allManager = userService.findAllManager();
+            List<Client> allManager = managerService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
                 List<UserDTO> managerList = allManager.stream()
                         .map(userMapping::getUserDTOFromUser)

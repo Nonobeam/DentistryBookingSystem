@@ -9,9 +9,10 @@ import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.TimeSlotService;
-import com.example.DentistryManagement.service.UserService.UserService;
+import com.example.DentistryManagement.service.UserService.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,10 @@ import java.util.stream.Collectors;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
+    private final UserDentistService dentistService;
+    private final UserStaffService staffService;
+    private final UserCustomerService customerService;
+    private final UserManagerService managerService;
     private final UserMapping userMapping;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
@@ -57,10 +62,10 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findDentistFollowSearching(search);
+                userList = dentistService.findDentistFollowSearching(search);
 
             } else {
-                userList = userService.findAllDentist();
+                userList = dentistService.findAllDentist();
             }
             List<DentistResponseDTO> dentistList = userList.stream()
                     .map(userMapping::convertToDentistDTO)
@@ -82,9 +87,9 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findManagerFollowSearching(search);
+                userList = managerService.findManagerFollowSearching(search);
             } else {
-                userList = userService.findAllManager();
+                userList = managerService.findAllManager();
             }
             List<UserDTO> managerList = userList.stream()
                     .map(userMapping::getUserDTOFromUser)
@@ -109,9 +114,9 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findStaffFollowSearching(search);
+                userList = staffService.findStaffFollowSearching(search);
             } else {
-                userList = userService.findAllStaff();
+                userList = staffService.findAllStaff();
             }
             List<StaffResponseDTO> staffDTOList = userList.stream()
                     .map(userMapping::convertToStaffDTO)
@@ -133,9 +138,9 @@ public class AdminController {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findCustomerFollowSearching(search);
+                userList = customerService.findCustomerFollowSearching(search);
             } else {
-                userList = userService.findAllCustomer();
+                userList = customerService.findAllCustomer();
             }
             List<UserDTO> userDTOList = userList.stream()
                     .map(userMapping::getUserDTOFromUser)
@@ -152,12 +157,14 @@ public class AdminController {
 
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String userID, @RequestBody UserDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String userID, @RequestBody UserDTO userDTO) {
         try {
             if (userService.isPresentUser(userID).isPresent()) {
-                Client client = userService.findUserById(userID);
-                userService.updateUser(updatedUser, client);
-                return ResponseEntity.ok(client);
+                Client updateUser = userService.findUserById(userID);
+                if(updateUser != null) {
+                    userService.updateUser(userDTO, updateUser);
+                }
+                return ResponseEntity.ok(updateUser);
             } else {
                 ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
                 logger.error("User could not be update");
