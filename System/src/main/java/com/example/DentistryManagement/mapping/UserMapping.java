@@ -6,7 +6,9 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserDentistService;
+import com.example.DentistryManagement.service.UserService.UserService;
+import com.example.DentistryManagement.service.UserService.UserStaffService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapping {
     private final UserService userService;
+    private final UserDentistService dentistService;
+    private final UserStaffService staffService;
 
     public UserDTO getUserDTOFromUser(Client user) {
         UserDTO userDTO = new UserDTO();
@@ -46,7 +50,7 @@ public class UserMapping {
         dentistResponseDTO.setMail(client.getMail());
         dentistResponseDTO.setBirthday(client.getBirthday());
         dentistResponseDTO.setStatus(client.getStatus());
-        Dentist dentist = userService.findDentistByMail(client.getMail());
+        Dentist dentist = dentistService.findDentistByMail(client.getMail());
         dentistResponseDTO.setClinicName(dentist.getClinic().getName());
 
         return dentistResponseDTO;
@@ -60,7 +64,7 @@ public class UserMapping {
         staffResponseDTO.setMail(client.getMail());
         staffResponseDTO.setStatus(client.getStatus());
         staffResponseDTO.setBirthday(client.getBirthday());
-        Staff staff = userService.findStaffByMail(client.getMail());
+        Staff staff = staffService.findStaffByMail(client.getMail());
         staffResponseDTO.setClinicName(staff.getClinic().getName());
 
         return staffResponseDTO;

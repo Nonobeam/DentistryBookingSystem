@@ -11,11 +11,12 @@ import com.example.DentistryManagement.core.dentistry.*;
 import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
-import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentDeleteService;
+import com.example.DentistryManagement.service.UserService.UserDependentService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,12 +42,12 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final UserDependentService userDependentService;
     private final UserMapping userMapping;
     private final ClinicService clinicService;
     private final ServiceService serviceService;
     private final PasswordResetTokenService tokenService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final AppointmentRepository appointmentRepository;
     private final DentistScheduleService dentistScheduleService;
     private final Logger logger = LogManager.getLogger(UserController.class);
     private final AppointmentAnalyticService appointmentAnalyticService;
@@ -66,7 +67,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
@@ -89,7 +90,7 @@ public class UserController {
                 logger.error("Not found any customer ");
                 return ResponseEntity.status(204).body(error);
             }
-            List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
+            List<Dependent> dependentsList = userDependentService.findDependentByCustomer(mail);
             return ResponseEntity.ok(dependentsList);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
@@ -100,8 +101,8 @@ public class UserController {
     public ResponseEntity<?> createDependentByCustomer(@RequestBody Dependent dependent) {
         try {
             String mail = userService.mailExtract();
-            dependent.setUser(userService.findClientByMail(mail));
-            return ResponseEntity.ok(userService.saveDependent(dependent));
+            dependent.setUser(userService.findUserByMail(mail));
+            return ResponseEntity.ok(userDependentService.saveDependent(dependent));
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -176,7 +177,7 @@ public class UserController {
     })
     @GetMapping("/booking")
     public boolean checkMaxedBooking(){
-        Client customer =  userService.findClientByMail(userService.mailExtract());
+        Client customer =  userService.findUserByMail(userService.mailExtract());
         return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
@@ -198,8 +199,8 @@ public class UserController {
 
         try {
             // Current user
-            Client customer = userService.findClientByMail(userService.mailExtract());
-            Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
+            Client customer = userService.findUserByMail(userService.mailExtract());
+            Dependent dependent = dependentID != null ? userDependentService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
@@ -273,7 +274,7 @@ public class UserController {
             (@RequestParam(required = false) LocalDate workDate,
              @RequestParam(required = false) Integer status) {
         try {
-            Client user = userService.findClientByMail(userService.mailExtract());
+            Client user = userService.findUserByMail(userService.mailExtract());
             List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsByUserAndByDateOrStatus(user, workDate, status);
             return ResponseEntity.ok(appointmentList);
         } catch (Error e) {
@@ -378,7 +379,7 @@ public class UserController {
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam String mail) {
         try {
-            Client user = userService.findClientByMail(mail);
+            Client user = userService.findUserByMail(mail);
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
@@ -402,7 +403,7 @@ public class UserController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client currentUser = userService.findByMail(userService.mailExtract()).orElse(null);
+            Client currentUser = userService.findUserByMail(userService.mailExtract());
             if (currentUser == null) {
                 return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
             }
