@@ -58,16 +58,15 @@ public class DentistController {
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
-    @Operation(summary = "Dentist update his/her profile")
+    @Operation(summary = "User update their profile")
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client updateDentist = userRepository.findByMail(userService.mailExtract()).orElse(null);
-            if (updateDentist != null) {
-                userService.updateUser(userDTO, updateDentist);
-            } else {
-                return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Cannot find user"));
+            Client currentUser = userService.findUserByMail(userService.mailExtract());
+            if (currentUser == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
             }
+            userService.updateUser(userDTO, currentUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");

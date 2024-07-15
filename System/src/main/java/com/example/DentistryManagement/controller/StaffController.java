@@ -71,10 +71,11 @@ public class StaffController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client updateUser = userService.findUserByMail(userService.mailExtract());
-            if (updateUser != null) {
-                userService.updateUser(userDTO, updateUser);
+            Client currentUser = userService.findUserByMail(userService.mailExtract());
+            if (currentUser == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
             }
+            userService.updateUser(userDTO, currentUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
