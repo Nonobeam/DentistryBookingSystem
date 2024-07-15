@@ -18,5 +18,7 @@ public class DashboardBoss {
     private Map<String, Map<Integer, Long>>  monthlyAppointments;
     private int totalAppointmentsInMonthNow;
     private int totalAppointmentsInYearNow;
+    private Map<String, Double>ratingDentist;
+
 
 }

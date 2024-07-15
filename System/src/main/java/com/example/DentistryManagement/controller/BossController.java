@@ -182,7 +182,7 @@ public class BossController {
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonth();
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYear();
 
-            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
+            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear,null);
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {

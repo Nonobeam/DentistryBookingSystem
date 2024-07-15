@@ -324,4 +324,59 @@ public class AppointmentAnalyticService {
         appointments.removeIf(appointment -> appointment.getStatus() == 0);
         return appointments;
     }
+
+    public List<Appointment> getAppointmentByUnFeedback(Client user) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByUser(user);
+        List<Appointment> respone = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == 2) {
+                if(appointment.getStarAppointment()==0){
+                    respone.add(appointment);
+                }
+            }
+        }
+        return respone;
+    }
+
+    public double totalStarByDentist(Client client) {
+        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(),2,0);
+       double total= totalAppointment.size();
+       double stars=0;
+       for (Appointment appointment : totalAppointment) {
+           stars+=appointment.getStarAppointment();
+       }
+       return Math.round(stars/total *10.0) /10.0 ;
+    }
+
+    public Map<String, Double> getRatingDentistByStaff(Staff staff) {
+        Map<String, Double> dentistRatings = new HashMap<>();
+
+        List<Dentist> managedDentists = staff.getDentistList();
+
+        for (Dentist dentist : managedDentists) {
+            Client clientForDentist = new Client();
+            clientForDentist.setDentist(dentist);
+
+            double rating = totalStarByDentist(clientForDentist);
+            dentistRatings.put(dentist.getUser().getName(), rating);
+        }
+
+        return dentistRatings;
+    }
+
+    public Map<String, Double> getRatingDentistByManager(Client manager) {
+        Map<String, Double> dentistRatings = new HashMap<>();
+
+        List<Dentist> managedDentists = manager.getClinicList().stream().map(clinic -> (Dentist) clinic.getDentistList()).toList();
+
+        for (Dentist dentist : managedDentists) {
+            Client clientForDentist = new Client();
+            clientForDentist.setDentist(dentist);
+
+            double rating = totalStarByDentist(clientForDentist);
+            dentistRatings.put(dentist.getUser().getName(), rating);
+        }
+
+        return dentistRatings;
+    }
 }

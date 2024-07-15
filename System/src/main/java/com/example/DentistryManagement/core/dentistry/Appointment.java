@@ -29,6 +29,8 @@ public class Appointment {
     private LocalDate date;
     @Size(max = 251, message = "Over the character limit")
     private String feedback;
+    private int starAppointment;
+
     private String dentistScheduleId;
 
     @ManyToOne

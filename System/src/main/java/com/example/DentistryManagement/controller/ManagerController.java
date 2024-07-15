@@ -368,8 +368,9 @@ public class ManagerController {
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndManager(manager, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByManager(manager);
+             Map<String, Double>ratingDentist= appointmentAnalyticService.getRatingDentistByManager(manager);
 
-            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
+            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear,ratingDentist);
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found data in dashboard");
