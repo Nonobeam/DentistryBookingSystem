@@ -11,5 +11,6 @@ import java.util.List;
 @Setter
 public class UserAppointDTO {
     private UserDTO userDTO;
+    private double star;
     private List<AppointmentDTO> appointment;
 }

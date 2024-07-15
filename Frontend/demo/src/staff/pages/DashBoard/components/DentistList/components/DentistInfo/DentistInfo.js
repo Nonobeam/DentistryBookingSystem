@@ -5,10 +5,12 @@ import { EmailPopup } from './components/EmailPopup';
 import { useParams } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
 import moment from 'moment';
+import { StarFilled } from '@ant-design/icons'; // Import StarFilled icon from Ant Design Icons
 
 export default function DentistInfo() {
   const { dentistID } = useParams();
   const [user, setUser] = useState({});
+  const [rate, setRate] = useState();
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function DentistInfo() {
           user: item.dependent ? `Customer: ${item.user}, Dependent: ${item.dependent}` : `Customer: ${item.user}`,
         }));
         setAppointments(appointmentData);
+        setRate(response.star);
       }
     } catch (error) {
       console.log('Error fetching data:', error);
@@ -51,6 +54,15 @@ export default function DentistInfo() {
       flexDirection: 'column',
       gap: '10px',
       marginBottom:'100px'
+    },
+    starContainer: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    starIcon: {
+      fontSize: '20px',
+      color: '#FFD700', // Color for filled stars
+      marginRight: '5px',
     },
   };
 
@@ -82,9 +94,21 @@ export default function DentistInfo() {
     },
   ];
 
+  const renderRateStars = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= rate) {
+        stars.push(<StarFilled key={i} style={styles.starIcon} />);
+      } else {
+        stars.push(<StarFilled key={i} style={{ ...styles.starIcon, color: '#D3D3D3' }} />);
+      }
+    }
+    return stars;
+  };
+
   return (
     <div className='dentist-info' style={{ padding: '20px' }}>
-      <h2 >Dentist Information</h2>
+      <h2>Dentist Information</h2>
       <EmailPopup user={user} />
       <div style={styles.infoContainer}>
         <div>
@@ -98,6 +122,9 @@ export default function DentistInfo() {
         </div>
         <div>
           <strong>Birthday:</strong> {user.birthday}
+        </div>
+        <div style={styles.starContainer}>
+          <strong>Rate : </strong> {renderRateStars()}
         </div>
       </div>
       <Card title='Appointment History' style={styles.card}>

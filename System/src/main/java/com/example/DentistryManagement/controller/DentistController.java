@@ -183,7 +183,7 @@ public class DentistController {
 
     @Operation(summary = "Dentist")
 
-    @GetMapping("/appointment-history/{appointmentId}")
+    @PutMapping("/appointment-history/{appointmentId}")
     public ResponseEntity<?> setAppointmentStatus(@RequestParam int status, @PathVariable String appointmentId) {
 
         try {

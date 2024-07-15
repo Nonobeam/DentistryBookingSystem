@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Select, Card, Row, Col, Typography, Divider, Spin, Empty } from 'antd';
+import { Layout, Select, Card, Row, Col, Typography, Divider, Empty } from 'antd';
 import axios from 'axios';
 import { Bar } from '@ant-design/charts';
 import ManagerSidebar from './ManagerSidebar';
@@ -15,31 +15,58 @@ const ManagerDashboard = () => {
     monthlyAppointments: {},
     totalAppointmentsInMonthNow: 0,
     totalAppointmentsInYearNow: 0,
+    ratingDentist: {} // Initialize ratingDentist state
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboardData(year);
-  }, [year]);
+    fetchRatingDentist();
+  }, [year]); // Fetch data when year changes
 
-  const fetchDashboardData = async (year) => {
+  const fetchDashboardData = async (selectedYear) => {
     setLoading(true);
-    const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/manager/dashboard?year=${year}`, {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:8080/api/v1/manager/dashboard?year=${selectedYear}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const data = response.data;
-      if (data.dailyAppointments === null) {
-        data.dailyAppointments = 0;
-      }
-      setDashboardData(data);
+      // Ensure dailyAppointments is not null or undefined
+      const dailyAppointments = data.dailyAppointments || 0;
+      const totalAppointmentsInMonthNow = data.totalAppointmentsInMonthNow || 0;
+      const totalAppointmentsInYearNow = data.totalAppointmentsInYearNow || 0;
+      setDashboardData({
+        dailyAppointments,
+        monthlyAppointments: data.monthlyAppointments || {},
+        totalAppointmentsInMonthNow,
+        totalAppointmentsInYearNow,
+        ratingDentist: dashboardData.ratingDentist // Preserve existing ratingDentist
+      });
     } catch (error) {
-      console.error('There was an error fetching the dashboard data!', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRatingDentist = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:8080/api/v1/manager/ratingDentist', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const ratingDentistData = response.data || {};
+      setDashboardData(prevState => ({
+        ...prevState,
+        ratingDentist: ratingDentistData
+      }));
+    } catch (error) {
+      console.error('Error fetching rating dentist data:', error);
     }
   };
 
@@ -49,7 +76,7 @@ const ManagerDashboard = () => {
 
   const barData = Object.keys(dashboardData.monthlyAppointments).map((key) => ({
     clinic: key,
-    appointments: dashboardData.monthlyAppointments[key]['7'],
+    appointments: dashboardData.monthlyAppointments[key]['7'] || 0,
   }));
 
   const barConfig = {
@@ -126,7 +153,7 @@ const ManagerDashboard = () => {
           </Row>
           <Divider style={{ margin: '24px 0' }} />
           <Row gutter={[16, 16]}>
-            <Col span={24}>
+            <Col span={12}>
               <Card loading={loading}>
                 <Title level={4}>Monthly Appointments by Clinic</Title>
                 <Divider style={{ margin: '12px 0' }} />
@@ -136,6 +163,23 @@ const ManagerDashboard = () => {
                   ) : (
                     <Empty description="No data available" />
                   )
+                )}
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card>
+                <Title level={4}>Rating of Dentists</Title>
+                <Divider style={{ margin: '12px 0' }} />
+                {Object.keys(dashboardData.ratingDentist).length > 0 ? (
+                  <ul>
+                    {Object.entries(dashboardData.ratingDentist).map(([dentist, rating]) => (
+                      <li key={dentist}>
+                        <Typography.Text>{`${dentist}: ${rating}`}</Typography.Text>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Empty description="No rating data available" />
                 )}
               </Card>
             </Col>

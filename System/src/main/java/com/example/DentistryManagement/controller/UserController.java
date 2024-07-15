@@ -2,6 +2,8 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
+import com.example.DentistryManagement.DTO.AppointmentFeedbackDTO;
 import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.mapping.UserMapping;
@@ -277,6 +279,84 @@ public class UserController {
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
             logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    @Operation(summary = "Show user Un feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-feedback")
+    public ResponseEntity<?> getAppointmentFeedback
+            () {
+        try {
+            Client user = userService.findClientByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentByUnFeedback(user);
+            return ResponseEntity.ok(appointmentList);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary = "feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/appointment-feedback/{appointmentID}")
+    public ResponseEntity<?>putAppointmentFeedback
+            (@PathVariable String appointmentID, @RequestBody AppointmentFeedbackDTO appointmentDTO) {
+        try {
+            Client user = userService.findClientByMail(userService.mailExtract());
+            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            appointment.setFeedback(appointmentDTO.getFeedback());
+           appointment.setStarAppointment(appointmentDTO.getStarAppointment());
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok("Feedback successfully");
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    @Operation(summary = "feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-feedback/{appointmentID}")
+    public ResponseEntity<?>getAppointmentFeedback
+            (@PathVariable String appointmentID) {
+        try {
+            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            AppointmentFeedbackDTO appointmentFeedbackDTO = new AppointmentFeedbackDTO();
+            appointmentFeedbackDTO.setFeedback(appointment.getFeedback());
+            appointmentFeedbackDTO.setStarAppointment(appointment.getStarAppointment());
+            return ResponseEntity.ok(appointmentFeedbackDTO);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found appointment");
+            logger.error("Not found appointment", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
