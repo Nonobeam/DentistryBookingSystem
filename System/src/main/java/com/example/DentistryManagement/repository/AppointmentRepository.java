@@ -3,6 +3,7 @@ package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
@@ -75,4 +76,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     @Query("SELECT a FROM Appointment a WHERE a.clinic.clinicID = :clinicID ORDER BY a.date DESC")
     List<Appointment> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
+
+    boolean existsByTimeSlotAndUser(TimeSlot timeSlot, Client user);
 }

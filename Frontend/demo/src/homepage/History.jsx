@@ -7,7 +7,6 @@ import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "a
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import NavBar from "./Nav";
-
 const { Title, Paragraph } = Typography;
 
 const { Option } = Select;
@@ -194,7 +193,7 @@ const History = () => {
           <Form.Item label="Filter by Status">
             <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
               <Option value={0}>Cancelled</Option>
-              <Option value={1}>Active</Option>
+              <Option value={1}>Upcoming</Option>
             </Select>
           </Form.Item>
           <Form.Item>

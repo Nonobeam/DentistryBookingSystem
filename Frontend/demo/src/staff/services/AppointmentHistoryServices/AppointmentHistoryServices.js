@@ -70,7 +70,7 @@ export const AppointmentHistoryServices = {
       });
     }
   },
-  patchAppointment: async ({ appointmentId, status }) => {
+   patchAppointment: async ({ appointmentId, status }) => {
     try {
       const responseData = await api.patch(
         `staff/appointment-history/${appointmentId}?status=${status}`
