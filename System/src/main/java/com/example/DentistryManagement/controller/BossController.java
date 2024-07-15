@@ -10,10 +10,9 @@ import com.example.DentistryManagement.core.dentistry.Services;
 import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
-import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ServiceService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +48,11 @@ public class BossController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
-    @Operation(summary = "User update their profile")
+    @Operation(summary = "Boss update his/her profile")
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
@@ -61,11 +60,9 @@ public class BossController {
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
-            logger.error("Not found user", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -91,11 +88,11 @@ public class BossController {
         try {
             List<Client> allManager = userService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
-                List<UserDTO> clientDTOs = allManager.stream()
+                List<UserDTO> managerList = allManager.stream()
                         .map(userMapping::getUserDTOFromUser)
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(managerList);
             }
             return ResponseEntity.ok("Not found any manager");
         } catch (Error error) {
@@ -104,13 +101,13 @@ public class BossController {
     }
 
 
-    @Operation(summary = "All Managers")
+    @Operation(summary = "Delete a manager")
     @DeleteMapping("/delete-manager/{managerID}")
-    public ResponseEntity<?> deleteManager(@PathVariable String managerID) {
+    public ResponseEntity<?> deleteManager(@PathVariable("managerID") String managerID) {
         try {
             // Find the manager by id then update the status ---> 0
-            Client manager = userService.findUserById(managerID);
-            userService.updateUserStatus(manager, 0);
+            Client removeManager = userService.findUserById(managerID);
+            userService.updateUserStatus(removeManager, 0);
             return ResponseEntity.ok("Delete successfully");
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
@@ -139,8 +136,8 @@ public class BossController {
     @GetMapping("/service/all")
     public ResponseEntity<?> showAllServices() {
         try {
-            List<Services> services = serviceService.getAll();
-            return ResponseEntity.ok(services);
+            List<Services> servicesList = serviceService.getAll();
+            return ResponseEntity.ok(servicesList);
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(errorResponseDTO);
@@ -165,7 +162,7 @@ public class BossController {
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboardData(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(required = false) Integer year) {
         try {
-            Client boss = userService.findClientByMail(userService.mailExtract());
+            Client boss = userService.findUserByMail(userService.mailExtract());
             if (boss == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }

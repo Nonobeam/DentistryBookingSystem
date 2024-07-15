@@ -11,7 +11,7 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.TimeSlotService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,7 +51,7 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets dentist list in the system")
     @GetMapping("/dentistList")
     public ResponseEntity<?> dentistList(@RequestParam(required = false) String search) {
         try {
@@ -77,7 +76,7 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets manager list in the system")
     @GetMapping("/managerList")
     public ResponseEntity<?> managerList(@RequestParam(required = false) String search) {
         try {
@@ -103,7 +102,7 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets staff list in the system")
 
     @GetMapping("/staffList")
     public ResponseEntity<?> staffList(@RequestParam(required = false) String search) {
@@ -128,7 +127,7 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets customer list in the system")
     @GetMapping("/customerList")
     public ResponseEntity<?> customerList(@RequestParam(required = false) String search) {
         try {
@@ -153,10 +152,10 @@ public class AdminController {
 
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String userID, @RequestBody UserDTO updatedUser) {
         try {
-            if (userService.isPresentUser(id).isPresent()) {
-                Client client = userService.findUserById(id);
+            if (userService.isPresentUser(userID).isPresent()) {
+                Client client = userService.findUserById(userID);
                 userService.updateUser(updatedUser, client);
                 return ResponseEntity.ok(client);
             } else {
@@ -175,11 +174,11 @@ public class AdminController {
 
     @Operation(summary = "Delete user")
     @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String userID) {
         try {
 
-            if (userService.isPresentUser(id).isPresent()) {
-                Optional<Client> c = userService.isPresentUser(id);
+            if (userService.isPresentUser(userID).isPresent()) {
+                Optional<Client> c = userService.isPresentUser(userID);
                 if (c.isPresent()) {
                     Client client = c.get();
                     userService.updateUserStatus(client, 0);

@@ -60,16 +60,6 @@ public class UserCustomerService {
         }
     }
 
-    public Dependent findDependentByDependentId(String dependentID) {
-        try {
-            // Perform necessary validation and business logic here
-            return dependentRepository.findByDependentID(dependentID);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while finding user: " + e.getMessage(), e);
-        }
-    }
-
     public List<Client> findCustomerFollowSearching(String search) {
         try {
             return userRepository.findByRoleAndNameContainingIgnoreCase(Role.CUSTOMER, search);

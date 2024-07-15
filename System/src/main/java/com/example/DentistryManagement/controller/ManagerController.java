@@ -12,6 +12,9 @@ import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.service.*;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
+import com.example.DentistryManagement.service.UserService.UserDentistService;
+import com.example.DentistryManagement.service.UserService.UserService;
+import com.example.DentistryManagement.service.UserService.UserStaffService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +37,9 @@ import java.util.stream.Collectors;
 @Tag(name = "Manager API")
 public class ManagerController {
     private final UserService userService;
-    private final StaffService staffService;
+    private final UserStaffService staffService;
+    private final UserDentistService dentistService;
     private final ClinicService clinicService;
-    private final DentistService dentistService;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final AppointmentService appointmentService;
@@ -52,7 +55,7 @@ public class ManagerController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
@@ -60,7 +63,10 @@ public class ManagerController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
+            Client updateUser = userService.findUserByMail(userService.mailExtract());
+            if (updateUser != null) {
+                userService.updateUser(userDTO, updateUser);
+            }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -156,7 +162,7 @@ public class ManagerController {
             return ResponseEntity.status(400).body("Slot duration must be between 30 to 180 minutes");
         }
 
-        Client manager = userService.findClientByMail(userService.mailExtract());
+        Client manager = userService.findUserByMail(userService.mailExtract());
 
         Clinic clinic = Clinic.builder()
                 .name(clinicDTO.getName())
@@ -235,9 +241,9 @@ public class ManagerController {
     @GetMapping("/set-staff/{clinicID}")
     public ResponseEntity<?> setUpStaffForDentistInClinic(@PathVariable String clinicID) {
         try {
-            List<Client> staff = userService.findAllStaffInClinic(clinicID);
+            List<Client> staff = staffService.findAllStaffInClinic(clinicID);
             List<ClinicWorkerDTO> staffList = ClinicWorkerDTO.fromClientList(staff);
-            List<Client> dentist = userService.findAllDentistInClinic(clinicID);
+            List<Client> dentist = dentistService.findAllDentistInClinic(clinicID);
             List<ClinicWorkerDTO> dentistList = ClinicWorkerDTO.fromClientList(dentist);
 
             ClinicWorkerResponseDTO responseDTO = new ClinicWorkerResponseDTO(staffList, dentistList);
@@ -271,13 +277,13 @@ public class ManagerController {
     public ResponseEntity<?> getAllDentists() {
         try {
             String mail = userService.mailExtract();
-            List<Client> dentists = userService.findAllDentistByManager(mail);
-            if (dentists != null && !dentists.isEmpty()) {
-                List<DentistResponseDTO> dentistList = dentists.stream()
+            List<Client> dentistList = dentistService.findAllDentistByManager(mail);
+            if (dentistList != null && !dentistList.isEmpty()) {
+                List<DentistResponseDTO> dentistDTOList = dentistList.stream()
                         .map(userMapping::convertToDentistDTO)
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(dentistList);
+                return ResponseEntity.ok(dentistDTOList);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found any dentist");
         } catch (Error error) {
@@ -291,7 +297,7 @@ public class ManagerController {
     public ResponseEntity<?> getAllStaffs() {
         try {
             String mail = userService.mailExtract();
-            List<Client> staffList = userService.findAllStaffByManager(mail);
+            List<Client> staffList = staffService.findAllStaffByManager(mail);
             if (staffList != null && !staffList.isEmpty()) {
                 List<StaffResponseDTO> staffDTOList = staffList.stream()
                         .map(userMapping::convertToStaffDTO)
@@ -321,13 +327,13 @@ public class ManagerController {
     @Operation(summary = "List staff dentist manage")
     @GetMapping("/{staffID}/all-dentists")
     public ResponseEntity<?> getDentistByStaff(@PathVariable String staffID) {
-        List<Dentist> dentists;
+        List<Dentist> dentistList;
         Staff staff;
         try {
             staff = staffService.findStaffById(staffID);
-            dentists = dentistService.findDentistByStaff(staff);
-            if (dentists != null && !dentists.isEmpty()) {
-                List<DentistResponseDTO> clientDTOs = dentists.stream()
+            dentistList = dentistService.findDentistListByStaff(staff);
+            if (dentistList != null && !dentistList.isEmpty()) {
+                List<DentistResponseDTO> clientDTOs = dentistList.stream()
                         .map(client -> {
                             DentistResponseDTO clientDTO = new DentistResponseDTO();
                             clientDTO.setName(client.getUser().getName());
@@ -353,7 +359,7 @@ public class ManagerController {
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashBoardData(@RequestParam(required = false) Integer year) {
         try {
-            Client manager = userService.findClientByMail(userService.mailExtract());
+            Client manager = userService.findUserByMail(userService.mailExtract());
             if (manager == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }

@@ -12,6 +12,7 @@ import com.example.DentistryManagement.service.AppointmentService.AppointmentAna
 import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AppointmentService.AppointmentUpdateService;
+import com.example.DentistryManagement.service.UserService.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,10 +38,10 @@ import java.util.stream.Collectors;
 @Tag(name = "Staff API")
 public class StaffController {
     private final UserService userService;
+    private final UserStaffService userStaffService;
+    private final UserDentistService userDentistService;
     private final UserMapping userMapping;
-    private final StaffService staffService;
     private final ServiceService serviceService;
-    private final DentistService dentistService;
     private final TimeSlotService timeSlotService;
     private final DentistRepository dentistRepository;
     private final AppointmentService appointmentService;
@@ -51,6 +52,8 @@ public class StaffController {
     private final AppointmentAnalyticService appointmentAnalyticService;
     private final AppointmentBookingService appointmentBookingService;
     private final AppointmentUpdateService appointmentUpdateService;
+    private final UserDependentService userDependentService;
+    private final UserCustomerService userCustomerService;
 
 
     //----------------------------------- USER INFORMATION -----------------------------------
@@ -59,7 +62,7 @@ public class StaffController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
@@ -68,10 +71,10 @@ public class StaffController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).
-                    ifPresent(
-                            user -> userService.updateUser(userDTO, user)
-                    );
+            Client updateUser = userService.findUserByMail(userService.mailExtract());
+            if (updateUser != null) {
+                userService.updateUser(userDTO, updateUser);
+            }
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -112,10 +115,10 @@ public class StaffController {
     public ResponseEntity<?> getWorkingDentistSchedule() {
         try {
             // find current staff account
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
             // Gt all dentists by current staff account
-            List<Dentist> dentists = dentistService.findDentistByStaff(staff);
+            List<Dentist> dentists = userDentistService.findDentistListByStaff(staff);
 
             // Get all dentistSchedule from the dentists
             for (Dentist dentist : dentists) {
@@ -143,11 +146,11 @@ public class StaffController {
     @PostMapping("/set-service/{dentistMail}")
     public ResponseEntity<?> updateDentistService(@PathVariable String dentistMail, @RequestParam String serviceID) {
         try {
-            Dentist dentist = dentistService.findDentistByMail(dentistMail);
+            Dentist dentist = userDentistService.findDentistByMail(dentistMail);
             Services service = serviceService.findServiceByID(serviceID);
             if (!dentist.getServicesList().contains(service)) {
                 dentist.getServicesList().add(service);
-                dentistService.save(dentist);
+                userDentistService.save(dentist);
             }
             return ResponseEntity.ok(service.getName());
         } catch (Exception e) {
@@ -165,9 +168,9 @@ public class StaffController {
             String mail = userService.mailExtract();
             List<Client> clients;
             if (search != null && !search.isEmpty()) {
-                clients = userService.searchDentistByStaff(mail, search);
+                clients = userDentistService.searchDentistByStaff(mail, search);
             } else {
-                clients = userService.findDentistByStaff(mail);
+                clients = userDentistService.findDentistListByStaff(mail);
             }
 
             if (!clients.isEmpty()) {
@@ -203,8 +206,8 @@ public class StaffController {
     public ResponseEntity<?> findDentistInformation(@PathVariable("mail") String dentistMail) {
         try {
             UserDTO userDTO = new UserDTO();
-            Client client = userService.findClientByMail(dentistMail);
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Client client = userService.findUserByMail(dentistMail);
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
@@ -235,10 +238,10 @@ public class StaffController {
 
             // Get current staff account
             List<Client> dentistList;
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             Clinic clinic = staff.getClinic();
             // Get all dentists by theirs Staff
-            dentistList = userService.findDentistByStaff(userService.mailExtract());
+            dentistList = userDentistService.findDentistListByStaff(userService.mailExtract());
 
             // Put all dentists in dentistList  ---->  dentistListDTO
             if (!dentistList.isEmpty()) {
@@ -305,7 +308,7 @@ public class StaffController {
                 return new ResponseEntity<>(new ErrorResponseDTO("403", "Cannot find user with current mail"), HttpStatus.FORBIDDEN);
             }
 
-            Staff staff = userService.findStaffByMail(mail);
+            Staff staff = userStaffService.findStaffByMail(mail);
             if (staff == null) {
                 return new ResponseEntity<>(new ErrorResponseDTO("403", "You don't have permission to do this"), HttpStatus.FORBIDDEN);
             }
@@ -354,9 +357,9 @@ public class StaffController {
     @GetMapping("/dependentList/{customerMail}")
     public ResponseEntity<?> getAllDependentByCustomer(@PathVariable String customerMail) {
         try {
-            Client customer = userService.findClientByMail(customerMail);
+            Client customer = userService.findUserByMail(customerMail);
             if (customer != null) {
-                List<Dependent> dependentsList = userService.findDependentByCustomer(customer.getMail());
+                List<Dependent> dependentsList = userDependentService.findDependentByCustomer(customer.getMail());
                 if (dependentsList.isEmpty()) {
                     return ResponseEntity.ok(new ArrayList<>());
                 } else return ResponseEntity.ok(dependentsList);
@@ -378,9 +381,9 @@ public class StaffController {
             HashSet<Client> clients;
 
             if (search != null && !search.isEmpty()) {
-                clients = userService.searchCustomerInClinicByStaff(mail, search);
+                clients = userCustomerService.searchCustomerInClinicByStaff(mail, search);
             } else {
-                clients = userService.findCustomerInClinicByStaff(mail);
+                clients = userCustomerService.findCustomerInClinicByStaff(mail);
             }
 
             if (clients != null && !clients.isEmpty()) {
@@ -417,7 +420,7 @@ public class StaffController {
             String staffMail = userService.mailExtract();
 
             UserDTO userDTO = new UserDTO();
-            Client client = userService.findClientByMail(customerMail);
+            Client client = userService.findUserByMail(customerMail);
             userDTO.setName(client.getName());
             userDTO.setPhone(client.getPhone());
             userDTO.setMail(client.getMail());
@@ -486,7 +489,7 @@ public class StaffController {
     @GetMapping("/booking/all-service")
     public ResponseEntity<?> getAllServiceByClinic(@RequestParam LocalDate workDate) {
         try {
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             Clinic clinic = staff.getClinic();
             List<Services> dentistService;
             dentistService = serviceService
@@ -502,7 +505,7 @@ public class StaffController {
     public ResponseEntity<?> getAvailableSchedules(
             @RequestParam LocalDate workDate,
             @RequestParam String servicesId) {
-        Staff staff = userService.findStaffByMail(userService.mailExtract());
+        Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
         Clinic clinic = staff.getClinic();
         List<DentistSchedule> dentistScheduleList = dentistScheduleService
                 .getByWorkDateAndServiceAndAvailableAndClinic(workDate, servicesId, 1, clinic.getClinicID()).stream().toList();
@@ -522,7 +525,7 @@ public class StaffController {
     @Operation(summary = "Check maxed booking")
     @GetMapping("/booking")
     public boolean checkMaxedBooking(@RequestParam String mail){
-        Client customer =  userService.findClientByMail(mail);
+        Client customer =  userService.findUserByMail(mail);
         return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
@@ -539,9 +542,9 @@ public class StaffController {
 
         try {
             // Current user
-            Client staff = userService.findClientByMail(userService.mailExtract());
-            Client customer = userService.findClientByMail(customerMail);
-            Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
+            Client staff = userService.findUserByMail(userService.mailExtract());
+            Client customer = userService.findUserByMail(customerMail);
+            Dependent dependent = dependentID != null ? userDependentService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
@@ -649,7 +652,7 @@ public class StaffController {
             @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(value = "year", required = false) Integer year) {
         try {
-            Staff staff = userService.findStaffByMail(userService.mailExtract());
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
@@ -678,7 +681,7 @@ public class StaffController {
     @GetMapping("/timetable/{startDate}")
     public ResponseEntity<?> timeTable(@PathVariable("startDate") LocalDate date, @RequestParam int numDay) {
         try {
-            Staff staff = staffService.findStaffByMail(userService.mailExtract());
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             Map<LocalDate, List<TimeTableResponseDTO>> timeTableResponseMap = new HashMap<>();
             date.datesUntil(date.plusDays(numDay).plusDays(1)).forEach(currentDate -> {
                 List<DentistSchedule> dentistSchedules = dentistScheduleService.findDentistScheduleByWorkDate(date, numDay, staff).stream()

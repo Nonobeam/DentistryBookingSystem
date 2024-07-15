@@ -6,7 +6,7 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
