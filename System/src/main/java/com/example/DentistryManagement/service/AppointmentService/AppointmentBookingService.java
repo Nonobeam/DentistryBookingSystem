@@ -7,10 +7,9 @@ import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
-import com.example.DentistryManagement.repository.TimeSlotRepository;
 import com.example.DentistryManagement.service.DentistScheduleService;
 import com.example.DentistryManagement.service.TimeSlotService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
