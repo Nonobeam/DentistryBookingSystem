@@ -216,9 +216,9 @@ public class StaffController {
 
             List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByCustomerMail(client.getMail(), staff.getClinic());
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
-
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
+            userAppointDTO.setStar(appointmentAnalyticService.totalStarByDentist(client));
             userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
         } catch (Exception e) {
@@ -261,15 +261,15 @@ public class StaffController {
             LocalDate sub = startDate;
             while (sub.isEqual(endDate) || sub.isBefore(endDate)) {
                 LocalDate timeSlot = timeSlotService.findNearestTimeSlot(sub, clinic.getClinicID());
-                timeSlotList.addAll(timeSlotService.getTimeSlotByDate(clinic,timeSlot));
+                timeSlotList.addAll(timeSlotService.getTimeSlotByDate(clinic, timeSlot));
                 sub = sub.plusDays(1);
             }
 
             // Put all time slot in clinic  ---->  timeslotListDTO
             for (TimeSlot timeSlot : timeSlotList) {
                 for (TimeSlot timeSlotDTO : timeSlotList) {
-                    if(timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" +timeSlot.getDate()+" or after "+ timeSlotDTO.getDate());
+                    if (timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" + timeSlot.getDate() + " or after " + timeSlotDTO.getDate());
                     }
                 }
             }
@@ -663,9 +663,8 @@ public class StaffController {
             Map<Integer, Long> monthlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndStaff(staff, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByStaff(staff);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByStaff(staff);
-
-            DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
-
+            Map<String, Double> ratingDentist = appointmentAnalyticService.getRatingDentistByStaff(staff);
+            DashboardResponse dashboardResponse = new DashboardResponse(dailyAppointments, monthlyAppointments, totalAppointmentInMonth, totalAppointmentInYear, ratingDentist);
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Data not found");

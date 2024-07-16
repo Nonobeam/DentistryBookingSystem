@@ -78,4 +78,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
 
     boolean existsByTimeSlotAndUser(TimeSlot timeSlot, Client user);
+    List<Appointment> findAppointmentsByUser(Client client);
+
+    List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);
 }

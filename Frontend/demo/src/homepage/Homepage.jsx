@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NavBar from "./Nav";
 import styled from 'styled-components';
-
 import "antd/dist/reset.css";
-import { Layout, Button, Row, Col, Card, Typography } from "antd";
+import { Layout, Button, Row, Col, Card, Typography, notification } from "antd";
 import {
   SmileOutlined,
   ProjectOutlined,
@@ -14,21 +13,49 @@ import {
   YoutubeOutlined,
   LinkedinOutlined,
 } from "@ant-design/icons";
+import axios from "axios";
+
 const StyledFooter = styled(Layout.Footer)`
   text-align: center;
   background-color: #1890ff;
   color: white;
   padding: 40px 0;
 `;
+
 const { Title, Paragraph } = Typography;
 
-const locations = [
-  { lat: 10.762622, lng: 106.660172, name: "Branch 1" },
-  { lat: 10.762622, lng: 106.680172, name: "Branch 2" },
-];
-
 const Homepage = () => {
+  useEffect(() => {
+    const checkFeedbacks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:8080/user/appointment-feedback", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data && response.data.length > 0) {
+          notification.info({
+            message: "Feedback Reminder",
+            description: (
+              <span>
+                You have appointments to provide feedback on. Please click <a href="/appointment-feedback">here</a> to give your feedback.
+              </span>
+            ),
+            duration: 5, // Thời gian hiển thị thông báo (tính bằng giây)
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch feedback data", error);
+      }
+    };
+
+    checkFeedbacks();
+  }, []);
+
   return (
+    <>
     <Layout className="layout">
       <NavBar />
 
@@ -93,21 +120,6 @@ const Homepage = () => {
             </Col>
           </Row>
         </div>
-
-        {/* <div className="branches-section" style={{ padding: "50px 0" }}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={12}>
-              <Map locations={locations} />
-            </Col>
-            <Col xs={24} md={12}>
-              <Title level={2}>Our Branches</Title>
-              <Paragraph>
-                Visit any of our branches for top-quality dental care. We are located at multiple convenient locations to serve you better.
-              </Paragraph>
-            </Col>
-          </Row>
-        </div> */}
-
         <div className="video-section" style={{ padding: "50px 0", background: "#f0f2f5" }}>
           <Title level={2} style={{ textAlign: "center" }}>
             Why Do You Need a Dentist?
@@ -153,36 +165,33 @@ const Homepage = () => {
         </div>
       </Layout.Content>
 
-      <StyledFooter >
-      <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
-
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={16} md={8}>
-            <Title level={4}>About Us</Title>
-            <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
-          </Col>
-          <Col xs={24} sm={16} md={8}>
-            <Title level={4}>Contact</Title>
-            <Paragraph>123 Dental St.</Paragraph>
-            <Paragraph>Sun City, TX 12345</Paragraph>
-            <Paragraph>info@sunflowerdentistry.com</Paragraph>
-          </Col>
-          <Col xs={24} sm={16} md={8}>
-            <Title level={4}>Follow Us</Title>
-            <Paragraph>
-              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-            </Paragraph>
-          </Col>
-        </Row>
+      <StyledFooter>
+        <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={16} md={8}>
+              <Title level={4}>About Us</Title>
+              <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
+            </Col>
+            <Col xs={24} sm={16} md={8}>
+              <Title level={4}>Contact</Title>
+              <Paragraph>123 Dental St.</Paragraph>
+              <Paragraph>Sun City, TX 12345</Paragraph>
+              <Paragraph>info@sunflowerdentistry.com</Paragraph>
+            </Col>
+            <Col xs={24} sm={16} md={8}>
+              <Title level={4}>Follow Us</Title>
+              <Paragraph>
+                <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+                <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+                <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+                <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
+              </Paragraph>
+            </Col>
+          </Row>
         </Layout.Footer>
-        </StyledFooter>
-
-
+      </StyledFooter>
     </Layout>
-
+    </>
   );
 };
 
