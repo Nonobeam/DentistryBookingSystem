@@ -1,20 +1,19 @@
-# Use an official OpenJDK 17 runtime as a parent image
-FROM openjdk:17-oracle
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-jdk-slim
 
-# Set the working directory inside the container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the JAR file from the host to the container
-COPY DentistryManagement.jar /app/DentistryManagement.jar
+# Copy the application's jar file to the container
+COPY target/DentistryManagement.jar /app/DentistryManagement.jar
 
-# Build argument for the Google Cloud service account key file
-ARG GOOGLE_APPLICATION_CREDENTIALS
+# Expose the port on which the Spring Boot application will run
+EXPOSE 8080
 
-# Save the credentials to a file inside the container
-RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" > /app/credentials.json
-
-# Set the environment variable for Google Cloud credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+# Set environment variables
+ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/DentistryManagementSystem
+ENV SPRING_DATASOURCE_USERNAME=product_user
+ENV SPRING_DATASOURCE_PASSWORD=product_user_password
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/DentistryManagement.jar"]

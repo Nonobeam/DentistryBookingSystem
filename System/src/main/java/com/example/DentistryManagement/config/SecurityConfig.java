@@ -71,6 +71,8 @@ public class SecurityConfig{
                                 .requestMatchers(POST, "/api/v1/manager/**").hasAuthority(WRITE.name())
                                 .requestMatchers("/api/v1/staff/**").hasRole(STAFF.name())
                                 .requestMatchers(GET, "/api/v1/staff/**").hasAuthority(READ.name())
+                                .requestMatchers(POST, "/api/v1/staff/**").hasAuthority(WRITE.name())
+                                .requestMatchers(PUT, "/api/v1/staff/**").hasAuthority(UPDATE.name())
                                 .requestMatchers("/api/v1/dentist/**").hasRole(DENTIST.name())
                                 .requestMatchers(GET, "/api/v1/dentist/**").hasAuthority(READ.name())
                                 .requestMatchers(POST, "/api/v1/dentist/**").hasAuthority(UPDATE.name())

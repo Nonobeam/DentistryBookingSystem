@@ -14,7 +14,6 @@ import com.example.DentistryManagement.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +33,7 @@ public class AppointmentBookingService {
      * @param services        Input Services
      * @param dependent       Input Dependent dependent
      */
-    public void createAppointment(@Nullable Client staff, Client customer, DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
+    public void createAppointment(Client staff, Client customer, DentistSchedule dentistSchedule, Services services, Dependent dependent) {
         Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
                 .user(customer)
                 .clinic(dentistSchedule.getClinic())
