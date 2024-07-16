@@ -39,13 +39,13 @@ const fetchData = async () => {
 };
 
 export const DentistList = () => {
-  const { data, error, loading } = useSWR('dentistServices', fetchData);
-
+  const { data, error, isLoading } = useSWR('dentistServices', fetchData);
+  
   return (
     <div>
       <h1>Dentist List</h1>
       <Flex justify='center' align='middle' style={{ minHeight: '200px' }}>
-        {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
+        {isLoading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
           <Spin size='large' />
         ) : (
           <TableList dataSource={data} columns={columns} />

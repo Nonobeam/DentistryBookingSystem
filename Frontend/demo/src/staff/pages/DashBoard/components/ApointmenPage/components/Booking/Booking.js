@@ -23,6 +23,7 @@ export const Booking = () => {
   const [dependentID, setDependentID] = useState([]);
   const [customerMail, setCustomerMail] = useState('');
   const [isValidMail, setIsValidMail] = useState(false);
+  const [isValidAppointment, setIsValidAppointment] = useState(true);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -101,11 +102,11 @@ export const Booking = () => {
   const handleBlur = async () => {
     if (isValidMail && customerMail) {
       const res = await DentistServices.getDentistById(customerMail);
-      console.log(res);
-      // if() {
-      //   await fetchDependents();
-      //   setLoading(false);
-      // }
+      setIsValidAppointment(res.appointment.length < 5);
+      if (isValidAppointment) {
+        await fetchDependents();
+        setLoading(false);
+      }
     }
   };
 
@@ -240,7 +241,16 @@ export const Booking = () => {
             rules={[
               { required: true, message: 'Please enter customer email' },
               { type: 'email', message: 'Please enter a valid email' },
-            ]}>
+            ]}
+            help={
+              isValidAppointment ? (
+                ''
+              ) : (
+                <span style={{ color: 'red' }}>
+                  Maximum 5 appointments allowed
+                </span>
+              )
+            }>
             <Input
               onChange={handleCustomerMailChange}
               onBlur={handleBlur}
@@ -270,6 +280,7 @@ export const Booking = () => {
         <Button
           type='primary'
           htmlType='submit'
+          disabled={!isValidAppointment}
           loading={loading}
           style={{
             backgroundColor: '#1890ff',

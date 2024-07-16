@@ -36,12 +36,6 @@ const items = [
     link: '/staff/appointment-history',
   },
   {
-    key: 'Dasboard',
-    label: 'Dash board',
-    icon: <DashboardOutlined />,
-    link: '',
-  },
-  {
     key: 'Timetable',
     label: 'Timetable',
     icon: <ScheduleOutlined />,
