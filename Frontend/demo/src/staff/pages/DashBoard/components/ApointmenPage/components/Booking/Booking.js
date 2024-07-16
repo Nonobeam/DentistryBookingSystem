@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Button, notification, DatePicker, Input, Row, Col } from 'antd';
+import {
+  Form,
+  Select,
+  Button,
+  notification,
+  DatePicker,
+  Input,
+  Row,
+  Col,
+} from 'antd';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
-import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
 import moment from 'moment';
+import { DentistServices } from '../../../../../../services/CustomerServices/CustomerServices';
 
 export const Booking = () => {
   const [services, setServices] = useState([]);
@@ -14,6 +23,7 @@ export const Booking = () => {
   const [dependentID, setDependentID] = useState([]);
   const [customerMail, setCustomerMail] = useState('');
   const [isValidMail, setIsValidMail] = useState(false);
+  const [isValidAppointment, setIsValidAppointment] = useState(true);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -22,7 +32,9 @@ export const Booking = () => {
       try {
         if (selectedDate) {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllServices(formattedDate);
+          const data = await AppointmentHistoryServices.getAllServices(
+            formattedDate
+          );
           setServices(data);
         }
       } catch (error) {
@@ -65,10 +77,11 @@ export const Booking = () => {
     fetchSchedules();
   }, [selectedService, selectedDate]);
 
-
   const fetchDependents = async () => {
     try {
-      const response = await AppointmentHistoryServices.getDependents(customerMail);
+      const response = await AppointmentHistoryServices.getDependents(
+        customerMail
+      );
       if (response) {
         setDependentID(response);
       } else {
@@ -83,13 +96,17 @@ export const Booking = () => {
     const { value } = e.target;
     setCustomerMail(value);
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    setIsValidMail(isValid && value.endsWith('.com'));
+    setIsValidMail(isValid);
   };
 
   const handleBlur = async () => {
     if (isValidMail && customerMail) {
-      await fetchDependents();
-      setLoading(false);
+      const res = await DentistServices.getDentistById(customerMail);
+      setIsValidAppointment(res.appointment.length < 5);
+      if (isValidAppointment) {
+        await fetchDependents();
+        setLoading(false);
+      }
     }
   };
 
@@ -146,31 +163,50 @@ export const Booking = () => {
   return (
     <Form
       form={form}
-      layout="vertical"
+      layout='vertical'
       onFinish={onFinish}
       initialValues={{ customerMail }}
-      style={{ padding: '20px', fontFamily: 'Arial, sans-serif', paddingLeft: '200px', paddingRight: '200px' }}
-    >
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#1890ff',fontSize:'45px' }}>Booking For Customer</h2>
+      style={{
+        padding: '20px',
+        fontFamily: 'Arial, sans-serif',
+        paddingLeft: '200px',
+        paddingRight: '200px',
+      }}>
+      <h2
+        style={{
+          textAlign: 'center',
+          marginBottom: '30px',
+          color: '#1890ff',
+          fontSize: '45px',
+        }}>
+        Booking For Customer
+      </h2>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-            name="date"
-            label="Select Date"
-            rules={[{ required: true, message: 'Please select a date' }]}
-          >
-            <DatePicker onChange={handleDateChange} disabledDate={disabledDate} style={{ width: '100%' }} />
+            name='date'
+            label='Select Date'
+            rules={[{ required: true, message: 'Please select a date' }]}>
+            <DatePicker
+              onChange={handleDateChange}
+              disabledDate={disabledDate}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
-            name="service"
-            label="Select Service"
-            rules={[{ required: true, message: 'Please select a service' }]}
-          >
-            <Select onChange={handleServicesChange} loading={loading} style={{ width: '100%' }}>
+            name='service'
+            label='Select Service'
+            rules={[{ required: true, message: 'Please select a service' }]}>
+            <Select
+              onChange={handleServicesChange}
+              loading={loading}
+              style={{ width: '100%' }}>
               {services.map((service) => (
-                <Select.Option key={service.serviceID} value={service.serviceID}>
+                <Select.Option
+                  key={service.serviceID}
+                  value={service.serviceID}>
                   {service.name}
                 </Select.Option>
               ))}
@@ -180,33 +216,41 @@ export const Booking = () => {
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-        <Form.Item
-        name='schedule'
-        label='Select Schedule'
-        rules={[{ required: true, message: 'Please select a schedule' }]}>
-        <Select
-          onChange={handleScheduleChange}
-          loading={loading}
-          disabled={!selectedService || !selectedDate}>
-          {schedules.map((schedule) => (
-            <Select.Option
-              key={schedule.dentistScheduleID}
-              value={schedule.dentistScheduleID}>
-              {`${schedule.startTime}`}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+          <Form.Item
+            name='schedule'
+            label='Select Schedule'
+            rules={[{ required: true, message: 'Please select a schedule' }]}>
+            <Select
+              onChange={handleScheduleChange}
+              loading={loading}
+              disabled={!selectedService || !selectedDate}>
+              {schedules.map((schedule) => (
+                <Select.Option
+                  key={schedule.dentistScheduleID}
+                  value={schedule.dentistScheduleID}>
+                  {`${schedule.startTime}`}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
-            name="customerMail"
-            label="Customer Email"
+            name='customerMail'
+            label='Customer Email'
             rules={[
               { required: true, message: 'Please enter customer email' },
               { type: 'email', message: 'Please enter a valid email' },
             ]}
-          >
+            help={
+              isValidAppointment ? (
+                ''
+              ) : (
+                <span style={{ color: 'red' }}>
+                  Maximum 5 appointments allowed
+                </span>
+              )
+            }>
             <Input
               onChange={handleCustomerMailChange}
               onBlur={handleBlur}
@@ -217,25 +261,32 @@ export const Booking = () => {
         </Col>
       </Row>
       <Form.Item
-        name="dependentID"
-        label="Dependent"
+        name='dependentID'
+        label='Dependent'
         loading={loading}
-        rules={[{ required: false, message: 'Please select a dependent' }]}
-      >
+        rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
-          <Select.Option value=""></Select.Option>
+          <Select.Option value=''></Select.Option>
           {dependentID.map((dependent) => (
             <Select.Option
               key={dependent.dependentID}
-              value={dependent.dependentID}
-            >
+              value={dependent.dependentID}>
               {dependent.name}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
       <Form.Item style={{ textAlign: 'center' }}>
-        <Button type="primary" htmlType="submit" loading={loading} style={{ backgroundColor: '#1890ff', borderColor: '#1890ff', marginRight: '10px' }}>
+        <Button
+          type='primary'
+          htmlType='submit'
+          disabled={!isValidAppointment}
+          loading={loading}
+          style={{
+            backgroundColor: '#1890ff',
+            borderColor: '#1890ff',
+            marginRight: '10px',
+          }}>
           Book Service
         </Button>
       </Form.Item>

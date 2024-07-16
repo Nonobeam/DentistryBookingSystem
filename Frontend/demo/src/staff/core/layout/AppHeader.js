@@ -51,7 +51,7 @@ export const AppHeader = () => {
       <div style={{ position: 'relative' }}>
         <CiBellOn
           className='bell-icon'
-          style={{ cursor: 'pointer', fontSize: '20px', color: '#333' }}
+          style={{ cursor: 'pointer', fontSize: '20px', color: 'white' }}
           onClick={handleBellIconClick}
         />
         {showBellDropdown && (

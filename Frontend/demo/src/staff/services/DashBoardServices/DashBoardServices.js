@@ -13,7 +13,7 @@ export const DashBoardServices = {
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: error.message,
+        description: 'Not Found Data. Please Try Again',
         onClick: () => {
           console.log('Notification Clicked!');
         },
