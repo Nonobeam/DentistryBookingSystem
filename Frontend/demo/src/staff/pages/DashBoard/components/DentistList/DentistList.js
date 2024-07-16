@@ -3,6 +3,7 @@ import { Flex, Spin } from 'antd'; // Spin là component của Ant Design để 
 import { TableList } from './components/Table/TableList';
 import { Action } from './components/Action/Action';
 import { DentistServices } from '../../../../services/DentistServices/DentistServices';
+import useSWR from 'swr';
 
 const columns = [
   {
@@ -32,32 +33,22 @@ const columns = [
   },
 ];
 
-export const DentistList = () => {
-  const [apiData, setApiData] = useState([]);
-  const [loading, setLoading] = useState(true); // State để theo dõi trạng thái loading
+const fetchData = async () => {
+  const response = await DentistServices.getAll();
+  return response;
+};
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await DentistServices.getAll();
-        setApiData(response);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false); // Kết thúc fetch data, đánh dấu là không còn loading nữa
-      }
-    };
-    fetchData();
-  }, []);
+export const DentistList = () => {
+  const { data, error, loading } = useSWR('dentistServices', fetchData);
 
   return (
     <div>
       <h1>Dentist List</h1>
-      <Flex justify="center" align="middle" style={{ minHeight: '200px' }}>
+      <Flex justify='center' align='middle' style={{ minHeight: '200px' }}>
         {loading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
-          <Spin size="large" />
+          <Spin size='large' />
         ) : (
-          <TableList dataSource={apiData} columns={columns} />
+          <TableList dataSource={data} columns={columns} />
         )}
       </Flex>
     </div>
