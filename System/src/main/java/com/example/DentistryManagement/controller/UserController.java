@@ -2,15 +2,22 @@
 package com.example.DentistryManagement.controller;
 
 
+import com.example.DentistryManagement.DTO.AppointmentDTO;
+import com.example.DentistryManagement.DTO.AppointmentFeedbackDTO;
 import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.core.dentistry.*;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.repository.AppointmentRepository;
 import com.example.DentistryManagement.service.*;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentDeleteService;
+import com.example.DentistryManagement.service.UserService.UserDependentService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -21,8 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -38,15 +43,18 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final UserDependentService userDependentService;
     private final UserMapping userMapping;
     private final ClinicService clinicService;
     private final ServiceService serviceService;
-    private final AppointmentService appointmentService;
     private final PasswordResetTokenService tokenService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final AppointmentRepository appointmentRepository;
     private final DentistScheduleService dentistScheduleService;
     private final Logger logger = LogManager.getLogger(UserController.class);
+    private final AppointmentAnalyticService appointmentAnalyticService;
+    private final AppointmentBookingService appointmentBookingService;
+    private final AppointmentDeleteService appointmentDeleteService;
+    private final AppointmentRepository appointmentRepository;
 
 
     //----------------------------------- CUSTOMER INFORMATION -----------------------------------
@@ -61,7 +69,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
@@ -84,7 +92,7 @@ public class UserController {
                 logger.error("Not found any customer ");
                 return ResponseEntity.status(204).body(error);
             }
-            List<Dependent> dependentsList = userService.findDependentByCustomer(mail);
+            List<Dependent> dependentsList = userDependentService.findDependentByCustomer(mail);
             return ResponseEntity.ok(dependentsList);
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
@@ -95,8 +103,8 @@ public class UserController {
     public ResponseEntity<?> createDependentByCustomer(@RequestBody Dependent dependent) {
         try {
             String mail = userService.mailExtract();
-            dependent.setUser(userService.findClientByMail(mail));
-            return ResponseEntity.ok(userService.saveDependent(dependent));
+            dependent.setUser(userService.findUserByMail(mail));
+            return ResponseEntity.ok(userDependentService.saveDependent(dependent));
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -113,7 +121,7 @@ public class UserController {
     @GetMapping("/all-clinic")
     public ResponseEntity<List<Clinic>> getAllClinics() {
         try {
-            return ResponseEntity.ok(clinicService.findAll());
+            return ResponseEntity.ok(clinicService.findAllClinicsByStatus(1));
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
         }
@@ -162,7 +170,18 @@ public class UserController {
 
         return ResponseEntity.ok(availableSchedulesResponses.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
     }
-
+    @Operation(summary = "Check maxed booking")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/booking")
+    public boolean checkMaxedBooking(){
+        Client customer =  userService.findUserByMail(userService.mailExtract());
+        return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
+    }
 
     @Operation(summary = "Booking")
     @ApiResponses(value = {
@@ -175,15 +194,15 @@ public class UserController {
     public ResponseEntity<?> makeBooking(@PathVariable String dentistScheduleId, @RequestParam(required = false) String dependentID, @RequestParam String serviceId) {
         // Apply redis single-thread
         String lockKey = "booking:lock:" + dentistScheduleId;
-        boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS);
+        boolean lockAcquired = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 10, TimeUnit.SECONDS));
         if (!lockAcquired) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("409", "Booking in progress by another user"));
         }
 
         try {
             // Current user
-            Client customer = userService.findClientByMail(userService.mailExtract());
-            Dependent dependent = dependentID != null ? userService.findDependentByDependentId(dependentID) : null;
+            Client customer = userService.findUserByMail(userService.mailExtract());
+            Dependent dependent = dependentID != null ? userDependentService.findDependentByDependentId(dependentID) : null;
             Services services = serviceService.findServiceByID(serviceId);
             DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
 
@@ -203,15 +222,15 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("400", "Service not found"));
             }
 
-            if (appointmentService.findAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
+            if (appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "Reach the limit of personal appointment. 5/5"));
             }
 
-            if (appointmentService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
+            if (appointmentAnalyticService.findAppointmentsByDateAndStatus(dentistSchedule.getWorkDate(), 1).size() >= 10) {
                 return ResponseEntity.status(400).body(new ErrorResponseDTO("400", "You cannot book another appointment right now. The clinic is full right now!"));
             }
 
-            appointmentService.createAppointment(null, customer, dentistSchedule, services, dependent);
+            appointmentBookingService.createAppointment(null, customer, dentistSchedule, services, dependent);
             return ResponseEntity.ok("Booking successfully");
         } catch (Error e) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", e.getMessage());
@@ -231,17 +250,7 @@ public class UserController {
     @PutMapping("/delete-booking/{appointmentId}")
     public ResponseEntity<?> deleteBooking(@PathVariable String appointmentId) {
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-            String dentistScheduleId = appointment.getDentistScheduleId();
-            DentistSchedule dentistSchedule = dentistScheduleService.findByScheduleId(dentistScheduleId);
-            //Check for duplicate cancelled just in case
-            if (appointment.getStatus() == 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Appointment has already been cancelled");
-            }
-            appointment.setStatus(0);
-            Optional<List<DentistSchedule>> unavailableSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 0);
-            unavailableSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(1)));
-            appointmentRepository.save(appointment);
+            appointmentDeleteService.deleteAppointment(appointmentId);
             return ResponseEntity.ok("Appointment has been cancelled");
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "Appointment can not be deleted");
@@ -267,12 +276,90 @@ public class UserController {
             (@RequestParam(required = false) LocalDate workDate,
              @RequestParam(required = false) Integer status) {
         try {
-            Client user = userService.findClientByMail(userService.mailExtract());
-            List<Appointment> appointmentList = appointmentService.findAppointmentHistory(user, workDate, status);
+            Client user = userService.findUserByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentsByUserAndByDateOrStatus(user, workDate, status);
             return ResponseEntity.ok(appointmentList);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
             logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    @Operation(summary = "Show user Un feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-feedback")
+    public ResponseEntity<?> getAppointmentFeedback
+            () {
+        try {
+            Client user = userService.findUserByMail(userService.mailExtract());
+            List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentByUnFeedback(user);
+            return ResponseEntity.ok(appointmentList);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary = "feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/appointment-feedback/{appointmentID}")
+    public ResponseEntity<?>putAppointmentFeedback
+            (@PathVariable String appointmentID, @RequestBody AppointmentFeedbackDTO appointmentDTO) {
+        try {
+            Client user = userService.findUserByMail(userService.mailExtract());
+            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            appointment.setFeedback(appointmentDTO.getFeedback());
+           appointment.setStarAppointment(appointmentDTO.getStarAppointment());
+            appointmentRepository.save(appointment);
+            return ResponseEntity.ok("Feedback successfully");
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
+            logger.error("Not found user", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
+            logger.error("Server_error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    @Operation(summary = "feedback appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully"),
+            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @GetMapping("/appointment-feedback/{appointmentID}")
+    public ResponseEntity<?>getAppointmentFeedback
+            (@PathVariable String appointmentID) {
+        try {
+            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            AppointmentFeedbackDTO appointmentFeedbackDTO = new AppointmentFeedbackDTO();
+            appointmentFeedbackDTO.setFeedback(appointment.getFeedback());
+            appointmentFeedbackDTO.setStarAppointment(appointment.getStarAppointment());
+            return ResponseEntity.ok(appointmentFeedbackDTO);
+        } catch (Error e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found appointment");
+            logger.error("Not found appointment", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -294,7 +381,7 @@ public class UserController {
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam String mail) {
         try {
-            Client user = userService.findClientByMail(mail);
+            Client user = userService.findUserByMail(mail);
             if (user != null) {
                 String token = UUID.randomUUID().toString();
                 tokenService.createPasswordResetTokenForUser(user, token);
@@ -318,7 +405,7 @@ public class UserController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            Client currentUser = userService.findByMail(userService.mailExtract()).orElse(null);
+            Client currentUser = userService.findUserByMail(userService.mailExtract());
             if (currentUser == null) {
                 return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
             }

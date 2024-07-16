@@ -7,12 +7,13 @@ import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.Services;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
-import com.example.DentistryManagement.service.AppointmentService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentAnalyticService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.ServiceService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.UserManagerService;
+import com.example.DentistryManagement.service.UserService.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/boss")
@@ -36,11 +36,12 @@ import java.util.stream.Collectors;
 @Tag(name = "Boss API")
 public class BossController {
     private final UserService userService;
+    private final UserManagerService managerService;
     private final UserMapping userMapping;
     private final ServiceService serviceService;
-    private final AppointmentService appointmentService;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final AppointmentAnalyticService appointmentAnalyticService;
 
 
     //----------------------------------- USER ACCOUNT -----------------------------------
@@ -49,7 +50,7 @@ public class BossController {
     @GetMapping("/info")
     public ResponseEntity<UserDTO> findUser() {
         String mail = userService.mailExtract();
-        Client user = userService.findClientByMail(mail);
+        Client user = userService.findUserByMail(mail);
         return ResponseEntity.ok(userMapping.getUserDTOFromUser(user));
     }
 
@@ -57,7 +58,11 @@ public class BossController {
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
         try {
-            userService.findByMail(userService.mailExtract()).ifPresent(userMapping::getUserDTOFromUser);
+            Client currentUser = userService.findUserByMail(userService.mailExtract());
+            if (currentUser == null) {
+                return ResponseEntity.status(403).body(new ErrorResponseDTO("403", "Cannot find user"));
+            }
+            userService.updateUser(userDTO, currentUser);
             return ResponseEntity.ok(userDTO);
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
@@ -89,13 +94,13 @@ public class BossController {
     @GetMapping("/all-manager")
     public ResponseEntity<?> getAllManager() {
         try {
-            List<Client> allManager = userService.findAllManager();
+            List<Client> allManager = managerService.findAllManager();
             if (allManager != null && !allManager.isEmpty()) {
-                List<UserDTO> clientDTOs = allManager.stream()
+                List<UserDTO> managerList = allManager.stream()
                         .map(userMapping::getUserDTOFromUser)
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok(clientDTOs);
+                return ResponseEntity.ok(managerList);
             }
             return ResponseEntity.ok("Not found any manager");
         } catch (Error error) {
@@ -104,13 +109,13 @@ public class BossController {
     }
 
 
-    @Operation(summary = "All Managers")
+    @Operation(summary = "Delete a manager")
     @DeleteMapping("/delete-manager/{managerID}")
-    public ResponseEntity<?> deleteManager(@PathVariable String managerID) {
+    public ResponseEntity<?> deleteManager(@PathVariable("managerID") String managerID) {
         try {
             // Find the manager by id then update the status ---> 0
-            Client manager = userService.findUserById(managerID);
-            userService.updateUserStatus(manager, 0);
+            Client removeManager = userService.findUserById(managerID);
+            userService.updateUserStatus(removeManager, 0);
             return ResponseEntity.ok("Delete successfully");
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
@@ -139,8 +144,8 @@ public class BossController {
     @GetMapping("/service/all")
     public ResponseEntity<?> showAllServices() {
         try {
-            List<Services> services = serviceService.getAll();
-            return ResponseEntity.ok(services);
+            List<Services> servicesList = serviceService.getAll();
+            return ResponseEntity.ok(servicesList);
         } catch (Error error) {
             ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(errorResponseDTO);
@@ -165,19 +170,19 @@ public class BossController {
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboardData(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(required = false) Integer year) {
         try {
-            Client boss = userService.findClientByMail(userService.mailExtract());
+            Client boss = userService.findUserByMail(userService.mailExtract());
             if (boss == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, List<Appointment>> dailyAppointments = appointmentService.getDailyAppointmentsByClinic(date);
-            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentService.getAppointmentsByClinicsForYear(year);
-            int totalAppointmentInMonth = appointmentService.totalAppointmentsInMonthByBoss();
-            int totalAppointmentInYear = appointmentService.totalAppointmentsInYearByBoss();
+            Map<String, List<Appointment>> dailyAppointments = appointmentAnalyticService.getAppointmentsByDate(date);
+            Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByYear(year);
+            int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonth();
+            int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYear();
 
-            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear);
+            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear,null);
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {

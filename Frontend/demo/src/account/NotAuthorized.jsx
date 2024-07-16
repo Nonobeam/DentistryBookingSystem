@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Result, Button } from 'antd';
 import { Link } from 'react-router-dom';
-import { LockOutlined } from '@ant-design/icons';
 
 const StyledContainer = styled.div`
   display: flex;

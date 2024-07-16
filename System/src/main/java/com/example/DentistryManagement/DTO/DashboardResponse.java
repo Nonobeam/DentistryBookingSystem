@@ -14,5 +14,6 @@ public class DashboardResponse {
     private Map<Integer, Long> monthlyAppointments;
     private int totalAppointmentsInMonthNow;
     private int totalAppointmentsInYearNow;
+    private Map<String, Double>ratingDentist;
 
 }

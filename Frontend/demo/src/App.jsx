@@ -10,6 +10,7 @@ import Services from './homepage/Services';
 import Educational from './homepage/Educational';
 import Booking from './homepage/Booking';
 import Homepage from './homepage/Homepage';
+import UserFeedback from'./homepage/Feedback';
 import { DashBoard } from './staff/pages/DashBoard';
 import { DentistList } from './staff/pages/DashBoard/components/DentistList/DentistList';
 import { StaffDashboard } from './staff/pages/DashBoard/components/StaffDash/StaffDashboard';
@@ -46,7 +47,6 @@ import BossManagerList from './boss/BossManagerList';
 import BossProfile from './boss/BossProfile';
 import ManagerProfile from './manager/ManagerProfile';
 
-
 const App = () => {
   return (
     <Router>
@@ -71,7 +71,8 @@ const App = () => {
         <Route path='/booking' element={<RoleBasedRoute element={<Booking />} requiredRole={['CUSTOMER']}/>}/>
         <Route path='/history' element={<RoleBasedRoute element={<History />} requiredRole={['CUSTOMER']}/>}/>
         <Route path='/profile' element={<RoleBasedRoute element={<UserProfile />} requiredRole={['CUSTOMER']}/>}/>
-        
+        <Route path='/appointment-feedback' element={<RoleBasedRoute element={<UserFeedback/>} requiredRole={['CUSTOMER']}/>}/>
+
         {/* DENTIST PAGES */}
         <Route path='/dentist'>
           <Route path='' element={<RoleBasedRoute element={<TodayAppointments />} requiredRole={['DENTIST']}/>}/>
@@ -100,9 +101,9 @@ const App = () => {
         </Route>
 
         {/* STAFF PAGES */}
-        <Route path='/staff' element={<DashBoard />}>
+        <Route path='/staff' element={<DashBoard/>}>
 
-          <Route path='dentist-list' element={<DentistList />} />
+          <Route path='dentist-list' element={<DentistList/>} />
           <Route
             path='dentist-list/detail/:dentistID'
             element={<DentistInfo />} 

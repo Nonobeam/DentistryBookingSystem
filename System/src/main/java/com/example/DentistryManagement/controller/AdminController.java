@@ -5,13 +5,14 @@ import com.example.DentistryManagement.DTO.StaffResponseDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
-import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.mapping.UserMapping;
-import com.example.DentistryManagement.core.error.ErrorResponseDTO;
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
 import com.example.DentistryManagement.service.TimeSlotService;
-import com.example.DentistryManagement.service.UserService;
+import com.example.DentistryManagement.service.UserService.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,10 +33,15 @@ import java.util.stream.Collectors;
 @Tag(name = "Admin API")
 public class AdminController {
     private final UserService userService;
+    private final UserDentistService dentistService;
+    private final UserStaffService staffService;
+    private final UserCustomerService customerService;
+    private final UserManagerService managerService;
     private final UserMapping userMapping;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     private final TimeSlotService timeSlotService;
+    private final AppointmentBookingService appointmentBookingService;
 
 
     @Operation(summary = "Register a new boss")
@@ -51,16 +56,16 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets dentist list in the system")
     @GetMapping("/dentistList")
     public ResponseEntity<?> dentistList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findDentistFollowSearching(search);
+                userList = dentistService.findDentistFollowSearching(search);
 
             } else {
-                userList = userService.findAllDentist();
+                userList = dentistService.findAllDentist();
             }
             List<DentistResponseDTO> dentistList = userList.stream()
                     .map(userMapping::convertToDentistDTO)
@@ -76,15 +81,15 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets manager list in the system")
     @GetMapping("/managerList")
     public ResponseEntity<?> managerList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findManagerFollowSearching(search);
+                userList = managerService.findManagerFollowSearching(search);
             } else {
-                userList = userService.findAllManager();
+                userList = managerService.findAllManager();
             }
             List<UserDTO> managerList = userList.stream()
                     .map(userMapping::getUserDTOFromUser)
@@ -102,16 +107,16 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets staff list in the system")
 
     @GetMapping("/staffList")
     public ResponseEntity<?> staffList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findStaffFollowSearching(search);
+                userList = staffService.findStaffFollowSearching(search);
             } else {
-                userList = userService.findAllStaff();
+                userList = staffService.findAllStaff();
             }
             List<StaffResponseDTO> staffDTOList = userList.stream()
                     .map(userMapping::convertToStaffDTO)
@@ -127,15 +132,15 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "Admin")
+    @Operation(summary = "Admin gets customer list in the system")
     @GetMapping("/customerList")
     public ResponseEntity<?> customerList(@RequestParam(required = false) String search) {
         try {
             List<Client> userList;
             if (search != null && !search.isEmpty()) {
-                userList = userService.findCustomerFollowSearching(search);
+                userList = customerService.findCustomerFollowSearching(search);
             } else {
-                userList = userService.findAllCustomer();
+                userList = customerService.findAllCustomer();
             }
             List<UserDTO> userDTOList = userList.stream()
                     .map(userMapping::getUserDTOFromUser)
@@ -152,12 +157,14 @@ public class AdminController {
 
     @Operation(summary = "Admin")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDTO updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String userID, @RequestBody UserDTO userDTO) {
         try {
-            if (userService.isPresentUser(id).isPresent()) {
-                Client client = userService.findUserById(id);
-                userService.updateUser(updatedUser, client);
-                return ResponseEntity.ok(client);
+            if (userService.isPresentUser(userID).isPresent()) {
+                Client updateUser = userService.findUserById(userID);
+                if(updateUser != null) {
+                    userService.updateUser(userDTO, updateUser);
+                }
+                return ResponseEntity.ok(updateUser);
             } else {
                 ErrorResponseDTO error = new ErrorResponseDTO("403", "User could not be update");
                 logger.error("User could not be update");
@@ -174,11 +181,11 @@ public class AdminController {
 
     @Operation(summary = "Delete user")
     @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String userID) {
         try {
 
-            if (userService.isPresentUser(id).isPresent()) {
-                Optional<Client> c = userService.isPresentUser(id);
+            if (userService.isPresentUser(userID).isPresent()) {
+                Optional<Client> c = userService.isPresentUser(userID);
                 if (c.isPresent()) {
                     Client client = c.get();
                     userService.updateUserStatus(client, 0);
@@ -203,7 +210,7 @@ public class AdminController {
     }
 
     @GetMapping("/test-api")
-    public ResponseEntity<?> testApi(LocalDate appointmentDate, int slotNumber, String clinicId) {
-        return ResponseEntity.ok(timeSlotService.findNearestTimeSlot(appointmentDate, slotNumber, clinicId));
+    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
+        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotId(customerId, timeSlotId));
     }
 }

@@ -19,7 +19,7 @@ const DentistSchedule = () => {
 
   useEffect(() => {
     fetchSchedule(initialStartDate, initialEndDate);
-  }, []);
+  });
 
   const fetchSchedule = async (start, end) => {
     setLoading(true);

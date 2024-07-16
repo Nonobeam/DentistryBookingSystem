@@ -1,86 +1,92 @@
-package com.example.DentistryManagement.service;
+package com.example.DentistryManagement.service.AppointmentService;
 
-import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.ClinicDTO;
 import com.example.DentistryManagement.DTO.UserDTO;
-import com.example.DentistryManagement.mapping.UserMapping;
-import com.example.DentistryManagement.core.dentistry.*;
+import com.example.DentistryManagement.core.dentistry.Appointment;
+import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
-import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
-import com.example.DentistryManagement.repository.*;
+import com.example.DentistryManagement.mapping.UserMapping;
+import com.example.DentistryManagement.repository.AppointmentRepository;
+import com.example.DentistryManagement.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class AppointmentService {
-    private final DentistScheduleService dentistScheduleService;
+public class AppointmentAnalyticService {
     private final AppointmentRepository appointmentRepository;
     private final StaffRepository staffRepository;
     private final UserMapping userMapping;
 
-    public LocalDate startUpdateTimeSlotDate(String clinicID) {
-        LocalDate result;
-        Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
-        result = appointment.getDate();
-        return result;
-    }
-
-    public List<Appointment> findAppointmentInClinic(String staffMail) {
+    public List<Appointment> getAppointmentsInAClinicByStaffMail(String staffMail) {
         try {
-            Staff staff = staffRepository.findStaffByUserMail(staffMail);
-
-            Clinic clinic = staff.getClinic();
-            return appointmentRepository.findAppointmentByClinic(clinic);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by clinic: " + e.getMessage(), e);
-        }
-    }
-
-    public List<Appointment> customerAppointment(String customerId, String staffMail) {
-        try {
+            List<Appointment> appointmentsInAClinic;
             Staff staff = staffRepository.findStaffByUserMail(staffMail);
             Clinic clinic = staff.getClinic();
-            return appointmentRepository.findAppointmentByUser_UserIDAndClinic(customerId, clinic);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
+            appointmentsInAClinic = appointmentRepository.findAppointmentByClinic(clinic);
+
+            return appointmentsInAClinic;
+        } catch (Exception e) {
+            throw e;
         }
     }
 
     public List<Appointment> customerAppointmentFollowDentist(String customerId, String dentist) {
         try {
-            return appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(customerId, dentist);
+            List<Appointment> customerAppointments;
+            customerAppointments = appointmentRepository.getAppointmentByUser_UserIDAndDentist_User_Mail(customerId, dentist);
+
+            return customerAppointments;
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by customer ID and clinic: " + e.getMessage(), e);
         }
     }
 
-    public List<Appointment> findAppointmentByDentist(String mail) {
+
+    public List<Appointment> getAppointmentsByDentistMail(String mail) {
         try {
-            return appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(), 1);
+            List<Appointment> appointmentsByADentist;
+            appointmentsByADentist = appointmentRepository.getAppointmentByDentist_User_MailAndDateAndStatus(mail, LocalDate.now(), 1);
+
+            return appointmentsByADentist;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+
+    public List<Appointment> getCustomerAppointmentsInAClinicByStaffMailAndCustomerId(String customerId, String staffMail) {
+        try {
+            List<Appointment> customerAppointmentsInAClinic;
+            Staff staff = staffRepository.findStaffByUserMail(staffMail);
+            Clinic clinic = staff.getClinic();
+            customerAppointmentsInAClinic = appointmentRepository.findAppointmentByUser_UserIDAndClinic(customerId, clinic);
+
+            return customerAppointmentsInAClinic;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+
+    public List<Appointment> getAppointmentsInAClinicByCustomerMail(String mail, Clinic clinic) {
+        try {
+            List<Appointment> appointmentsInAClinic;
+            appointmentsInAClinic = appointmentRepository.getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(mail, clinic);
+            return appointmentsInAClinic;
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
         }
     }
 
-    public List<Appointment> findAllAppointmentByDentist(String mail, Clinic clinic) {
-        try {
-            return appointmentRepository.getAppointmentByDentist_User_MailAndClinicOrderByDateAsc(mail, clinic);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
-        }
-    }
 
-
-    public List<Appointment> findAppointmentHistory(Client user, LocalDate date, Integer status) {
+    public List<Appointment> getAppointmentsByUserAndByDateOrStatus(Client user, LocalDate date, Integer status) {
         try {
             String userID = user.getUserID();
             List<Appointment> appointmentsHistory;
@@ -101,15 +107,8 @@ public class AppointmentService {
         }
     }
 
-    public Appointment AppointmentUpdate(Appointment appointment) {
-        try {
-            return appointmentRepository.save(appointment);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error occurred while fetching appointment list by dentist ID: " + e.getMessage(), e);
-        }
-    }
 
-    public Appointment findAppointmentById(String appointmentID) {
+    public Appointment getAppointmentById(String appointmentID) {
         try {
             return appointmentRepository.findAppointmentByAppointmentID(appointmentID);
         } catch (DataAccessException e) {
@@ -118,7 +117,7 @@ public class AppointmentService {
     }
 
 
-    public Optional<List<Appointment>> findAppointmentsByUserAndStatus(Client userId, int status) {
+    public Optional<List<Appointment>> getAppointmentsByUserAndStatus(Client userId, int status) {
         try {
             return appointmentRepository.findAppointmentsByUserAndStatus(userId, status);
         } catch (Exception e) {
@@ -126,7 +125,8 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByStaff(String name, String staffMail) {
+
+    public List<Appointment> getAppointmentsByCustomerNameOrDependentNameAndStaffMail(String name, String staffMail) {
         try {
             Staff staffClient = staffRepository.findStaffByUserMail(staffMail);
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
@@ -144,7 +144,7 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointment> searchAppointmentByDentist(String name, Dentist dentist) {
+    public List<Appointment> getAppointmentsByCustomerNameOrDependentNameAndDentist(String name, Dentist dentist) {
         try {
             List<Appointment> appointments = appointmentRepository.findByUserNameContainingIgnoreCaseOrDependentNameContainingIgnoreCase(name, name);
             List<Appointment> filterAppointments = new ArrayList<>();
@@ -159,23 +159,9 @@ public class AppointmentService {
         }
     }
 
-    public int totalAppointmentsInMonthByBoss() {
-        return appointmentRepository.countAppointmentsByMonthPresentByBoss(LocalDate.now().getMonthValue(), LocalDate.now().getYear());
-    }
 
-    public int totalAppointmentsInYearByBoss() {
-        return appointmentRepository.countAppointmentsByYearPresentByBoss(LocalDate.now().getYear());
-    }
 
-    public int totalAppointmentsInMonthByStaff(Staff staff) {
-        return appointmentRepository.countAppointmentsByMonthPresentByStaff(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), staff);
-    }
-
-    public int totalAppointmentsInYearByStaff(Staff staff) {
-        return appointmentRepository.countAppointmentsByYearPresentByStaff(LocalDate.now().getYear(), staff);
-    }
-
-    public Map<String, Integer> getDailyAppointmentsByDentist(LocalDate date, Staff staff) {
+    public Map<String, Integer> getAppointmentsByDateAndDentist(LocalDate date, Staff staff) {
         List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateAndDentist_Staff(date, staff);
         Map<String, Integer> appointmentsByDentist = new HashMap<>();
 
@@ -190,7 +176,7 @@ public class AppointmentService {
         return appointmentsByDentist;
     }
 
-    public Map<Integer, Long> getMonthlyAppointmentsByDentist(LocalDate startDate, LocalDate endDate, Staff staff) {
+    public Map<Integer, Long> getAppointmentsByDateAndDentist(LocalDate startDate, LocalDate endDate, Staff staff) {
         Map<Integer, Long> monthlyAppointmentCounts = new HashMap<>();
         List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaff(startDate, endDate, staff);
         List<Appointment> appointments = Optional.ofNullable(appointmentsBase)
@@ -208,14 +194,14 @@ public class AppointmentService {
         return monthlyAppointmentCounts;
     }
 
-    public Map<Integer, Long> getAppointmentsByStaffForYear(Staff staff, int year) {
+    public Map<Integer, Long> getAppointmentsByYearAndStaff(Staff staff, int year) {
         Map<Integer, Long> yearlyAppointmentCounts = new HashMap<>();
 
         for (int month = 1; month <= 12; month++) {
             final int currentMonth = month;
             LocalDate startDate = LocalDate.of(year, currentMonth, 1);
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-            Map<Integer, Long> monthlyCounts = getMonthlyAppointmentsByDentist(startDate, endDate, staff);
+            Map<Integer, Long> monthlyCounts = getAppointmentsByDateAndDentist(startDate, endDate, staff);
 
             monthlyCounts.forEach((key, value) -> yearlyAppointmentCounts.merge(currentMonth, value, Long::sum));
         }
@@ -223,7 +209,7 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
-    public Map<String, List<Appointment>> getDailyAppointmentsByClinic(LocalDate date) {
+    public Map<String, List<Appointment>> getAppointmentsByDate(LocalDate date) {
         List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDate(date);
         List<Appointment> appointments = new ArrayList<>();
         for (Appointment appointment : appointmentBase) {
@@ -242,7 +228,7 @@ public class AppointmentService {
         return appointmentsByClinic;
     }
 
-    public Map<String, Map<Integer, Long>> getAppointmentsByClinicsForYear(int year) {
+    public Map<String, Map<Integer, Long>> getAppointmentsByYear(int year) {
         Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
 
         for (int month = 1; month <= 12; month++) {
@@ -270,7 +256,7 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
-    public Map<String, Map<Integer, Long>> getClinicAppointmentsForYear(Client manager, int year) {
+    public Map<String, Map<Integer, Long>> getAppointmentsByYearAndManager(Client manager, int year) {
         Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
 
         for (int month = 1; month <= 12; month++) {
@@ -298,6 +284,22 @@ public class AppointmentService {
         return yearlyAppointmentCounts;
     }
 
+    public int totalAppointmentsInMonth() {
+        return appointmentRepository.countAppointmentsByMonthPresentByBoss(LocalDate.now().getMonthValue(), LocalDate.now().getYear());
+    }
+
+    public int totalAppointmentsInYear() {
+        return appointmentRepository.countAppointmentsByYearPresentByBoss(LocalDate.now().getYear());
+    }
+
+    public int totalAppointmentsInMonthByStaff(Staff staff) {
+        return appointmentRepository.countAppointmentsByMonthPresentByStaff(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), staff);
+    }
+
+    public int totalAppointmentsInYearByStaff(Staff staff) {
+        return appointmentRepository.countAppointmentsByYearPresentByStaff(LocalDate.now().getYear(), staff);
+    }
+
     public int totalAppointmentsInMonthByManager(Client manager) {
 
         return appointmentRepository.countAppointmentsByMonthPresentByManager(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), manager);
@@ -307,89 +309,74 @@ public class AppointmentService {
         return appointmentRepository.countAppointmentsByYearPresentByManager(LocalDate.now().getYear(), manager);
     }
 
-    public Appointment save(Appointment appointment) {
-        return appointmentRepository.save(appointment);
-    }
-
     public List<Appointment> findAppointmentsByDateAndStatus(LocalDate workDate, int status) {
         return appointmentRepository.findAppointmentsByDateAndStatus(workDate, status);
     }
 
-    public List<Appointment> findAppointmentsByDateBetween(LocalDate startDate, LocalDate endDate, Staff staff) {
+    public List<Appointment> findAppointmentsByDateAndStaff(LocalDate startDate, LocalDate endDate, Staff staff) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentistStaff(startDate, endDate, staff);
         appointments.removeIf(appointment -> appointment.getStatus() == 0);
         return appointments;
     }
 
-    public List<Appointment> findAppointmentsByDateBetweenDentist(LocalDate startDate, LocalDate endDate, Dentist dentist) {
+    public List<Appointment> findAppointmentsByDateAndDentist(LocalDate startDate, LocalDate endDate, Dentist dentist) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByDateBetweenAndDentist(startDate, endDate, dentist);
         appointments.removeIf(appointment -> appointment.getStatus() == 0);
         return appointments;
     }
 
-    public List<AppointmentDTO> appointmentDTOList(List<Appointment> appointmentList) {
-        List<AppointmentDTO> appointmentDTOList;
-        appointmentDTOList = appointmentList.stream()
-                .map(appointmentEntity -> {
-                    AppointmentDTO appointment = new AppointmentDTO();
-                    appointment.setAppointmentId(appointmentEntity.getAppointmentID());
-                    appointment.setServices(appointmentEntity.getServices().getName());
-                    appointment.setStatus(appointmentEntity.getStatus());
-                    appointment.setDate(appointmentEntity.getDate());
-                    appointment.setDentist(appointmentEntity.getDentist().getUser().getName());
-                    appointment.setTimeSlot(appointmentEntity.getTimeSlot().getStartTime());
-                    appointment.setUser(appointmentEntity.getUser().getName());
-                    if (appointmentEntity.getDependent() != null) {
-                        appointment.setDependent(appointmentEntity.getDependent().getName());
-                        System.out.println(appointmentEntity.getDependent().getName());
-                    }
-                    if (appointmentEntity.getStaff() != null) {
-                        appointment.setStaff(appointmentEntity.getStaff().getUser().getName());
-                    }
-                    appointment.setCustomerID(appointmentEntity.getUser().getUserID());
-
-                    return appointment;
-                })
-                .sorted(Comparator.comparing(AppointmentDTO::getDate))
-                .toList();
-        return appointmentDTOList;
+    public List<Appointment> getAppointmentByUnFeedback(Client user) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByUser(user);
+        List<Appointment> respone = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == 2) {
+                if(appointment.getStarAppointment()==0){
+                    respone.add(appointment);
+                }
+            }
+        }
+        return respone;
     }
 
-
-    /**
-     * @param staff           Input Client staff
-     * @param customer        Input Client customer
-     * @param dentistSchedule Input DentistSchedule
-     * @param services        Input Services
-     * @param dependent       Input Dependent dependent
-     */
-    public void createAppointment(@Nullable Client staff, Client customer, DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
-        Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
-                .user(customer)
-                .clinic(dentistSchedule.getClinic())
-                .date(dentistSchedule.getWorkDate())
-                .timeSlot(dentistSchedule.getTimeslot())
-                .dentist(dentistSchedule.getDentist())
-                .services(services)
-                .dentistScheduleId(dentistSchedule.getScheduleID())
-                .status(1);
-
-        if (staff != null) {
-            appointmentBuilder.staff(staff.getStaff());
-        }
-
-        if (dependent != null) {
-            appointmentBuilder.dependent(dependent);
-        }
-        appointmentBuilder.build();
-
-        dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
-        Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
-        otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
-
-        appointmentRepository.save(appointmentBuilder.build());
+    public double totalStarByDentist(Client client) {
+        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(),2,0);
+       double total= totalAppointment.size();
+       double stars=0;
+       for (Appointment appointment : totalAppointment) {
+           stars+=appointment.getStarAppointment();
+       }
+       return Math.round(stars/total *10.0) /10.0 ;
     }
 
+    public Map<String, Double> getRatingDentistByStaff(Staff staff) {
+        Map<String, Double> dentistRatings = new HashMap<>();
 
+        List<Dentist> managedDentists = staff.getDentistList();
 
+        for (Dentist dentist : managedDentists) {
+            Client clientForDentist = new Client();
+            clientForDentist.setDentist(dentist);
+
+            double rating = totalStarByDentist(clientForDentist);
+            dentistRatings.put(dentist.getUser().getName(), rating);
+        }
+
+        return dentistRatings;
+    }
+
+    public Map<String, Double> getRatingDentistByManager(Client manager) {
+        Map<String, Double> dentistRatings = new HashMap<>();
+
+        List<Dentist> managedDentists = manager.getClinicList().stream().map(clinic -> (Dentist) clinic.getDentistList()).toList();
+
+        for (Dentist dentist : managedDentists) {
+            Client clientForDentist = new Client();
+            clientForDentist.setDentist(dentist);
+
+            double rating = totalStarByDentist(clientForDentist);
+            dentistRatings.put(dentist.getUser().getName(), rating);
+        }
+
+        return dentistRatings;
+    }
 }

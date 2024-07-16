@@ -22,6 +22,14 @@ public class ClinicService {
         }
     }
 
+    public List<Clinic> findAllClinicsByStatus(int status) {
+        try {
+            return clinicRepository.findClinicsByStatus(status);
+        } catch (Error e) {
+            throw e;
+        }
+    }
+
     public Clinic save(Clinic clinic) {
         return clinicRepository.save(clinic);
     }

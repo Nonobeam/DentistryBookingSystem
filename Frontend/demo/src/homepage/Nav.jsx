@@ -9,6 +9,7 @@ import {
   UserOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
+import { PiEngine } from "react-icons/pi";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -63,6 +64,12 @@ const NavBar = () => {
     },
     {
       key: '3',
+      label: <Link to="/appointment-feedback">Feedback</Link>
+
+    },
+    
+    {
+      key: '4',
       label: 'Logout',
       onClick: handleLogout
     },
@@ -171,6 +178,7 @@ const NavBar = () => {
               <Menu.Item key="4" icon={<AppstoreOutlined />}>
                 <Link to="/services">Services</Link>
               </Menu.Item>
+             
             </Menu>
 
             <div

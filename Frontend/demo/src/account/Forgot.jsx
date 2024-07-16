@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, Alert, Spin } from 'antd';
+import { Form, Input, Button, Typography, Alert } from 'antd';
 import styled from 'styled-components';
 
 const { Title } = Typography;
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
     setLoading(true);
     console.log('Success:', values);
     try {
-      const response = await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
+      await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
       setSuccessMessage("The reset password link has been sent to your email.");
     } catch (error) {
       setErrorMessage( error.response?.data?.message || "An error occurred. Please try again later.");

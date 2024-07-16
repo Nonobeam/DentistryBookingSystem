@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
-import { Layout, Menu, Row, Col, Card, Typography } from "antd";
+import { Layout, Typography } from "antd";
 import "antd/dist/reset.css";
 import axios from "axios";
-import { Table, Button, Modal, Form, DatePicker, Select, Spin, message } from "antd";
+import { Table, Button, Modal, Form, DatePicker, Select, Spin, message, Input, Rate } from "antd";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import NavBar from "./Nav";
-import {
-  FacebookOutlined,
-  TwitterOutlined,
-  YoutubeOutlined,
-  LinkedinOutlined,
-} from "@ant-design/icons";
-const { Title, Paragraph } = Typography;
 
+const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
 const StyledFooter = styled(Layout.Footer)`
@@ -23,6 +17,7 @@ const StyledFooter = styled(Layout.Footer)`
   color: white;
   padding: 40px 0;
 `;
+
 const History = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +26,9 @@ const History = () => {
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   const [sortOrder, setSortOrder] = useState("descend");
+  const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [starRating, setStarRating] = useState(0);
   const history = useNavigate();
 
   useEffect(() => {
@@ -79,6 +77,42 @@ const History = () => {
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
     }
+  };
+
+  const handleUpdateFeedback = async () => {
+    const token = localStorage.getItem("token");
+
+    // Kiểm tra xem người dùng đã nhập số sao hay chưa
+    if (starRating === 0) {
+      message.error("Please rate the appointment.");
+      return;
+    }
+
+    try {
+      await axios.put(`http://localhost:8080/user/appointment-feedback/${selectedAppointmentId}`, { 
+        feedback,
+        starAppointment: starRating 
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      message.success("Feedback updated successfully");
+      setFeedbackModalVisible(false);
+      setFeedback("");
+      setStarRating(0);
+      setSelectedAppointmentId(null);
+      fetchAppointments();
+    } catch (error) {
+      message.error("Failed to update feedback");
+    }
+  };
+
+  const handleFeedbackButtonClick = (record) => {
+    setSelectedAppointmentId(record.appointmentID);
+    setFeedback(record.feedback || ""); // set existing feedback if available
+    setStarRating(record.starAppointment || 0); // set existing star rating if available
+    setFeedbackModalVisible(true);
   };
 
   const columns = [
@@ -130,17 +164,14 @@ const History = () => {
         if (status === 0) {
           statusText = "Cancelled";
           statusColor = "red";
-        } else {
-          const appointmentDate = moment(record.date);
-          const currentDate = moment();
-          if (appointmentDate.isBefore(currentDate, "day")) {
+        } else if (status === 2 ) {
             statusText = "Finished";
             statusColor = "green";
           } else {
             statusText = "Upcoming";
             statusColor = "yellow";
           }
-        }
+        
         return (
           <span
             style={{
@@ -166,21 +197,36 @@ const History = () => {
         const currentDate = moment();
         if (record.status === 1 && appointmentDate.isSameOrAfter(currentDate, "day")) {
           return (
+            <>
+              <Button
+                type="primary"
+                danger
+                onClick={() => {
+                  setSelectedAppointmentId(record.appointmentID);
+                  setCancelModalVisible(true);
+                }}
+                style={{ marginRight: 8 }}
+              >
+                Cancel
+              </Button>
+            
+            </>
+          );
+        } else if (record.status === 2 && record.starAppointment !==0) {
+          return (
             <Button
               type="primary"
-              danger
-              onClick={() => {
-                setSelectedAppointmentId(record.appointmentID);
-                setCancelModalVisible(true);
-              }}
+              onClick={() => handleFeedbackButtonClick(record)}
+              style={{ marginRight: 8 }}
             >
-              Cancel
+              View your feedback
             </Button>
           );
         }
         return null;
       },
     },
+    
   ];
 
   const locale = {
@@ -199,7 +245,7 @@ const History = () => {
           <Form.Item label="Filter by Status">
             <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
               <Option value={0}>Cancelled</Option>
-              <Option value={1}>Active</Option>
+              <Option value={1}>Upcoming</Option>
             </Select>
           </Form.Item>
           <Form.Item>
@@ -210,20 +256,19 @@ const History = () => {
         </Form>
 
         <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-            <Table
-              columns={columns}
-              dataSource={appointments}
-              rowKey="appointmentID"
-              pagination={{ pageSize: 10 }}
-              locale={locale}
-              loading={loading}
-            />
-          
+          <Table
+            columns={columns}
+            dataSource={appointments}
+            rowKey="appointmentID"
+            pagination={{ pageSize: 10 }}
+            locale={locale}
+            loading={loading}
+          />
         </div>
 
         <Modal
           title="Cancel Appointment"
-          open={cancelModalVisible}
+          visible={cancelModalVisible}
           onOk={handleCancel}
           onCancel={() => setCancelModalVisible(false)}
           okText="Yes, Cancel"
@@ -231,9 +276,37 @@ const History = () => {
         >
           <p>Are you sure you want to cancel this appointment? This action cannot be undone.</p>
         </Modal>
+
+        <Modal
+          title="View your feedback"
+          visible={feedbackModalVisible}
+          onCancel={() => {
+            setFeedbackModalVisible(false);
+            setSelectedAppointmentId(null);
+            setFeedback("");
+            setStarRating(0);
+          }}
+          onOk={handleUpdateFeedback}
+          okText="Update"
+          cancelText="Cancel"
+        >
+          <Form layout="vertical">
+            <Form.Item label="Feedback">
+              <Input.TextArea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </Form.Item>
+            <Form.Item label="Rate Appointment">
+              <Rate
+                value={starRating}
+                onChange={(value) => setStarRating(value)}
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     </div>
-    
   );
 };
 
