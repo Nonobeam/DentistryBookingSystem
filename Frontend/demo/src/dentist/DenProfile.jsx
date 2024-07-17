@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin, Layout } from "antd";
+import { Form, Input, Button, DatePicker, message, Layout, Card, Skeleton } from "antd";
+import { UserOutlined, PhoneOutlined, MailOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 
@@ -10,6 +11,7 @@ const { Header, Content } = Layout;
 const DenProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(false);
   const [form] = Form.useForm();
 
 
@@ -41,9 +43,9 @@ const DenProfile = () => {
   }, [fetchUserInfo]);
 
   const handleUpdate = async (values) => {
+    setUpdate(true);
     try {
       const token = localStorage.getItem("token");
-      console.log(values.birthday)
       const response = await axios.put(
         "http://localhost:8080/api/v1/dentist/info/update",
         {
@@ -65,6 +67,14 @@ const DenProfile = () => {
     } catch (error) {
       message.error("Failed to update profile");
     }
+    finally {
+      setUpdate(false);
+    }
+  };
+  const disableDatesAfterToday = (current) => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return current > today;
   };
 
   return (
@@ -74,9 +84,13 @@ const DenProfile = () => {
     <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
         <Content style={{ margin: '20px 16px 20px 20px' }}>
       
-      <h1>Profile</h1>
+        <Card
+          title="Profile"
+          bordered={false}
+          style={{ textAlign: "center" }}
+        >
       {loading ? (
-        <Spin />
+            <Skeleton active/>
       ) : (
         <Form
           form={form}
@@ -92,44 +106,47 @@ const DenProfile = () => {
         >
           <Form.Item
             name="name"
-            label="Name"
+                label={<span><UserOutlined /> Name </span>}
             rules={[{ required: true, message: "Please enter your name" }]}
           >
-            <Input />
+                <Input placeholder="Enter your name" />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Phone"
-            rules={[{ required: true, message: "Please enter your phone number" }]}
+                label={<span><PhoneOutlined /> Phone </span>}
+                rules={[
+                  { required: true, message: "Please enter your phone number" },{
+                    pattern: /^\d{10}$/,
+                    message: "Phone number must be 10 digits!",
+                  },]}
           >
-            <Input />
+                <Input placeholder="Enter your phone number" />
           </Form.Item>
           <Form.Item
             name="mail"
-            label="Email"
+                label={<span><MailOutlined /> Email</span>}
             rules={[{ required: true, message: "Please enter your email" }]}
           >
             <Input disabled />
           </Form.Item>
-
           <Form.Item
             name="birthday"
-            label="Birthday"
+                label={<span><CalendarOutlined /> Birthday </span>}
             rules={[{ required: true, message: "Please select your birthday" }]}
           >
-            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                <DatePicker format={'DD-MM-YYYY'} disabledDate={disableDatesAfterToday} style={{ width: "100%" }}/>
           </Form.Item>
-
          <Form.Item>
           <a href="/forgot">Wanna change password?</a>
          </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+                <Button type="primary" loading={update} htmlType="submit" style={{ width: "100%" }}>
               Update Profile
             </Button>
           </Form.Item>
         </Form>
       )}
+      </Card>
     </Content>
     </Layout>
     </Layout>

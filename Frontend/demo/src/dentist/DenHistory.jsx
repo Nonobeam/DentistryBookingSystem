@@ -59,8 +59,8 @@ const DenHistory = () => {
   const handleChangeStatus = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.get(
-        `http://localhost:8080/api/v1/dentist/appointment-history/${selectedAppointment.appointmentId}?status=${newStatus}`,
+      await axios.put(
+        `http://localhost:8080/api/v1/dentist/appointment-history/${selectedAppointment.appointmentId}?status=${newStatus}`,[],
         {
           headers: {
             Authorization: `Bearer ${token}`

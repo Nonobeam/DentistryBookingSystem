@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Calendar, DatePicker, Spin, message } from "antd";
+import { Layout, Calendar, DatePicker, Spin, message, Badge } from "antd";
 import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 import "./style.css";
@@ -12,31 +12,31 @@ const DentistSchedule = () => {
   const initialStartDate = dayjs();
   const initialEndDate = dayjs().add(30, "days");
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [scheduleData, setScheduleData] = useState({});
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
 
   useEffect(() => {
     fetchSchedule(initialStartDate, initialEndDate);
-  });
+  }, []);
 
   const fetchSchedule = async (start, end) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       const numDays = end.diff(start, 'days');
-      console.log(numDays);
       const response = await axios.get(`http://localhost:8080/api/v1/dentist/weekSchedule/${start.format('YYYY-MM-DD')}?numDay=${numDays}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       setScheduleData(response.data);
+      setLoading(false);
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
     }
-    setLoading(false);
+    
   };
 
   const onRangeChange = (dates) => {
@@ -45,6 +45,16 @@ const DentistSchedule = () => {
     fetchSchedule(dates[0], dates[1]);
   };
 
+  const headerRender = ({ value, type, onChange, onTypeChange }) => {
+    const current = value.format('YYYY-MM');
+    return (
+      <div style={{ padding: 8 }}>
+        <div>{current}</div>
+      </div>
+    );
+  };
+  
+
   const dateCellRender = (value) => {
     const formattedDate = value.format("YYYY-MM-DD");
     const dayData = scheduleData[formattedDate] || [];
@@ -52,12 +62,26 @@ const DentistSchedule = () => {
       <ul className="events">
         {dayData.map(item => (
           <li key={item.id}>
-            <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"})
-          </li>
+                <Badge 
+            status={
+              item.status === 1 
+                ? 'processing' 
+                : item.status === 2 
+                  ? 'success' 
+                  : 'error'
+            } 
+            text={
+             <> <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"}) </>
+
+            } 
+          />
+        </li>
         ))}
       </ul>
     );
   };
+              {/* <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"}) */}
+
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -78,6 +102,7 @@ const DentistSchedule = () => {
             ) : (
               <Calendar
                 cellRender={dateCellRender}
+                // headerRender={headerRender}
                 disabledDate={(current) => {
                   return current && (current < startDate || current > endDate);
                 }}
