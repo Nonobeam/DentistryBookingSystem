@@ -10,7 +10,7 @@ import {
   Select,
   notification,
 } from 'antd';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined icon from Ant Design
 import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
@@ -210,8 +210,8 @@ const Schedule = () => {
     // Allow dates up to two months from today
     return (
       current &&
-      (current < moment().startOf("day") ||
-        current > moment().add(2, "months").endOf("day"))
+      (current < dayjs().startOf("day") ||
+        current > dayjs().add(2, "months").endOf("day"))
     );
   };
 

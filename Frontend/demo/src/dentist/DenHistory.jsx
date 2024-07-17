@@ -1,6 +1,6 @@
 import { Button, DatePicker, Input, Layout, Modal, Select, Spin, Table, message } from "antd";
 import axios from "axios";
-import moment from "moment";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import Sidebar from "./Sidebar";
@@ -30,7 +30,7 @@ const DenHistory = () => {
       let apiUrl = `http://localhost:8080/api/v1/dentist/appointment-history/?`;
       
       if (filterDate) {
-        const formattedDate = moment(filterDate).format("YYYY-MM-DD");
+        const formattedDate = dayjs(filterDate).format("YYYY-MM-DD");
         apiUrl += `date=${formattedDate}&`;
       }
 
@@ -93,8 +93,8 @@ const DenHistory = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => moment(date).format("DD-MM-YYYY"),
-      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+      render: (date) => dayjs(date).format("DD-MM-YYYY"),
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       defaultSortOrder: "ascend",
     },
     {
@@ -102,7 +102,7 @@ const DenHistory = () => {
       dataIndex: "timeSlot",
       key: "timeSlot",
       render: (timeSlot) => timeSlot,
-      sorter: (a, b) => moment(a.timeSlot, "HH:mm:ss").unix() - moment(b.timeSlot, "HH:mm:ss").unix(),
+      sorter: (a, b) => dayjs(a.timeSlot, "HH:mm:ss").unix() - dayjs(b.timeSlot, "HH:mm:ss").unix(),
       defaultSortOrder: "descend",
     },
     {

@@ -5,7 +5,7 @@ import "antd/dist/reset.css";
 import axios from "axios";
 import { Table, Button, Modal, Form, DatePicker, Select, Spin, message, Input, Rate } from "antd";
 import { useNavigate } from "react-router-dom";
-import moment from "moment";
+import dayjs from "dayjs";
 import NavBar from "./Nav";
 
 const { Title, Paragraph } = Typography;
@@ -126,8 +126,8 @@ const History = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => moment(date).format("DD-MM-YYYY"),
-      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+      render: (date) => dayjs(date).format("DD-MM-YYYY"),
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       defaultSortOrder: sortOrder,
     },
     {
@@ -193,8 +193,8 @@ const History = () => {
       title: "Action",
       key: "action",
       render: (_, record) => {
-        const appointmentDate = moment(record.date);
-        const currentDate = moment();
+        const appointmentDate = dayjs(record.date);
+        const currentDate = dayjs();
         if (record.status === 1 && appointmentDate.isSameOrAfter(currentDate, "day")) {
           return (
             <>

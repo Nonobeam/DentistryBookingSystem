@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Layout, Table, Button, message, Spin } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
 
@@ -55,8 +55,8 @@ const PatientInfo = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => moment(date).format("DD-MM-YYYY"),
-      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+      render: (date) => dayjs(date).format("DD-MM-YYYY"),
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       defaultSortOrder: "ascend",
     },
     {
@@ -64,7 +64,7 @@ const PatientInfo = () => {
       dataIndex: "timeSlot",
       key: "timeSlot",
       render: (timeSlot) => timeSlot,
-      sorter: (a, b) => moment(a.timeSlot, "HH:mm:ss").unix() - moment(b.timeSlot, "HH:mm:ss").unix(),
+      sorter: (a, b) => dayjs(a.timeSlot, "HH:mm:ss").unix() - dayjs(b.timeSlot, "HH:mm:ss").unix(),
       defaultSortOrder: "descend",
     },
     {
@@ -134,7 +134,7 @@ const PatientInfo = () => {
                   <p><b>Name:</b> {patientInfo?.name}</p>
                   <p><b>Phone:</b> {patientInfo?.phone}</p>
                   <p><b>Email:</b> {patientInfo?.mail}</p>
-                  <p><b>Birthday:</b> {moment(patientInfo?.birthday).format("DD-MM-YYYY")}</p>
+                  <p><b>Birthday:</b> {dayjs(patientInfo?.birthday).format("DD-MM-YYYY")}</p>
                   <p><b>Status:</b> {patientInfo?.status === 0 ? "Inactive" : "Active"}</p>
                 </div>
 
