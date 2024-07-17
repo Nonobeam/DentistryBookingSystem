@@ -94,7 +94,7 @@ export const TimeTable = () => {
         Weekly Task Manager
       </h1>
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        <Link to='/schedule'>
+        <Link to='/staff/schedule'>
           <Button
             style={{
               marginRight: '10px',
