@@ -23,7 +23,7 @@ export const DentistServices = {
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: error.message,
+        description: 'Not found Customer',
         onClick: () => {
           console.log('Notification Clicked!');
         },

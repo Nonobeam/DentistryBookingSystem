@@ -106,7 +106,7 @@ const App = () => {
           <Route path='dentist-list' element={<DentistList/>} />
           <Route
             path='dentist-list/detail/:dentistID'
-            element={<DentistInfo />}
+            element={<DentistInfo />} 
           />
 
           <Route path='' element={<StaffDashboard/>} />
