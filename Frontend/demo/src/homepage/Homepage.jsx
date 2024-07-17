@@ -8,10 +8,6 @@ import {
   ProjectOutlined,
   FileDoneOutlined,
   MailOutlined,
-  FacebookOutlined,
-  TwitterOutlined,
-  YoutubeOutlined,
-  LinkedinOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 
@@ -25,6 +21,7 @@ const StyledFooter = styled(Layout.Footer)`
 const { Title, Paragraph } = Typography;
 
 const Homepage = () => {
+
   useEffect(() => {
     const checkFeedbacks = async () => {
       try {

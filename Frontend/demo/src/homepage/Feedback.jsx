@@ -15,23 +15,23 @@ const FeedbackPage = () => {
   const [feedback, setFeedback] = useState("");
   const [starRating, setStarRating] = useState(0);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        const response = await axios.get("http://localhost:8080/user/appointment-feedback", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setAppointments(response.data);
-      } catch (error) {
-        message.error("Failed to fetch appointments");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAppointments = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get("http://localhost:8080/user/appointment-feedback", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setAppointments(response.data);
+    } catch (error) {
+      message.error("Failed to fetch appointments");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchAppointments();
   }, []);
 
@@ -58,13 +58,7 @@ const FeedbackPage = () => {
       setFeedback("");
       setStarRating(0);
       setSelectedAppointmentId(null);
-      // Refresh appointments
-      const response = await axios.get("http://localhost:8080/user/appointment-feedback", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setAppointments(response.data);
+      fetchAppointments();
     } catch (error) {
       message.error("Failed to update feedback");
     }
