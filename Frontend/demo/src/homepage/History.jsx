@@ -195,7 +195,7 @@ const History = () => {
       render: (_, record) => {
         const appointmentDate = dayjs(record.date);
         const currentDate = dayjs();
-        if (record.status === 1 && !appointmentDate.isBefore(currentDate, "day")) {
+        if (record.status === 1 && appointmentDate.isSameOrAfter(currentDate, "day")) {
           return (
             <>
               <Button
