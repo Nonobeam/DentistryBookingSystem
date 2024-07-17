@@ -42,9 +42,6 @@ public class SecurityConfig{
             "/swagger-resources/**",
             "/swagger-ui.html",
             "/swagger-ui/index.html#/**",
-            "/user/forgotPassword",
-            "/user/resetPassword",
-            "/user/resetPassword/**",
             "/api/v1/admin/test-api"
     };
 
