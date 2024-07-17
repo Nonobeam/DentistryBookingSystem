@@ -40,8 +40,8 @@ After working for a long time, some conflict may come up, try to use git fetch a
    ```git push origin your-branch-name``` 
 
 ### Docker run
-1. Docker run mysql imag
-```docker run --name mydb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mypassword -e MYSQL_DATABASE=mydb -e MYSQL_USER=myuser -e MYSQL_PASSWORD=mypassword -d mysql:latest```
+1. Docker run project
+```docker-compose up --build -d```
 
 ### Resolve conflict
 
