@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Layout, Typography, Table, Button, Modal, Form, Input, message, Spin, Rate } from "antd";
 import "antd/dist/reset.css";
 import axios from "axios";
-import moment from "moment";
+import dayjs from "dayjs";
 import NavBar from "./Nav";
 
 const { Content } = Layout;
@@ -82,8 +82,8 @@ const FeedbackPage = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => moment(date).format("DD-MM-YYYY"),
-      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+      render: (date) => dayjs(date).format("DD-MM-YYYY"),
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
     },
     {
       title: "Time",

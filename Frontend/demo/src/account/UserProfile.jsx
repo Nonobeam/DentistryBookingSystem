@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin, Card } from "antd";
+import { Form, Input, Button, DatePicker, message, Spin, Card, Skeleton } from "antd";
 import { UserOutlined, PhoneOutlined, MailOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs"; 
 import NavBar from "../homepage/Nav";
@@ -8,6 +8,7 @@ import NavBar from "../homepage/Nav";
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(false);
   const [form] = Form.useForm();
 
 
@@ -38,6 +39,7 @@ const UserProfile = () => {
   }, [fetchUserInfo]);
 
   const handleUpdate = async (values) => {
+    setUpdate(true);
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
@@ -61,6 +63,14 @@ const UserProfile = () => {
     } catch (error) {
       message.error("Failed to update profile");
     }
+    finally {
+      setUpdate(false);
+    }
+  };
+  const disableDatesAfterToday = (current) => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return current > today;
   };
 
   return (
@@ -73,7 +83,7 @@ const UserProfile = () => {
           style={{ textAlign: "center" }}
         >
           {loading ? (
-            <Spin />
+            <Skeleton active/>
           ) : (
             <Form
               form={form}
@@ -88,14 +98,14 @@ const UserProfile = () => {
             >
               <Form.Item
                 name="name"
-                label={<span><UserOutlined /> Name <span style={{ color: 'red' }}>*</span></span>}
+                label={<span><UserOutlined /> Name </span>}
                 rules={[{ required: true, message: "Please enter your name" }]}
               >
                 <Input placeholder="Enter your name" />
               </Form.Item>
               <Form.Item
                 name="phone"
-                label={<span><PhoneOutlined /> Phone <span style={{ color: 'red' }}>*</span></span>}
+                label={<span><PhoneOutlined /> Phone </span>}
                 rules={[
                   { required: true, message: "Please enter your phone number" },{
                     pattern: /^\d{10}$/,
@@ -106,23 +116,23 @@ const UserProfile = () => {
               </Form.Item>
               <Form.Item
                 name="mail"
-                label={<span><MailOutlined /> Email <span style={{ color: 'red' }}>*</span></span>}
+                label={<span><MailOutlined /> Email</span>}
                 rules={[{ required: true, message: "Please enter your email" }]}
               >
                 <Input disabled />
               </Form.Item>
               <Form.Item
                 name="birthday"
-                label={<span><CalendarOutlined /> Birthday <span style={{ color: 'red' }}>*</span></span>}
+                label={<span><CalendarOutlined /> Birthday </span>}
                 rules={[{ required: true, message: "Please select your birthday" }]}
               >
-                <DatePicker style={{ width: "100%" }}/>
+                <DatePicker format={'DD-MM-YYYY'} disabledDate={disableDatesAfterToday} style={{ width: "100%" }}/>
               </Form.Item>
               <Form.Item>
                 <a href="/forgot">Wanna change password?</a>
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+                <Button type="primary" loading={update} htmlType="submit" style={{ width: "100%" }}>
                   Update Profile
                 </Button>
               </Form.Item>
