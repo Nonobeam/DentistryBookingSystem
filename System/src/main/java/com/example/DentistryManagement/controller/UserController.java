@@ -47,7 +47,7 @@ public class UserController {
     private final UserMapping userMapping;
     private final ClinicService clinicService;
     private final ServiceService serviceService;
-    private final PasswordResetTokenService tokenService;
+    private final AuthenticationService authenticationService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final DentistScheduleService dentistScheduleService;
     private final Logger logger = LogManager.getLogger(UserController.class);
@@ -369,38 +369,6 @@ public class UserController {
     }
 
     //----------------------------------- UPDATE INFORMATION -----------------------------------
-
-
-    @Operation(summary = "Send a reset password link to customer's email")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam String mail) {
-        try {
-            Client user = userService.findUserByMail(mail);
-            if (user != null) {
-                String token = UUID.randomUUID().toString();
-                tokenService.createPasswordResetTokenForUser(user, token);
-                tokenService.sendPasswordResetEmail(user.getMail(), token);
-                return ResponseEntity.ok("Password reset link has been sent to your email");
-            } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
-                logger.error("Not found user");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-            }
-
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-
     @Operation(summary = "User update their profile")
     @PutMapping("/info/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO) {
@@ -411,33 +379,6 @@ public class UserController {
             }
             userService.updateUser(userDTO, currentUser);
             return ResponseEntity.ok(userDTO);
-        } catch (Error e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
-            logger.error("Not found user", e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        } catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
-            logger.error("Server_error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-    @Operation(summary = "Reset customer's email")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully"),
-            @ApiResponse(responseCode = "403", description = "Don't have permission to do this"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    @PostMapping("/resetPassword/{token}")
-    public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestParam("password") String password) {
-        try {
-            String validationResult = tokenService.validatePasswordResetToken(token);
-            if (validationResult.equalsIgnoreCase("invalid")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
-            }
-            tokenService.resetPassword(token, password);
-            return ResponseEntity.ok("Password has been reset successfully");
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found user");
             logger.error("Not found user", e);

@@ -119,10 +119,10 @@ public class StaffController {
             Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
             HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
             // Gt all dentists by current staff account
-            List<Dentist> dentists = userDentistService.findDentistListByStaff(staff);
+            List<Dentist> dentistList = userDentistService.findDentistListByStaff(staff);
 
             // Get all dentistSchedule from the dentists
-            for (Dentist dentist : dentists) {
+            for (Dentist dentist : dentistList) {
                 List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList();
                 if (!dentistSchedule.isEmpty()) {
                     dentistSchedules.addAll(dentistSchedule);

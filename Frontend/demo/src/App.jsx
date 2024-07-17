@@ -101,31 +101,26 @@ const App = () => {
         </Route>
 
         {/* STAFF PAGES */}
-        <Route path='/staff' element={<DashBoard/>}>
+        <Route path='/staff' element={<RoleBasedRoute element={<DashBoard />} requiredRole={['STAFF']} />}>
+          <Route path='' element={<RoleBasedRoute element={<StaffDashboard />} requiredRole={['STAFF']} />} />
+          <Route path='dentist-list' element={<RoleBasedRoute element={<DentistList />} requiredRole={['STAFF']} />} />
+          <Route path='dentist-list/detail/:dentistID' element={<RoleBasedRoute element={<DentistInfo />} requiredRole={['STAFF']} />} />
+          <Route path='appointment-history' element={<RoleBasedRoute element={<AppointmentsPage />} requiredRole={['STAFF']} />} />
+          <Route path='timetable' element={<RoleBasedRoute element={<TimeTable />} requiredRole={['STAFF']} />} />
+          <Route path='profile' element={<RoleBasedRoute element={<StaffProfile />} requiredRole={['STAFF']} />} />
+          <Route path='customer-list' element={<RoleBasedRoute element={<CustomerListDash />} requiredRole={['STAFF']} />} />
+          <Route path='customer-list/detail/:customerID' element={<RoleBasedRoute element={<CustomerInfo />} requiredRole={['STAFF']} />} />
+          <Route path='schedule' element={<RoleBasedRoute element={<Schedule />} requiredRole={['STAFF']} />} /> 
+       </Route>
 
-          <Route path='dentist-list' element={<DentistList/>} />
-          <Route
-            path='dentist-list/detail/:dentistID'
-            element={<DentistInfo />}
-          />
-
-          <Route path='' element={<StaffDashboard/>} />
-
-          <Route path='appointment-history' element={<AppointmentsPage />} />
-          <Route path='timetable' element={<TimeTable />} />
-          <Route path='profile' element={<StaffProfile/>} />
-          <Route path='customer-list' element={<CustomerListDash />} />
-          <Route path='customer-list/detail/:customerID' element={<CustomerInfo />} />
-        </Route>
-        <Route path='/schedule' element={<Schedule />} />
-        
           {/* ADMIN PAGES */}
-        <Route path='/admin' element={<Pages />}>
-          <Route path='customer-list-admin' element={<CustomerList />} />
-          <Route path='dentist-list-admin' element={<DentistListAmin />} />
-          <Route path='manager-list' element={<ManagerList />} />
-          <Route path='staff-list' element={<StaffList />} />
-        </Route>
+          <Route path='/admin' element={<RoleBasedRoute element={<Pages />} requiredRole={['ADMIN']} />}>
+            <Route path='customer-list-admin' element={<RoleBasedRoute element={<CustomerList />} requiredRole={['ADMIN']} />} />
+            <Route path='dentist-list-admin' element={<RoleBasedRoute element={<DentistListAmin />} requiredRole={['ADMIN']} />} />
+            <Route path='manager-list' element={<RoleBasedRoute element={<ManagerList />} requiredRole={['ADMIN']} />} />
+            <Route path='staff-list' element={<RoleBasedRoute element={<StaffList />} requiredRole={['ADMIN']} />} />
+          </Route>
+
       </Routes>
     </Router>
   );

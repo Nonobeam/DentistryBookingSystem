@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: product_user
+      MYSQL_PASSWORD: product_user_password
+      MYSQL_DATABASE: DentistryManagementSystem
+    volumes:
+      - ./initDB.sql:/docker-entrypoint-initdb.d/initDB.sql
+
+  spring-boot-app:
+    build:
+      context: ./System
+      dockerfile: Dockerfile
+    image: backend:v1.00
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/DentistryManagementSystem
+      SPRING_DATASOURCE_USERNAME: product_user
+      SPRING_DATASOURCE_PASSWORD: product_user_password
+
+  react-app:
+    build:
+      context: ./Frontend/demo
+      dockerfile: Dockerfile
+    image: frontend:v1.00
+    ports:
+      - "3000:80"
