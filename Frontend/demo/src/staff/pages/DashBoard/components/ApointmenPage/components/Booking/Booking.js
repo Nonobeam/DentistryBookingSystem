@@ -10,7 +10,7 @@ import {
   Col,
 } from 'antd';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { DentistServices } from '../../../../../../services/CustomerServices/CustomerServices';
 
 export const Booking = () => {
@@ -157,7 +157,7 @@ export const Booking = () => {
 
   // Function to disable dates more than 2 months from today
   const disabledDate = (current) => {
-    return current && current > moment().add(2, 'months');
+    return current && current > dayjs().add(2, 'months');
   };
 
   return (

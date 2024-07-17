@@ -37,7 +37,7 @@ const items = [
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       localStorage.removeItem("expirationTime");
-      window.location.href = '/'; // Redirect to the homepage after logout// Remove access token or any other stored data    
+      window.location.href = '/';    
  
     },
   }

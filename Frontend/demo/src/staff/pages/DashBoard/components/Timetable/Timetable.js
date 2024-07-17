@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Button, Card, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import TimetableServices from '../../../../services/TimetableServices/TimetableServices';
@@ -18,9 +18,9 @@ const fetchTimetableData = async (firstDayOfWeek) => {
 };
 
 export const TimeTable = () => {
-  const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
+  const [currentWeek, setCurrentWeek] = useState(dayjs().startOf('week'));
   const [firstDayOfWeek, setFirstDayOfWeek] = useState(
-    moment().startOf('week')
+    dayjs().startOf('week')
   );
   const { data, error, isLoading, mutate } = useSWR('Timetable', () =>
     fetchTimetableData(firstDayOfWeek)
@@ -31,7 +31,7 @@ export const TimeTable = () => {
   }, [firstDayOfWeek]);
 
   useEffect(() => {
-    setFirstDayOfWeek(moment(currentWeek).startOf('week'));
+    setFirstDayOfWeek(dayjs(currentWeek).startOf('week'));
   }, [currentWeek]);
 
   const nextWeek = () => {
@@ -60,9 +60,9 @@ export const TimeTable = () => {
 
         tasksForWeek.push({
           date: date,
-          day: moment(date).format('ddd'),
+          day: dayjs(date).format('ddd'),
           tasks: tasksForDay.map((task) => ({
-            time: moment(task.time, 'HH:mm:ss').format('HH:mm'),
+            time: dayjs(task.time, 'HH:mm:ss').format('HH:mm'),
             dentistName: task.dentistName,
             customerName: task.customerName || 'N/A',
             serviceName: task.serviceName || 'N/A',
@@ -94,7 +94,7 @@ export const TimeTable = () => {
         Weekly Task Manager
       </h1>
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        <Link to='/schedule'>
+        <Link to='/staff/schedule'>
           <Button
             style={{
               marginRight: '10px',
@@ -155,8 +155,8 @@ export const TimeTable = () => {
                 background: index % 2 === 0 ? '#E3EFFF' : '#FFFFFF',
                 color: '#001F3F',
               }}>
-              <h3>{moment(date).format('DD/MM')}</h3>
-              <p>{moment(date).format('ddd')}</p>
+              <h3>{dayjs(date).format('DD/MM')}</h3>
+              <p>{dayjs(date).format('ddd')}</p>
             </div>
           ))}
         </div>
