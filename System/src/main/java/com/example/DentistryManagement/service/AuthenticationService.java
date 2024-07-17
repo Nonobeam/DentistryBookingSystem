@@ -6,6 +6,7 @@ import com.example.DentistryManagement.auth.AuthenticationRequest;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.core.dentistry.Clinic;
+import com.example.DentistryManagement.core.token.PasswordResetToken;
 import com.example.DentistryManagement.core.token.Token;
 import com.example.DentistryManagement.core.token.TokenType;
 import com.example.DentistryManagement.core.user.Dentist;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -29,13 +31,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final NotificationService notificationService;
-    @Value("${spring.confirmation.link.baseurl}")
+    @Value("http://localhost:3000")
     private String confirmationLinkBaseUrl;
 
     private final JwtService jwtService;
@@ -46,6 +49,7 @@ public class AuthenticationService {
     private final DentistRepository dentistRepository;
     private final AuthenticationManager authenticationManager;
     private final TemporaryUserRepository temporaryUserRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
@@ -335,5 +339,46 @@ public class AuthenticationService {
         }
     }
 
+    //----------------------------------- Forgot Password -----------------------------------
+    public void createPasswordResetTokenForUser(Client user, String token) {
+        PasswordResetToken
+                myToken = new PasswordResetToken();
+        myToken.setToken(token);
+        myToken.setUser(user);
+        myToken.setExpiryTime(calculateExpiryDate());
+        passwordResetTokenRepository.save(myToken);
+    }
+
+    public String validatePasswordResetToken(String token) {
+        PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
+        if (passToken == null || isTokenExpired(passToken)) {
+            return "invalid";
+        }
+        return "valid";
+    }
+
+    public void resetPassword(String token, String password){
+        PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
+        Client user = passToken.getUser();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        passwordResetTokenRepository.delete(passToken); // Invalidate the used token
+    }
+
+    public void sendPasswordResetEmail(String mail, String token) {
+        String url = confirmationLinkBaseUrl + "/api/v1/auth/resetPassword/" + token;
+        String subject = "Password Reset Request";
+        String text = "To reset your password, click the link below:\n" + url + "\nThis link will expire after 5 minutes";
+        notificationService.sendSimpleMessage(mail, subject, text);
+    }
+
+    private LocalDateTime calculateExpiryDate() {
+        LocalDateTime expiryDate = LocalDateTime.now();
+        return expiryDate.plusMinutes(5);
+    }
+
+    private boolean isTokenExpired(PasswordResetToken passToken) {
+        return passToken.getExpiryTime().isBefore(LocalDateTime.now());
+    }
 
 }
