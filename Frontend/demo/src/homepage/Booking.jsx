@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import dayjs from "dayjs";
 import {
   Form,
   Input,
@@ -9,8 +10,8 @@ import {
   Checkbox,
   DatePicker,
   Modal,
-  Spin,
   Radio,
+  Skeleton,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import NavBar from "./Nav";
@@ -55,10 +56,12 @@ const Booking = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [newDependentName, setNewDependentName] = useState("");
   const [newDependentBirthday, setNewDependentBirthday] = useState(null);
+
   const [loadingClinics, setLoadingClinics] = useState(true);
   const [loadingServices, setLoadingServices] = useState(false);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
+  const [loadingForm, setLoadingForm] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -68,12 +71,38 @@ const Booking = () => {
   const [selectedDentist, setSelectedDentist] = useState("random");
   const [selectedDependant, setSelectedDependant] = useState(null);
 
+  const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [isDateDisabled, setIsDateDisabled] = useState(true);
   const [isServiceDisabled, setIsServiceDisabled] = useState(true);
   const [isDentistDisabled, setIsDentistDisabled] = useState(true);
   const [isTimeSlotDisabled, setIsTimeSlotDisabled] = useState(true);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkBookingLimit = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get('http://localhost:8080/user/booking', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data) {
+          setIsFormDisabled(true);
+          Modal.error({
+            title: "Booking Limit Exceeded",
+            content: "You have reached the maximum number of bookings allowed (5/5). Please cancel the existing booking(s) before making a new one.",
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching booking limit:', error);
+      }
+    };
+
+    checkBookingLimit();
+  }, []);
 
   useEffect(() => {
     const fetchClinics = async () => {
@@ -293,6 +322,7 @@ const Booking = () => {
   };
 
   const onFinish = async (values) => {
+    setLoadingForm(true);
     try {
       const token = localStorage.getItem("token");
       const selectedSlot = timeSlots.find(
@@ -338,6 +368,9 @@ const Booking = () => {
         onOk: () => window.location.reload(),
       });
     }
+    finally {
+      setLoadingForm(false);
+    }
   };
 
   const disabledDate = (current) => {
@@ -359,253 +392,274 @@ const Booking = () => {
 
   return (
     <>
-    <NavBar />
-    <BookingContainer>
-      <BookingFormWrapper>
-        <Title level={2}>Reserve your appointment!</Title>
-        <Form form={form} name="booking" onFinish={onFinish}>
-          <Form.Item name="forWhom" initialValue="self">
-            <Radio.Group onChange={(e) => setSelectedFor(e.target.value)}>
-              <Radio.Button value="self">For yourself</Radio.Button>
-              <Radio.Button value="others">For others</Radio.Button>
-            </Radio.Group>
-          </Form.Item>
+      <NavBar />
+      <BookingContainer>
+        <BookingFormWrapper>
+          <Title level={2}>Reserve your appointment!</Title>
+          <Form form={form} name="booking" onFinish={onFinish} disabled={isFormDisabled} layout="vertical">
+            <Form.Item name="forWhom" initialValue="self">
+              <Radio.Group onChange={(e) => setSelectedFor(e.target.value)}>
+                <Radio.Button value="self">For yourself</Radio.Button>
+                <Radio.Button value="others">For others</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
 
-          {selectedFor === "others" && (
-            <>
-              <Button type="link" onClick={() => setModalVisible(true)}>
-                <IoAddCircleOutline /> Create new
-              </Button>
-              <div>
-                    <UserOutlined style={{ marginRight: 8 }} />
-                    <span style={{ color: "red" }}>*</span> Dependent:
-                  </div>
-              <Form.Item
-                name="patient"
-                rules={[
-                  { required: true, message: "Please select a patient!" },
-                ]}
-              >
-                {loadingPatients ? (
-                  <Spin size="small" />
-                ) : (
-                  <Select
-                    placeholder="Select patient"
-                    onChange={handleDependantChange}
-                    notFoundContent="You don't have any dependent."
-                  >
-                    {patients.map((patient) => (
-                      <Option
-                        key={patient.dependentID}
-                        value={patient.dependentID}
-                      >
-                        {patient.name} ({patient.birthday})
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-            </>
-          )}
-           <div style={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                    <HomeOutlined style={{ marginRight: 8 }} />
-                    <span style={{ color: "red" }}>*</span> Branch:
-                  </div>
+            {selectedFor === "others" && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '4px' }}>
+            <span style={{color: 'red'}}>*</span><UserOutlined style={{ marginLeft: 4, marginRight: 8 }} />
+              Patient:
+            </div>
+            <Button type="link" onClick={() => setModalVisible(true)}>
+              <IoAddCircleOutline /> Create new
+            </Button>
+          </div>
           <Form.Item
-            name="clinic"
-            rules={[{ required: true, message: "Please select a branch!" }]}
+            name="patient"
+            rules={[
+              { required: true, message: "Please select a patient!" },
+            ]}
           >
-            <Select
-              placeholder="Choose branch"
-              onChange={handleBranchChange}
-              dropdownRender={(menu) => (
-                <>
-                 
-                  {menu}
-                </>
-              )}
+            {loadingPatients ? (
+              <Skeleton.Input style={{ width: '244%' }} active />
+            ) : (
+              <Select
+                placeholder="Select patient"
+                onChange={handleDependantChange}
+                notFoundContent="You don't have any dependent."
+              >
+                {patients.map((patient) => (
+                  <Option
+                    key={patient.dependentID}
+                    value={patient.dependentID}
+                  >
+                    {patient.name} ({dayjs(patient.birthday).format('DD-MM-YYYY')})
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </Form.Item>
+        </>
+      )}
+
+            <Form.Item
+              name="clinic"
+              rules={[{ required: true, message: "Please select a branch!" }]}
+              label={
+                <div style={{ padding: '4px' }}>
+                  <HomeOutlined style={{ marginRight: 8 }} />
+                  Branch:
+                </div>}
             >
               {loadingClinics ? (
-                <Spin size="small" />
+                <Skeleton.Input style={{ width: '244%' }} active />
               ) : (
-                clinics.map((clinic) => (
-                  <Option key={clinic.clinicID} value={clinic.clinicID}>
-                    {clinic.name}
-                  </Option>
-                ))
-              )}
-            </Select>
-          </Form.Item>
-          <div style={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                  <CalendarOutlined style={{ marginRight: 8 }} />
-                  <span style={{ color: "red" }}>*</span> Date:
-                </div>
-          <Form.Item
-            name="date"
-            rules={[{ required: true, message: "Please choose a date!" }]}
-          >
-            <DatePicker
-              placeholder="Select Date"
-              style={{ width: "100%" }}
-              onChange={handleDateChange}
-              format="DD-MM-YYYY"
-              disabledDate={disabledDate}
-              disabled={isDateDisabled}
+                <Select
+                  loading={loadingClinics}
+                  placeholder="Choose branch"
+                  onChange={handleBranchChange}
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                    </>
+                  )}
+                >
+                  {clinics.map((clinic) => (
+                    <Option key={clinic.clinicID} value={clinic.clinicID}>
+                      {clinic.name} ({clinic.address})
+                    </Option>
+                  ))}
 
-            />
-          </Form.Item>
-          <div style={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                    <AppstoreOutlined style={{ marginRight: 8 }} />
-                    <span style={{ color: "red" }}>*</span> Service:
-                  </div>
-          <Form.Item
-            name="service"
-            rules={[{ required: true, message: "Please select a service!" }]}
-          >
-            <Select
-              placeholder="Choose service"
-              disabled={isServiceDisabled}
-              onChange={handleServiceChange}
-              dropdownRender={(menu) => (
-                <>
-                  
-                  {menu}
-                </>
+                </Select>
               )}
+            </Form.Item>
+
+
+            <Form.Item
+              name="date"
+              rules={[{ required: true, message: "Please choose a date!" }]}
+              label={
+                <div style={{ padding: '4px' }}>
+                  <CalendarOutlined style={{ marginRight: 8 }} />
+                  Date:
+                </div>
+              }
+            >
+              <DatePicker
+                placeholder="Select Date"
+                style={{ width: "100%" }}
+                onChange={handleDateChange}
+                format="DD-MM-YYYY"
+                disabledDate={disabledDate}
+                disabled={isDateDisabled}
+
+              />
+            </Form.Item>
+
+
+            <Form.Item
+              name="service"
+              rules={[{ required: true, message: "Please select a service!" }]}
+              label={<div style={{ padding: '4px' }}>
+                <AppstoreOutlined style={{ marginRight: 8 }} />
+                Service:
+              </div>}
             >
               {loadingServices ? (
-                <Spin size="small" />
+                <Skeleton.Input style={{ width: '244%' }} active />
               ) : (
-                services.length === 0 && !loadingServices ? (
-                  <Option value="" disabled>
-                    No services available for selected date.
-                  </Option>
-                ) : (
-                  services.map((service) => (
+                <Select
+                  placeholder="Choose service"
+                  disabled={isServiceDisabled}
+                  onChange={handleServiceChange}
+                  notFoundContent="No services available on this date."
+                  dropdownRender={(menu) => (
+                    <>
+
+                      {menu}
+                    </>
+                  )}
+                >
+
+
+                  {services.map((service) => (
                     <Option key={service.serviceID} value={service.serviceID}>
                       {service.name}
                     </Option>
-                  ))
-                )
+                  ))}
+                  )
+
+                </Select>
               )}
-            </Select>
-          </Form.Item>
-          <div style={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                    <ClockCircleOutlined style={{ marginRight: 8 }} />
-                    <span style={{ color: "red" }}>*</span> Time Slot:
-                  </div>
-          <Form.Item
-            name="time"
-            rules={[
-              { required: true, message: "Please choose a time slot!" },
-            ]}
-          >
-            <Select
-              placeholder="Choose timeslot"
-              disabled={isTimeSlotDisabled}
-              onChange={handleTimeSlotChange}
-              dropdownRender={(menu) => (
-                <>
-                 
-                  {menu}
-                </>
-              )}
+            </Form.Item>
+
+
+            <Form.Item
+              name="time"
+              rules={[
+                { required: true, message: "Please choose a time slot!" },
+              ]}
+              label={
+                <div style={{ padding: '4px' }}>
+                  <ClockCircleOutlined style={{ marginRight: 8 }} />
+                  Time Slot:
+                </div>}
             >
               {loadingTimeSlots ? (
-                <Spin size="small" />
+                <Skeleton.Input style={{ width: '244%' }} active />
               ) : (
-                timeSlots.map((slot, index) => (
-                  <Option key={index} value={slot.time}>
-                    {slot.time}
+                <Select
+                  placeholder="Choose timeslot"
+                  disabled={isTimeSlotDisabled}
+                  onChange={handleTimeSlotChange}
+                  dropdownRender={(menu) => (
+                    <>
+
+                      {menu}
+                    </>
+                  )}
+                >
+
+                  {timeSlots.map((slot, index) => (
+                    <Option key={index} value={slot.time}>
+                      {slot.time}
+                    </Option>
+                  ))}
+
+                </Select>
+              )}
+            </Form.Item>
+
+
+            <Form.Item name="dentist"
+              label={<div style={{ padding: '4px', display: 'flex', alignItems: 'center' }}>
+                <UserSwitchOutlined style={{ marginRight: 8 }} />
+                Dentist:
+              </div>}
+              rules={[
+                { required: true, message: "Please choose a Dentist!" },
+              ]}>
+              <Select
+                placeholder="Choose dentist"
+                disabled={isDentistDisabled}
+                onChange={handleDentistChange}
+                dropdownRender={(menu) => (
+                  <>
+
+                    {menu}
+                  </>
+                )}
+              >
+                {/* <Option value="random">Random</Option> */}
+                {dentists.map((dentist, index) => (
+                  <Option key={index} value={dentist.dentistName}>
+                    {dentist.dentistName}
                   </Option>
-                ))
-              )}
-            </Select>
-          </Form.Item>
-          <div style={{ padding: '8px', display: 'flex', alignItems: 'center' }}>
-                    <UserSwitchOutlined style={{ marginRight: 8 }} />
-                    Dentist:
-                  </div>
-          <Form.Item name="dentist">
-            <Select
-              placeholder="Choose dentist"
-              disabled={isDentistDisabled}
-              onChange={handleDentistChange}
-              dropdownRender={(menu) => (
-                <>
-                  
-                  {menu}
-                </>
-              )}
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="agreement"
+              valuePropName="checked"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    value
+                      ? Promise.resolve()
+                      : Promise.reject("Should accept agreement"),
+                },
+              ]}
             >
-              <Option value="random">Random</Option>
-              {dentists.map((dentist, index) => (
-                <Option key={index} value={dentist.dentistName}>
-                  {dentist.dentistName}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+              <Checkbox>I've checked everything and it cannot be change.</Checkbox>
+            </Form.Item>
 
-          <Form.Item
-            name="agreement"
-            valuePropName="checked"
-            rules={[
-              {
-                validator: (_, value) =>
-                  value
-                    ? Promise.resolve()
-                    : Promise.reject("Should accept agreement"),
-              },
-            ]}
-          >
-            <Checkbox>I have checked everything before submit</Checkbox>
-          </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "100%" }}
+                loading={loadingForm}
+              >
+                Book your appointment
+              </Button>
+            </Form.Item>
+          </Form>
+        </BookingFormWrapper>
+      </BookingContainer>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
+      <Modal
+        title="Create New Dependent"
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={[
+          <Button key="back" onClick={() => setModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleNewDependent}>
+            Submit
+          </Button>,
+        ]}
+      >
+        <Form layout="vertical">
+          <Form.Item label="Name" required>
+            <Input
+              value={newDependentName}
+              onChange={(e) => setNewDependentName(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item label="Birthday" required>
+            <DatePicker
               style={{ width: "100%" }}
-            >
-              Book your appointment
-            </Button>
+              disabledDate={disableDatesAfterToday}
+              onChange={(date) => setNewDependentBirthday(date)}
+              format="DD-MM-YYYY"
+            />
           </Form.Item>
         </Form>
-      </BookingFormWrapper>
-    </BookingContainer>
-
-    <Modal
-      title="Create New Dependent"
-      open={modalVisible}
-      onCancel={() => setModalVisible(false)}
-      footer={[
-        <Button key="back" onClick={() => setModalVisible(false)}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleNewDependent}>
-          Submit
-        </Button>,
-      ]}
-    >
-      <Form layout="vertical">
-        <Form.Item label="Name" required>
-          <Input
-            value={newDependentName}
-            onChange={(e) => setNewDependentName(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="Birthday" required>
-          <DatePicker
-            style={{ width: "100%" }}
-            disabledDate={disableDatesAfterToday}
-            onChange={(date) => setNewDependentBirthday(date)}
-            format="DD-MM-YYYY"
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
-  </>
+      </Modal>
+    </>
   );
 };
 

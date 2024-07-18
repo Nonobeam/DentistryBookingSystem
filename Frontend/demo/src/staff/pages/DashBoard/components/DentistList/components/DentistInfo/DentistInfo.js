@@ -4,7 +4,7 @@ import { HiOutlineMail } from 'react-icons/hi';
 import { EmailPopup } from './components/EmailPopup';
 import { useParams } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { StarFilled } from '@ant-design/icons'; // Import StarFilled icon from Ant Design Icons
 
 export default function DentistInfo() {
@@ -26,7 +26,7 @@ export default function DentistInfo() {
         const appointmentData = response.appointment.map((item) => ({
           ...item,
           key: item.appointmentId,
-          date: moment(item.date).format('YYYY-MM-DD'),
+          date: dayjs(item.date).format('YYYY-MM-DD'),
           timeSlot: item.timeSlot,
           dentist: item.dentist,
           services: item.services,
