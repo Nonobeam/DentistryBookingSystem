@@ -4,9 +4,6 @@ spring:
     username: product_user
     password: product_user_password
     driver-class-name: com.mysql.cj.jdbc.Driver
-  #    url: jdbc:mysql:///DentistryManagementSystem?cloudSqlInstance=red-carver-425403-d9:asia-south2:sunflowerdentistry&socketFactory=com.google.cloud.sql.mysql.SocketFactory
-#    username: sa
-#    password: Haha123456{SPRING_DATASOURCE_URL}
   jpa:
     hibernate:
       ddl-auto: update
@@ -28,14 +25,13 @@ spring:
   confirmation:
     link:
       baseurl: http://localhost:8080
-#  cloud:
-#    gcp:
-#      sql:
-#        database-name: DentistryManagementSystem
-#        instance-connection-name: red-carver-425403-d9:asia-south2:sunflowerdentistry
   data:
     redis:
       url: redis://default:9YPndKjEv7ZQjaHLvgUaq3LQAIYSelBd@redis-18190.c1.asia-northeast1-1.gce.redns.redis-cloud.com:18190
+
+  profiles:
+    default: default
+
 application:
   security:
     jwt:
