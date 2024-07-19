@@ -78,12 +78,13 @@ public class DentistController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
     @Operation(summary = "Dentist clinic")
     @GetMapping("/clinic")
     public ResponseEntity<String> clinicName() {
         String mail = userService.mailExtract();
         Client user = userService.findUserByMail(mail);
-        return ResponseEntity.ok(user.getDentist().getClinic().getName()+" - "+user.getDentist().getClinic().getAddress());
+        return ResponseEntity.ok(user.getDentist().getClinic().getName() + " - " + user.getDentist().getClinic().getAddress());
     }
 
     @Operation(summary = "Get today appointment")

@@ -50,11 +50,11 @@ public class DentistScheduleService {
 
 
     /**
-     * @param dentistID Input Dentist dentist
-     * @param startDate Input LocalDate startDate
-     * @param endDate Input LocalDate endDate
+     * @param dentistID  Input Dentist dentist
+     * @param startDate  Input LocalDate startDate
+     * @param endDate    Input LocalDate endDate
      * @param slotNumber Input int slot (e.g: 1, 2, 3, 4.....)
-     * @param clinicID Input String clinicID
+     * @param clinicID   Input String clinicID
      */
     public void setDentistSchedule(String dentistID, LocalDate startDate, LocalDate endDate, int slotNumber, String clinicID) {
         Dentist dentist = dentistRepository.findById(dentistID).orElseThrow(() -> new RuntimeException("Dentist not found"));
@@ -65,7 +65,7 @@ public class DentistScheduleService {
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
             TimeSlot timeSlot = timeSlotService.findNearestTimeSlot(date, slotNumber, clinicID);
-            if(timeSlot == null){
+            if (timeSlot == null) {
                 throw new Error("Time slot for date " + date + "is not be set.");
             }
 
@@ -103,12 +103,12 @@ public class DentistScheduleService {
     }
 
     public List<DentistSchedule> findDentistScheduleByWorkDate(LocalDate date, int numDay, Staff staff) {
-        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(date, date.plusDays(numDay), 1,staff);
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(date, date.plusDays(numDay), 1, staff);
 
     }
 
-    public  List<DentistSchedule>  findDentistScheduleByWorkDateByDentist(LocalDate date,int numDay,Dentist dentist) {
-        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(date, date.plusDays(numDay), 1,dentist);
+    public List<DentistSchedule> findDentistScheduleByWorkDateByDentist(LocalDate date, int numDay, Dentist dentist) {
+        return dentistScheduleRepository.findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(date, date.plusDays(numDay), 1, dentist);
 
     }
 
@@ -119,12 +119,13 @@ public class DentistScheduleService {
             throw error;
         }
     }
+
     @Scheduled(fixedRate = 86400000)
     @Transactional
     public void deletePastAvailableSchedules() {
         LocalDate now = LocalDate.now();
         LocalTime time = LocalTime.now();
-        List<DentistSchedule> pastAvailableSchedules = dentistScheduleRepository.findDentistSchedulesByAvailableAndWorkDateIsBeforeAndTimeslot_StartTimeBefore(1,now, time);
+        List<DentistSchedule> pastAvailableSchedules = dentistScheduleRepository.findDentistSchedulesByAvailableAndWorkDateIsBeforeAndTimeslot_StartTimeBefore(1, now, time);
         dentistScheduleRepository.deleteAll(pastAvailableSchedules);
     }
 }

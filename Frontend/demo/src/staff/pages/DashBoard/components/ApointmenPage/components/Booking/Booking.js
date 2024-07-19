@@ -32,8 +32,8 @@ export const Booking = () => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [dependentID, setDependentID] = useState([]);
-  const [customerMail, setCustomerMail] = useState('');
-  const [isValidMail, setIsValidMail] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isValidAppointment, setIsValidAppointment] = useState(true);
   const [form] = Form.useForm();
 
@@ -43,9 +43,7 @@ export const Booking = () => {
       try {
         if (selectedDate) {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllServices(
-            formattedDate
-          );
+          const data = await AppointmentHistoryServices.getAllServices(formattedDate);
           setServices(data);
         }
       } catch (error) {
@@ -67,12 +65,10 @@ export const Booking = () => {
       if (selectedService && selectedDate) {
         try {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllAvailableSchedule(
-            {
-              workDate: formattedDate,
-              servicesID: selectedService,
-            }
-          );
+          const data = await AppointmentHistoryServices.getAllAvailableSchedule({
+            workDate: formattedDate,
+            servicesID: selectedService,
+          });
           setSchedules(data);
         } catch (error) {
           notification.error({
@@ -88,11 +84,25 @@ export const Booking = () => {
     fetchSchedules();
   }, [selectedService, selectedDate]);
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const data = await AppointmentHistoryServices.getAllCustomers();
+        setCustomers(data);
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: error.message,
+        });
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
   const fetchDependents = async () => {
     try {
-      const response = await AppointmentHistoryServices.getDependents(
-        customerMail
-      );
+      const response = await AppointmentHistoryServices.getDependents(selectedCustomer);
       if (response) {
         setDependentID(response);
       } else {
@@ -103,28 +113,20 @@ export const Booking = () => {
     }
   };
 
-  const handleCustomerMailChange = (e) => {
-    const { value } = e.target;
-    setCustomerMail(value);
-    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    setIsValidMail(isValid);
-  };
-
-  const handleBlur = async () => {
-    if (isValidMail && customerMail) {
-      const res = await DentistServices.getDentistById(customerMail);
-      setIsValidAppointment(res.appointment.length < 5);
-      if (isValidAppointment) {
-        await fetchDependents();
-        setLoading(false);
-      }
+  const handleCustomerChange = async (value) => {
+    setSelectedCustomer(value);
+    const res = await DentistServices.getDentistById(value);
+    setIsValidAppointment(res.appointment.length < 5);
+    if (isValidAppointment) {
+     fetchDependents();
+      setLoading(false);
     }
   };
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      let { dependentID, customerMail } = values;
+      let { dependentID } = values;
       if (dependentID === '') {
         dependentID = undefined;
       }
@@ -132,7 +134,7 @@ export const Booking = () => {
       const scheduleId = selectedSchedule || null;
       await AppointmentHistoryServices.makeBooking({
         dependentID,
-        customerMail,
+        customerMail: selectedCustomer,
         serviceId,
         dentistScheduleId: scheduleId,
       });
@@ -176,7 +178,7 @@ export const Booking = () => {
       form={form}
       layout='vertical'
       onFinish={onFinish}
-      initialValues={{ customerMail }}
+      initialValues={{ customerMail: selectedCustomer }}
       style={{
         padding: '30px',
         fontFamily: 'Arial, sans-serif',
@@ -247,34 +249,28 @@ export const Booking = () => {
           <Form.Item
             name='customerMail'
             label={<span style={{ color: '#1890ff' }}><MailOutlined /> Customer Email</span>}
-            rules={[
-              { required: true, message: 'Please enter customer email' },
-              { type: 'email', message: 'Please enter a valid email' },
-            ]}
-            help={
-              isValidAppointment ? (
-                ''
-              ) : (
-                <span style={{ color: 'red' }}>
-                  Maximum 5 appointments allowed
-                </span>
-              )
-            }>
-            <Input
-              onChange={handleCustomerMailChange}
-              onBlur={handleBlur}
-              value={customerMail}
-              style={{ width: '100%' }}
-            />
+            rules={[{ required: true, message: 'Please select a customer' }]}>
+            <Select
+              onChange={handleCustomerChange}
+              loading={loading}
+              style={{ width: '100%' }}>
+              {customers.map((customer) => (
+                <Select.Option
+                  key={customer.userID}
+                  value={customer.mail}>
+                  {customer.mail}-{customer.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Col>
       </Row>
       <Form.Item
         name='dependentID'
         label={<span style={{ color: '#1890ff' }}><TeamOutlined /> Dependent</span>}
-        loading={loading}
         rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
+        loading={loading}
           <Select.Option value=''></Select.Option>
           {dependentID.map((dependent) => (
             <Select.Option

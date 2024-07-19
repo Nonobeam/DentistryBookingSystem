@@ -168,6 +168,7 @@ public class UserController {
 
         return ResponseEntity.ok(availableSchedulesResponses.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
     }
+
     @Operation(summary = "Check maxed booking")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -176,8 +177,8 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/booking")
-    public boolean checkMaxedBooking(){
-        Client customer =  userService.findUserByMail(userService.mailExtract());
+    public boolean checkMaxedBooking() {
+        Client customer = userService.findUserByMail(userService.mailExtract());
         return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 
@@ -287,6 +288,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
     @Operation(summary = "Show user Un feedback appointment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -320,12 +322,12 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping("/appointment-feedback/{appointmentID}")
-    public ResponseEntity<?>putAppointmentFeedback
+    public ResponseEntity<?> putAppointmentFeedback
             (@PathVariable String appointmentID, @RequestBody AppointmentFeedbackDTO appointmentDTO) {
         try {
-            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentID);
             appointment.setFeedback(appointmentDTO.getFeedback());
-           appointment.setStarAppointment(appointmentDTO.getStarAppointment());
+            appointment.setStarAppointment(appointmentDTO.getStarAppointment());
             appointmentRepository.save(appointment);
             return ResponseEntity.ok("Feedback successfully");
         } catch (Error e) {
@@ -338,6 +340,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
     @Operation(summary = "feedback appointment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully"),
@@ -346,10 +349,10 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @GetMapping("/appointment-feedback/{appointmentID}")
-    public ResponseEntity<?>getAppointmentFeedback
+    public ResponseEntity<?> getAppointmentFeedback
             (@PathVariable String appointmentID) {
         try {
-            Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
+            Appointment appointment = appointmentAnalyticService.getAppointmentById(appointmentID);
             AppointmentFeedbackDTO appointmentFeedbackDTO = new AppointmentFeedbackDTO();
             appointmentFeedbackDTO.setFeedback(appointment.getFeedback());
             appointmentFeedbackDTO.setStarAppointment(appointment.getStarAppointment());

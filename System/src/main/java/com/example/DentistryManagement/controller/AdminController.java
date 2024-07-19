@@ -155,7 +155,7 @@ public class AdminController {
         try {
             if (userService.isPresentUser(userID).isPresent()) {
                 Client updateUser = userService.findUserById(userID);
-                if(updateUser != null) {
+                if (updateUser != null) {
                     userService.updateUser(userDTO, updateUser);
                 }
                 return ResponseEntity.ok(updateUser);

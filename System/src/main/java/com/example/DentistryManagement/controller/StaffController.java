@@ -93,7 +93,7 @@ public class StaffController {
     public ResponseEntity<String> clinicName() {
         String mail = userService.mailExtract();
         Client user = userService.findUserByMail(mail);
-        return ResponseEntity.ok(user.getStaff().getClinic().getName()+" - "+user.getStaff().getClinic().getAddress());
+        return ResponseEntity.ok(user.getStaff().getClinic().getName() + " - " + user.getStaff().getClinic().getAddress());
     }
     //---------------------------MANAGE DENTIST---------------------------
 
@@ -379,7 +379,16 @@ public class StaffController {
             throw new Error("Error while getting clinic " + error);
         }
     }
-
+    @Operation(summary = "customer list")
+    @GetMapping("/allCustomer")
+    public ResponseEntity<?> allCustomer() {
+        try {
+            return ResponseEntity.ok(userCustomerService.findAllCustomer());
+        }catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
+            logger.error("Not found any customer user ");
+            return ResponseEntity.status(204).body(error);        }
+    }
     @Operation(summary = "customerList")
     @GetMapping("/customerList")
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
@@ -531,8 +540,8 @@ public class StaffController {
 
     @Operation(summary = "Check maxed booking")
     @GetMapping("/booking")
-    public boolean checkMaxedBooking(@RequestParam String mail){
-        Client customer =  userService.findUserByMail(mail);
+    public boolean checkMaxedBooking(@RequestParam String mail) {
+        Client customer = userService.findUserByMail(mail);
         return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 

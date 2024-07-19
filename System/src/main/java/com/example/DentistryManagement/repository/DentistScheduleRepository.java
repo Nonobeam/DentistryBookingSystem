@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public interface DentistScheduleRepository extends JpaRepository<DentistSchedule, String> {
 
-    List<DentistSchedule> findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(LocalDate workDate, int available, String clinicId,LocalTime time);
+    List<DentistSchedule> findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(LocalDate workDate, int available, String clinicId, LocalTime time);
 
     DentistSchedule findByScheduleID(String scheduleID);
 

@@ -358,7 +358,7 @@ public class AuthenticationService {
         return "valid";
     }
 
-    public void resetPassword(String token, String password){
+    public void resetPassword(String token, String password) {
         PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
         Client user = passToken.getUser();
         user.setPassword(passwordEncoder.encode(password));
