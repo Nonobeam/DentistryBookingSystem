@@ -15,8 +15,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Optional<Client> findByMail(String mail);
 
-    boolean existsByPhoneOrMailAndStatus(String phone, String mail, int status);
-
 
     Client findClientsByUserID(String userId);
 
@@ -40,4 +38,5 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findUserByMail(String mail);
 
+    List<Client> findClientsByPhoneOrMail(String phone, String mail);
 }

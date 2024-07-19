@@ -88,7 +88,13 @@ public class StaffController {
         }
     }
 
-
+    @Operation(summary = "Staff clinic")
+    @GetMapping("/clinic")
+    public ResponseEntity<String> clinicName() {
+        String mail = userService.mailExtract();
+        Client user = userService.findUserByMail(mail);
+        return ResponseEntity.ok(user.getStaff().getClinic().getName() + " - " + user.getStaff().getClinic().getAddress());
+    }
     //---------------------------MANAGE DENTIST---------------------------
 
 
@@ -123,7 +129,8 @@ public class StaffController {
 
             // Get all dentistSchedule from the dentists
             for (Dentist dentist : dentistList) {
-                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList();
+                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
+
                 if (!dentistSchedule.isEmpty()) {
                     dentistSchedules.addAll(dentistSchedule);
                 }
@@ -243,7 +250,6 @@ public class StaffController {
             Clinic clinic = staff.getClinic();
             // Get all dentists by theirs Staff
             dentistList = userDentistService.findDentistListByStaff(userService.mailExtract());
-
             // Put all dentists in dentistList  ---->  dentistListDTO
             if (!dentistList.isEmpty()) {
                 dentistListDTO = dentistList.stream()
@@ -373,7 +379,16 @@ public class StaffController {
             throw new Error("Error while getting clinic " + error);
         }
     }
-
+    @Operation(summary = "customer list")
+    @GetMapping("/allCustomer")
+    public ResponseEntity<?> allCustomer() {
+        try {
+            return ResponseEntity.ok(userCustomerService.findAllCustomer());
+        }catch (Exception e) {
+            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
+            logger.error("Not found any customer user ");
+            return ResponseEntity.status(204).body(error);        }
+    }
     @Operation(summary = "customerList")
     @GetMapping("/customerList")
     public ResponseEntity<?> findAllCustomerByStaff(@RequestParam(required = false) String search) {
@@ -517,7 +532,8 @@ public class StaffController {
             availableSchedule.setDentistScheduleID(i.getScheduleID());
             availableSchedule.setDentistName(i.getDentist().getUser().getName());
             availableSchedule.setStartTime(i.getTimeslot().getStartTime());
-            availableSchedule.setWorkDate(workDate);
+            long durationInMinutes = clinic.getSlotDuration().toSecondOfDay() / 60;
+            availableSchedule.setEndTime(availableSchedule.getStartTime().plusMinutes(durationInMinutes));
             availableSchedulesResponse.add(availableSchedule);
         }
         return ResponseEntity.ok(availableSchedulesResponse.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));
@@ -525,8 +541,8 @@ public class StaffController {
 
     @Operation(summary = "Check maxed booking")
     @GetMapping("/booking")
-    public boolean checkMaxedBooking(@RequestParam String mail){
-        Client customer =  userService.findUserByMail(mail);
+    public boolean checkMaxedBooking(@RequestParam String mail) {
+        Client customer = userService.findUserByMail(mail);
         return appointmentAnalyticService.getAppointmentsByUserAndStatus(customer, 1).map(List::size).orElse(5) >= 5;
     }
 

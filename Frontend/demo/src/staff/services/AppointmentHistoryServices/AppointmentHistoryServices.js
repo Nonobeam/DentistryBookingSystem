@@ -20,6 +20,23 @@ export const AppointmentHistoryServices = {
       });
     }
   },
+    getAllCustomers: async () => {
+      try {
+        const responseData = await api.get(`staff/allCustomer`);
+          
+        return responseData.data;
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: error.message,
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
+   }
+
+  },
+  
   getAllServices: async (workDate) => {
     try {
       const responseData = await api.get(

@@ -14,6 +14,7 @@ import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Staff;
 import com.example.DentistryManagement.repository.*;
+import com.example.DentistryManagement.service.UserService.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -38,6 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final NotificationService notificationService;
+    private final UserService userService;
     @Value("http://localhost:3000")
     private String confirmationLinkBaseUrl;
 
@@ -80,7 +81,7 @@ public class AuthenticationService {
     //----------------------------------- REGISTER -----------------------------------
 
     public AuthenticationResponse registerBoss(RegisterRequest request) {
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+        if (userService.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
             throw new Error("Phone or mail is already existed");
         }
 
@@ -112,7 +113,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse registerStaff(RegisterRequest request, Clinic clinic) {
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+        if (userService.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
             throw new Error("Phone or mail is already existed");
         }
 
@@ -148,7 +149,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse registerDentist(RegisterRequest request, Clinic clinic, Staff staff) {
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+        if (userService.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
             throw new Error("Phone or mail is already existed");
         }
 
@@ -184,7 +185,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse registerManager(RegisterRequest request) {
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getMail(), request.getPhone(), 1)) {
+        if (userService.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
             throw new Error("Phone or mail is already existed");
         }
 
@@ -216,7 +217,7 @@ public class AuthenticationService {
 
     public String register(RegisterRequest request, Role role) {
 
-        if (userRepository.existsByPhoneOrMailAndStatus(request.getPhone(), request.getMail(), 1)) {
+        if (userService.existsByPhoneOrMail(request.getPhone(), request.getMail())) {
             throw new Error("Phone or mail is already existed");
         }
 
@@ -357,7 +358,7 @@ public class AuthenticationService {
         return "valid";
     }
 
-    public void resetPassword(String token, String password){
+    public void resetPassword(String token, String password) {
         PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
         Client user = passToken.getUser();
         user.setPassword(passwordEncoder.encode(password));

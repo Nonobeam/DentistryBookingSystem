@@ -53,7 +53,6 @@ const BossManagerList = () => {
     }
     setDeleteModalVisible(false); 
   };
-
   const handleCreateManager = async (values) => {
     try {
       const token = localStorage.getItem("token");
@@ -67,11 +66,13 @@ const BossManagerList = () => {
       form.resetFields(); 
       fetchManagers(); 
     } catch (error) {
+      // Check if the error response contains a custom message
+      const errorMessage = error.response?.data?.message || 'Error creating manager';
       console.error('Error creating manager:', error);
-      message.error('Failed to create manager');
+      message.error(errorMessage); // Display the custom error message
     }
   };
-
+  
   const columns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Phone', dataIndex: 'phone', key: 'phone' },

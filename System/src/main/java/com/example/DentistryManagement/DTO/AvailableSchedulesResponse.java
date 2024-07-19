@@ -11,6 +11,7 @@ import java.time.LocalTime;
 public class AvailableSchedulesResponse {
     private String dentistName;
     private LocalTime startTime;
+    private LocalTime endTime;
     private String dentistScheduleID;
     private LocalDate workDate;
 
