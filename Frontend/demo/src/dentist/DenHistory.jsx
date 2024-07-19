@@ -1,12 +1,14 @@
-import { Button, DatePicker, Input, Layout, Modal, Select, Spin, Table, message } from "antd";
-import axios from "axios";
-import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import axios from "axios";
+import { Button, DatePicker, Input, Layout, Modal, Select, Table, message, Typography, Row, Col } from "antd";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { FacebookOutlined, TwitterOutlined, YoutubeOutlined, LinkedinOutlined } from '@ant-design/icons';
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
-const { Header, Content } = Layout;
+const { Header, Content, Footer } = Layout;
+const { Title, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 
 const DenHistory = () => {
@@ -17,10 +19,12 @@ const DenHistory = () => {
   const [newStatus, setNewStatus] = useState(null);
   const [filterDate, setFilterDate] = useState(null); 
   const [filterName, setFilterName] = useState(""); 
+  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchAppointments();
+    fetchClinicInfo(); // Fetch clinic info on component mount
   }, [filterDate, filterName]);
 
   const fetchAppointments = async () => {
@@ -51,16 +55,38 @@ const DenHistory = () => {
     setLoading(false);
   };
 
+  const fetchClinicInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setClinicInfo(response.data);
+    } catch (error) {
+      message.error(error.response?.data || "An error occurred while fetching clinic information");
+      console.error(error);
+    }
+  };
 
   const handleNameChange = (e) => {
     setFilterName(e.target.value);
   };
 
   const handleChangeStatus = async () => {
+    const appointmentDateTime = dayjs(`${selectedAppointment.date} ${selectedAppointment.timeSlot}`);
+    const now = dayjs();
+
+    if (newStatus === 2 && appointmentDateTime.isAfter(now)) {
+      message.error("Cannot mark future appointments as completed");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8080/api/v1/dentist/appointment-history/${selectedAppointment.appointmentId}?status=${newStatus}`,[],
+      await axios.patch(
+        `http://localhost:8080/api/v1/dentist/appointment-history/${selectedAppointment.appointmentId}?status=${newStatus}`, [],
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -182,44 +208,67 @@ const DenHistory = () => {
     <Layout style={{ minHeight: "100vh" }}>
       <Sidebar />
       <Layout className="site-layout">
-      <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+        <Header
+          className="site-layout-sub-header-background"
+          style={{ 
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '64px' // Default Ant Design Header height
+          }}
+        >
+          <div style={{ 
+            color: 'white', 
+            fontFamily: 'Georgia', 
+            fontSize: '22px', 
+            textAlign: 'center' 
+          }}>
+            {clinicInfo}
+          </div>
+        </Header>
 
         <Content style={{ margin: "0 16px" }}>
           <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
-        <h1>Appointment History</h1>
+            <h1>Appointment History</h1>
 
             <div style={{ marginBottom: 16 }}>
-              <Input placeholder="Patient Name" value={filterName} onChange={handleNameChange} style={{ marginLeft: 10, width: 200 }} />
+              <Input 
+                placeholder="Patient Name" 
+                value={filterName} 
+                onChange={handleNameChange} 
+                style={{ marginLeft: 10, width: 200 }} 
+              />
             </div>
 
-       
-          <Table
-            columns={columns}
-            dataSource={appointments}
-            rowKey="appointmentId"
-            pagination={{ pageSize: 10 }}
-            style={{ marginBottom: 20 }}
-            loading={loading}
-          />
-        
-        <Modal
-          title="Change Appointment Status"
+            <Table
+              columns={columns}
+              dataSource={appointments}
+              rowKey="appointmentId"
+              pagination={{ pageSize: 10 }}
+              style={{ marginBottom: 20 }}
+              loading={loading}
+            />
+
+            <Modal
+              title="Change Appointment Status"
               open={statusModalVisible}
               onOk={handleChangeStatus}
-          onCancel={() => setStatusModalVisible(false)}
-        >
-          <p>Change status for appointment with {selectedAppointment?.user}:</p>
+              onCancel={() => setStatusModalVisible(false)}
+            >
+              <p>Change status for appointment with {selectedAppointment?.user}:</p>
               <Select
                 defaultValue={selectedAppointment?.status}
                 onChange={(value) => setNewStatus(value)}
                 style={{ width: '100%' }}
               >
-            <Option value={1}>Upcoming</Option>
-            <Option value={2}>Completed</Option>
-          </Select>
-        </Modal>
+                <Option value={1}>Upcoming</Option>
+                <Option value={2}>Completed</Option>
+              </Select>
+            </Modal>
           </div>
         </Content>
+        
       </Layout>
     </Layout>
   );

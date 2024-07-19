@@ -7,13 +7,13 @@ import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
-import jnr.constants.platform.Local;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,4 +82,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByUser(Client client);
 
     List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);
+
+    List<Appointment> findAppointmentsByDateIsBeforeAndTimeSlot_StartTimeBeforeAndStatus(LocalDate now, LocalTime time, int i);
 }

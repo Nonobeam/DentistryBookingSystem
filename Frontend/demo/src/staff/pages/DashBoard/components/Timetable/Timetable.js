@@ -66,7 +66,7 @@ export const TimeTable = () => {
             dentistName: task.dentistName,
             customerName: task.customerName || 'N/A',
             serviceName: task.serviceName || 'N/A',
-            status: task.status === 1 ? 'arranged' : 'On appointment',
+            status: task.status === 1 ? 'Arranged' : 'On appointment',
           })),
         });
       });
@@ -143,94 +143,99 @@ export const TimeTable = () => {
           backgroundColor: '#F5F5F5',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         }}>
-        <div style={{ display: 'flex' }}>
-          {weekDates.map((date, index) => (
-            <div
-              key={index}
-              style={{
-                flex: 1,
-                textAlign: 'center',
-                padding: '10px',
-                fontWeight: 'bold',
-                background: index % 2 === 0 ? '#E3EFFF' : '#FFFFFF',
-                color: '#001F3F',
-              }}>
-              <h3>{dayjs(date).format('DD/MM')}</h3>
-              <p>{dayjs(date).format('ddd')}</p>
-            </div>
-          ))}
-        </div>
-        <div
+        <div style={{ display: 'flex', marginBottom: '10px' }}>
+  {weekDates.map((date, index) => (
+    <div
+      key={index}
+      style={{
+        flex: 1,
+        textAlign: 'center',
+        padding: '5px',
+        fontWeight: 'bold',
+        background: index % 2 === 0 ? '#E3EFFF' : '#FFFFFF',
+        color: '#001F3F',
+      }}>
+      <div style={{ fontSize: '14px' }}>{dayjs(date).format('DD/MM')}</div>
+      <div style={{ fontSize: '12px' }}>{dayjs(date).format('ddd')}</div>
+    </div>
+  ))}
+</div>
+<div
+  style={{
+    display: 'flex',
+    gap: '10px',
+    flexWrap: 'wrap',
+  }}>
+  {isLoading ? (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+      }}>
+      <Spin size='large' />
+    </div>
+  ) : (
+    tasksForWeek.map((day, index) => (
+      <div key={index} style={{ flex: 1, minWidth: 0 }}>
+        <h3
           style={{
-            display: 'flex',
-            padding: '10px',
-            gap: '20px',
-            flexWrap: 'wrap',
+            textAlign: 'center',
+            backgroundColor: '#E3EFFF',
+            padding: '5px',
+            color: '#1890ff',
+            fontSize: '14px',
+            marginBottom: '8px'
           }}>
-          {isLoading ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-              }}>
-              <Spin size='large' />
+          {day.day}
+        </h3>
+        <div style={{ maxHeight: 'calc(100vh - 250px)', overflowY: 'auto' }}>
+          {day.tasks.length > 0 ? (
+            <div>
+              {day.tasks.map((task, index) => (
+                <Card
+                  key={index}
+                  size="small"
+                  style={{
+                    marginBottom: '8px',
+                    borderColor: 'blue',
+                    borderRadius: '5px',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                  }}>
+                  <Meta
+                    title={<div style={{ fontSize: '12px' }}>{`Dentist: ${task.dentistName}`}</div>}
+                    description={
+                      <div style={{ color: 'darkblue',fontWeight:'bold', fontSize: '11px' }}>
+                        <p style={{ margin: '2px 0' }}>Customer: {task.customerName}</p>
+                        <p style={{ margin: '2px 0' }}>Service: {task.serviceName}</p>
+                        <p style={{ margin: '2px 0' }}>Status: {task.status}</p>
+                        <p style={{ margin: '2px 0' }}>Start Time: {task.time}</p>
+                      </div>
+                    }
+                  />
+                </Card>
+              ))}
             </div>
           ) : (
-            tasksForWeek.map((day, index) => (
-              <div key={index} style={{ flex: 1, marginBottom: '20px' }}>
-                <h3
-                  style={{
-                    textAlign: 'center',
-                    backgroundColor: '#E3EFFF',
-                    padding: '10px',
-                    color: '#1890ff',
-                  }}>
-                  {day.day}
-                </h3>
-                {day.tasks.length > 0 ? (
-                  <div>
-                    {day.tasks.map((task, index) => (
-                      <Card
-                        key={index}
-                        style={{
-                          marginBottom: '10px',
-                          borderColor: '#001F3F',
-                          borderRadius: '10px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                        }}>
-                        <Meta
-                          title={`Dentist: ${task.dentistName}`}
-                          description={
-                            <div style={{ color: '#1890ff' }}>
-                              <p>Customer: {task.customerName}</p>
-                              <p>Service: {task.serviceName}</p>
-                              <p>Status: {task.status}</p>
-                              <p>Start Time: {task.time}</p>
-                            </div>
-                          }
-                        />
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <p
-                    style={{
-                      textAlign: 'center',
-                      padding: '10px',
-                      fontWeight: 'bold',
-                      background: '#E3EFFF',
-                      marginBottom: '0',
-                      color: '#1890ff',
-                    }}>
-                    No tasks for this day
-                  </p>
-                )}
-              </div>
-            ))
+            <p
+              style={{
+                textAlign: 'center',
+                padding: '5px',
+                fontWeight: 'bold',
+                background: '#E3EFFF',
+                marginBottom: '0',
+                color: '#1890ff',
+                fontSize: '12px',
+              }}>
+              No tasks for this day
+            </p>
           )}
         </div>
+      </div>
+    ))
+  )}
+</div>
       </div>
     </div>
   );

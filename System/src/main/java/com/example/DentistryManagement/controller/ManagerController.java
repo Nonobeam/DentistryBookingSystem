@@ -350,7 +350,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No staff user found");
+            return ResponseEntity.ok("No staff user found");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }

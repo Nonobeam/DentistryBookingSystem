@@ -8,10 +8,21 @@ import {
   Input,
   Row,
   Col,
+  Typography,
 } from 'antd';
+import { 
+  CalendarOutlined, 
+  MedicineBoxOutlined, 
+  ClockCircleOutlined, 
+  MailOutlined, 
+  TeamOutlined,
+  BookOutlined
+} from '@ant-design/icons';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import dayjs from 'dayjs';
 import { DentistServices } from '../../../../../../services/CustomerServices/CustomerServices';
+
+const { Title } = Typography;
 
 export const Booking = () => {
   const [services, setServices] = useState([]);
@@ -167,25 +178,23 @@ export const Booking = () => {
       onFinish={onFinish}
       initialValues={{ customerMail }}
       style={{
-        padding: '20px',
+        padding: '30px',
         fontFamily: 'Arial, sans-serif',
-        paddingLeft: '200px',
-        paddingRight: '200px',
+        maxWidth: '800px',
+        margin: '50px Auto',
+        backgroundColor: '#f0f8ff',
+        borderRadius: '15px',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
       }}>
-      <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '30px',
-          color: '#1890ff',
-          fontSize: '45px',
-        }}>
+      <Title level={2} style={{ textAlign: 'center', color: '#1890ff', marginBottom: '30px' }}>
+        <BookOutlined style={{ marginRight: '10px' }} />
         Booking For Customer
-      </h2>
+      </Title>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name='date'
-            label='Select Date'
+            label={<span style={{ color: '#1890ff' }}><CalendarOutlined /> Select Date</span>}
             rules={[{ required: true, message: 'Please select a date' }]}>
             <DatePicker
               onChange={handleDateChange}
@@ -197,7 +206,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='service'
-            label='Select Service'
+            label={<span style={{ color: '#1890ff' }}><MedicineBoxOutlined /> Select Service</span>}
             rules={[{ required: true, message: 'Please select a service' }]}>
             <Select
               onChange={handleServicesChange}
@@ -218,7 +227,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='schedule'
-            label='Select Schedule'
+            label={<span style={{ color: '#1890ff' }}><ClockCircleOutlined /> Select Schedule</span>}
             rules={[{ required: true, message: 'Please select a schedule' }]}>
             <Select
               onChange={handleScheduleChange}
@@ -237,7 +246,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='customerMail'
-            label='Customer Email'
+            label={<span style={{ color: '#1890ff' }}><MailOutlined /> Customer Email</span>}
             rules={[
               { required: true, message: 'Please enter customer email' },
               { type: 'email', message: 'Please enter a valid email' },
@@ -262,7 +271,7 @@ export const Booking = () => {
       </Row>
       <Form.Item
         name='dependentID'
-        label='Dependent'
+        label={<span style={{ color: '#1890ff' }}><TeamOutlined /> Dependent</span>}
         loading={loading}
         rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
@@ -282,10 +291,13 @@ export const Booking = () => {
           htmlType='submit'
           disabled={!isValidAppointment}
           loading={loading}
+          icon={<BookOutlined />}
           style={{
             backgroundColor: '#1890ff',
             borderColor: '#1890ff',
-            marginRight: '10px',
+            padding: '0 30px',
+            height: '40px',
+            fontSize: '16px',
           }}>
           Book Service
         </Button>

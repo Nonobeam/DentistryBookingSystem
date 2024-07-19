@@ -60,7 +60,6 @@ public class AppointmentBookingService {
         if (isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, bookDate)) {
             throw new Error("Already booked with this time slot");
         }
-
         dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
         Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
         otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
@@ -72,8 +71,9 @@ public class AppointmentBookingService {
     public boolean isBookedByCustomerIdAndTimeSlotIdAndDate(String customerId, String timeSlotId, LocalDate bookDate) {
         Client appointmentCustomer = userService.findUserById(customerId);
         TimeSlot appointmentTimeSlot = timeSlotService.getTimeSlotByTimeSlotId(timeSlotId);
-        boolean isBooked = appointmentRepository.existsByTimeSlotAndDateAndUser(appointmentTimeSlot, bookDate, appointmentCustomer);
 
-        return isBooked;
+        return appointmentRepository.existsByTimeSlotAndDateAndUser(appointmentTimeSlot, bookDate, appointmentCustomer);
     }
+
+
 }

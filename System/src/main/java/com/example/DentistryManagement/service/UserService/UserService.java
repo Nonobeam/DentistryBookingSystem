@@ -4,6 +4,7 @@ import com.example.DentistryManagement.DTO.UserDTO;
 import com.example.DentistryManagement.core.user.*;
 import com.example.DentistryManagement.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +25,18 @@ public class UserService {
     private final DependentRepository dependentRepository;
 
     public boolean existsByPhoneOrMail(String phone, String mail) {
-        return userRepository.existsByPhoneOrMailAndStatus(phone, mail, 1);
+        List<Client> clients =userRepository.findClientsByPhoneOrMail(phone, mail) ;
+        if(clients.isEmpty()){
+            return false;
+        }else {
+            for (Client user : clients ) {
+                if (user.getStatus() == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
 
     public String mailExtract() {

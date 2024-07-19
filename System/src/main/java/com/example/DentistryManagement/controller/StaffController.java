@@ -88,7 +88,13 @@ public class StaffController {
         }
     }
 
-
+    @Operation(summary = "Staff clinic")
+    @GetMapping("/clinic")
+    public ResponseEntity<String> clinicName() {
+        String mail = userService.mailExtract();
+        Client user = userService.findUserByMail(mail);
+        return ResponseEntity.ok(user.getStaff().getClinic().getName()+" - "+user.getStaff().getClinic().getAddress());
+    }
     //---------------------------MANAGE DENTIST---------------------------
 
 
@@ -123,7 +129,8 @@ public class StaffController {
 
             // Get all dentistSchedule from the dentists
             for (Dentist dentist : dentistList) {
-                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList();
+                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
+
                 if (!dentistSchedule.isEmpty()) {
                     dentistSchedules.addAll(dentistSchedule);
                 }
@@ -243,7 +250,6 @@ public class StaffController {
             Clinic clinic = staff.getClinic();
             // Get all dentists by theirs Staff
             dentistList = userDentistService.findDentistListByStaff(userService.mailExtract());
-
             // Put all dentists in dentistList  ---->  dentistListDTO
             if (!dentistList.isEmpty()) {
                 dentistListDTO = dentistList.stream()

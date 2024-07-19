@@ -27,8 +27,6 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
 
     List<TimeSlot> findTimeSlotsByClinic_ClinicIDAndSlotNumber(String clinicId, int slotNumber);
 
-    void deleteTimeSlotsByDateAndClinic(LocalDate date, Clinic clinic);
-
     List<TimeSlot> findTimeSlotsByClinic_ClinicID(String clinic);
 
     TimeSlot findTimeSlotByTimeSlotID(String timeSlotID);

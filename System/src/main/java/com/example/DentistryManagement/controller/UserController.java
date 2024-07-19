@@ -2,7 +2,6 @@
 package com.example.DentistryManagement.controller;
 
 
-import com.example.DentistryManagement.DTO.AppointmentDTO;
 import com.example.DentistryManagement.DTO.AppointmentFeedbackDTO;
 import com.example.DentistryManagement.DTO.AvailableSchedulesResponse;
 import com.example.DentistryManagement.DTO.UserDTO;
@@ -47,7 +46,6 @@ public class UserController {
     private final UserMapping userMapping;
     private final ClinicService clinicService;
     private final ServiceService serviceService;
-    private final AuthenticationService authenticationService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final DentistScheduleService dentistScheduleService;
     private final Logger logger = LogManager.getLogger(UserController.class);
@@ -325,7 +323,6 @@ public class UserController {
     public ResponseEntity<?>putAppointmentFeedback
             (@PathVariable String appointmentID, @RequestBody AppointmentFeedbackDTO appointmentDTO) {
         try {
-            Client user = userService.findUserByMail(userService.mailExtract());
             Appointment appointment= appointmentAnalyticService.getAppointmentById(appointmentID);
             appointment.setFeedback(appointmentDTO.getFeedback());
            appointment.setStarAppointment(appointmentDTO.getStarAppointment());

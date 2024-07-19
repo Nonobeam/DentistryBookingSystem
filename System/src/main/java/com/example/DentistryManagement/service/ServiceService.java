@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -42,7 +43,9 @@ public class ServiceService {
         List<DentistSchedule> scheduleList = dentistScheduleRepository.findDentistSchedulesByClinicAndWorkDateAndAvailable(clinic, bookDate, 1);
         HashSet<Services> servicesHashSet = new HashSet<>();
         for (DentistSchedule dentistSchedule : scheduleList) {
-            servicesHashSet.addAll(dentistSchedule.getDentist().getServicesList());
+            if(dentistSchedule.getTimeslot().getStartTime().isBefore(LocalTime.now())){
+                servicesHashSet.addAll(dentistSchedule.getDentist().getServicesList());
+            }
         }
         return servicesHashSet;
 

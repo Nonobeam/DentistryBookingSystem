@@ -367,7 +367,10 @@ public class AppointmentAnalyticService {
     public Map<String, Double> getRatingDentistByManager(Client manager) {
         Map<String, Double> dentistRatings = new HashMap<>();
 
-        List<Dentist> managedDentists = manager.getClinicList().stream().map(clinic -> (Dentist) clinic.getDentistList()).toList();
+        HashSet<Dentist> managedDentists = new HashSet<>();
+        for (Clinic c :manager.getClinicList()){
+            managedDentists.addAll(c.getDentistList());
+        }
 
         for (Dentist dentist : managedDentists) {
             Client clientForDentist = new Client();
@@ -379,4 +382,6 @@ public class AppointmentAnalyticService {
 
         return dentistRatings;
     }
+
+
 }

@@ -78,7 +78,13 @@ public class DentistController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
+    @Operation(summary = "Dentist clinic")
+    @GetMapping("/clinic")
+    public ResponseEntity<String> clinicName() {
+        String mail = userService.mailExtract();
+        Client user = userService.findUserByMail(mail);
+        return ResponseEntity.ok(user.getDentist().getClinic().getName()+" - "+user.getDentist().getClinic().getAddress());
+    }
 
     @Operation(summary = "Get today appointment")
     @GetMapping("/appointment-today")
@@ -192,7 +198,7 @@ public class DentistController {
 
     @Operation(summary = "Update Appointment History")
 
-    @PutMapping("/appointment-history/{appointmentId}")
+    @PatchMapping("/appointment-history/{appointmentId}")
     public ResponseEntity<?> updateAppointmentStatus(@RequestParam int status, @PathVariable("appointmentId") String appointmentId) {
 
         try {
