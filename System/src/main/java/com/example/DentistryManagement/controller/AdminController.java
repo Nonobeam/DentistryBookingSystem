@@ -208,9 +208,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
-    @GetMapping("/test-api")
-    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
-        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotId(customerId, timeSlotId));
-    }
+//
+//    @GetMapping("/test-api")
+//    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
+//        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, ));
+//    }
 }
