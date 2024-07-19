@@ -30,7 +30,11 @@ public class DentistScheduleService {
     public HashSet<DentistSchedule> getByWorkDateAndServiceAndAvailableAndClinic(LocalDate workDate, String serviceId, int available, String clinicId) {
         Services service = serviceRepository.findById(serviceId).orElse(null);
         HashSet<DentistSchedule> dentistSchedulesHashSet = new HashSet<>();
-        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(workDate, available, clinicId, LocalTime.now());
+        LocalTime time = LocalTime.now();
+        if(workDate.isAfter(LocalDate.now())) {
+            time=LocalTime.MIDNIGHT;
+        }
+        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(workDate, available, clinicId,time);
         for (DentistSchedule ds : dentistScheduleList) {
             if (ds.getDentist().getServicesList().contains(service)) {
                 dentistSchedulesHashSet.add(ds);

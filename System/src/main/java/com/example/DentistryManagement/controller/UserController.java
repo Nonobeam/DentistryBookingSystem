@@ -163,6 +163,8 @@ public class UserController {
             availableSchedulesResponse.setDentistScheduleID(i.getScheduleID());
             availableSchedulesResponse.setDentistName(i.getDentist().getUser().getName());
             availableSchedulesResponse.setStartTime(i.getTimeslot().getStartTime());
+            long durationInMinutes = i.getClinic().getSlotDuration().toSecondOfDay() / 60;
+            availableSchedulesResponse.setEndTime(availableSchedulesResponse.getStartTime().plusMinutes(durationInMinutes));
             availableSchedulesResponses.add(availableSchedulesResponse);
         }
 

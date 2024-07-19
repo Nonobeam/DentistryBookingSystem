@@ -168,9 +168,9 @@ export const Booking = () => {
     setSelectedSchedule(value);
   };
 
-  // Function to disable dates more than 2 months from today
+  // Function to disable dates before today and more than 2 months from today
   const disabledDate = (current) => {
-    return current && current > dayjs().add(2, 'months');
+    return current && (current <= dayjs().startOf('day') || current > dayjs().add(2, 'months'));
   };
 
   return (
@@ -239,7 +239,7 @@ export const Booking = () => {
                 <Select.Option
                   key={schedule.dentistScheduleID}
                   value={schedule.dentistScheduleID}>
-                  {`${schedule.startTime}`}
+                  {`${schedule.startTime}` + `-`+ `${schedule.endTime}`}
                 </Select.Option>
               ))}
             </Select>
@@ -270,7 +270,6 @@ export const Booking = () => {
         label={<span style={{ color: '#1890ff' }}><TeamOutlined /> Dependent</span>}
         rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
-        loading={loading}
           <Select.Option value=''></Select.Option>
           {dependentID.map((dependent) => (
             <Select.Option

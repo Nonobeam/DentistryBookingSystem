@@ -532,7 +532,8 @@ public class StaffController {
             availableSchedule.setDentistScheduleID(i.getScheduleID());
             availableSchedule.setDentistName(i.getDentist().getUser().getName());
             availableSchedule.setStartTime(i.getTimeslot().getStartTime());
-            availableSchedule.setWorkDate(workDate);
+            long durationInMinutes = clinic.getSlotDuration().toSecondOfDay() / 60;
+            availableSchedule.setEndTime(availableSchedule.getStartTime().plusMinutes(durationInMinutes));
             availableSchedulesResponse.add(availableSchedule);
         }
         return ResponseEntity.ok(availableSchedulesResponse.stream().sorted(Comparator.comparing(AvailableSchedulesResponse::getStartTime)).collect(Collectors.toList()));

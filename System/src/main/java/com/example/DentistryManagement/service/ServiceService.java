@@ -43,7 +43,7 @@ public class ServiceService {
         List<DentistSchedule> scheduleList = dentistScheduleRepository.findDentistSchedulesByClinicAndWorkDateAndAvailable(clinic, bookDate, 1);
         HashSet<Services> servicesHashSet = new HashSet<>();
         for (DentistSchedule dentistSchedule : scheduleList) {
-            if (dentistSchedule.getTimeslot().getStartTime().isAfter(LocalTime.now())) {
+            if ((dentistSchedule.getTimeslot().getStartTime().isAfter(LocalTime.now()) && dentistSchedule.getWorkDate().isEqual(LocalDate.now()))|| dentistSchedule.getWorkDate().isAfter(LocalDate.now())) {
                 servicesHashSet.addAll(dentistSchedule.getDentist().getServicesList());
             }
         }
