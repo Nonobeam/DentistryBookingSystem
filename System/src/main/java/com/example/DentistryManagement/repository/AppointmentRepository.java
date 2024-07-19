@@ -7,6 +7,7 @@ import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
+import jnr.constants.platform.Local;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -77,7 +78,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     @Query("SELECT a FROM Appointment a WHERE a.clinic.clinicID = :clinicID ORDER BY a.date DESC")
     List<Appointment> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
 
-    boolean existsByTimeSlotAndUser(TimeSlot timeSlot, Client user);
+    boolean existsByTimeSlotAndDateAndUser(TimeSlot timeSlot, LocalDate bookDate, Client user);
     List<Appointment> findAppointmentsByUser(Client client);
 
     List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);

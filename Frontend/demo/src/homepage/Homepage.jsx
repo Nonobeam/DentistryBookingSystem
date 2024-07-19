@@ -8,10 +8,6 @@ import {
   ProjectOutlined,
   FileDoneOutlined,
   MailOutlined,
-  FacebookOutlined,
-  TwitterOutlined,
-  YoutubeOutlined,
-  LinkedinOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 
@@ -25,6 +21,7 @@ const StyledFooter = styled(Layout.Footer)`
 const { Title, Paragraph } = Typography;
 
 const Homepage = () => {
+
   useEffect(() => {
     const checkFeedbacks = async () => {
       try {
@@ -168,17 +165,17 @@ const Homepage = () => {
       <StyledFooter>
         <Layout.Footer style={{ textAlign: "center", backgroundColor: "#1890ff" }}>
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={16} md={8}>
+            <Col xs={36} sm={24} md={12}>
               <Title level={4}>About Us</Title>
               <Paragraph>Sunflower Dentistry is dedicated to providing top-notch dental care to our community.</Paragraph>
             </Col>
-            <Col xs={24} sm={16} md={8}>
+            <Col xs={36} sm={25} md={12}>
               <Title level={4}>Contact</Title>
-              <Paragraph>123 Dental St.</Paragraph>
-              <Paragraph>Sun City, TX 12345</Paragraph>
-              <Paragraph>info@sunflowerdentistry.com</Paragraph>
+              <Paragraph>VNUHCM Student Cultural House</Paragraph>
+              <Paragraph>Luu Huu Phuoc, Dong Hoa, Di An, Binh Duong</Paragraph>
+              <Paragraph>dentistrysunflower@gmail.com</Paragraph>
             </Col>
-            <Col xs={24} sm={16} md={8}>
+            {/* <Col xs={24} sm={16} md={8}>
               <Title level={4}>Follow Us</Title>
               <Paragraph>
                 <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
@@ -186,7 +183,7 @@ const Homepage = () => {
                 <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
                 <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
               </Paragraph>
-            </Col>
+            </Col> */}
           </Row>
         </Layout.Footer>
       </StyledFooter>

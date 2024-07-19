@@ -1,9 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BiSearch } from 'react-icons/bi';
-import { CiBellOn } from 'react-icons/ci';
-import { FaUserCircle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { Button, Dropdown, Menu, message } from 'antd';
 import { PersonalServices } from '../../../../staff/services/PersonalServices/PersonalServices';
 import NotificationDropdown from '../../../../staff/pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
 
@@ -30,17 +25,6 @@ export const AppHeader = () => {
   }, []);
 
   
-
-  const handleLogout = () => {
-    // Perform logout action here
-    console.log('Logging out...');
-
-    // Example: Clear token from localStorage and redirect to login page
-    localStorage.removeItem('accessToken'); // Remove access token or any other stored data
-    
-    // Redirect to login page
-    window.location.href = '/login';
-  };
 
   const handleNotificationClick = (notification) => {
     // Logic to handle notification click

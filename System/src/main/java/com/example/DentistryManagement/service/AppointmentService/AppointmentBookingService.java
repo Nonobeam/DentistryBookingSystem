@@ -13,7 +13,7 @@ import com.example.DentistryManagement.service.UserService.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class AppointmentBookingService {
      * @param services        Input Services
      * @param dependent       Input Dependent dependent
      */
-    public void createAppointment(@Nullable Client staff, Client customer, DentistSchedule dentistSchedule, Services services, @Nullable Dependent dependent) {
+    public void createAppointment(Client staff, Client customer, DentistSchedule dentistSchedule, Services services, Dependent dependent) {
         Appointment.AppointmentBuilder appointmentBuilder = Appointment.builder()
                 .user(customer)
                 .clinic(dentistSchedule.getClinic())
@@ -53,8 +53,11 @@ public class AppointmentBookingService {
         }
         appointmentBuilder.build();
 
-        // Customer booked an appointment in this time slot already
-        if (isBookedByCustomerIdAndTimeSlotId(customer.getUserID(), dentistSchedule.getTimeslot().getTimeSlotID())) {
+        // Customer booked an appointment in that timeslot in that date already
+        String customerId = customer.getUserID();
+        String timeSlotId = dentistSchedule.getTimeslot().getTimeSlotID();
+        LocalDate bookDate = dentistSchedule.getWorkDate();
+        if (isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, bookDate)) {
             throw new Error("Already booked with this time slot");
         }
 
@@ -66,10 +69,10 @@ public class AppointmentBookingService {
     }
 
 
-    public boolean isBookedByCustomerIdAndTimeSlotId(String customerId, String timeSlotId) {
+    public boolean isBookedByCustomerIdAndTimeSlotIdAndDate(String customerId, String timeSlotId, LocalDate bookDate) {
         Client appointmentCustomer = userService.findUserById(customerId);
         TimeSlot appointmentTimeSlot = timeSlotService.getTimeSlotByTimeSlotId(timeSlotId);
-        boolean isBooked = appointmentRepository.existsByTimeSlotAndUser(appointmentTimeSlot, appointmentCustomer);
+        boolean isBooked = appointmentRepository.existsByTimeSlotAndDateAndUser(appointmentTimeSlot, bookDate, appointmentCustomer);
 
         return isBooked;
     }
