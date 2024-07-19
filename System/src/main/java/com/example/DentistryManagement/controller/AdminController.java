@@ -8,7 +8,10 @@ import com.example.DentistryManagement.auth.RegisterRequest;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.user.Client;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentBookingService;
+import com.example.DentistryManagement.service.AppointmentService.AppointmentService;
 import com.example.DentistryManagement.service.AuthenticationService;
+import com.example.DentistryManagement.service.TimeSlotService;
 import com.example.DentistryManagement.service.UserService.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +40,9 @@ public class AdminController {
     private final UserMapping userMapping;
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final TimeSlotService timeSlotService;
+    private final AppointmentBookingService appointmentBookingService;
+
 
     @Operation(summary = "Register a new boss")
     @PostMapping("/register/boss")
@@ -202,6 +208,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
-
+//
+//    @GetMapping("/test-api")
+//    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
+//        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, ));
+//    }
 }

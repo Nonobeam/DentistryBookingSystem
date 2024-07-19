@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Flex, Spin } from 'antd'; // Spin là component của Ant Design để hiển thị loading
+import { Flex, Input, Spin } from 'antd';
 import { TableList } from './components/Table/TableList';
 import { Action } from './components/Action/Action';
 import { DentistServices } from '../../../../services/DentistServices/DentistServices';
@@ -39,18 +39,34 @@ const fetchData = async () => {
 };
 
 export const DentistList = () => {
-  const { data, error, isLoading } = useSWR('dentistServices', fetchData);
-  
+  const { data, error, isValidating } = useSWR('dentistServices', fetchData);
+  const [searchText, setSearchText] = useState('');
+
+  const handleSearch = value => {
+    setSearchText(value);
+  };
+
+  // Lọc dữ liệu dựa trên searchText
+  const filteredData = searchText
+    ? data.filter(item =>
+        item.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : data;
+
   return (
     <div>
       <h1>Dentist List</h1>
-      <Flex justify='center' align='middle' style={{ minHeight: '200px' }}>
-        {isLoading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
-          <Spin size='large' />
-        ) : (
-          <TableList dataSource={data} columns={columns} />
-        )}
+      <Flex justify='space-between' style={{ marginBottom: '16px' }}>
+        <Input.Search
+          placeholder='Search by name'
+          onSearch={handleSearch}
+          loading={isValidating} // Sử dụng isValidating để chỉ ra khi đang tải dữ liệu
+          style={{ width: 200 }}
+        />
       </Flex>
+      <Spin spinning={!data}>
+        <TableList dataSource={filteredData} columns={columns} />
+      </Spin>
     </div>
   );
 };
