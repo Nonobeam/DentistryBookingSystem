@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { Button, Card, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import TimetableServices from '../../../../services/TimetableServices/TimetableServices';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 
 const { Meta } = Card;
 
@@ -22,7 +22,7 @@ export const TimeTable = () => {
   const [firstDayOfWeek, setFirstDayOfWeek] = useState(
     dayjs().startOf('week')
   );
-  const { data, error, isLoading, mutate } = useSWR('Timetable', () =>
+  const { data, isLoading, mutate } = useSWR('Timetable', () =>
     fetchTimetableData(firstDayOfWeek)
   );
 
@@ -51,7 +51,6 @@ export const TimeTable = () => {
   };
 
   const generateTasksForWeek = (weekDates) => {
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const tasksForWeek = [];
 
     if (!isLoading) {

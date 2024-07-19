@@ -40,7 +40,7 @@ const fetchData = async () => {
 };
 
 export const CustomerListDash = () => {
-  const { data, error, isValidating } = useSWR('Customer', fetchData);
+  const { data, isValidating } = useSWR('Customer', fetchData);
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = value => {

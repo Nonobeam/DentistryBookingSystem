@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Table } from 'antd';
+import {  Card, Table } from 'antd';
 import { useParams } from 'react-router-dom';
 import { notification } from 'antd';
 import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
@@ -9,7 +9,7 @@ export default function CustomerInfo() {
   const [info, setInfo] = useState([]);
   const [user, setUser] = useState({});
   const [appointmentData, setAppointmentData] = useState([]);
-  const [apiData, setApiData] = useState([]);
+ 
 
   useEffect(() => {
     fetchData();
