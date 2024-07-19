@@ -393,7 +393,7 @@ const Booking = () => {
   return (
     <>
       <NavBar />
-      <BookingContainer>
+      <BookingContainer style={{paddingTop: "100px"}}>
         <BookingFormWrapper>
           <Title level={2}>Reserve your appointment!</Title>
           <Form form={form} name="booking" onFinish={onFinish} disabled={isFormDisabled} layout="vertical">

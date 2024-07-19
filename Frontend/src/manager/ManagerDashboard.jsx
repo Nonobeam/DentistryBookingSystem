@@ -81,7 +81,7 @@ const ManagerDashboard = () => {
       },
     },
     barWidthRatio: 0.6,
-    color: ["#1890ff"],
+    color: ["#1976d2"],
   };
 
   const ratingBarConfig = {
@@ -103,7 +103,7 @@ const ManagerDashboard = () => {
       "#ff4d4f",
       "#ffc107",
       "#52c41a",
-      "#1890ff",
+      "#1976d2",
       "#fcffe6",
       "#ffffb8",
       "#f5222d",
@@ -169,12 +169,12 @@ const ManagerDashboard = () => {
                     }}
                   >
                     <HomeOutlined
-                      style={{ fontSize: "24px", color: "#1890ff" }}
+                      style={{ fontSize: "24px", color: "#1976d2" }}
                     />
-                    <Title level={5}>Today's Month</Title>
+                    <Title level={5}>This Month</Title>
                     <Divider style={{ margin: "12px 0" }} />
                     <Title level={4} style={{ margin: 0 }}>
-                      {dashboardData.totalAppointmentsInMonthNow}
+                      {dashboardData.totalAppointmentsInMonthNow} Appointments
                     </Title>
                   </Card>
                 </Col>
@@ -190,10 +190,10 @@ const ManagerDashboard = () => {
                     <CalendarOutlined
                       style={{ fontSize: "24px", color: "#f5222d" }}
                     />
-                    <Title level={5}>Today's Year</Title>
+                    <Title level={5}>This Year</Title>
                     <Divider style={{ margin: "12px 0" }} />
                     <Title level={4} style={{ margin: 0 }}>
-                      {dashboardData.totalAppointmentsInYearNow}
+                      {dashboardData.totalAppointmentsInYearNow} Appointments
                     </Title>
                   </Card>
                 </Col>

@@ -215,9 +215,6 @@ const Educational = () => {
           <Paragraph style={{ color: 'white', fontSize: '1.2rem', marginBottom: '30px' }}>
             Empowering you with knowledge for better oral health
           </Paragraph>
-          <Button type="primary" size="large">
-            Explore Articles
-          </Button>
         </HeroContent>
         </HeroSection>
 

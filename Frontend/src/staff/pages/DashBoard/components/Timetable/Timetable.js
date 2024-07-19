@@ -82,7 +82,7 @@ export const TimeTable = () => {
       <h1
         style={{
           textAlign: 'center',
-          backgroundColor: '#1890ff',
+          backgroundColor: '#1976d2',
           padding: '20px',
           color: 'white',
           border: '2px',
@@ -97,9 +97,9 @@ export const TimeTable = () => {
           <Button
             style={{
               marginRight: '10px',
-              backgroundColor: '#1890ff',
+              backgroundColor: '#1976d2',
               color: 'white',
-              borderColor: '#1890ff',
+              borderColor: '#1976d2',
               borderRadius: '5px',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}>
@@ -110,9 +110,9 @@ export const TimeTable = () => {
           onClick={previousWeek}
           style={{
             marginRight: '10px',
-            backgroundColor: '#1890ff',
+            backgroundColor: '#1976d2',
             color: 'white',
-            borderColor: '#1890ff',
+            borderColor: '#1976d2',
             borderRadius: '5px',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           }}>
@@ -121,9 +121,9 @@ export const TimeTable = () => {
         <Button
           onClick={nextWeek}
           style={{
-            backgroundColor: '#1890ff',
+            backgroundColor: '#1976d2',
             color: 'white',
-            borderColor: '#1890ff',
+            borderColor: '#1976d2',
             borderRadius: '5px',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           }}>
@@ -183,7 +183,7 @@ export const TimeTable = () => {
             textAlign: 'center',
             backgroundColor: '#E3EFFF',
             padding: '5px',
-            color: '#1890ff',
+            color: '#1976d2',
             fontSize: '14px',
             marginBottom: '8px'
           }}>
@@ -224,7 +224,7 @@ export const TimeTable = () => {
                 fontWeight: 'bold',
                 background: '#E3EFFF',
                 marginBottom: '0',
-                color: '#1890ff',
+                color: '#1976d2',
                 fontSize: '12px',
               }}>
               No tasks for this day

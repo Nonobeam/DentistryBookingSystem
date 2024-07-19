@@ -13,7 +13,7 @@ const { Option } = Select;
 
 const StyledFooter = styled(Layout.Footer)`
   text-align: center;
-  background-color: #1890ff;
+  background-color: #1976d2;
   color: white;
   padding: 40px 0;
 `;
@@ -235,7 +235,7 @@ const History = () => {
   return (
     <div>
       <NavBar />
-      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px" }}>
+      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px", paddingTop: "100px" }}>
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Appointment History</h1>
         <Form layout="inline" style={{ justifyContent: "center", marginBottom: "20px" }}>
           <Form.Item label="Filter by Date">

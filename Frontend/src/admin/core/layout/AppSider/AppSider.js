@@ -85,7 +85,7 @@ export const AppSider = () => {
         {items.map((item) => (
           <Menu.Item 
             key={item.key} 
-            icon={React.cloneElement(item.icon, { style: { fontSize: '18px', color: '#1890ff' } })}
+            icon={React.cloneElement(item.icon, { style: { fontSize: '18px', color: '#1976d2' } })}
             style={{ 
               margin: '10px 0',
               borderRadius: '0 20px 20px 0',

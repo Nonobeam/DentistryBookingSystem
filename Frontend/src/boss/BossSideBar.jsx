@@ -94,7 +94,7 @@ const BossSidebar = () => {
           <Menu.Item
             key={item.key}
             icon={React.cloneElement(item.icon, {
-              style: { fontSize: '18px', color: '#1890ff' }
+              style: { fontSize: '18px', color: '#1976d2' }
             })}
             onClick={item.onClick}
             style={{

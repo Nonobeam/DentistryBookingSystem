@@ -226,7 +226,7 @@ const Schedule = () => {
           border: "2px solid #ccc", // Đường viền 2px, màu xám nhạt
           padding: "10px", // Khoảng cách nội bộ 10px
           borderRadius: "5px",
-          background: "#1890ff",
+          background: "#1976d2",
           height: "100px",
           lineHeight: "80px",
           // Đường viền cong góc 5px

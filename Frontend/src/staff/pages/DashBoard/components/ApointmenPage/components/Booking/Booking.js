@@ -188,7 +188,7 @@ export const Booking = () => {
         borderRadius: '15px',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
       }}>
-      <Title level={2} style={{ textAlign: 'center', color: '#1890ff', marginBottom: '30px' }}>
+      <Title level={2} style={{ textAlign: 'center', color: '#1976d2', marginBottom: '30px' }}>
         <BookOutlined style={{ marginRight: '10px' }} />
         Booking For Customer
       </Title>
@@ -196,7 +196,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='date'
-            label={<span style={{ color: '#1890ff' }}><CalendarOutlined /> Select Date</span>}
+            label={<span style={{ color: '#1976d2' }}><CalendarOutlined /> Select Date</span>}
             rules={[{ required: true, message: 'Please select a date' }]}>
             <DatePicker
               onChange={handleDateChange}
@@ -208,7 +208,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='service'
-            label={<span style={{ color: '#1890ff' }}><MedicineBoxOutlined /> Select Service</span>}
+            label={<span style={{ color: '#1976d2' }}><MedicineBoxOutlined /> Select Service</span>}
             rules={[{ required: true, message: 'Please select a service' }]}>
             <Select
               onChange={handleServicesChange}
@@ -229,7 +229,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='schedule'
-            label={<span style={{ color: '#1890ff' }}><ClockCircleOutlined /> Select Schedule</span>}
+            label={<span style={{ color: '#1976d2' }}><ClockCircleOutlined /> Select Schedule</span>}
             rules={[{ required: true, message: 'Please select a schedule' }]}>
             <Select
               onChange={handleScheduleChange}
@@ -248,7 +248,7 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='customerMail'
-            label={<span style={{ color: '#1890ff' }}><MailOutlined /> Customer Email</span>}
+            label={<span style={{ color: '#1976d2' }}><MailOutlined /> Customer Email</span>}
             rules={[{ required: true, message: 'Please select a customer' }]}>
             <Select
               onChange={handleCustomerChange}
@@ -267,7 +267,7 @@ export const Booking = () => {
       </Row>
       <Form.Item
         name='dependentID'
-        label={<span style={{ color: '#1890ff' }}><TeamOutlined /> Dependent</span>}
+        label={<span style={{ color: '#1976d2' }}><TeamOutlined /> Dependent</span>}
         rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
           <Select.Option value=''></Select.Option>
@@ -288,8 +288,8 @@ export const Booking = () => {
           loading={loading}
           icon={<BookOutlined />}
           style={{
-            backgroundColor: '#1890ff',
-            borderColor: '#1890ff',
+            backgroundColor: '#1976d2',
+            borderColor: '#1976d2',
             padding: '0 30px',
             height: '40px',
             fontSize: '16px',

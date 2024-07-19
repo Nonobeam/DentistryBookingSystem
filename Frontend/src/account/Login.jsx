@@ -30,7 +30,7 @@ const LoginBox = styled.div`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  background-color: #1890ff;
+  background-color: #1976d2;
   border: none;
   &:hover {
     background-color: #21867a;
@@ -41,7 +41,7 @@ const ExtraLinks = styled.div`
   margin-top: 20px;
   text-align: center;
   a {
-    color: #1890ff;
+    color: #1976d2;
     margin: 0 5px;
     &:hover {
       text-decoration: underline;
@@ -117,7 +117,7 @@ const Login = () => {
   return (
     <LoginContainer>
       <LoginBox>
-        <Title level={2} style={{ color: '#1890ff' }}>LOGIN</Title>
+        <Title level={2} style={{ color: '#1976d2' }}>LOGIN</Title>
         <Form
           name='login'
           initialValues={{ remember: true }}
