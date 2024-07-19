@@ -650,11 +650,11 @@ public class StaffController {
             List<Appointment> appointmentList;
             if (search != null && !search.isEmpty()) {
                 appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndStaffMail(search, mail);
-            } else appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
+            } else {
+                appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
+            }
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
-            if (!appointmentDTOList.isEmpty()) {
-                return ResponseEntity.ok(appointmentDTOList);
-            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No appointments found");
+            return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");
