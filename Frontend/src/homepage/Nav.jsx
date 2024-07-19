@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Button, Typography, Dropdown, Drawer } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
+import styled from 'styled-components';
 import {
   HomeOutlined,
   BookOutlined,
@@ -9,10 +10,64 @@ import {
   UserOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
-import { PiEngine } from "react-icons/pi";
 
 const { Header } = Layout;
-const { Title } = Typography;
+
+const StyledHeader = styled(Header)`
+  background: linear-gradient(to right, #1976d2, #1976d2);
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ `;
+
+const Logo = styled(Link)`
+  img {
+    height: 50px;
+    margin-top: 7px;
+  }
+`;
+
+const StyledMenu = styled(Menu)`
+  background: transparent;
+  border-bottom: none;
+  line-height: 64px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+
+  .ant-menu-item, .ant-menu-submenu-title {
+    color: #e3f2fd;
+    font-weight: 500;
+    
+    &:hover {
+      color: #ffffff;
+      background-color: rgba(255,255,255,0.1);
+    }
+    
+    &.ant-menu-item-selected {
+      color: #ffffff;
+      background-color: rgba(255,255,255,0.2);
+    }
+  }
+`;
+
+const StyledButton = styled(Button)`
+  background-color: #5fa0e5;
+  border-color: #2b6777;
+  color: white;
+  border-radius: 20px;
+  
+  &:hover, &:focus {
+    background-color: #52ab98;
+    border-color: #52ab98;
+    color: white;
+  }
+`;
 
 const NavBar = () => {
   const location = useLocation();
@@ -65,9 +120,7 @@ const NavBar = () => {
     {
       key: '3',
       label: <Link to="/appointment-feedback">Feedback</Link>
-
     },
-    
     {
       key: '4',
       label: 'Logout',
@@ -80,46 +133,32 @@ const NavBar = () => {
   };
 
   return (
-    <>
-      <Header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: "#1890ff",
-          padding: "0 20px"
-        }}
-      >
-        <div className="logo" style={{ flex: '0 0 auto' }}>
-          <Link to="/">
+    <StyledHeader>
+      <Logo to="/">
             <img
               src={require("../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
               alt="Logo"
-              style={{ height: "80px", paddingBottom: "10px"}}
+              style={{ height: "100px", paddingBottom: "20px" }}
+              href="/"
             />
-          </Link>
-        </div>
+      </Logo>
 
         {isMobile ? (
           <>
-            <Button
-              type="primary"
+          <StyledButton
               icon={<MenuOutlined />}
               onClick={toggleDrawer}
-              style={{ marginLeft: "auto" }}
             />
             <Drawer
               title="Menu"
               placement="right"
               onClose={toggleDrawer}
-              visible={visible}
+            open={visible}
               bodyStyle={{ padding: 0 }}
             >
-              <Menu
-                theme="light"
+            <StyledMenu
                 mode="vertical"
                 selectedKeys={[currentKey]}
-                style={{ borderRight: 0 }}
                 onClick={toggleDrawer}
               >
                 <Menu.Item key="1" icon={<HomeOutlined />}>
@@ -150,21 +189,14 @@ const NavBar = () => {
                     </Menu.Item>
                   </>
                 )}
-              </Menu>
+            </StyledMenu>
             </Drawer>
           </>
         ) : (
           <>
-            <Menu
-              theme="dark"
+          <StyledMenu
               mode="horizontal"
               selectedKeys={[currentKey]}
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                backgroundColor: "#1890ff",
-                borderBottom: "none"
-              }}
             >
               <Menu.Item key="1" icon={<HomeOutlined />}>
                 <Link to="/">Home</Link>
@@ -178,29 +210,27 @@ const NavBar = () => {
               <Menu.Item key="4" icon={<AppstoreOutlined />}>
                 <Link to="/services">Services</Link>
               </Menu.Item>
-             
-            </Menu>
+          </StyledMenu>
 
-            <div
-              style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
-            >
+          <div>
               {new Date().getTime() < expirationTime ? (
                 <Dropdown menu={{ items: menuItems }} placement="bottomRight">
-                  <Button icon={<UserOutlined />}>My Account</Button>
+                <StyledButton icon={<UserOutlined />}>My Account</StyledButton>
                 </Dropdown>
               ) : (
                 <>
-                  <Button type="primary" style={{ marginRight: "10px" }}>
+                <StyledButton style={{ marginRight: 10 }}>
                     <Link to="/login">Login</Link>
-                  </Button>
-                  <Button><Link to="/signup">Sign up</Link></Button>
+                </StyledButton>
+                <StyledButton>
+                  <Link to="/signup">Sign up</Link>
+                </StyledButton>
                 </>
               )}
             </div>
           </>
         )}
-      </Header>
-    </>
+    </StyledHeader>
   );
 };
 
