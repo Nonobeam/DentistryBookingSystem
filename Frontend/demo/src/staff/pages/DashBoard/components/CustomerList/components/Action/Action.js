@@ -1,8 +1,5 @@
 import React from 'react';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
-
-import { MdOutlineModeEdit } from 'react-icons/md';
-import { FiTrash2 } from 'react-icons/fi';
 import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
 

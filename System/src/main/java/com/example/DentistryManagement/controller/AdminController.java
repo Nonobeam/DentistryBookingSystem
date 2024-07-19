@@ -161,7 +161,7 @@ public class AdminController {
         try {
             if (userService.isPresentUser(userID).isPresent()) {
                 Client updateUser = userService.findUserById(userID);
-                if(updateUser != null) {
+                if (updateUser != null) {
                     userService.updateUser(userDTO, updateUser);
                 }
                 return ResponseEntity.ok(updateUser);
@@ -208,9 +208,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
-    @GetMapping("/test-api")
-    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
-        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotId(customerId, timeSlotId));
-    }
+//
+//    @GetMapping("/test-api")
+//    public ResponseEntity<?> testApi(@RequestParam String customerId,@RequestParam String timeSlotId) {
+//        return ResponseEntity.ok(appointmentBookingService.isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, ));
+//    }
 }

@@ -80,12 +80,12 @@ public class BossController {
 
     @Operation(summary = "Register a new manager member")
     @PostMapping("/register/manager")
-    public ResponseEntity<AuthenticationResponse> registerManager(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerManager(@RequestBody RegisterRequest request) {
         try {
             AuthenticationResponse response = authenticationService.registerManager(request);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+        } catch (Error e) {
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 
@@ -182,7 +182,7 @@ public class BossController {
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonth();
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYear();
 
-            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear,null);
+            DashboardBoss dashboardResponse = new DashboardBoss(dailyAppointments, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear, null);
 
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {

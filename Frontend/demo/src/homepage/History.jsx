@@ -82,7 +82,6 @@ const History = () => {
   const handleUpdateFeedback = async () => {
     const token = localStorage.getItem("token");
 
-    // Kiểm tra xem người dùng đã nhập số sao hay chưa
     if (starRating === 0) {
       message.error("Please rate the appointment.");
       return;
@@ -195,7 +194,7 @@ const History = () => {
       render: (_, record) => {
         const appointmentDate = dayjs(record.date);
         const currentDate = dayjs();
-        if (record.status === 1 && !appointmentDate.isBefore(currentDate, "day")) {
+        if (record.status === 1 && appointmentDate.isAfter(currentDate, "day")) {
           return (
             <>
               <Button
@@ -246,6 +245,8 @@ const History = () => {
             <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
               <Option value={0}>Cancelled</Option>
               <Option value={1}>Upcoming</Option>
+              <Option value={2}>Finished</Option>
+
             </Select>
           </Form.Item>
           <Form.Item>

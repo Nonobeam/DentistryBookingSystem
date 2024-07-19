@@ -10,7 +10,7 @@ const { Option } = Select;
 
 const BossDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs()); // Set default to current date
   const [selectedYear, setSelectedYear] = useState(dayjs().year());
   const [loading, setLoading] = useState(false);
 
@@ -164,19 +164,14 @@ const BossDashboard = () => {
               </Select>
             </Col>
           </Row>
-
-          
-            <>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
-                </Col>
-                <Col span={12}>
-                  <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
-                </Col>
-              </Row>
-            </>
-          
+          <Row gutter={16}>
+            <Col span={12}>
+              <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
+            </Col>
+            <Col span={12}>
+              <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
+            </Col>
+          </Row>
         </Content>
       </Layout>
     </Layout>
