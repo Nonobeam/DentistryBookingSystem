@@ -16,7 +16,7 @@ import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined ico
 import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
 const { RangePicker: DateRangePicker } = DatePicker;
-const { RangePicker: TimeRangePicker } = TimePicker;
+// const { RangePicker: TimeRangePicker } = TimePicker;
 const { Option } = Select;
 
 const Schedule = () => {
@@ -26,7 +26,6 @@ const Schedule = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState(undefined);
   const [timeSlotList, setTimeSlotList] = useState([]);
   const [dentistName, setDentistName] = useState("");
-  const [scheduledTasks, setScheduledTasks] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [dentistList, setDentistList] = useState([]);
