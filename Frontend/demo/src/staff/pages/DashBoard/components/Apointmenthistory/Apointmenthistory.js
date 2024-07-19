@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Card,
   Table,
@@ -9,9 +9,15 @@ import {
   Menu,
   Spin,
   Tag,
+  DatePicker,
+  AutoComplete,
+  Input,
 } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import useSWR from 'swr';
+import moment from 'moment';
+
+const { RangePicker } = DatePicker;
 
 // useEffect(() => {
 //   fetchData();
@@ -24,6 +30,23 @@ const fetchData = async () => {
 
 export const AppointmentHistory = () => {
   const { data, error, isLoading, mutate } = useSWR('appointments', fetchData);
+  const [searchText, setSearchText] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedDentist, setSelectedDentist] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  // Extract unique users and dentists for autocomplete options
+  const userOptions = useMemo(() => {
+    const uniqueUsers = Array.from(new Set(data?.map((item) => item.user)));
+    return uniqueUsers.map((user) => ({ value: user }));
+  }, [data]);
+
+  const dentistOptions = useMemo(() => {
+    const uniqueDentists = Array.from(
+      new Set(data?.map((item) => item.dentist))
+    );
+    return uniqueDentists.map((dentist) => ({ value: dentist }));
+  }, [data]);
 
   const handleUpdateStatus = async (record, status) => {
     try {
@@ -42,6 +65,41 @@ export const AppointmentHistory = () => {
     } finally {
       // Kết thúc update, ẩn biểu tượng loading
     }
+  };
+
+  // Function to filter appointments based on current filters
+  const filterAppointments = () => {
+    let filteredData = data;
+
+    // Filter by searchText
+    if (searchText) {
+      filteredData = filteredData.filter((item) =>
+        item.user.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Filter by selectedUser
+    if (selectedUser) {
+      filteredData = filteredData.filter((item) => item.user === selectedUser);
+    }
+
+    // Filter by selectedDentist
+    if (selectedDentist) {
+      filteredData = filteredData.filter(
+        (item) => item.dentist === selectedDentist
+      );
+    }
+
+    // Filter by selectedDate
+    if (selectedDate !== null && selectedDate[0] !== '') {
+      console.log(selectedDate[0], selectedDate[1]);
+      filteredData = filteredData.filter(
+        (item) => item.date >= selectedDate[0] && item.date <= selectedDate[1]
+      );
+      console.log(filteredData);
+    }
+
+    return filteredData;
   };
 
   const handleDelete = async (record) => {
@@ -165,8 +223,43 @@ export const AppointmentHistory = () => {
     minHeight: '200px',
   };
 
+  const handleDateChange = (date, dateString) => {
+    setSelectedDate(dateString);
+  };
+
   return (
     <div>
+      {/* Filters */}
+      <div style={{ marginBottom: 16 }}>
+        <Input.Search
+          placeholder='Search by user'
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: 200, marginRight: 8 }}
+        />
+        <AutoComplete
+          placeholder='Select user'
+          value={selectedUser}
+          dataSource={userOptions}
+          onSelect={(value) => setSelectedUser(value)}
+          onSearch={(value) => setSelectedUser(value)}
+          style={{ width: 200, marginRight: 8 }}
+        />
+        <AutoComplete
+          placeholder='Select dentist'
+          value={selectedDentist}
+          dataSource={dentistOptions}
+          onSelect={(value) => setSelectedDentist(value)}
+          onSearch={(value) => setSelectedDentist(value)}
+          style={{ width: 200, marginRight: 8 }}
+        />
+        <RangePicker
+          placeholder={['Start date', 'End date']}
+          format='YYYY-MM-DD'
+          onChange={handleDateChange}
+          style={{ marginRight: 8 }}
+        />
+      </div>
       <Card title='Appointment History' style={cardStyle}>
         {isLoading ? (
           <div style={loadingStyle}>
@@ -174,7 +267,7 @@ export const AppointmentHistory = () => {
           </div>
         ) : (
           <Table
-            dataSource={data}
+            dataSource={filterAppointments()}
             columns={columns}
             pagination={false}
             bordered
