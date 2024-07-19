@@ -2,6 +2,7 @@ package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Role;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,20 +19,17 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     Client findClientsByUserID(String userId);
 
-
-    List<Client> getClientsByRoleAndDentist_Staff_UserMail(Role DENTIST, String staffMail);
-
     //boss/adminList
     List<Client> getClientsByRole(Role role);
 
 
     //managerList
     @Query("SELECT c FROM Client c , Dentist d " +
-            "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail ")
+            "WHERE c.role = :roleParam AND c.dentist.user.userID = d.dentistID and d.clinic.user.mail = :managerMail and d.user.status=1")
     List<Client> getDentistByManager(@Param("roleParam") Role role, String managerMail);
 
     @Query("SELECT c FROM Client c , Staff d " +
-            "WHERE c.role = :roleParam AND c.staff.user.userID = d.staffID and d.clinic.user.mail = :managerMail ")
+            "WHERE c.role = :roleParam AND c.staff.user.userID = d.staffID and d.clinic.user.mail = :managerMail and d.user.status=1")
     List<Client> getStaffByManager(@Param("roleParam") Role role, String managerMail);
 
     List<Client> findByRoleAndNameContainingIgnoreCase(Role role, String searchWord);
@@ -39,4 +37,6 @@ public interface UserRepository extends JpaRepository<Client, String> {
     Client findUserByMail(String mail);
 
     List<Client> findClientsByPhoneOrMail(String phone, String mail);
+
+    List<Client> getClientsByRoleAndDentist_Staff_UserMailAndStatus(Role role, String mail, int i);
 }

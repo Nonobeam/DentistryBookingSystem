@@ -117,38 +117,6 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "Show all working dentist schedule")
-    @GetMapping("/dentist-schedule")
-    public ResponseEntity<?> getWorkingDentistSchedule() {
-        try {
-            // find current staff account
-            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
-            HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
-            // Gt all dentists by current staff account
-            List<Dentist> dentistList = userDentistService.findDentistListByStaff(staff);
-
-            // Get all dentistSchedule from the dentists
-            for (Dentist dentist : dentistList) {
-                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
-
-                if (!dentistSchedule.isEmpty()) {
-                    dentistSchedules.addAll(dentistSchedule);
-                }
-            }
-
-            List<DentistSchedule> sortedDentistSchedules = dentistSchedules.stream()
-                    .sorted(Comparator.comparing(DentistSchedule::getWorkDate))
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(sortedDentistSchedules);
-        } catch (Error error) {
-            // Get error return from service
-            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
-            logger.error(errorResponseDTO.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
-        }
-    }
-
 
     @Operation(summary = "Set Service for dentists")
     @PostMapping("/set-service/{dentistMail}")
@@ -234,7 +202,37 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+    @Operation(summary = "Show all working dentist schedule")
+    @GetMapping("/dentist-schedule")
+    public ResponseEntity<?> getWorkingDentistSchedule() {
+        try {
+            // find current staff account
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
+            HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
+            // Gt all dentists by current staff account
+            List<Dentist> dentistList = userDentistService.findDentistListByStaff(staff);
 
+            // Get all dentistSchedule from the dentists
+            for (Dentist dentist : dentistList) {
+                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
+
+                if (!dentistSchedule.isEmpty()) {
+                    dentistSchedules.addAll(dentistSchedule);
+                }
+            }
+
+            List<DentistSchedule> sortedDentistSchedules = dentistSchedules.stream()
+                    .sorted(Comparator.comparing(DentistSchedule::getWorkDate))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(sortedDentistSchedules);
+        } catch (Error error) {
+            // Get error return from service
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            logger.error(errorResponseDTO.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        }
+    }
 
     @Operation(summary = "Show dentists and timeslots for choosing set schedule")
     @GetMapping("/show-set-schedule")
