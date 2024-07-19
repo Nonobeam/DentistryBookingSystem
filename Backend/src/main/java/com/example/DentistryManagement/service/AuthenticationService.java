@@ -363,11 +363,11 @@ public class AuthenticationService {
         Client user = passToken.getUser();
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-        passwordResetTokenRepository.delete(passToken); // Invalidate the used token
+        passwordResetTokenRepository.delete(passToken);
     }
 
     public void sendPasswordResetEmail(String mail, String token) {
-        String url = confirmationLinkBaseUrl + "/api/v1/auth/resetPassword/" + token;
+        String url = confirmationLinkBaseUrl + "/resetPassword/" + token;
         String subject = "Password Reset Request";
         String text = "To reset your password, click the link below:\n" + url + "\nThis link will expire after 5 minutes";
         notificationService.sendSimpleMessage(mail, subject, text);

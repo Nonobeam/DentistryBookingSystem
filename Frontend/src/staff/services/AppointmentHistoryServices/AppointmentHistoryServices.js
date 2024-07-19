@@ -13,13 +13,30 @@ export const AppointmentHistoryServices = {
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: error.message,
+        description: error.message || "Not found any data",
         onClick: () => {
           console.log('Notification Clicked!');
         },
       });
     }
   },
+    getAllCustomers: async () => {
+      try {
+        const responseData = await api.get(`staff/allCustomer`);
+          
+        return responseData.data;
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: error.message,
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
+   }
+
+  },
+  
   getAllServices: async (workDate) => {
     try {
       const responseData = await api.get(

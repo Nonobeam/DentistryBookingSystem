@@ -8,7 +8,7 @@ import {
   HistoryOutlined,
   HomeOutlined,
   ScheduleOutlined,
-} from '@ant-design/icons'; // Import các icon từ Ant Design
+} from '@ant-design/icons';
 
 const items = [
   {
@@ -49,14 +49,13 @@ const items = [
   },
   {
     key: 'Logout',
-
     label: 'Logout',
     icon: <LuLogOut />,
     onClick: () => {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('expirationTime');
-      window.location.href = '/'; // Redirect to the homepage after logout
+      window.location.href = '/';
     },
   },
 ];
@@ -65,22 +64,26 @@ export const AppSider = () => {
   return (
     <div
       style={{
-        backgroundColor: '#fff',
-        borderRight: 'none',
+        borderRight: '1px solid #e8e8e8',
         height: '100vh',
+        boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
       }}>
-      <div className='demo-logo-vertical' style={{ height: '0px' }} />
       <div
         className='logo'
-        style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '120px',
+          backgroundColor: 'white',
+        }}>
         <Link to='/'>
           <img
             src={require('../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png')}
             alt='Logo'
             style={{
-              height: '130px',
-              paddingBottom: '10px',
-              paddingLeft: '40px',
+              height: '100px',
+              objectFit: 'contain',
             }}
           />
         </Link>
@@ -88,16 +91,30 @@ export const AppSider = () => {
       <Menu
         mode='inline'
         defaultSelectedKeys={['Dashboard']}
-        style={{ borderRight: 'none' }}>
+        style={{
+          borderRight: 'none',
+          backgroundColor: 'transparent',
+        }}>
         {items.map((item) => (
           <Menu.Item
             key={item.key}
-            icon={item.icon}
-            style={{ margin: 0 }}
+            icon={React.cloneElement(item.icon, {
+              style: { fontSize: '18px', color: '#1890ff' },
+            })}
+            style={{
+              margin: '10px 0',
+              borderRadius: '0 20px 20px 0',
+              transition: 'all 0.3s',
+            }}
             onClick={item.onClick}>
             <Link
               to={item.link}
-              style={{ color: '#333', textDecoration: 'none' }}>
+              style={{
+                color: '#333',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: 400,
+              }}>
               {item.label}
             </Link>
           </Menu.Item>
