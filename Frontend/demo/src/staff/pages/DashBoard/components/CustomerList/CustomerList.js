@@ -1,11 +1,9 @@
-import { Flex, Spin } from 'antd';
-import React from 'react';
-
+import React, { useState } from 'react';
+import { Flex, Spin, Input } from 'antd'; // Import Input từ Ant Design
 import { Action } from './components/Action/Action';
 import { TableList } from './components/TableList/TableList';
 import useSWR from 'swr';
 import { CustomerServicess } from '../../../../services/CustomerServicess/CustomerServicess';
-
 
 const columns = [
   {
@@ -36,26 +34,40 @@ const columns = [
   },
 ];
 
+const fetchData = async () => {
+  const response = await CustomerServicess.getAll();
+  return response;
+};
 
+export const CustomerListDash = () => {
+  const { data, error, isValidating } = useSWR('Customer', fetchData);
+  const [searchText, setSearchText] = useState('');
 
-  const fetchData = async () => {
-    const response = await CustomerServicess.getAll();
-    return response;
+  const handleSearch = value => {
+    setSearchText(value);
   };
-  
-  export const CustomerListDash = () => {
-    const { data, error, isLoading } = useSWR('Customer', fetchData);
+
+  // Lọc dữ liệu dựa trên searchText
+  const filteredData = searchText
+    ? data.filter(item =>
+        item.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : data;
 
   return (
     <div>
       <h1>Customer List</h1>
-      <Flex justify="center" align="middle" style={{ minHeight: '200px' }}>
-        {isLoading ? ( // Kiểm tra nếu đang loading thì hiển thị Spin (biểu tượng loading)
-          <Spin size="large" />
-        ) : (
-          <TableList dataSource={data} columns={columns} />
-        )}
+      <Flex justify="space-between" style={{ marginBottom: '16px' }}>
+        <Input.Search
+          placeholder="Search by name"
+          onSearch={handleSearch}
+          loading={isValidating} // Sử dụng isValidating để chỉ ra khi đang tải dữ liệu
+          style={{ width: 200 }}
+        />
       </Flex>
+      <Spin spinning={!data}>
+        <TableList dataSource={filteredData} columns={columns} />
+      </Spin>
     </div>
   );
 };
