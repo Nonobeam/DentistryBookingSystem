@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { BiSearch } from 'react-icons/bi';
 import { CiBellOn } from 'react-icons/ci';
-import { FaUserCircle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { Button, Dropdown, Menu, message } from 'antd';
-import NotificationDropdown from '../../pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
 import { PersonalServices } from '../../services/PersonalServices/PersonalServices';
+import NotificationDropdown from '../../pages/DashBoard/components/NotificationDropdown/NotificationDropdown';
 
 export const AppHeader = () => {
   const [showBellDropdown, setShowBellDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
+  const [clinicName, setClinicName] = useState('');
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -22,36 +19,54 @@ export const AppHeader = () => {
         console.error('Error fetching notifications:', error);
       }
     };
+
+    const fetchClinicName = async () => {
+      try {
+        const response = await PersonalServices.getClinicStaff();
+        setClinicName(response);
+      } catch (error) {
+        console.error('Error fetching clinic name:', error);
+      }
+    };
+
     fetchNotifications();
+    fetchClinicName();
   }, []);
 
-  
   const handleBellIconClick = () => {
     setShowBellDropdown(!showBellDropdown);
   };
-
-
 
   const handleNotificationClick = (notification) => {
     console.log('Notification clicked:', notification);
   };
 
-
   return (
     <div
       style={{
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '20px',
-        color: '#1890ff',
+        padding: '0 20px',
+        color: '#1976d2',
+        position: 'relative', // Add relative positioning to handle absolute positioning of the dropdown
       }}
     >
-      
-      <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          flex: 1,
+          textAlign: 'center', // Center the clinic name
+          color: 'white',
+          fontFamily: 'Georgia',
+          fontSize: '22px',
+        }}
+      >
+        {clinicName}
+      </div>
+      <div style={{ position: 'absolute', right: '20px' }}>
         <CiBellOn
           className='bell-icon'
-          style={{ cursor: 'pointer', fontSize: '20px', color: 'white' }}
+          style={{ cursor: 'pointer', fontSize: '26px', color: 'white' }}
           onClick={handleBellIconClick}
         />
         {showBellDropdown && (
@@ -59,7 +74,7 @@ export const AppHeader = () => {
             style={{
               position: 'absolute',
               top: '40px',
-              right: '10px',
+              right: '0', // Adjust this to align with the icon
               minWidth: '300px', // Adjust the width as needed
               background: '#F5F5F5',
               boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
@@ -75,7 +90,6 @@ export const AppHeader = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

@@ -1,92 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Select, Card, Row, Col, Typography, Divider, Empty } from 'antd';
-import axios from 'axios';
-import { Bar } from '@ant-design/charts';
-import ManagerSidebar from './ManagerSidebar';
+import React, { useState, useEffect } from "react";
+import { Layout, Card, Row, Col, Typography, Divider, Empty } from "antd";
+import axios from "axios";
+import { Bar } from "@ant-design/charts";
+import ManagerSidebar from "./ManagerSidebar";
+import { HomeOutlined, CalendarOutlined } from "@ant-design/icons";
 
-const { Header, Content } = Layout;
-const { Option } = Select;
+const { Content } = Layout;
 const { Title } = Typography;
 
 const ManagerDashboard = () => {
-  const [year, setYear] = useState(2024);
+  const [year, setYear] = useState(new Date().getFullYear()); // Set initial year to the current year
   const [dashboardData, setDashboardData] = useState({
-    dailyAppointments: 0,
     monthlyAppointments: {},
     totalAppointmentsInMonthNow: 0,
     totalAppointmentsInYearNow: 0,
-    ratingDentist: {} // Initialize ratingDentist state
+    ratingDentist: {},
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboardData(year);
-    fetchRatingDentist();
-  }, [year]); // Fetch data when year changes
+  }, [year]);
 
   const fetchDashboardData = async (selectedYear) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/v1/manager/dashboard?year=${selectedYear}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/manager/dashboard?year=${selectedYear}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = response.data;
-      // Ensure dailyAppointments is not null or undefined
-      const dailyAppointments = data.dailyAppointments || 0;
-      const totalAppointmentsInMonthNow = data.totalAppointmentsInMonthNow || 0;
-      const totalAppointmentsInYearNow = data.totalAppointmentsInYearNow || 0;
       setDashboardData({
-        dailyAppointments,
         monthlyAppointments: data.monthlyAppointments || {},
-        totalAppointmentsInMonthNow,
-        totalAppointmentsInYearNow,
-        ratingDentist: dashboardData.ratingDentist // Preserve existing ratingDentist
+        totalAppointmentsInMonthNow: data.totalAppointmentsInMonthNow || 0,
+        totalAppointmentsInYearNow: data.totalAppointmentsInYearNow || 0,
+        ratingDentist: data.ratingDentist || {},
       });
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchRatingDentist = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/v1/manager/ratingDentist', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const ratingDentistData = response.data || {};
-      setDashboardData(prevState => ({
-        ...prevState,
-        ratingDentist: ratingDentistData
-      }));
-    } catch (error) {
-      console.error('Error fetching rating dentist data:', error);
-    }
+  const handleYearChange = (selectedYear) => {
+    setYear(selectedYear);
   };
 
-  const handleYearChange = (value) => {
-    setYear(value);
-  };
+  // Generate the last 5 years including the current year
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, index) => currentYear - index);
 
   const barData = Object.keys(dashboardData.monthlyAppointments).map((key) => ({
     clinic: key,
-    appointments: dashboardData.monthlyAppointments[key]['7'] || 0,
+    appointments: dashboardData.monthlyAppointments[key]["7"] || 0,
+  }));
+
+  const ratingBarData = Object.keys(dashboardData.ratingDentist).map((key) => ({
+    dentist: key,
+    rating: dashboardData.ratingDentist[key],
   }));
 
   const barConfig = {
     data: barData,
-    xField: 'clinic',
-    yField: 'appointments',
-    seriesField: 'clinic',
-    colorField: 'clinic',
+    xField: "clinic",
+    yField: "appointments",
+    seriesField: "clinic",
+    colorField: "clinic",
     legend: {
-      position: 'top-left',
+      position: "top-left",
     },
     xAxis: {
       label: {
@@ -94,90 +81,144 @@ const ManagerDashboard = () => {
       },
     },
     barWidthRatio: 0.6,
-    color: ['#1890ff'],
+    color: ["#1976d2"],
+  };
+
+  const ratingBarConfig = {
+    data: ratingBarData,
+    xField: "dentist",
+    yField: "rating",
+    seriesField: "dentist",
+    colorField: "dentist",
+    legend: {
+      position: "top-left",
+    },
+    xAxis: {
+      label: {
+        autoRotate: true,
+      },
+    },
+    barWidthRatio: 0.6,
+    color: [
+      "#ff4d4f",
+      "#ffc107",
+      "#52c41a",
+      "#1976d2",
+      "#fcffe6",
+      "#ffffb8",
+      "#f5222d",
+    ], // Example colors
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <ManagerSidebar />
 
-      <Layout style={{ padding: '24px' }}>
-        <Content style={{ padding: '24px', margin: 0, minHeight: '85vh', backgroundColor: '#fff' }}>
+      <Layout style={{ padding: "24px" }}>
+        <Content
+          style={{
+            padding: "24px",
+            margin: 0,
+            minHeight: "85vh",
+            backgroundColor: "#fff",
+          }}
+        >
           <Row gutter={[16, 16]}>
             <Col span={24}>
-              <Title level={2}>Manager Dashboard</Title>
+              <Title level={2} style={{ textAlign: "center" }}>
+                Manager Dashboard
+              </Title>
             </Col>
-            <Col span={7}>
-              <Card
-                bordered={false}
-                style={{ backgroundColor: '#f0f9ff', textAlign: 'center', padding: '16px 0' }}
-              >
-                <Title level={5}>Appointments Today</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={4}>{dashboardData.dailyAppointments}</Title>
-              </Card>
-            </Col>
-            <Col span={7}>
-              <Card
-                bordered={false}
-                style={{ backgroundColor: '#fcffe6', textAlign: 'center', padding: '16px 0' }}
-              >
-                <Title level={5}>This Month</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={4}>{dashboardData.totalAppointmentsInMonthNow}</Title>
-              </Card>
-            </Col>
-            <Col span={7}>
-              <Card
-                bordered={false}
-                style={{ backgroundColor: '#ffffb8', textAlign: 'center', padding: '16px 0' }}
-              >
-                <Title level={5}>This Year</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                <Title level={4}>{dashboardData.totalAppointmentsInYearNow}</Title>
-              </Card>
-            </Col>
-            <Col span={3}>
-              <Select
-                defaultValue={year}
-                style={{ width: '100%' }}
-                onChange={handleYearChange}
-              >
-                {[2022, 2023, 2024, 2025].map((year) => (
-                  <Option key={year} value={year}>
-                    {year}
-                  </Option>
+            <Col span={24}>
+              <Row gutter={[16, 16]} justify="center">
+                {years.map((item) => (
+                  <Col key={item} xs={12} sm={6} md={4} lg={4}>
+                    <Card
+                      onClick={() => handleYearChange(item)}
+                      bordered={false}
+                      style={{
+                        textAlign: "center",
+                        cursor: "pointer",
+                        height: "100px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: year === item ? "#C6E2FF" : "#e6f7ff",
+                        border: "1px solid #d9d9d9",
+                        marginBottom: "16px",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <Title level={4} style={{ margin: 0 }}>
+                        {item}
+                      </Title>
+                    </Card>
+                  </Col>
                 ))}
-              </Select>
+              </Row>
+            </Col>
+            <Col span={24}>
+              <Row justify="center" gutter={[16, 16]}>
+                <Col xs={24} sm={12} md={10} lg={8} xl={6}>
+                  <Card
+                    bordered={false}
+                    style={{
+                      backgroundColor: "#fcffe6",
+                      textAlign: "center",
+                      padding: "16px",
+                    }}
+                  >
+                    <HomeOutlined
+                      style={{ fontSize: "24px", color: "#1976d2" }}
+                    />
+                    <Title level={5}>This Month</Title>
+                    <Divider style={{ margin: "12px 0" }} />
+                    <Title level={4} style={{ margin: 0 }}>
+                      {dashboardData.totalAppointmentsInMonthNow} Appointments
+                    </Title>
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} md={10} lg={8} xl={6}>
+                  <Card
+                    bordered={false}
+                    style={{
+                      backgroundColor: "#ffffb8",
+                      textAlign: "center",
+                      padding: "16px",
+                    }}
+                  >
+                    <CalendarOutlined
+                      style={{ fontSize: "24px", color: "#f5222d" }}
+                    />
+                    <Title level={5}>This Year</Title>
+                    <Divider style={{ margin: "12px 0" }} />
+                    <Title level={4} style={{ margin: 0 }}>
+                      {dashboardData.totalAppointmentsInYearNow} Appointments
+                    </Title>
+                  </Card>
+                </Col>
+              </Row>
             </Col>
           </Row>
-          <Divider style={{ margin: '24px 0' }} />
+          <Divider style={{ margin: "24px 0" }} />
           <Row gutter={[16, 16]}>
-            <Col span={12}>
+            <Col span={24} md={12}>
               <Card loading={loading}>
                 <Title level={4}>Monthly Appointments by Clinic</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                {(
-                  barData.length > 0 ? (
-                    <Bar {...barConfig} />
-                  ) : (
-                    <Empty description="No data available" />
-                  )
+                <Divider style={{ margin: "12px 0" }} />
+                {barData.length > 0 ? (
+                  <Bar {...barConfig} />
+                ) : (
+                  <Empty description="No data available" />
                 )}
               </Card>
             </Col>
-            <Col span={12}>
-              <Card>
+            <Col span={24} md={12}>
+              <Card loading={loading}>
                 <Title level={4}>Rating of Dentists</Title>
-                <Divider style={{ margin: '12px 0' }} />
-                {Object.keys(dashboardData.ratingDentist).length > 0 ? (
-                  <ul>
-                    {Object.entries(dashboardData.ratingDentist).map(([dentist, rating]) => (
-                      <li key={dentist}>
-                        <Typography.Text>{`${dentist}: ${rating}`}</Typography.Text>
-                      </li>
-                    ))}
-                  </ul>
+                <Divider style={{ margin: "12px 0" }} />
+                {ratingBarData.length > 0 ? (
+                  <Bar {...ratingBarConfig} />
                 ) : (
                   <Empty description="No rating data available" />
                 )}

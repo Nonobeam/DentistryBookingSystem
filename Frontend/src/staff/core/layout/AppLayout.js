@@ -2,21 +2,21 @@ import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content, Header } from 'antd/es/layout/layout';
 import React from 'react';
-import { AppHeader } from './AppHeader';
-import { AppSider } from './AppSider';
+import { AppHeader } from './AppHeader'; // Adjust import if needed
+import { AppSider } from './AppSider'; // Adjust import if needed
+import { AppFooter } from './AppFooter'; // Adjust import if needed
 
 const headerStyle = {
   textAlign: 'center',
   color: '#fff',
   lineHeight: '64px',
-  backgroundColor: '#1890ff',
+  backgroundColor: '#1976d2',
 };
 
 const siderStyle = {
   lineHeight: '120px',
   color: '#333',
   backgroundColor: '#fff',
-  
 };
 
 export const AppLayout = ({ content }) => {
@@ -32,7 +32,8 @@ export const AppLayout = ({ content }) => {
           console.log(collapsed, type);
         }}
         style={siderStyle}
-        width='15%'>
+        width='15%'
+      >
         <AppSider />
       </Sider>
       <Layout>
@@ -44,9 +45,19 @@ export const AppLayout = ({ content }) => {
             padding: '0 24px',
             minHeight: 280,
             backgroundColor: '#F5F5F5',
-          }}>
+          }}
+        >
           {content}
         </Content>
+        <Layout.Footer
+          style={{
+            textAlign: 'center',
+            backgroundColor: '#1976d2',
+            color: '#fff',
+          }}
+        >
+          <AppFooter />
+        </Layout.Footer>
       </Layout>
     </Layout>
   );

@@ -27,7 +27,7 @@ const SignupBox = styled.div`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  background-color: #1890ff;
+  background-color: #1976d2;
   border: none;
   &:hover {
     background-color: #167acb;
@@ -38,7 +38,7 @@ const ExtraLink = styled.div`
   margin-top: 20px;
   text-align: center;
   a {
-    color: #1890ff;
+    color: #1976d2;
     &:hover {
       text-decoration: underline;
     }
@@ -85,7 +85,7 @@ const Signup = () => {
   return (
     <SignupContainer>
       <SignupBox>
-        <Title level={2} style={{ color: '#1890ff' }}>Sign Up</Title>
+        <Title level={2} style={{ color: '#1976d2' }}>Sign Up</Title>
         <Form
           name="signup"
           initialValues={{ remember: true }}

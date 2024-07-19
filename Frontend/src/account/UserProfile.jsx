@@ -76,7 +76,7 @@ const UserProfile = () => {
   return (
     <>
       <NavBar />
-      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px", paddingTop: "100px" }}>
         <Card
           title="Profile"
           bordered={false}

@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from './ManagerSidebar';
 
-
 const { Header, Content } = Layout;
 const { Option } = Select;
 
@@ -20,7 +19,7 @@ const ManagerDentistList = () => {
   const [deletingDentistId, setDeletingDentistId] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const fetchAllDentists = async () => {
@@ -32,7 +31,12 @@ const ManagerDentistList = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setDentists(response.data);
+      if (Array.isArray(response.data)) {
+        setDentists(response.data);
+      } else {
+        setDentists([]);
+        message.info('No dentists found.');
+      }
     } catch (error) {
       console.error('There was an error fetching the dentist data!', error);
     } finally {
@@ -58,7 +62,12 @@ const ManagerDentistList = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        setStaff(response.data);
+        if (Array.isArray(response.data)) {
+          setStaff(response.data);
+        } else {
+          setStaff([]);
+          message.info('No staff found.');
+        }
       } catch (error) {
         console.error('There was an error fetching the staff data!', error);
       }
@@ -66,9 +75,6 @@ const ManagerDentistList = () => {
 
     fetchStaff();
   }, []);
-
-  
- 
 
   const showEditModal = (record) => {
     setEditingDentist(record);
@@ -109,7 +115,7 @@ const ManagerDentistList = () => {
   };
 
   const handleStaffFilter = async (staffID) => {
-    history(`/manager/dentist/${staffID}`);
+    navigate(`/manager/dentist/${staffID}`);
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
@@ -118,7 +124,12 @@ const ManagerDentistList = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setDentists(response.data);
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setDentists(response.data);
+      } else {
+        setDentists([]);
+        message.info('No dentists found for the selected staff.');
+      }
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setDentists([]);
@@ -214,7 +225,7 @@ const ManagerDentistList = () => {
         <span style={{ color: status === 1 ? 'green' : 'red' }}>{status === 1 ? 'Active' : 'Inactive'}</span>
 
       ),
-        },
+    },
     {
       title: 'Clinic',
       dataIndex: 'clinicName',
@@ -231,7 +242,7 @@ const ManagerDentistList = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <ManagerSidebar />
       <Layout style={{ padding: '0 auto' }}>
-      <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+        <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
 
         <Content style={{ padding: 30, margin: 0, minHeight: 280 }}>
           <h1>Dentist List</h1>

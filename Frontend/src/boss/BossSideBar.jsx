@@ -16,57 +16,119 @@ const BossSidebar = () => {
     '/boss/profile': '4'
   };
 
+  const menuItems = [
+    {
+      key: '1',
+      icon: <BarChartOutlined />,
+      label: 'Dashboard',
+      link: '/boss'
+    },
+    {
+      key: '2',
+      icon: <TeamOutlined />,
+      label: 'Manager List',
+      link: '/boss/manager'
+    },
+    {
+      key: '3',
+      icon: <HomeOutlined />,
+      label: 'Service',
+      link: '/boss/service'
+    },
+    {
+      key: '4',
+      icon: <UserOutlined />,
+      label: 'Profile',
+      link: '/boss/profile'
+    },
+    {
+      key: '5',
+      icon: <LuLogOut />,
+      label: 'Logout',
+      onClick: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('expirationTime');
+        window.location.href = '/';
+      }
+    }
+  ];
+
   return (
-    <Sider width={250} className="site-layout-background">
-      
-      <div className="logo" style={{ flex: '0 0 auto', backgroundColor: 'white' }}>
-          <Link to="/">
-            <img
-              src={require("../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
-              alt="Logo"
-              style={{ height: "120px", paddingBottom: "10px", paddingLeft: "50px"}}
-            />
-          </Link>
-        </div>
+    <Sider 
+      width={250} 
+      style={{
+        backgroundColor: 'white',
+        boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
+      }}
+    >
+      <div 
+        className="logo" 
+        style={{ 
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '120px',
+          backgroundColor: 'white',
+        }}
+      >
+        <Link to="/">
+          <img
+            src={require("../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png")}
+            alt="Logo"
+            style={{ height: "100px", objectFit: 'contain' }}
+          />
+        </Link>
+      </div>
 
       <Menu
         mode="inline"
         defaultSelectedKeys={[pathToKey[location.pathname]]}
-        style={{ height: '100%', borderRight: 0 }}
-        items={[
-          {
-            key: '1',
-            icon: <BarChartOutlined />,
-            label: <Link to="/boss">Dashboard</Link>,
-          },
-          {
-            key: '2',
-            icon: <TeamOutlined />,
-            label: <Link to="/boss/manager">Manager List</Link>,
-          },
-          {
-            key: '3',
-            icon: <HomeOutlined />,
-            label: <Link to="/boss/service">Service</Link>,
-          },
-          {
-            key: '4',
-            icon: <UserOutlined />,
-            label: <Link to="/boss/profile">Profile</Link>,
-          },
-          {
-            key: '5',
-            label: 'Logout',
-            icon: <LuLogOut />,
-            onClick: () => {
-              localStorage.removeItem('token');
-              localStorage.removeItem('role');
-              localStorage.removeItem('expirationTime');
-              window.location.href = '/';
-            },
-          }
-        ]}
-      />
+        style={{ 
+          height: '100%', 
+          borderRight: 0,
+          backgroundColor: 'transparent',
+        }}
+      >
+        {menuItems.map(item => (
+          <Menu.Item
+            key={item.key}
+            icon={React.cloneElement(item.icon, {
+              style: { fontSize: '18px', color: '#1976d2' }
+            })}
+            onClick={item.onClick}
+            style={{
+              margin: '10px 0',
+              borderRadius: '0 20px 20px 0',
+              transition: 'all 0.3s',
+            }}
+          >
+            {item.link ? (
+              <Link 
+                to={item.link}
+                style={{
+                  color: '#333',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                }}
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <span
+                style={{
+                  color: '#333',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                }}
+              >
+                {item.label}
+              </span>
+            )}
+          </Menu.Item>
+        ))}
+      </Menu>
     </Sider>
   );
 };

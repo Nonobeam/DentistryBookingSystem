@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { ServiceList } from '../ServiceList/ServiceList';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import { Booking } from '../Booking/Booking';
 export const ScheduleWork = () => {

@@ -26,7 +26,7 @@ const ResetPasswordBox = styled.div`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  background-color: #1890ff;
+  background-color: #1976d2;
   border: none;
   &:hover {
     background-color: #167acb;
@@ -42,7 +42,7 @@ const ResetPassword = () => {
   const onFinish = async (values) => {
     const { password } = values;
     try {
-      await axios.post(`http://localhost:8080/user/resetPassword/${token}?password=${password}`);
+      await axios.post(`http://localhost:8080/api/v1/auth/resetPassword/${token}?password=${password}`);
       setSuccessMessage("Your password has been reset successfully. Redirecting to login page...");
       setErrorMessage("");
 
@@ -63,7 +63,7 @@ const ResetPassword = () => {
   return (
     <ResetPasswordContainer>
       <ResetPasswordBox>
-        <Title level={2} style={{ color: '#1890ff' }}>Reset your password</Title>
+        <Title level={2} style={{ color: '#1976d2' }}>Reset your password</Title>
         <p>Please enter your new password below.</p>
 
         {successMessage && (

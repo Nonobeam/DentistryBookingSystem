@@ -172,10 +172,10 @@ const Booking = () => {
           const schedules = response.data;
           const timeSlotsMap = new Map();
           schedules.forEach((schedule) => {
-            if (!timeSlotsMap.has(schedule.startTime)) {
-              timeSlotsMap.set(schedule.startTime, []);
+            if (!timeSlotsMap.has(schedule.startTime+'-'+schedule.endTime)) {
+              timeSlotsMap.set(schedule.startTime+'-'+schedule.endTime, []);
             }
-            timeSlotsMap.get(schedule.startTime).push({
+            timeSlotsMap.get(schedule.startTime+'-'+schedule.endTime).push({
               dentistName: schedule.dentistName,
               dentistScheduleID: schedule.dentistScheduleID,
             });
@@ -393,7 +393,7 @@ const Booking = () => {
   return (
     <>
       <NavBar />
-      <BookingContainer>
+      <BookingContainer style={{paddingTop: "100px"}}>
         <BookingFormWrapper>
           <Title level={2}>Reserve your appointment!</Title>
           <Form form={form} name="booking" onFinish={onFinish} disabled={isFormDisabled} layout="vertical">

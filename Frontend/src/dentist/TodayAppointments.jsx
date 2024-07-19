@@ -10,7 +10,22 @@ const TodayAppointments = () => {
   const [loading, setLoading] = useState(true);
   const [reminderModalVisible, setReminderModalVisible] = useState(false);
   const [reminderMessage, setReminderMessage] = useState("");
+  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
 
+  const fetchClinicInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setClinicInfo(response.data);
+    } catch (error) {
+      message.error(error.response?.data || "An error occurred while fetching clinic information");
+      console.error(error);
+    }
+  };
   const handleSendReminder = async () => {
     setLoading(true);
     try {
@@ -30,13 +45,13 @@ const TodayAppointments = () => {
       setReminderModalVisible(false);
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    fetchClinicInfo(); // Fetch clinic info on component mount
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -66,8 +81,25 @@ const TodayAppointments = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
       <Layout>
-        <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+      <Header
+          className="site-layout-sub-header-background"
+          style={{ 
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '64px' // Default Ant Design Header height
+          }}
+        >
+          <div style={{ 
+            color: 'white', 
+            fontFamily: 'Georgia', 
+            fontSize: '22px', 
+            textAlign: 'center' 
+          }}>
+            {clinicInfo}
+          </div>
+        </Header>        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
             <h1>DENTIST</h1>
             <h2>Today's Appointment</h2>
@@ -77,22 +109,22 @@ const TodayAppointments = () => {
                 setReminderModalVisible(true);
               }}
             >
-              <Modal
-                title="Send Reminder"
-                open={reminderModalVisible}
-                onOk={handleSendReminder}
-                onCancel={() => setReminderModalVisible(false)}
-                confirmLoading={loading}
-              >
-                <Input.TextArea
-                  rows={4}
-                  value={reminderMessage}
-                  onChange={(e) => setReminderMessage(e.target.value)}
-                  placeholder="Type your reminder message here..."
-                />
-              </Modal>
               Send Reminder
             </Button>
+            <Modal
+              title="Send Reminder"
+              open={reminderModalVisible}
+              onOk={handleSendReminder}
+              onCancel={() => setReminderModalVisible(false)}
+              confirmLoading={loading}
+            >
+              <Input.TextArea
+                rows={4}
+                value={reminderMessage}
+                onChange={(e) => setReminderMessage(e.target.value)}
+                placeholder="Type your reminder message here..."
+              />
+            </Modal>
             {loading ? (
               <p>Loading...</p>
             ) : appointments.length === 0 ? (
@@ -101,8 +133,7 @@ const TodayAppointments = () => {
               <Row gutter={16}>
                 {appointments.map((appointment) => (
                   <Col span={6} key={appointment.appointmentId}>
-                    <Card title={`${appointment.timeSlot}`}
-                    >
+                    <Card title={`${appointment.timeSlot}`}>
                       <p>Patient: {appointment.user}</p>
                       <p>Service: {appointment.services}</p>
                       <p>Staff: {appointment.staff}</p>

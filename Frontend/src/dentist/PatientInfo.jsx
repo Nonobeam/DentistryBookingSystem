@@ -12,10 +12,26 @@ const PatientInfo = () => {
   const [patientInfo, setPatientInfo] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
 
-
+  const fetchClinicInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setClinicInfo(response.data);
+    } catch (error) {
+      message.error(error.response?.data || "An error occurred while fetching clinic information");
+      console.error(error);
+    }
+  };
   useEffect(() => {
     fetchPatientInfo();
+    fetchClinicInfo(); // Fetch clinic info on component mount
+
   }, []);
 
   const fetchPatientInfo = async () => {
@@ -120,8 +136,25 @@ const PatientInfo = () => {
     <Layout style={{ minHeight: "100vh" }}>
       <Sidebar />
       <Layout className="site-layout">
-        <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
-
+      <Header
+          className="site-layout-sub-header-background"
+          style={{ 
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '64px' // Default Ant Design Header height
+          }}
+        >
+          <div style={{ 
+            color: 'white', 
+            fontFamily: 'Georgia', 
+            fontSize: '22px', 
+            textAlign: 'center' 
+          }}>
+            {clinicInfo}
+          </div>
+        </Header>
         <Content style={{ margin: "0 16px" }}>
           <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
             <h1>Patient Information</h1>

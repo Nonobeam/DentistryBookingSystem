@@ -10,7 +10,7 @@ const { Option } = Select;
 
 const BossDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs()); // Set default to current date
   const [selectedYear, setSelectedYear] = useState(dayjs().year());
   const [loading, setLoading] = useState(false);
 
@@ -130,7 +130,7 @@ const BossDashboard = () => {
           <h1>Dashboard</h1>
           <Row gutter={16} style={{ marginBottom: 16 }}>
             <Col span={9}>
-              <Card style={{ borderLeft: "5px solid #1890ff" }}>
+              <Card style={{ borderLeft: "5px solid #1976d2" }}>
                 <h3>Total appointments of the month</h3>
                 <p style={{ fontSize: "24px", fontWeight: "bold" }}>
                   {dashboardData?.totalAppointmentsInMonthNow || 0}
@@ -164,19 +164,14 @@ const BossDashboard = () => {
               </Select>
             </Col>
           </Row>
-
-          
-            <>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
-                </Col>
-                <Col span={12}>
-                  <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
-                </Col>
-              </Row>
-            </>
-          
+          <Row gutter={16}>
+            <Col span={12}>
+              <Card loading={loading} title="Daily Appointments">{renderPieChart()}</Card>
+            </Col>
+            <Col span={12}>
+              <Card loading={loading} title="Monthly Appointments">{renderBarChart()}</Card>
+            </Col>
+          </Row>
         </Content>
       </Layout>
     </Layout>
