@@ -16,9 +16,9 @@ import {
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import useSWR from 'swr';
 import moment from 'moment';
+import dayjs from "dayjs";
 
 const { RangePicker } = DatePicker;
-import dayjs from "dayjs";
 
 
 // useEffect(() => {
@@ -29,7 +29,6 @@ const fetchData = async () => {
   const response = await AppointmentHistoryServices.getAll();
   return response;
 };
-
 export const AppointmentHistory = () => {
   const { data, error, isLoading, mutate } = useSWR("appointments", fetchData);
   const [searchText, setSearchText] = useState('');
