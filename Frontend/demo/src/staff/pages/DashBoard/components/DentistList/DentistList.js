@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Flex, Input, Spin } from 'antd';
 import { TableList } from './components/Table/TableList';
 import { Action } from './components/Action/Action';
@@ -39,7 +39,7 @@ const fetchData = async () => {
 };
 
 export const DentistList = () => {
-  const { data, error, isValidating } = useSWR('dentistServices', fetchData);
+  const { data, isValidating } = useSWR('dentistServices', fetchData);
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = value => {
