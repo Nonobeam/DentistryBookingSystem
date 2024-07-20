@@ -32,7 +32,7 @@ public class UserDentistService {
     public List<Client> findDentistListByStaff(String mail) {
         try {
 
-            return userRepository.getClientsByRoleAndDentist_Staff_UserMailAndStatus(Role.DENTIST, mail, 1);
+            return userRepository.getClientsByRoleAndStatusAndDentist_Staff_User_Mail(Role.DENTIST,1, mail);
 
         } catch (DataAccessException e) {
             throw new RuntimeException("Error occurred while fetching dentist list by staff: " + e.getMessage(), e);
@@ -42,12 +42,14 @@ public class UserDentistService {
 
     public List<Client> searchDentistByStaff(String mail, String search) {
         try {
-            List<Client> dentistList = userRepository.getClientsByRoleAndDentist_Staff_UserMailAndStatus(Role.DENTIST, mail, 1);
+            List<Client> dentistList = userRepository.getClientsByRoleAndStatusAndDentist_Staff_User_Mail(Role.DENTIST,1, mail);
             List<Client> searchList = new ArrayList<>();
             for (Client c : dentistList) {
-                if (c.getMail().contains(search) || c.getName().contains(search)) {
-                    searchList.add(c);
-                }
+                    if (c.getMail().contains(search) || c.getName().contains(search)) {
+                        searchList.add(c);
+                    }
+
+
             }
             if (!searchList.isEmpty()) {
                 return searchList;

@@ -5,6 +5,7 @@ import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Staff;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,8 +33,10 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
 
     List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(LocalDate date, LocalDate localDate, int i, Staff staff);
 
-    @Query("DELETE FROM DentistSchedule ds WHERE ds.workDate >= :workDate AND ds.clinic.clinicID = :clinicId")
-    void deleteByWorkDateAfterAndClinicId(@Param("workDate") LocalDate workDate, @Param("clinicId") String clinicId);
+    @Transactional
+    void deleteDentistSchedulesByWorkDateAfterAndClinic_ClinicID(LocalDate workDate, String clinicId);
 
     List<DentistSchedule> findDentistSchedulesByAvailableAndWorkDateIsBeforeAndTimeslot_StartTimeBefore(int available, LocalDate workDate, LocalTime timeslot_startTime);
+
+    List<DentistSchedule> findDentistSchedulesByWorkDateAfterAndClinic_ClinicID(LocalDate workDate, String clinicId);
 }
