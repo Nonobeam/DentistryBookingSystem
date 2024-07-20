@@ -13,7 +13,7 @@ services:
 
   spring-boot-app:
     build:
-      context: ./System
+      context: ./Backend
       dockerfile: Dockerfile
     image: backend:v1.00
     ports:

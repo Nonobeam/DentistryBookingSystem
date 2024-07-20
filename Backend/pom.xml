@@ -128,6 +128,11 @@
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-sql-mysql</artifactId>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>mysql</groupId>-->
+<!--			<artifactId>mysql-connector-java</artifactId>-->
+<!--			<version>8.0.32</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
@@ -136,6 +141,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>DentistryManagement</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
