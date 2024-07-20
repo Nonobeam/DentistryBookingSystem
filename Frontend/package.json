@@ -6,7 +6,7 @@
     "@ant-design/charts": "^2.1.1",
     "@ant-design/icons": "^5.3.7",
     "@ant-design/plots": "^2.2.5",
-    "@antv/g2": "^5.2.0",
+    "@antv/g2": "^5.2.1",
     "@babel/plugin-transform-class-properties": "^7.24.7",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
     "@babel/plugin-transform-numeric-separator": "^7.24.7",
@@ -17,15 +17,15 @@
     "@jridgewell/sourcemap-codec": "^1.5.0",
     "@react-icons/all-files": "^4.1.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
     "animate.css": "^4.1.1",
-    "antd": "^5.17.4",
+    "antd": "^5.19.3",
     "axios": "^1.7.2",
     "bizcharts": "^4.1.23",
     "chart.js": "^4.4.3",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "glob": "^11.0.0",
     "jsonschema": "^1.4.1",
     "lru-cache": "^11.0.0",
@@ -34,24 +34,23 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
-    "react-router-dom": "^6.23.1",
-    "react-scripts": "5.0.1",
+    "react-router-dom": "^6.25.1",
+    "react-scripts": "^5.0.1",
     "react-scroll": "^1.9.0",
     "react-slick": "^0.30.2",
     "recharts": "^2.12.7",
-    "rimraf": "^6.0.1",
     "slick-carousel": "^1.8.1",
-    "styled-components": "^6.1.11",
+    "styled-components": "^6.1.12",
     "svgo": "^3.3.2",
     "swr": "^2.2.5",
-    "tailwindcss": "^3.4.4",
-    "web-vitals": "^2.1.4"
+    "tailwindcss": "^3.4.6",
+    "web-vitals": "^4.2.2",
+    "webpack-dev-server": "^5.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "server": "json-server --watch db.json --port 5000",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -71,5 +70,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-app-rewired": "^2.2.1",
+    "rimraf": "^6.0.1",
+    "source-map-loader": "^5.0.0"
   }
 }
