@@ -18,7 +18,8 @@ public class AppointmentService {
     public LocalDate startUpdateTimeSlotDate(String clinicID) {
         LocalDate result;
         Appointment appointment = appointmentRepository.findTopByClinicOrderByDateDescStartTimeDesc(clinicID, PageRequest.of(0, 1)).get(0);
-        result = appointment.getDate();
+        if(appointment!=null) result = appointment.getDate();
+        else result = LocalDate.now();
         return result;
     }
 
