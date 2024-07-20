@@ -252,6 +252,7 @@ public class UserController {
         try {
             appointmentDeleteService.deleteAppointment(appointmentId);
             return ResponseEntity.ok("Appointment has been cancelled");
+
         } catch (Error e) {
             ErrorResponseDTO error = new ErrorResponseDTO("403", "Appointment can not be deleted");
             logger.error("Appointment can not be deleted", e);

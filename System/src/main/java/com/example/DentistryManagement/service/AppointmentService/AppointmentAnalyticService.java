@@ -379,4 +379,8 @@ public class AppointmentAnalyticService {
 
         return dentistRatings;
     }
+
+    public List<Appointment> getAppointmentByDentistAndStatus(Dentist dentist, int status) {
+        return appointmentRepository.findAppointmentByDentistAndStatus(dentist, status);
+    }
 }

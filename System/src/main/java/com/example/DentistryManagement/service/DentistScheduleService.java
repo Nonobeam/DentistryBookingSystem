@@ -119,4 +119,8 @@ public class DentistScheduleService {
             throw error;
         }
     }
+
+//    public List<DentistSchedule> findDentistScheduleByDentist(Dentist dentist, int available) {
+//        return dentistScheduleRepository.findDentistScheduleByDentistAndAvailable(dentist, available);
+//    }
 }
