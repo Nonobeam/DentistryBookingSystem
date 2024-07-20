@@ -1,5 +1,6 @@
 package com.example.DentistryManagement.service.AppointmentService;
 
+import com.example.DentistryManagement.config.error.ErrorResponseDTO;
 import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.dentistry.Services;
@@ -53,13 +54,12 @@ public class AppointmentBookingService {
         }
         appointmentBuilder.build();
 
-        // Customer booked an appointment in that timeslot in that date already
-        String customerId = customer.getUserID();
-        String timeSlotId = dentistSchedule.getTimeslot().getTimeSlotID();
-        LocalDate bookDate = dentistSchedule.getWorkDate();
-        if (isBookedByCustomerIdAndTimeSlotIdAndDate(customerId, timeSlotId, bookDate)) {
-            throw new Error("Already booked with this time slot");
+        boolean alreadyBooked = appointmentRepository.existsByDependentAndUserAndTimeSlotAndStatus(dependent, customer, dentistSchedule.getTimeslot(), 1);
+        if (alreadyBooked) {
+            throw new Error("Already have appointment in this time");
         }
+
+        // Customer booked an appointment in that timeslot in that date already
         dentistScheduleService.setAvailableDentistSchedule(dentistSchedule, 0);
         Optional<List<DentistSchedule>> otherSchedule = dentistScheduleService.findDentistScheduleByWorkDateAndTimeSlotAndDentist(dentistSchedule.getTimeslot(), dentistSchedule.getWorkDate(), dentistSchedule.getDentist(), 1);
         otherSchedule.ifPresent(schedules -> schedules.forEach(schedule -> schedule.setAvailable(0)));
