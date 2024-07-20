@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Layout, Button, Modal, Form, Input, Select, Dropdown, Menu, message, Spin, DatePicker } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -22,37 +22,6 @@ const ManagerDentistList = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const fetchAllDentists = async () => {
-    const token = localStorage.getItem("token");
-    setLoading(true);
-    try {
-      const response = await axios.get('http://localhost:8080/api/v1/manager/all-dentist', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (Array.isArray(response.data)) {
-        setDentists(response.data);
-      } else {
-        setDentists([]);
-        message.info('No dentists found.');
-      }
-    } catch (error) {
-      console.error('There was an error fetching the dentist data!', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      handleStaffFilter(id);
-      form.setFieldsValue({ staffId: id });
-    } else {
-      fetchAllDentists();
-    }
-  }, [id]);
-
   useEffect(() => {
     const fetchStaff = async () => {
       const token = localStorage.getItem("token");
@@ -75,6 +44,32 @@ const ManagerDentistList = () => {
 
     fetchStaff();
   }, []);
+
+  const fetchAllDentists = useCallback( async () => {
+    const token = localStorage.getItem("token");
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/manager/all-dentist', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (Array.isArray(response.data)) {
+        setDentists(response.data);
+      } else {
+        setDentists([]);
+        message.info('No dentists found.');
+      }
+    } catch (error) {
+      console.error('There was an error fetching the dentist data!', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []) ;
+
+
+
+  
 
   const showEditModal = (record) => {
     setEditingDentist(record);
@@ -114,10 +109,11 @@ const ManagerDentistList = () => {
     }
   };
 
-  const handleStaffFilter = async (staffID) => {
+  const handleStaffFilter = useCallback(async (staffID) => {
     navigate(`/manager/dentist/${staffID}`);
     const token = localStorage.getItem("token");
     setLoading(true);
+
     try {
       const response = await axios.get(`http://localhost:8080/api/v1/manager/${staffID}/all-dentists`, {
         headers: {
@@ -139,7 +135,16 @@ const ManagerDentistList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (id) {
+      handleStaffFilter(id);
+      form.setFieldsValue({ staffId: id });
+    } else {
+      fetchAllDentists();
+    }
+  }, [id, fetchAllDentists, handleStaffFilter,form]);
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");

@@ -1,20 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Layout, Typography, Card, Button, Row, Col, Divider } from 'antd';
-import {
-  FacebookOutlined,
-  TwitterOutlined,
-  InstagramOutlined, 
-  LinkedinOutlined,
-  ClockCircleOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  EnvironmentOutlined
-} from '@ant-design/icons';
+import { Layout, Typography, Card, Button, Row, Col } from 'antd';
 import NavBar from './Nav';
 
 const { Title, Paragraph } = Typography;
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
 const PageContainer = styled(Layout)`
   font-family: 'Poppins', sans-serif;
@@ -82,26 +72,6 @@ const StyledFooter = styled(Layout.Footer)`
   padding: 20px 0;
 `;
 
-const SocialIcon = styled.a`
-  color: white;
-  font-size: 24px;
-  margin-right: 20px;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #1890ff;
-  }
-`;
-
-const ContactItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-
-  .anticon {
-    margin-right: 10px;
-  }
-`;
 
 const Services = () => {
   const services = [

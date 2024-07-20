@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu, Button, Typography, Dropdown, Drawer } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Layout, Menu, Button, Dropdown, Drawer } from 'antd';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   HomeOutlined,
@@ -71,6 +71,7 @@ const StyledButton = styled(Button)`
 
 const NavBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const expirationTime = localStorage.getItem("expirationTime");
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -109,6 +110,29 @@ const NavBar = () => {
   };
 
   const menuItems = [
+    {
+      key: '1',
+      label: <Link to="/">Home</Link>,
+      icon: <HomeOutlined />,
+    },
+    {
+      key: '2',
+      label: <Link to="/booking">Booking</Link>,
+      icon: <BookOutlined />,
+    },
+    {
+      key: '3',
+      label: <Link to="/educational">Educational</Link>,
+      icon: <ReadOutlined />,
+    },
+    {
+      key: '4',
+      label: <Link to="/services">Services</Link>,
+      icon: <AppstoreOutlined />,
+    },
+  ];
+
+  const accountMenuItems = [
     {
       key: '1',
       label: <Link to="/history">Appointment History</Link>
@@ -159,37 +183,20 @@ const NavBar = () => {
             <StyledMenu
                 mode="vertical"
                 selectedKeys={[currentKey]}
-                onClick={toggleDrawer}
-              >
-                <Menu.Item key="1" icon={<HomeOutlined />}>
-                  <Link to="/">Home</Link>
-                </Menu.Item>
-                <Menu.Item key="2" icon={<BookOutlined />}>
-                  <Link to="/booking">Booking</Link>
-                </Menu.Item>
-                <Menu.Item key="3" icon={<ReadOutlined />}>
-                  <Link to="/educational">Educational</Link>
-                </Menu.Item>
-                <Menu.Item key="4" icon={<AppstoreOutlined />}>
-                  <Link to="/services">Services</Link>
-                </Menu.Item>
-                {new Date().getTime() < expirationTime ? (
-                  menuItems.map(item => (
-                    <Menu.Item key={item.key} onClick={item.onClick}>
-                      {item.label}
-                    </Menu.Item>
-                  ))
-                ) : (
-                  <>
-                    <Menu.Item key="login">
-                      <Link to="/login">Login</Link>
-                    </Menu.Item>
-                    <Menu.Item key="signup">
-                      <Link to="/signup">Sign up</Link>
-                    </Menu.Item>
-                  </>
+              items={menuItems.concat(
+                new Date().getTime() < expirationTime ? accountMenuItems : [
+                  {
+                    key: 'login',
+                    label: <Link to="/login">Login</Link>
+                  },
+                  {
+                    key: 'signup',
+                    label: <Link to="/signup">Sign up</Link>
+                  }
+                ]
                 )}
-            </StyledMenu>
+              onClick={toggleDrawer}
+            />
             </Drawer>
           </>
         ) : (
@@ -197,24 +204,11 @@ const NavBar = () => {
           <StyledMenu
               mode="horizontal"
               selectedKeys={[currentKey]}
-            >
-              <Menu.Item key="1" icon={<HomeOutlined />}>
-                <Link to="/">Home</Link>
-              </Menu.Item>
-              <Menu.Item key="2" icon={<BookOutlined />}>
-                <Link to="/booking">Booking</Link>
-              </Menu.Item>
-              <Menu.Item key="3" icon={<ReadOutlined />}>
-                <Link to="/educational">Educational</Link>
-              </Menu.Item>
-              <Menu.Item key="4" icon={<AppstoreOutlined />}>
-                <Link to="/services">Services</Link>
-              </Menu.Item>
-          </StyledMenu>
-
+            items={menuItems}
+          />
           <div>
               {new Date().getTime() < expirationTime ? (
-                <Dropdown menu={{ items: menuItems }} placement="bottomRight">
+              <Dropdown menu={{ items: accountMenuItems }} placement="bottomRight">
                 <StyledButton icon={<UserOutlined />}>My Account</StyledButton>
                 </Dropdown>
               ) : (

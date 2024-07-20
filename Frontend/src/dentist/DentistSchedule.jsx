@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Layout, Calendar, DatePicker, Spin, message, Badge } from "antd";
 import dayjs from "dayjs";
@@ -16,8 +16,10 @@ const DentistSchedule = () => {
   const [scheduleData, setScheduleData] = useState({});
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
-  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
-  const fetchClinicInfo = async () => {
+  const [clinicInfo, setClinicInfo] = useState("");
+  
+
+  const fetchClinicInfo = useCallback ( async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
@@ -30,16 +32,14 @@ const DentistSchedule = () => {
       message.error(error.response?.data || "An error occurred while fetching clinic information");
       console.error(error);
     }
-  };
-  useEffect(() => {
-    fetchSchedule(initialStartDate, initialEndDate);
-    fetchClinicInfo(); // Fetch clinic info on component mount
+  },[]);
 
-  }, []);
 
-  const fetchSchedule = async (start, end) => {
-    setLoading(true);
+
+  const fetchSchedule = useCallback ( async (start, end) => {
+
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const numDays = end.diff(start, 'days');
       const response = await axios.get(`http://localhost:8080/api/v1/dentist/weekSchedule/${start.format('YYYY-MM-DD')}?numDay=${numDays}`, {
@@ -53,7 +53,12 @@ const DentistSchedule = () => {
       message.error(error.response?.data || "An error occurred");
     }
     
-  };
+  },[]);
+
+  useEffect(() => {
+    fetchSchedule(initialStartDate, initialEndDate);
+    fetchClinicInfo(); 
+  },[fetchClinicInfo, fetchSchedule]);
 
   const onRangeChange = (dates) => {
     setStartDate(dates[0]);
@@ -61,14 +66,14 @@ const DentistSchedule = () => {
     fetchSchedule(dates[0], dates[1]);
   };
 
-  const headerRender = ({ value, type, onChange, onTypeChange }) => {
-    const current = value.format('YYYY-MM');
-    return (
-      <div style={{ padding: 8 }}>
-        <div>{current}</div>
-      </div>
-    );
-  };
+  // const headerRender = ({ value, type, onChange, onTypeChange }) => {
+  //   const current = value.format('YYYY-MM');
+  //   return (
+  //     <div style={{ padding: 8 }}>
+  //       <div>{current}</div>
+  //     </div>
+  //   );
+  // };
   
 
   const dateCellRender = (value) => {
@@ -110,7 +115,7 @@ const DentistSchedule = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' // Default Ant Design Header height
+            height: '64px' 
           }}
         >
           <div style={{ 

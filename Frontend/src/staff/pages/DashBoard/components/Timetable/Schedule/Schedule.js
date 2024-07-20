@@ -12,11 +12,10 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
-import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined icon from Ant Design
+import { LeftOutlined } from '@ant-design/icons'; 
 import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
 const { RangePicker: DateRangePicker } = DatePicker;
-// const { RangePicker: TimeRangePicker } = TimePicker;
 const { Option } = Select;
 
 const Schedule = () => {

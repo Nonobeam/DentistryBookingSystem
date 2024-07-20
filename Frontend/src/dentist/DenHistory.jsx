@@ -1,33 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Button, DatePicker, Input, Layout, Modal, Select, Table, message, Typography, Row, Col } from "antd";
+import { Button, Input, Layout, Modal, Select, Table, message } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-import { FacebookOutlined, TwitterOutlined, YoutubeOutlined, LinkedinOutlined } from '@ant-design/icons';
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
-const { Header, Content, Footer } = Layout;
-const { Title, Paragraph } = Typography;
-const { RangePicker } = DatePicker;
+const { Header, Content } = Layout;
 
 const DenHistory = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [newStatus, setNewStatus] = useState(null);
-  const [filterDate, setFilterDate] = useState(null); 
+  const filterDate = null;
   const [filterName, setFilterName] = useState(""); 
-  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
+  const [clinicInfo, setClinicInfo] = useState(""); 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchAppointments();
-    fetchClinicInfo(); // Fetch clinic info on component mount
-  }, [filterDate, filterName]);
 
-  const fetchAppointments = async () => {
+
+  const fetchAppointments = useCallback ( async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -53,9 +48,9 @@ const DenHistory = () => {
       console.error(error);
     }
     setLoading(false);
-  };
+  }, [filterDate, filterName]);
 
-  const fetchClinicInfo = async () => {
+  const fetchClinicInfo = useCallback ( async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
@@ -68,13 +63,19 @@ const DenHistory = () => {
       message.error(error.response?.data || "An error occurred while fetching clinic information");
       console.error(error);
     }
-  };
+  },[]);
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchClinicInfo(); 
+  }, [fetchAppointments,fetchClinicInfo, filterDate, filterName]);
 
   const handleNameChange = (e) => {
     setFilterName(e.target.value);
   };
 
   const handleChangeStatus = async () => {
+    setEditLoading(true);
     const appointmentDateTime = dayjs(`${selectedAppointment.date} ${selectedAppointment.timeSlot}`);
     const now = dayjs();
 
@@ -93,6 +94,7 @@ const DenHistory = () => {
           }
         }
       );
+      setEditLoading(false);
       message.success("Appointment status updated successfully");
       fetchAppointments();
       setStatusModalVisible(false);
@@ -109,9 +111,9 @@ const DenHistory = () => {
       render: (_, record) => {
         const patientName = record.dependent ? `Customer: ${record.user}, Dependent: ${record.dependent}` : `Customer: ${record.user}`;
         return (
-          <a onClick={() => navigate(`/dentist/patient/${record.customerID}`)}>
+          <button onClick={() => navigate(`/dentist/patient/${record.customerID}`)} style={{ background: 'none', border: 'none', padding: 0, color: '#1976d2', cursor: 'pointer' }}>
             {patientName}
-          </a>
+          </button>
         );
       },
     },
@@ -159,7 +161,7 @@ const DenHistory = () => {
             statusColor = "green";
           } else if (status === 1) {
             statusText = "Upcoming";
-            statusColor = "yellow";
+            statusColor = 'chocolate';
           } else if (status === 0){
             statusText = "Cancelled";
             statusColor = "red";
@@ -168,8 +170,7 @@ const DenHistory = () => {
         return (
           <span
             style={{
-              backgroundColor: statusColor,
-              color: "black",
+              color: statusColor,
               padding: "4px 8px",
               borderRadius: "18px",
               display: "inline-block",
@@ -215,7 +216,7 @@ const DenHistory = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' // Default Ant Design Header height
+            height: '64px' 
           }}
         >
           <div style={{ 
@@ -255,6 +256,7 @@ const DenHistory = () => {
               open={statusModalVisible}
               onOk={handleChangeStatus}
               onCancel={() => setStatusModalVisible(false)}
+              confirmLoading={editLoading}
             >
               <p>Change status for appointment with {selectedAppointment?.user}:</p>
               <Select

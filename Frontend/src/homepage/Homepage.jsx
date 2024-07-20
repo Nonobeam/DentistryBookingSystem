@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "./Nav";
 import styled from 'styled-components';
 import "antd/dist/reset.css";
-import { Layout, Button, Row, Col, Card, Typography, notification, Carousel, Select, Modal } from "antd";
+import { Layout, Button, Row, Col, Card, Typography, notification, Carousel, Select } from "antd";
 import {
   SmileOutlined,
   ProjectOutlined,
@@ -12,10 +12,6 @@ import {
   EnvironmentOutlined,
   PhoneOutlined,
   ClockCircleOutlined,
-  FacebookOutlined,
-  TwitterOutlined,
-  InstagramOutlined,
-  LinkedinOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 
@@ -113,20 +109,10 @@ const StyledFooter = styled(Layout.Footer)`
   padding: 20px 0;
 `;
 
-const SocialIcon = styled.a`
-  color: white;
-  font-size: 24px;
-  margin-right: 20px;
-  transition: color 0.3s ease;
 
-  &:hover {
-    color: #1890ff;
-  }
-`;
 
 const Homepage = () => {
   const [selectedBranch, setSelectedBranch] = useState('branch1');
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     const checkFeedbacks = async () => {
@@ -161,13 +147,6 @@ const Homepage = () => {
     setSelectedBranch(value);
   };
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const branches = {
     branch1: { name: "Tôn Thất Thuyết Clinic", phone: "(028) 837 088", address: "123 Main St, City, Country", map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.096949065736!2d105.78009291476343!3d21.028805785998236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab4cd0c66f05%3A0xea31563511af2e54!2zxJDhuqFpIGjhu41jIFF14buRYyBnaWEgSMOgIE7hu5lp!5e0!3m2!1svi!2s!4v1625136714943!5m2!1svi!2s" },
@@ -304,7 +283,7 @@ const Homepage = () => {
                 <Paragraph><EnvironmentOutlined /> {branches[selectedBranch].address}</Paragraph>
                 <Paragraph><PhoneOutlined /> {branches[selectedBranch].phone}</Paragraph>
                 <Paragraph><ClockCircleOutlined /> Mon-Sun: 9:00 AM - 6:00 PM</Paragraph>
-                <Button type="primary" icon={<CalendarOutlined />} onClick={showModal}>
+                <Button type="primary" icon={<CalendarOutlined />} href="/booking">
                   Book Appointment
                 </Button>
               </Card>
