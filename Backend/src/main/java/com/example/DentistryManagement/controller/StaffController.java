@@ -271,7 +271,7 @@ public class StaffController {
             for (TimeSlot timeSlot : timeSlotList) {
                 for (TimeSlot timeSlotDTO : timeSlotList) {
                     if (timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" + timeSlot.getDate() + " or after " + timeSlotDTO.getDate());
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before " + timeSlot.getDate() + " or after " + timeSlotDTO.getDate());
                     }
                 }
             }
