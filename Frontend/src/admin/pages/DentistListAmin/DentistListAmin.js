@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { Card, Table, Spin } from 'antd';
 import { DentistServices } from '../../services/DentistServer/DentistSever';
 import { Action } from './components/Action/Action';
 
 const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true); // Thêm state loading để quản lý hiệu ứng loading
 
   const columns = [
     {
@@ -54,10 +55,13 @@ const AppointmentHistory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true); // Đặt loading thành true khi bắt đầu fetch dữ liệu
         const response = await DentistServices.getAll();
         setApiData(response);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Đặt loading thành false sau khi fetch dữ liệu xong (bao gồm cả lỗi)
       }
     };
     fetchData();
@@ -66,14 +70,20 @@ const AppointmentHistory = () => {
   return (
     <div>
       <Card title='Dentist List' style={cardStyle}>
-        <Table
-          dataSource={apiData}
-          columns={columns}
-          pagination={false}
-          bordered
-          size='small'
-          style={{ backgroundColor: 'white' }} // Background color for the table
-        />
+        {loading ? (
+          <div style={{ textAlign: 'center' }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Table
+            dataSource={apiData}
+            columns={columns}
+            pagination={false}
+            bordered
+            size='small'
+            style={{ backgroundColor: 'white' }} // Background color for the table
+          />
+        )}
       </Card>
     </div>
   );
