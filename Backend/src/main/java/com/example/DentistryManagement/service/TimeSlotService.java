@@ -3,6 +3,7 @@ package com.example.DentistryManagement.service;
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.repository.TimeSlotRepository;
+import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -23,6 +25,7 @@ public class TimeSlotService {
     // Find the nearest Time Slot
     public TimeSlot findNearestTimeSlot(LocalDate appointmentDate, int slotNumber, String clinicId) {
         List<TimeSlot> timeSlots = timeSlotRepository.findTimeSlotsByClinic_ClinicIDAndSlotNumber(clinicId, slotNumber);
+
 
         return timeSlots.stream()
                 .filter(timeSlot -> timeSlot.getDate().isBefore(appointmentDate) || timeSlot.getDate().isEqual(appointmentDate))
@@ -54,7 +57,7 @@ public class TimeSlotService {
         List<TimeSlot> timeSlots = new ArrayList<>();
         LocalTime currentTime = startTime;
         int slotNumber = 1;
-
+        deleteTimeSlotByDate(date);
         while (currentTime.isBefore(endTime)) {
             if (!(currentTime.isAfter(startBreakTime.minusSeconds(1)) && currentTime.isBefore(endBreakTime))) {
                 TimeSlot timeSlot = TimeSlot.builder()
@@ -82,6 +85,20 @@ public class TimeSlotService {
             return timeSlotRepository.findTimeSlotByTimeSlotID(timeSlotId);
         } catch (Error e) {
             throw e;
+        }
+    }
+
+    private boolean checkDuplicateTimeSlots(LocalDate date) {
+        List<TimeSlot> dupTimeSlots = timeSlotRepository.findTimeSlotsByDate(date);
+        if(dupTimeSlots == null || dupTimeSlots.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    private void deleteTimeSlotByDate(LocalDate date) {
+        if(checkDuplicateTimeSlots(date)){
+            timeSlotRepository.deleteTimeSlotByDate(date);
         }
     }
 }

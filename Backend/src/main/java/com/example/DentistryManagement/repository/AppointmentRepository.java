@@ -6,6 +6,7 @@ import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
 import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
+import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
 import jnr.constants.platform.Local;
 import org.springframework.data.domain.Pageable;
@@ -84,4 +85,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);
 
     List<Appointment> findAppointmentByDentistAndStatus(Dentist dentist, int status);
+
+    boolean existsByDependentAndUserAndTimeSlotAndStatus(Dependent dependent, Client user, TimeSlot timeSlot, int status);
 }
