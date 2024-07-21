@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import {  Card, Table, notification } from 'antd';
-
+import { Card, Table, notification, Spin } from 'antd';
 import { EmailPopup } from './components/EmailPopup';
 import { useParams } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
 import dayjs from 'dayjs';
-import { StarFilled } from '@ant-design/icons'; // Import StarFilled icon from Ant Design Icons
+import { StarFilled } from '@ant-design/icons';
 
 export default function DentistInfo() {
   const { dentistID } = useParams();
   const [user, setUser] = useState({});
   const [rate, setRate] = useState();
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   useEffect(() => {
     fetchData();
   }, [dentistID]);
 
   const fetchData = async () => {
+    setLoading(true); // Bật loading khi bắt đầu fetch dữ liệu
     try {
       const response = await DentistServices.getDentistById(dentistID);
       setUser(response.userDTO);
@@ -41,6 +42,8 @@ export default function DentistInfo() {
         message: 'Error',
         description: error.message,
       });
+    } finally {
+      setLoading(false); // Tắt loading khi fetch dữ liệu hoàn thành
     }
   };
 
@@ -53,7 +56,7 @@ export default function DentistInfo() {
       justifyContent: 'center',
       flexDirection: 'column',
       gap: '10px',
-      marginBottom:'100px'
+      marginBottom: '100px'
     },
     starContainer: {
       display: 'flex',
@@ -61,7 +64,7 @@ export default function DentistInfo() {
     },
     starIcon: {
       fontSize: '20px',
-      color: '#FFD700', // Color for filled stars
+      color: '#FFD700',
       marginRight: '5px',
     },
   };
@@ -128,7 +131,9 @@ export default function DentistInfo() {
         </div>
       </div>
       <Card title='Appointment History' style={styles.card}>
-        <Table dataSource={appointments} columns={columns} pagination={false} bordered size='small' />
+        <Spin spinning={loading}>
+          <Table dataSource={appointments} columns={columns} pagination={false} bordered size='small' />
+        </Spin>
       </Card>
     </div>
   );

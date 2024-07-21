@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {  Card, Table } from 'antd';
+import { Card, Table, notification, Spin } from 'antd';
 import { useParams } from 'react-router-dom';
-import { notification } from 'antd';
 import { CustomerServicess } from '../../../../../../services/CustomerServicess/CustomerServicess';
 
 export default function CustomerInfo() {
@@ -9,13 +8,14 @@ export default function CustomerInfo() {
   const [info, setInfo] = useState([]);
   const [user, setUser] = useState({});
   const [appointmentData, setAppointmentData] = useState([]);
- 
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   useEffect(() => {
     fetchData();
   }, [customerID]);
 
   const fetchData = async () => {
+    setLoading(true); // Bật loading khi bắt đầu fetch dữ liệu
     try {
       const response = await CustomerServicess.getCustomerById(customerID);
       console.log(response);
@@ -31,9 +31,9 @@ export default function CustomerInfo() {
           dentist: item.dentist,
           services: item.services,
           clinic: item.clinic,
-          user: response.userDTO ? 
-          (item.dependent ? `Customer: ${response.userDTO.name}, Dependent: ${item.dependent}` : `Customer: ${response.userDTO.name}`)
-          : 'N/A',
+          user: response.userDTO ?
+            (item.dependent ? `Customer: ${response.userDTO.name}, Dependent: ${item.dependent}` : `Customer: ${response.userDTO.name}`)
+            : 'N/A',
         }));
         setAppointmentData(aData);
       }
@@ -46,17 +46,14 @@ export default function CustomerInfo() {
           console.log('Notification Clicked!');
         },
       });
+    } finally {
+      setLoading(false); // Tắt loading khi fetch dữ liệu hoàn thành
     }
   };
 
   const styles = {
     card: {
       marginBottom: '20px',
-    },
-    treatment: {
-      backgroundColor: '#f0f0f0',
-      padding: '5px 10px',
-      borderRadius: '5px',
     },
   };
 
@@ -91,7 +88,7 @@ export default function CustomerInfo() {
   return (
     <div className='customer-info' style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <h2>Customer Information</h2>
-      
+
       <div>
         <strong>Name:</strong> {user.name}
       </div>
@@ -106,16 +103,17 @@ export default function CustomerInfo() {
       </div>
       <div>
         <Card title='Appointment History' style={styles.card}>
-          <Table
-            dataSource={appointmentData}
-            columns={columns}
-            pagination={false}
-            bordered
-            size='small'
-          />
+          <Spin spinning={loading}>
+            <Table
+              dataSource={appointmentData}
+              columns={columns}
+              pagination={false}
+              bordered
+              size='small'
+            />
+          </Spin>
         </Card>
       </div>
     </div>
   );
 }
-  
