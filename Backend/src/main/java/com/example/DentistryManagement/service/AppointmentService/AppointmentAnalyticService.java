@@ -160,7 +160,6 @@ public class AppointmentAnalyticService {
     }
 
 
-
     public Map<String, Integer> getAppointmentsByDateAndDentist(LocalDate date, Staff staff) {
         List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateAndDentist_Staff(date, staff);
         Map<String, Integer> appointmentsByDentist = new HashMap<>();
@@ -209,24 +208,29 @@ public class AppointmentAnalyticService {
         return yearlyAppointmentCounts;
     }
 
-    public Map<String, List<Appointment>> getAppointmentsByDate(LocalDate date) {
+    public Map<String, Integer> getAppointmentsByDate(LocalDate date) {
         List<Appointment> appointmentBase = appointmentRepository.findAppointmentsByDate(date);
         List<Appointment> appointments = new ArrayList<>();
+
         for (Appointment appointment : appointmentBase) {
             if (appointment.getStatus() == 1 || appointment.getStatus() == 2) {
                 appointments.add(appointment);
             }
         }
-        Map<String, List<Appointment>> appointmentsByClinic = new HashMap<>();
+
+        Map<String, Integer> appointmentsByClinic = new HashMap<>();
 
         for (Appointment appointment : appointments) {
             Clinic clinic = appointment.getClinic();
             ClinicDTO clinicDTO = new ClinicDTO().clinicMapping(clinic);
-            appointmentsByClinic.computeIfAbsent("Name " + clinicDTO.getName() + "- Address " + clinicDTO.getAddress(), k -> new ArrayList<>()).add(appointment);
+            String clinicInfo = "Name " + clinicDTO.getName() + "- Address " + clinicDTO.getAddress();
+
+            appointmentsByClinic.put(clinicInfo, appointmentsByClinic.getOrDefault(clinicInfo, 0) + 1);
         }
 
         return appointmentsByClinic;
     }
+
 
     public Map<String, Map<Integer, Long>> getAppointmentsByYear(int year) {
         Map<String, Map<Integer, Long>> yearlyAppointmentCounts = new HashMap<>();
@@ -330,7 +334,7 @@ public class AppointmentAnalyticService {
         List<Appointment> response = new ArrayList<>();
         for (Appointment appointment : appointments) {
             if (appointment.getStatus() == 2) {
-                if(appointment.getStarAppointment() == 0){
+                if (appointment.getStarAppointment() == 0) {
                     response.add(appointment);
                 }
             }
@@ -339,13 +343,13 @@ public class AppointmentAnalyticService {
     }
 
     public double totalStarByDentist(Client client) {
-        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(),2,0);
-       double total= totalAppointment.size();
-       double stars = 0;
-       for (Appointment appointment : totalAppointment) {
-           stars+=appointment.getStarAppointment();
-       }
-       return Math.round(stars/total *10.0) /10.0 ;
+        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(), 2, 0);
+        double total = totalAppointment.size();
+        double stars = 0;
+        for (Appointment appointment : totalAppointment) {
+            stars += appointment.getStarAppointment();
+        }
+        return Math.round(stars / total * 10.0) / 10.0;
     }
 
     public Map<String, Double> getRatingDentistByStaff(Staff staff) {
