@@ -327,21 +327,21 @@ public class AppointmentAnalyticService {
 
     public List<Appointment> getAppointmentByUnFeedback(Client user) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByUser(user);
-        List<Appointment> respone = new ArrayList<>();
+        List<Appointment> response = new ArrayList<>();
         for (Appointment appointment : appointments) {
             if (appointment.getStatus() == 2) {
-                if(appointment.getStarAppointment()==0){
-                    respone.add(appointment);
+                if(appointment.getStarAppointment() == 0){
+                    response.add(appointment);
                 }
             }
         }
-        return respone;
+        return response;
     }
 
     public double totalStarByDentist(Client client) {
         List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(),2,0);
        double total= totalAppointment.size();
-       double stars=0;
+       double stars = 0;
        for (Appointment appointment : totalAppointment) {
            stars+=appointment.getStarAppointment();
        }
