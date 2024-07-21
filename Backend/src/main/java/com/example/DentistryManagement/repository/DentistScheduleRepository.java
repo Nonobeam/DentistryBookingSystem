@@ -35,5 +35,7 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
     @Query("DELETE FROM DentistSchedule ds WHERE ds.workDate >= :workDate AND ds.clinic.clinicID = :clinicId")
     void deleteByWorkDateAfterAndClinicId(@Param("workDate") LocalDate workDate, @Param("clinicId") String clinicId);
 
+    List<DentistSchedule> findByWorkDateAndAvailableAndClinic_ClinicID(LocalDate workDate, int available, String clinicId);
+
     List<DentistSchedule> findDentistSchedulesByAvailableAndWorkDateIsBeforeAndTimeslot_StartTimeBefore(int available, LocalDate workDate, LocalTime timeslot_startTime);
 }

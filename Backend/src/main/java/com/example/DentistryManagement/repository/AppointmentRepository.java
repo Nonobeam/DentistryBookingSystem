@@ -82,4 +82,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findAppointmentsByUser(Client client);
 
     List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);
+
+    List<Appointment> findAppointmentByDentistAndStatus(Dentist dentist, int status);
 }

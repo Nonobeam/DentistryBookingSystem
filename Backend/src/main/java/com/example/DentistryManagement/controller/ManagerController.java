@@ -1,8 +1,6 @@
 package com.example.DentistryManagement.controller;
-
 import com.example.DentistryManagement.DTO.*;
 import com.example.DentistryManagement.core.dentistry.Appointment;
-import com.example.DentistryManagement.core.dentistry.DentistSchedule;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
