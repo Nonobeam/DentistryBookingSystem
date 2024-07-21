@@ -101,7 +101,7 @@ export const StaffDashboard = () => {
         <Col span={12}>
           <Row gutter={[0, 16]}>
             <Col span={24}>
-              <Card title="Monthly Appointments">
+              <Card >
                 <ChartMonthly monthlyAppointmentsData={monthlyAppointmentsData} />
               </Card>
             </Col>
@@ -113,7 +113,7 @@ export const StaffDashboard = () => {
           </Row>
         </Col>
         <Col span={12}>
-          <Card title="Daily Appointments" style={{ height: '100%' }}>
+          <Card  style={{ height: '100%' }}>
             <ChartDailyAppointment dailyAppointmentsData={dailyAppointmentsData} />
           </Card>
         </Col>

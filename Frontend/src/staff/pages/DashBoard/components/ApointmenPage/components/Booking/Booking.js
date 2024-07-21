@@ -284,7 +284,6 @@ export const Booking = () => {
           type='primary'
           htmlType='submit'
           disabled={!isValidAppointment}
-          loading={loading}
           icon={<BookOutlined />}
           style={{
             backgroundColor: '#1976d2',
