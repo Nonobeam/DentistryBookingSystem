@@ -12,5 +12,6 @@ import java.util.List;
 public class UserAppointDTO {
     private UserDTO userDTO;
     private double star;
+    private String services;
     private List<AppointmentDTO> appointment;
 }

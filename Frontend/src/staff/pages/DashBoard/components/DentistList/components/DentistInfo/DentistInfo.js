@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, notification, Spin } from 'antd';
-import { EmailPopup } from './components/EmailPopup';
-import { useParams } from 'react-router-dom';
-import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';
-import dayjs from 'dayjs';
-import { StarFilled } from '@ant-design/icons';
+import React, { useEffect, useState } from "react";
+import { Card, Table, notification, Spin } from "antd";
+import { EmailPopup } from "./components/EmailPopup";
+import { useParams } from "react-router-dom";
+import { DentistServices } from "../../../../../../services/DentistServices/DentistServices";
+import dayjs from "dayjs";
+import { StarFilled } from "@ant-design/icons";
 
 export default function DentistInfo() {
   const { dentistID } = useParams();
   const [user, setUser] = useState({});
   const [rate, setRate] = useState();
+  const [services, setServices] = useState();
+
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false); // Thêm state loading
 
@@ -27,7 +29,7 @@ export default function DentistInfo() {
         const appointmentData = response.appointment.map((item) => ({
           ...item,
           key: item.appointmentId,
-          date: dayjs(item.date).format('YYYY-MM-DD'),
+          date: dayjs(item.date).format("DD-MM-YYYY"),
           timeSlot: item.timeSlot,
           dentist: item.dentist,
           services: item.services,
@@ -37,11 +39,15 @@ export default function DentistInfo() {
         }));
         setAppointments(appointmentData);
         setRate(response.star);
+        setUser((prevUser) => ({
+          ...prevUser,
+          services: response.services,
+        }));
       }
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log("Error fetching data:", error);
       notification.error({
-        message: 'Error',
+        message: "Error",
         description: error.message,
       });
     } finally {
@@ -51,51 +57,51 @@ export default function DentistInfo() {
 
   const styles = {
     card: {
-      marginBottom: '20px',
+      marginBottom: "20px",
     },
     infoContainer: {
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      gap: '10px',
-      marginBottom: '100px',
+      display: "flex",
+      justifyContent: "center",
+      flexDirection: "column",
+      gap: "10px",
+      marginBottom: "100px",
     },
     starContainer: {
-      display: 'flex',
-      alignItems: 'center',
+      display: "flex",
+      alignItems: "center",
     },
     starIcon: {
-      fontSize: '20px',
-      color: '#FFD700',
-      marginRight: '5px',
+      fontSize: "20px",
+      color: "#FFD700",
+      marginRight: "5px",
     },
   };
 
   const columns = [
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
     },
     {
-      title: 'Time Slot',
-      dataIndex: 'timeSlot',
-      key: 'timeSlot',
+      title: "Time Slot",
+      dataIndex: "timeSlot",
+      key: "timeSlot",
     },
     {
-      title: 'User',
-      dataIndex: 'user',
-      key: 'user',
+      title: "User",
+      dataIndex: "user",
+      key: "user",
     },
     {
-      title: 'Dentist',
-      dataIndex: 'dentist',
-      key: 'dentist',
+      title: "Dentist",
+      dataIndex: "dentist",
+      key: "dentist",
     },
     {
-      title: 'Services',
-      dataIndex: 'services',
-      key: 'services',
+      title: "Services",
+      dataIndex: "services",
+      key: "services",
     },
   ];
 
@@ -108,7 +114,7 @@ export default function DentistInfo() {
         stars.push(
           <StarFilled
             key={i}
-            style={{ ...styles.starIcon, color: '#D3D3D3' }}
+            style={{ ...styles.starIcon, color: "#D3D3D3" }}
           />
         );
       }
@@ -117,7 +123,7 @@ export default function DentistInfo() {
   };
 
   return (
-    <div className='dentist-info' style={{ padding: '20px' }}>
+    <div className="dentist-info" style={{ padding: "20px" }}>
       <h2>Dentist Information</h2>
       <EmailPopup user={user} />
       <div style={styles.infoContainer}>
@@ -136,15 +142,21 @@ export default function DentistInfo() {
         <div style={styles.starContainer}>
           <strong>Rate : </strong> {renderRateStars()}
         </div>
+        <div>
+          <strong>Services:</strong>{" "}
+          {user.services
+            ? user.services.replace(/[\[\]']+/g, "")
+            : "No services available"}
+        </div>
       </div>
-      <Card title='Appointment History' style={styles.card}>
+      <Card title="Appointment History" style={styles.card}>
         <Spin spinning={loading}>
           <Table
             dataSource={appointments}
             columns={columns}
             pagination={false}
             bordered
-            size='small'
+            size="small"
           />
         </Spin>
       </Card>
