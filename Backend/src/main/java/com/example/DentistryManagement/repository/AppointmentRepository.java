@@ -8,13 +8,13 @@ import com.example.DentistryManagement.core.user.Client;
 import com.example.DentistryManagement.core.user.Dentist;
 import com.example.DentistryManagement.core.user.Dependent;
 import com.example.DentistryManagement.core.user.Staff;
+import jnr.constants.platform.Local;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,10 +80,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> findTopByClinicOrderByDateDescStartTimeDesc(@Param("clinicID") String clinicID, Pageable pageable);
 
     boolean existsByTimeSlotAndDateAndUser(TimeSlot timeSlot, LocalDate bookDate, Client user);
-
     List<Appointment> findAppointmentsByUser(Client client);
 
-    List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status, int star);
+    List<Appointment> findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(Dentist dentist, int status,int star);
+
+    List<Appointment> findAppointmentByDentistAndStatus(Dentist dentist, int status);
 
     boolean existsByDependentAndUserAndTimeSlotAndStatus(Dependent dependent, Client user, TimeSlot timeSlot, int status);
 }

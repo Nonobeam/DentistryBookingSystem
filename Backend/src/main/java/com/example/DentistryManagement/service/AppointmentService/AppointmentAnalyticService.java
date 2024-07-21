@@ -160,6 +160,7 @@ public class AppointmentAnalyticService {
     }
 
 
+
     public Map<String, Integer> getAppointmentsByDateAndDentist(LocalDate date, Staff staff) {
         List<Appointment> appointmentsBase = appointmentRepository.findAppointmentsByDateAndDentist_Staff(date, staff);
         Map<String, Integer> appointmentsByDentist = new HashMap<>();
@@ -326,25 +327,25 @@ public class AppointmentAnalyticService {
 
     public List<Appointment> getAppointmentByUnFeedback(Client user) {
         List<Appointment> appointments = appointmentRepository.findAppointmentsByUser(user);
-        List<Appointment> respone = new ArrayList<>();
+        List<Appointment> response = new ArrayList<>();
         for (Appointment appointment : appointments) {
             if (appointment.getStatus() == 2) {
-                if (appointment.getStarAppointment() == 0) {
-                    respone.add(appointment);
+                if(appointment.getStarAppointment() == 0){
+                    response.add(appointment);
                 }
             }
         }
-        return respone;
+        return response;
     }
 
     public double totalStarByDentist(Client client) {
-        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(), 2, 0);
-        double total = totalAppointment.size();
-        double stars = 0;
-        for (Appointment appointment : totalAppointment) {
-            stars += appointment.getStarAppointment();
-        }
-        return Math.round(stars / total * 10.0) / 10.0;
+        List<Appointment> totalAppointment = appointmentRepository.findAppointmentsByDentistAndStatusAndStarAppointmentGreaterThan(client.getDentist(),2,0);
+       double total= totalAppointment.size();
+       double stars = 0;
+       for (Appointment appointment : totalAppointment) {
+           stars+=appointment.getStarAppointment();
+       }
+       return Math.round(stars/total *10.0) /10.0 ;
     }
 
     public Map<String, Double> getRatingDentistByStaff(Staff staff) {
@@ -366,10 +367,7 @@ public class AppointmentAnalyticService {
     public Map<String, Double> getRatingDentistByManager(Client manager) {
         Map<String, Double> dentistRatings = new HashMap<>();
 
-        HashSet<Dentist> managedDentists = new HashSet<>();
-        for (Clinic c : manager.getClinicList()) {
-            managedDentists.addAll(c.getDentistList());
-        }
+        List<Dentist> managedDentists = manager.getClinicList().stream().map(clinic -> (Dentist) clinic.getDentistList()).toList();
 
         for (Dentist dentist : managedDentists) {
             Client clientForDentist = new Client();
@@ -382,5 +380,7 @@ public class AppointmentAnalyticService {
         return dentistRatings;
     }
 
-
+    public List<Appointment> getAppointmentByDentistAndStatus(Dentist dentist, int status) {
+        return appointmentRepository.findAppointmentByDentistAndStatus(dentist, status);
+    }
 }
