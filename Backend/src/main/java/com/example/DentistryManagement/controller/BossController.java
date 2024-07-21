@@ -177,7 +177,7 @@ public class BossController {
 
             if (date == null) date = LocalDate.now();
             if (year == null) year = LocalDate.now().getYear();
-            Map<String, List<Appointment>> dailyAppointments = appointmentAnalyticService.getAppointmentsByDate(date);
+            Map<String, Integer> dailyAppointments = appointmentAnalyticService.getAppointmentsByDate(date);
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByYear(year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonth();
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYear();
