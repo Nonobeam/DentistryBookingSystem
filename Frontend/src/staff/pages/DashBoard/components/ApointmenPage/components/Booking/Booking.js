@@ -9,13 +9,13 @@ import {
   Col,
   Typography,
 } from 'antd';
-import { 
-  CalendarOutlined, 
-  MedicineBoxOutlined, 
-  ClockCircleOutlined, 
-  MailOutlined, 
+import {
+  CalendarOutlined,
+  MedicineBoxOutlined,
+  ClockCircleOutlined,
+  MailOutlined,
   TeamOutlined,
-  BookOutlined
+  BookOutlined,
 } from '@ant-design/icons';
 import { AppointmentHistoryServices } from '../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import dayjs from 'dayjs';
@@ -38,11 +38,13 @@ export const Booking = () => {
 
   useEffect(() => {
     const fetchServices = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         if (selectedDate) {
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllServices(formattedDate);
+          const data = await AppointmentHistoryServices.getAllServices(
+            formattedDate
+          );
           setServices(data);
         }
       } catch (error) {
@@ -60,14 +62,16 @@ export const Booking = () => {
 
   useEffect(() => {
     const fetchSchedules = async () => {
-      setLoading(true);
       if (selectedService && selectedDate) {
         try {
+          setLoading(true);
           const formattedDate = selectedDate.format('YYYY-MM-DD');
-          const data = await AppointmentHistoryServices.getAllAvailableSchedule({
-            workDate: formattedDate,
-            servicesID: selectedService,
-          });
+          const data = await AppointmentHistoryServices.getAllAvailableSchedule(
+            {
+              workDate: formattedDate,
+              servicesID: selectedService,
+            }
+          );
           setSchedules(data);
         } catch (error) {
           notification.error({
@@ -86,6 +90,7 @@ export const Booking = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
+        setLoading(true);
         const data = await AppointmentHistoryServices.getAllCustomers();
         setCustomers(data);
       } catch (error) {
@@ -93,15 +98,20 @@ export const Booking = () => {
           message: 'Error',
           description: error.message,
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCustomers();
-  }, []);
+  }, [selectedSchedule]);
 
   const fetchDependents = async () => {
     try {
-      const response = await AppointmentHistoryServices.getDependents(selectedCustomer);
+      setLoading(true);
+      const response = await AppointmentHistoryServices.getDependents(
+        selectedCustomer
+      );
       if (response) {
         setDependentID(response);
       } else {
@@ -109,6 +119,8 @@ export const Booking = () => {
       }
     } catch (error) {
       console.error('Error fetching dependents:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,7 +129,7 @@ export const Booking = () => {
     const res = await DentistServices.getDentistById(value);
     setIsValidAppointment(res.appointment.length < 5);
     if (isValidAppointment) {
-     fetchDependents();
+      fetchDependents();
       setLoading(false);
     }
   };
@@ -169,7 +181,10 @@ export const Booking = () => {
 
   // Function to disable dates before today and more than 2 months from today
   const disabledDate = (current) => {
-    return current && (current <= dayjs().startOf('day') || current > dayjs().add(2, 'months'));
+    return (
+      current &&
+      (current <= dayjs().startOf('day') || current > dayjs().add(2, 'months'))
+    );
   };
 
   return (
@@ -187,7 +202,9 @@ export const Booking = () => {
         borderRadius: '15px',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
       }}>
-      <Title level={2} style={{ textAlign: 'center', color: '#1976d2', marginBottom: '30px' }}>
+      <Title
+        level={2}
+        style={{ textAlign: 'center', color: '#1976d2', marginBottom: '30px' }}>
         <BookOutlined style={{ marginRight: '10px' }} />
         Booking For Customer
       </Title>
@@ -195,7 +212,11 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='date'
-            label={<span style={{ color: '#1976d2' }}><CalendarOutlined /> Select Date</span>}
+            label={
+              <span style={{ color: '#1976d2' }}>
+                <CalendarOutlined /> Select Date
+              </span>
+            }
             rules={[{ required: true, message: 'Please select a date' }]}>
             <DatePicker
               onChange={handleDateChange}
@@ -207,10 +228,15 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='service'
-            label={<span style={{ color: '#1976d2' }}><MedicineBoxOutlined /> Select Service</span>}
+            label={
+              <span style={{ color: '#1976d2' }}>
+                <MedicineBoxOutlined /> Select Service
+              </span>
+            }
             rules={[{ required: true, message: 'Please select a service' }]}>
             <Select
               onChange={handleServicesChange}
+              disabled={!selectedDate || loading}
               loading={loading}
               style={{ width: '100%' }}>
               {services.map((service) => (
@@ -228,7 +254,11 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='schedule'
-            label={<span style={{ color: '#1976d2' }}><ClockCircleOutlined /> Select Schedule</span>}
+            label={
+              <span style={{ color: '#1976d2' }}>
+                <ClockCircleOutlined /> Select Schedule
+              </span>
+            }
             rules={[{ required: true, message: 'Please select a schedule' }]}>
             <Select
               onChange={handleScheduleChange}
@@ -238,7 +268,7 @@ export const Booking = () => {
                 <Select.Option
                   key={schedule.dentistScheduleID}
                   value={schedule.dentistScheduleID}>
-                  {`${schedule.startTime}` + `-`+ `${schedule.endTime}`}
+                  {`${schedule.startTime} - ${schedule.endTime}`}
                 </Select.Option>
               ))}
             </Select>
@@ -247,16 +277,19 @@ export const Booking = () => {
         <Col span={12}>
           <Form.Item
             name='customerMail'
-            label={<span style={{ color: '#1976d2' }}><MailOutlined /> Customer Email</span>}
+            label={
+              <span style={{ color: '#1976d2' }}>
+                <MailOutlined /> Customer Email
+              </span>
+            }
             rules={[{ required: true, message: 'Please select a customer' }]}>
             <Select
               onChange={handleCustomerChange}
               loading={loading}
+              disabled={!selectedSchedule || loading}
               style={{ width: '100%' }}>
               {customers.map((customer) => (
-                <Select.Option
-                  key={customer.userID}
-                  value={customer.mail}>
+                <Select.Option key={customer.userID} value={customer.mail}>
                   {customer.mail}-{customer.name}
                 </Select.Option>
               ))}
@@ -266,7 +299,11 @@ export const Booking = () => {
       </Row>
       <Form.Item
         name='dependentID'
-        label={<span style={{ color: '#1976d2' }}><TeamOutlined /> Dependent</span>}
+        label={
+          <span style={{ color: '#1976d2' }}>
+            <TeamOutlined /> Dependent
+          </span>
+        }
         rules={[{ required: false, message: 'Please select a dependent' }]}>
         <Select style={{ width: '100%' }}>
           <Select.Option value=''></Select.Option>
@@ -283,7 +320,13 @@ export const Booking = () => {
         <Button
           type='primary'
           htmlType='submit'
-          disabled={!isValidAppointment}
+          disabled={
+            !isValidAppointment ||
+            !selectedService ||
+            !selectedDate ||
+            !selectedSchedule ||
+            !selectedCustomer
+          }
           icon={<BookOutlined />}
           style={{
             backgroundColor: '#1976d2',

@@ -31,7 +31,9 @@ export default function DentistInfo() {
           timeSlot: item.timeSlot,
           dentist: item.dentist,
           services: item.services,
-          user: item.dependent ? `Customer: ${item.user}, Dependent: ${item.dependent}` : `Customer: ${item.user}`,
+          user: item.dependent
+            ? `Customer: ${item.user}, Dependent: ${item.dependent}`
+            : `Customer: ${item.user}`,
         }));
         setAppointments(appointmentData);
         setRate(response.star);
@@ -56,7 +58,7 @@ export default function DentistInfo() {
       justifyContent: 'center',
       flexDirection: 'column',
       gap: '10px',
-      marginBottom: '100px'
+      marginBottom: '100px',
     },
     starContainer: {
       display: 'flex',
@@ -103,7 +105,12 @@ export default function DentistInfo() {
       if (i <= rate) {
         stars.push(<StarFilled key={i} style={styles.starIcon} />);
       } else {
-        stars.push(<StarFilled key={i} style={{ ...styles.starIcon, color: '#D3D3D3' }} />);
+        stars.push(
+          <StarFilled
+            key={i}
+            style={{ ...styles.starIcon, color: '#D3D3D3' }}
+          />
+        );
       }
     }
     return stars;
@@ -132,7 +139,13 @@ export default function DentistInfo() {
       </div>
       <Card title='Appointment History' style={styles.card}>
         <Spin spinning={loading}>
-          <Table dataSource={appointments} columns={columns} pagination={false} bordered size='small' />
+          <Table
+            dataSource={appointments}
+            columns={columns}
+            pagination={false}
+            bordered
+            size='small'
+          />
         </Spin>
       </Card>
     </div>

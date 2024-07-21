@@ -5,7 +5,6 @@ import { CustomerServicess } from '../../../../../../services/CustomerServicess/
 
 export default function CustomerInfo() {
   const { customerID } = useParams();
-  const [info, setInfo] = useState([]);
   const [user, setUser] = useState({});
   const [appointmentData, setAppointmentData] = useState([]);
   const [loading, setLoading] = useState(false); // Thêm state loading
@@ -20,7 +19,7 @@ export default function CustomerInfo() {
       const response = await CustomerServicess.getCustomerById(customerID);
       console.log(response);
       setUser(response.userDTO);
-      setInfo(response.appointment);
+      
 
       if (Array.isArray(response.appointment)) {
         const aData = response.appointment.map((item) => ({
