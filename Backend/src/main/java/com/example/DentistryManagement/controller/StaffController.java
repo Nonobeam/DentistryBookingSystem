@@ -191,6 +191,8 @@ public class StaffController {
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
+            List<String> services = client.getDentist().getServicesList().stream().map(Services::getName).toList();
+            userAppointDTO.setServices(services.toString());
             userAppointDTO.setStar(appointmentAnalyticService.totalStarByDentist(client));
             userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
