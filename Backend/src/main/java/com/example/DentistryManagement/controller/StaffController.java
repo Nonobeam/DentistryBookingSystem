@@ -367,7 +367,7 @@ public class StaffController {
                     return ResponseEntity.ok(new ArrayList<>());
                 } else return ResponseEntity.ok(dependentsList);
             } else {
-                return ResponseEntity.ok("Not found any dependent user");
+                return ResponseEntity.ok(new ArrayList<>());
 
             }
         } catch (Error error) {
