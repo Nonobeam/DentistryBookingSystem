@@ -47,8 +47,8 @@ const TimetableServices = {
       return responseData.data;
     } catch (error) {
       notification.error({
-        message: 'Failed to fetch dentist list',
-        description: error.message,
+        message: 'Failed to fetch dentist   list',
+        description: error.response?.data,
       });
       throw error;
     }

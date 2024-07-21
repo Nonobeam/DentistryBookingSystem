@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Modal, Input, Form, Avatar, notification } from 'antd';
 import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
-const { TextArea } = Input;
+
 
 export const ModalInfo = ({ open, setOpen, info, data, setApiData }) => {
   const [formData, setFormData] = useState(info);

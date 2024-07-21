@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Form, Input, Button, DatePicker, message, Spin, Card, Row, Col } from "antd";
+import { Form, Input, Button, DatePicker, message, Spin, Card } from "antd";
 import { UserOutlined, PhoneOutlined, MailOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs"; 
 

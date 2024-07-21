@@ -1,10 +1,10 @@
 import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
-import { Content, Footer, Header } from 'antd/es/layout/layout';
+import { Content, Header } from 'antd/es/layout/layout';
 import React from 'react';
 import { AppSider } from '../AppSider/AppSider';
 import { AppHeader } from '../AppHeader/AppHeader';
-import AppFooter from '../AppFooter/AppFooter';
+
 
 
 const headerStyle = {

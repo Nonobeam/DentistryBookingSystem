@@ -23,7 +23,7 @@ export const StaffDashboard = () => {
     }
   };
 
-  const handleDateChange = (date, dateString) => {
+  const handleDateChange = ( dateString) => {
     setInputDate(dateString);
   };
 

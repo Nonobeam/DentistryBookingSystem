@@ -3,7 +3,6 @@ import { Button, Select, Popover, notification } from 'antd';
 import { HiOutlineMail } from 'react-icons/hi';
 import { DentistServices } from '../../../../../../../services/DentistServices/DentistServices';
 import { Option } from 'antd/es/mentions';
-import { AppointmentHistoryServices } from '../../../../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 
 export const EmailPopup = ({ user }) => {
   const [selectedService, setSelectedService] = useState(null);

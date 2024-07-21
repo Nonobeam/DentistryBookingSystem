@@ -6,9 +6,9 @@ import NotificationDropdown from '../../../../staff/pages/DashBoard/components/N
 
 export const AppHeader = () => {
   const [showBellDropdown, setShowBellDropdown] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  
   const [notifications, setNotifications] = useState([]);
-  const [searchValue, setSearchValue] = useState(''); // State for search input value
+   
   const [filteredNotifications, setFilteredNotifications] = useState([]);
 
   useEffect(() => {

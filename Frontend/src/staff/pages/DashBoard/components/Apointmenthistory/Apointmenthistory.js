@@ -15,7 +15,6 @@ import {
 } from 'antd';
 import { AppointmentHistoryServices } from '../../../../services/AppointmentHistoryServices/AppointmentHistoryServices';
 import useSWR from 'swr';
-import moment from 'moment';
 import dayjs from "dayjs";
 
 const { RangePicker } = DatePicker;
@@ -30,7 +29,7 @@ const fetchData = async () => {
   return response;
 };
 export const AppointmentHistory = () => {
-  const { data, error, isLoading, mutate } = useSWR("appointments", fetchData);
+  const { data, isLoading, mutate } = useSWR("appointments", fetchData);
   const [searchText, setSearchText] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDentist, setSelectedDentist] = useState(null);

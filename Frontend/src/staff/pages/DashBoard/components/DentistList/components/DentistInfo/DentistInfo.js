@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Table, notification } from 'antd';
-import { HiOutlineMail } from 'react-icons/hi';
+import {  Card, Table, notification } from 'antd';
+
 import { EmailPopup } from './components/EmailPopup';
 import { useParams } from 'react-router-dom';
 import { DentistServices } from '../../../../../../services/DentistServices/DentistServices';

@@ -6,7 +6,6 @@ import {
   DashboardOutlined,
   UserOutlined,
   HistoryOutlined,
-  HomeOutlined,
   ScheduleOutlined,
 } from '@ant-design/icons';
 
