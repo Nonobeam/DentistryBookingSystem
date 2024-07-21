@@ -2,6 +2,7 @@ package com.example.DentistryManagement.repository;
 
 import com.example.DentistryManagement.core.dentistry.Clinic;
 import com.example.DentistryManagement.core.dentistry.TimeSlot;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -28,4 +29,9 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, String> {
     List<TimeSlot> findTimeSlotsByClinic_ClinicID(String clinic);
 
     TimeSlot findTimeSlotByTimeSlotID(String timeSlotID);
+
+    List<TimeSlot> findTimeSlotsByDate(LocalDate date);
+
+    @Transactional
+    void deleteTimeSlotByDate(LocalDate date);
 }

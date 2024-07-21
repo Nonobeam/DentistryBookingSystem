@@ -1,6 +1,6 @@
 package com.example.DentistryManagement.controller;
-
 import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.core.dentistry.Appointment;
 import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
@@ -140,6 +140,20 @@ public class ManagerController {
             Optional<Client> optionalClient = userService.isPresentUser(id);
             if (optionalClient.isPresent()) {
                 Client client = optionalClient.get();
+                if(client.getRole() == Role.STAFF){
+                    Staff staff = staffService.findStaffById(client.getUserID());
+                    List<Dentist> dentistList = dentistService.findDentistListByStaff(staff);
+                    if(!dentistList.isEmpty()){
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Staff still manages dentists");
+                    }
+                }
+                if(client.getRole() == Role.DENTIST){
+                    Dentist dentist = dentistService.findDentistByID(client.getUserID());
+                    List<Appointment> appointmentList = appointmentAnalyticService.getAppointmentByDentistAndStatus(dentist, 1);
+                    if(!appointmentList.isEmpty()){
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Dentist still has available schedule");
+                    }
+                }
                 userService.updateUserStatus(client, 0);
                 return ResponseEntity.ok("Delete user successfully");
             } else {
@@ -352,7 +366,7 @@ public class ManagerController {
 
                 return ResponseEntity.ok(clientDTOs);
             }
-            return ResponseEntity.ok("No staff user found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No staff user found");
         } catch (Error error) {
             throw new Error("Error while getting dentists " + error);
         }
@@ -370,9 +384,9 @@ public class ManagerController {
             Map<String, Map<Integer, Long>> yearlyAppointments = appointmentAnalyticService.getAppointmentsByYearAndManager(manager, year);
             int totalAppointmentInMonth = appointmentAnalyticService.totalAppointmentsInMonthByManager(manager);
             int totalAppointmentInYear = appointmentAnalyticService.totalAppointmentsInYearByManager(manager);
-            Map<String, Double> ratingDentist = appointmentAnalyticService.getRatingDentistByManager(manager);
+             Map<String, Double>ratingDentist= appointmentAnalyticService.getRatingDentistByManager(manager);
 
-            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear, ratingDentist);
+            DashboardBoss dashboardResponse = new DashboardBoss(null, yearlyAppointments, totalAppointmentInMonth, totalAppointmentInYear,ratingDentist);
             return ResponseEntity.ok(dashboardResponse);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found data in dashboard");
