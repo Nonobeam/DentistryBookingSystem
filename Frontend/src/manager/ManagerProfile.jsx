@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Form, Input, Button, DatePicker, message, Spin, Layout } from "antd";
 import dayjs from "dayjs";
@@ -12,11 +12,9 @@ const ManagerProfile = () => {
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
 
-  const fetchUserInfo = async () => {
+
+  const fetchUserInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:8080/api/v1/manager/info", {
@@ -36,7 +34,11 @@ const ManagerProfile = () => {
       message.error("Failed to fetch user information");
       setLoading(false);
     }
-  };
+  }, [form]);
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, [fetchUserInfo]);
 
   const handleUpdate = async (values) => {
     try {

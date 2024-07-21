@@ -38,5 +38,5 @@ public interface UserRepository extends JpaRepository<Client, String> {
 
     List<Client> findClientsByPhoneOrMail(String phone, String mail);
 
-    List<Client> getClientsByRoleAndDentist_Staff_UserMailAndStatus(Role role, String mail, int i);
+    List<Client> getClientsByRoleAndStatusAndDentist_Staff_User_Mail(Role role,int i, String mail);
 }

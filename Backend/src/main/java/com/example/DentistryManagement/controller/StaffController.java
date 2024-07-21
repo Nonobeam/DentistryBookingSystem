@@ -165,9 +165,7 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any dentist user");
-                logger.error("Not found any dentist user");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                return ResponseEntity.ok(clients);
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -369,9 +367,8 @@ public class StaffController {
                     return ResponseEntity.ok(new ArrayList<>());
                 } else return ResponseEntity.ok(dependentsList);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
-                logger.error("Not found any customer user ");
-                return ResponseEntity.status(204).body(error);
+                return ResponseEntity.ok("Not found any dependent user");
+
             }
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
@@ -383,9 +380,8 @@ public class StaffController {
         try {
             return ResponseEntity.ok(userCustomerService.findAllCustomer());
         }catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
-            logger.error("Not found any customer user ");
-            return ResponseEntity.status(204).body(error);        }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDTO("500", e.getMessage()));
+        }
     }
     @Operation(summary = "customerList")
     @GetMapping("/customerList")
@@ -415,9 +411,8 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
-                logger.error("Not found any customer ");
-                return ResponseEntity.status(204).body(error);
+                return ResponseEntity.ok(clients);
+
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");

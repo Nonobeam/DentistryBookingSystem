@@ -99,7 +99,7 @@ const BossSidebar = () => {
             onClick={item.onClick}
             style={{
               margin: '10px 0',
-              borderRadius: '0 20px 20px 0',
+              borderRadius: '0 10px 10px 0',
               transition: 'all 0.3s',
             }}
           >

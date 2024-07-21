@@ -43,9 +43,10 @@ const Sidebar = () => {
     }
   ];
 
-  // Determine the default selected key based on the current path
   const getDefaultSelectedKey = () => {
     switch (location.pathname) {
+      case '/dentist':
+        return '1';
       case '/dentist/schedule':
         return '2';
       case '/dentist/history':
@@ -53,7 +54,8 @@ const Sidebar = () => {
       case '/dentist/profile':
         return '4';
       default:
-        return '1';
+        return '0';
+
     }
   };
 
@@ -78,7 +80,7 @@ const Sidebar = () => {
             key={item.key}
             icon={React.cloneElement(item.icon, { style: { fontSize: '18px', color: '#1976d2' } })}
             onClick={item.onClick}
-            style={{ margin: '10px 0', borderRadius: '0 20px 20px 0', transition: 'all 0.3s' }}
+            style={{ margin: '10px 0', borderRadius: '0 10px 10px 0', transition: 'all 0.3s' }}
           >
             {item.label}
           </Menu.Item>

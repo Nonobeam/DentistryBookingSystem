@@ -236,6 +236,7 @@ public class ManagerController {
                 LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
 
                 // Delete all dentist-schedule after the apply date of new time slot
+
                 dentistScheduleService.deleteDentistSchedulesAfterDate(lastDate, clinicDTO.getId());
 
                 timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,

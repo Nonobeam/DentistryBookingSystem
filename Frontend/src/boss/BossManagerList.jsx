@@ -3,7 +3,6 @@ import { Layout, Table, Button, Modal, message, Form, Input, DatePicker } from '
 import BossSidebar from './BossSideBar';
 import axios from 'axios';
 
-const { Content } = Layout;
 
 const BossManagerList = () => {
   const [managers, setManagers] = useState([]);
