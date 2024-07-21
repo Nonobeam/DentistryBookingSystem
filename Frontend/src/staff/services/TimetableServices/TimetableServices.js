@@ -20,8 +20,17 @@ const TimetableServices = {
 
   getAllDentists: async () => {
     try {
-      const responseData = await api.get('/staff/dentist-schedule');
-      return responseData.data;
+      const response = await api.get('/staff/dentist-schedule');
+      const data = response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      } else {
+        notification.warning({
+          message: 'No Data',
+          description: 'No dentist schedule data found.',
+        });
+        return []; 
+      }
     } catch (error) {
       notification.error({
         message: 'Failed to fetch schedule list',

@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from "react";
-import styled from 'styled-components';
-import { Layout, Typography } from "antd";
+import React, { useEffect, useState, useCallback } from "react";
 import "antd/dist/reset.css";
 import axios from "axios";
-import { Table, Button, Modal, Form, DatePicker, Select, Spin, message, Input, Rate } from "antd";
+import { Table, Button, Modal, Form, DatePicker, Select, message, Input, Rate } from "antd";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import NavBar from "./Nav";
 
-const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
-const StyledFooter = styled(Layout.Footer)`
-  text-align: center;
-  background-color: #1890ff;
-  color: white;
-  padding: 40px 0;
-`;
 
 const History = () => {
   const [appointments, setAppointments] = useState([]);
@@ -25,17 +16,15 @@ const History = () => {
   const [filterStatus, setFilterStatus] = useState(null);
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
-  const [sortOrder, setSortOrder] = useState("descend");
+  const sortOrder = "descend";
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [starRating, setStarRating] = useState(0);
   const history = useNavigate();
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [filterDate, filterStatus, sortOrder]);
 
-  const fetchAppointments = async () => {
+
+  const fetchAppointments = useCallback ( async () => {
     setLoading(true);
     try {
       let url = `http://localhost:8080/user/appointment-history`;
@@ -56,13 +45,17 @@ const History = () => {
       message.error("Failed to fetch appointment history");
     }
     setLoading(false);
-  };
+  }, [filterDate, filterStatus]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments, filterDate, filterStatus, sortOrder]);
 
   const handleCancel = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:8080/user/delete-booking/${selectedAppointmentId}`,
         {},
         {
@@ -235,7 +228,7 @@ const History = () => {
   return (
     <div>
       <NavBar />
-      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px" }}>
+      <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px", paddingTop: "100px" }}>
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Appointment History</h1>
         <Form layout="inline" style={{ justifyContent: "center", marginBottom: "20px" }}>
           <Form.Item label="Filter by Date">

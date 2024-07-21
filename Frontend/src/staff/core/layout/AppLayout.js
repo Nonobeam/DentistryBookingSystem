@@ -10,7 +10,7 @@ const headerStyle = {
   textAlign: 'center',
   color: '#fff',
   lineHeight: '64px',
-  backgroundColor: '#1890ff',
+  backgroundColor: '#1976d2',
 };
 
 const siderStyle = {
@@ -52,7 +52,7 @@ export const AppLayout = ({ content }) => {
         <Layout.Footer
           style={{
             textAlign: 'center',
-            backgroundColor: '#1890ff',
+            backgroundColor: '#1976d2',
             color: '#fff',
           }}
         >

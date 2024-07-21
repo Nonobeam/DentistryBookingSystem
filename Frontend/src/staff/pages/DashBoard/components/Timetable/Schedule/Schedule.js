@@ -12,11 +12,10 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
-import { LeftOutlined } from '@ant-design/icons'; // Import the LeftOutlined icon from Ant Design
+import { LeftOutlined } from '@ant-design/icons'; 
 import TimetableServices from '../../../../../services/TimetableServices/TimetableServices';
 
 const { RangePicker: DateRangePicker } = DatePicker;
-// const { RangePicker: TimeRangePicker } = TimePicker;
 const { Option } = Select;
 
 const Schedule = () => {
@@ -226,7 +225,7 @@ const Schedule = () => {
           border: "2px solid #ccc", // Đường viền 2px, màu xám nhạt
           padding: "10px", // Khoảng cách nội bộ 10px
           borderRadius: "5px",
-          background: "#1890ff",
+          background: "#1976d2",
           height: "100px",
           lineHeight: "80px",
           // Đường viền cong góc 5px

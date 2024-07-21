@@ -1,6 +1,7 @@
 package com.example.DentistryManagement.controller;
 
 import com.example.DentistryManagement.DTO.*;
+import com.example.DentistryManagement.core.user.Role;
 import com.example.DentistryManagement.mapping.UserMapping;
 import com.example.DentistryManagement.auth.AuthenticationResponse;
 import com.example.DentistryManagement.auth.RegisterRequest;
@@ -221,6 +222,7 @@ public class ManagerController {
                 LocalDate lastDate = appointmentService.startUpdateTimeSlotDate(updateClinic.getClinicID());
 
                 // Delete all dentist-schedule after the apply date of new time slot
+
                 dentistScheduleService.deleteDentistSchedulesAfterDate(lastDate, clinicDTO.getId());
 
                 timeSlotService.createAndSaveTimeSlots(lastDate.plusDays(1), updateClinic,

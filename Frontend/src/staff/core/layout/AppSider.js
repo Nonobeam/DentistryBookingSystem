@@ -77,7 +77,7 @@ export const AppSider = () => {
           height: '120px',
           backgroundColor: 'white',
         }}>
-        <Link to='/'>
+        <Link to='/staff'>
           <img
             src={require('../../../img/z5622999205798_a788dec6bb647bf92381ce26586c370b-removebg.png')}
             alt='Logo'
@@ -99,11 +99,11 @@ export const AppSider = () => {
           <Menu.Item
             key={item.key}
             icon={React.cloneElement(item.icon, {
-              style: { fontSize: '18px', color: '#1890ff' },
+              style: { fontSize: '18px', color: '#1976d2' },
             })}
             style={{
               margin: '10px 0',
-              borderRadius: '0 20px 20px 0',
+              borderRadius: '0 10px 10px 0',
               transition: 'all 0.3s',
             }}
             onClick={item.onClick}>

@@ -1,138 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import NavBar from './Nav';
-import "antd/dist/reset.css";
-import { Layout, Row, Col, Typography } from "antd";
+import { Layout, Typography, Card, Button, Row, Col, Carousel } from "antd";
 import {
- 
-  FacebookOutlined,
-  TwitterOutlined,
-  YoutubeOutlined,
-  LinkedinOutlined,
+  ArrowUpOutlined,
 } from "@ant-design/icons";
+import NavBar from './Nav';
+
 const { Title, Paragraph } = Typography;
-const StyledFooter = styled(Layout.Footer)`
-  text-align: center;
-  background-color: #1890ff;
-  color: white;
-  padding: 40px 0;
-`;
-// Styled components for the page layout
-const PageContainer = styled.div`
-  font-family: 'Roboto', sans-serif;
-  max-width: 100%;
-  margin: 0;
-  padding: 40px 20px;
+const { Content } = Layout;
+
+const PageContainer = styled(Layout)`
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 `;
 
-const PageTitle = styled.h1`
+const HeroSection = styled.div`
+  background: url('https://images.unsplash.com/photo-1606811971618-4486d14f3f99?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80') center/cover no-repeat;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-weight: bold;
-  color: #2980b9;
-  font-size: 3rem;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  color: white;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
 `;
 
-
-
-const ArticleList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
 `;
 
-const ArticleItem = styled.li`
-  padding: 20px;
-  border: none;
+const StyledContent = styled(Content)`
+  padding: 50px 50px;
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+  }
+`;
+
+const ArticleCard = styled(Card)`
   border-radius: 15px;
+  overflow: hidden;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  background-color: white;
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   }
-`;
 
-const ArticleImage = styled.img`
-  width: 100%;
-  height: auto;
-  border-radius: 5px;
-  transition: transform 0.2s ease-in-out;
+  .ant-card-cover img {
+    height: 200px;
+    object-fit: cover;
+  }
 
-  &:hover {
-    transform: scale(1.05);
+  .ant-card-meta-title {
+    font-size: 1.2em;
+    font-weight: 600;
   }
 `;
 
-const ArticleLink = styled.a`
-  display: block;
-  margin-top: 15px;
-  font-weight: bold;
-  color: #3498db;
-  text-decoration: none;
-  font-size: 1.2rem;
+const StyledCarousel = styled(Carousel)`
+  margin-bottom: 50px;
 
-  &:hover {
-    color: #2980b9;
+  .slick-slide {
+    height: 400px;
+    overflow: hidden;
+  }
+
+  .slick-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 `;
-const IntroSection = styled.div`
-  background-color: #C6E2FF;
-  color: white;
-  padding: 40px;
-  border-radius: 15px;
-  margin-bottom: 40px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-`;
-const ArticleDescription = styled.p`
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: #777;
-`;
-const BackToTopButton = styled.button`
+
+const BackToTopButton = styled(Button)`
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #2980b9;
-  }
 `;
-// Function to shuffle array randomly
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
 
-// Educational component
+const StyledFooter = styled(Layout.Footer)`
+  background-color: #1976d2;
+  color: white;
+  padding: 20px 0;
+`;
+
+
+
 const Educational = () => {
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Dummy article links array
-  const articleLinks = shuffleArray([
+  const articleLinks = [
     {
       title: 'Effective Methods for Maintaining Dental Hygiene',
       description: 'Discover effective methods and tools for maintaining dental hygiene at home.',
@@ -193,63 +175,100 @@ const Educational = () => {
       url: 'https://www.nidirect.gov.uk/conditions/dental-problems',
       imageUrl: 'https://websterdds.com/wp-content/uploads/2021/05/dental-specialties.jpg'
     },
-  ])
+  ];
 
   return (
-    <>
-     
-
+    <PageContainer>
       <NavBar />
-      <PageContainer>
-        <IntroSection>
-          <PageTitle>Discover Dental Care Excellence</PageTitle>
-       
-        </IntroSection>
-        <ArticleList>
+        <HeroSection>
+        <HeroContent>
+          <Title style={{ color: 'white', fontSize: '3.5rem', marginBottom: '20px' }}>
+            Dental Education Hub
+          </Title>
+          <Paragraph style={{ color: 'white', fontSize: '1.2rem', marginBottom: '30px' }}>
+            Empowering you with knowledge for better oral health
+          </Paragraph>
+        </HeroContent>
+        </HeroSection>
+
+      <StyledContent>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: '50px' }}>
+          Featured Articles
+        </Title>
+
+        <StyledCarousel autoplay>
+          <div><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" alt="Dental Care 1" /></div>
+          <div><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" alt="Dental Care 2" /></div>
+          <div><img src="https://images.unsplash.com/photo-1445527815219-ecbfec67492e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" alt="Dental Care 3" /></div>
+        </StyledCarousel>
+
+        <Row gutter={[32, 32]}>
           {articleLinks.map((article, index) => (
-            <ArticleItem key={index}>
-              <ArticleImage src={article.imageUrl} alt={`Article ${index + 1}`} />
-              <ArticleLink href={article.url} target="_blank" rel="noopener noreferrer">
-                {article.title}
-              </ArticleLink>
-              <ArticleDescription>{article.description}</ArticleDescription>
-            </ArticleItem>
+            <Col xs={24} sm={12} md={8} key={index}>
+              <ArticleCard
+                hoverable
+                cover={<img alt={article.title} src={article.imageUrl} />}
+              >
+                <Card.Meta
+                  title={article.title}
+                  description={article.description}
+                />
+                <Button type="primary" href={article.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: '16px' }}>
+                  Read More
+                </Button>
+              </ArticleCard>
+            </Col>
           ))}
-        </ArticleList>
-        <BackToTopButton onClick={scrollToTop}>↑</BackToTopButton>
-      </PageContainer>
-      <StyledFooter>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>About Us</Title>
-            <Paragraph style={{ color: 'white' }}>Our Mission</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Our Team</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Testimonials</Paragraph>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Services</Title>
-            <Paragraph style={{ color: 'white' }}>General Dentistry</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Cosmetic Dentistry</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Orthodontics</Paragraph>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Contact</Title>
-            <Paragraph style={{ color: 'white' }}>Location</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Phone</Paragraph>
-            <Paragraph style={{ color: 'white' }}>Email</Paragraph>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: 'white' }}>Follow Us</Title>
-            <Paragraph>
-              <FacebookOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <TwitterOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <YoutubeOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-              <LinkedinOutlined style={{ fontSize: '24px', margin: '0 10px', color: 'white' }} />
-            </Paragraph>
-          </Col>
         </Row>
-      </StyledFooter>
-    </>
+
+        {showBackToTop && (
+          <BackToTopButton
+            type="primary"
+            shape="circle"
+            icon={<ArrowUpOutlined />}
+            size="large"
+            onClick={scrollToTop}
+          />
+        )}
+      </StyledContent>
+
+      <StyledFooter>
+  <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+    <Row gutter={[32, 32]} justify="center">
+      <Col xs={24} md={8}>
+        <Title level={3} style={{ color: 'white' }}>About Us</Title>
+        <Paragraph style={{ color: 'white' }}>
+          Sunflower Dentistry is dedicated to providing top-notch dental care to our community with a focus on patient comfort and cutting-edge technology.
+        </Paragraph>
+      </Col>
+      <Col xs={24} md={8}>
+        <Title level={3} style={{ color: 'white' }}>Contact</Title>
+        <Paragraph style={{ color: 'white' }}>
+          VNUHCM Student Cultural House<br />
+          Luu Huu Phuoc, Dong Hoa, Di An, Binh Duong<br />
+          Email: dentistrysunflower@gmail.com<br />
+          Phone: (123) 456-7890
+        </Paragraph>
+      </Col>
+      <Col xs={24} md={8}>
+        <Title level={3} style={{ color: 'white' }}>Opening Hours</Title>
+        <Paragraph style={{ color: 'white' }}>
+          Monday - Friday: 9:00 AM - 6:00 PM<br />
+          Saturday: 9:00 AM - 2:00 PM<br />
+          Sunday: Closed
+        </Paragraph>
+      </Col>
+    </Row>
+    <Row justify="center" style={{ marginTop: '40px' }}>
+      <Col>
+        <Paragraph style={{ color: 'white' }}>
+          © 2024 Sunflower Dentistry. All rights reserved.
+        </Paragraph>
+      </Col>
+    </Row>
+  </div>
+</StyledFooter>
+    </PageContainer>
   );
 };
 

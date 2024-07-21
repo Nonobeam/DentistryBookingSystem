@@ -48,7 +48,7 @@ export const AppHeader = () => {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0 20px',
-        color: '#1890ff',
+        color: '#1976d2',
         position: 'relative', // Add relative positioning to handle absolute positioning of the dropdown
       }}
     >

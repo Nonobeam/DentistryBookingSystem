@@ -31,10 +31,10 @@ public class DentistScheduleService {
         Services service = serviceRepository.findById(serviceId).orElse(null);
         HashSet<DentistSchedule> dentistSchedulesHashSet = new HashSet<>();
         LocalTime time = LocalTime.now();
-        if(workDate.isAfter(LocalDate.now())) {
-            time=LocalTime.MIDNIGHT;
+        if (workDate.isAfter(LocalDate.now())) {
+            time = LocalTime.MIDNIGHT;
         }
-        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(workDate, available, clinicId,time);
+        List<DentistSchedule> dentistScheduleList = dentistScheduleRepository.findByWorkDateAndAvailableAndClinic_ClinicIDAndTimeslot_StartTimeAfter(workDate, available, clinicId, time);
         for (DentistSchedule ds : dentistScheduleList) {
             if (ds.getDentist().getServicesList().contains(service)) {
                 dentistSchedulesHashSet.add(ds);
@@ -118,7 +118,8 @@ public class DentistScheduleService {
 
     public void deleteDentistSchedulesAfterDate(LocalDate workDate, String clinicId) {
         try {
-            dentistScheduleRepository.deleteByWorkDateAfterAndClinicId(workDate, clinicId);
+            if (dentistScheduleRepository.findDentistSchedulesByWorkDateAfterAndClinic_ClinicID(workDate, clinicId) !=null)
+                dentistScheduleRepository.deleteDentistSchedulesByWorkDateAfterAndClinic_ClinicID(workDate, clinicId);
         } catch (Error error) {
             throw error;
         }

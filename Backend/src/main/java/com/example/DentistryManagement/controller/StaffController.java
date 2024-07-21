@@ -117,38 +117,6 @@ public class StaffController {
         }
     }
 
-    @Operation(summary = "Show all working dentist schedule")
-    @GetMapping("/dentist-schedule")
-    public ResponseEntity<?> getWorkingDentistSchedule() {
-        try {
-            // find current staff account
-            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
-            HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
-            // Gt all dentists by current staff account
-            List<Dentist> dentistList = userDentistService.findDentistListByStaff(staff);
-
-            // Get all dentistSchedule from the dentists
-            for (Dentist dentist : dentistList) {
-                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
-
-                if (!dentistSchedule.isEmpty()) {
-                    dentistSchedules.addAll(dentistSchedule);
-                }
-            }
-
-            List<DentistSchedule> sortedDentistSchedules = dentistSchedules.stream()
-                    .sorted(Comparator.comparing(DentistSchedule::getWorkDate))
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(sortedDentistSchedules);
-        } catch (Error error) {
-            // Get error return from service
-            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
-            logger.error(errorResponseDTO.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
-        }
-    }
-
 
     @Operation(summary = "Set Service for dentists")
     @PostMapping("/set-service/{dentistMail}")
@@ -197,9 +165,7 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any dentist user");
-                logger.error("Not found any dentist user");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                return ResponseEntity.ok(clients);
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -234,7 +200,37 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+    @Operation(summary = "Show all working dentist schedule")
+    @GetMapping("/dentist-schedule")
+    public ResponseEntity<?> getWorkingDentistSchedule() {
+        try {
+            // find current staff account
+            Staff staff = userStaffService.findStaffByMail(userService.mailExtract());
+            HashSet<DentistSchedule> dentistSchedules = new HashSet<>();
+            // Gt all dentists by current staff account
+            List<Dentist> dentistList = userDentistService.findDentistListByStaff(staff);
 
+            // Get all dentistSchedule from the dentists
+            for (Dentist dentist : dentistList) {
+                List<DentistSchedule> dentistSchedule = dentist.getDentistScheduleList().stream().filter(schedule -> schedule.getWorkDate().isAfter(LocalDate.now()) || schedule.getWorkDate().isEqual(LocalDate.now())).toList();
+
+                if (!dentistSchedule.isEmpty()) {
+                    dentistSchedules.addAll(dentistSchedule);
+                }
+            }
+
+            List<DentistSchedule> sortedDentistSchedules = dentistSchedules.stream()
+                    .sorted(Comparator.comparing(DentistSchedule::getWorkDate))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(sortedDentistSchedules);
+        } catch (Error error) {
+            // Get error return from service
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO("400", error.getMessage());
+            logger.error(errorResponseDTO.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        }
+    }
 
     @Operation(summary = "Show dentists and timeslots for choosing set schedule")
     @GetMapping("/show-set-schedule")
@@ -371,9 +367,8 @@ public class StaffController {
                     return ResponseEntity.ok(new ArrayList<>());
                 } else return ResponseEntity.ok(dependentsList);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
-                logger.error("Not found any customer user ");
-                return ResponseEntity.status(204).body(error);
+                return ResponseEntity.ok("Not found any dependent user");
+
             }
         } catch (Error error) {
             throw new Error("Error while getting clinic " + error);
@@ -385,9 +380,8 @@ public class StaffController {
         try {
             return ResponseEntity.ok(userCustomerService.findAllCustomer());
         }catch (Exception e) {
-            ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer user");
-            logger.error("Not found any customer user ");
-            return ResponseEntity.status(204).body(error);        }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDTO("500", e.getMessage()));
+        }
     }
     @Operation(summary = "customerList")
     @GetMapping("/customerList")
@@ -417,9 +411,8 @@ public class StaffController {
 
                 return ResponseEntity.ok(clientDTOs);
             } else {
-                ErrorResponseDTO error = new ErrorResponseDTO("204", "Not found any customer ");
-                logger.error("Not found any customer ");
-                return ResponseEntity.status(204).body(error);
+                return ResponseEntity.ok(clients);
+
             }
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("400", "Server_error");
@@ -650,11 +643,11 @@ public class StaffController {
             List<Appointment> appointmentList;
             if (search != null && !search.isEmpty()) {
                 appointmentList = appointmentAnalyticService.getAppointmentsByCustomerNameOrDependentNameAndStaffMail(search, mail);
-            } else appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
+            } else {
+                appointmentList = appointmentAnalyticService.getAppointmentsInAClinicByStaffMail(mail);
+            }
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
-            if (!appointmentDTOList.isEmpty()) {
-                return ResponseEntity.ok(appointmentDTOList);
-            } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No appointments found");
+            return ResponseEntity.ok(appointmentDTOList);
         } catch (Exception e) {
             ErrorResponseDTO error = new ErrorResponseDTO("204", "Customer not found");
             logger.error("Customer not found");

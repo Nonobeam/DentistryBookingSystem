@@ -120,7 +120,7 @@ const FeedbackPage = () => {
   return (
     <Layout>
       <NavBar />
-      <Content style={{ padding: '20px' }}>
+      <Content style={{ padding: '20px', paddingTop: "100px"}}>
         <Typography.Title level={2}>Appointment Feedback</Typography.Title>
         {loading ? (
           <Spin size="large" />

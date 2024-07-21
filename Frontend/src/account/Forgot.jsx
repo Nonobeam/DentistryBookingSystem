@@ -25,7 +25,7 @@ const ForgotPasswordBox = styled.div`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  background-color: #1890ff;
+  background-color: #1976d2;
   border: none;
   &:hover {
     background-color: #167acb;
@@ -36,7 +36,7 @@ const ExtraLink = styled.div`
   margin-top: 20px;
   text-align: right;
   a {
-    color: #1890ff;
+    color: #1976d2;
     &:hover {
       text-decoration: underline;
     }
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
     setLoading(true);
     console.log('Success:', values);
     try {
-      await axios.post(`http://localhost:8080/user/forgotPassword?mail=${values.email}`);
+      await axios.post(`http://localhost:8080/api/v1/auth/forgotPassword?mail=${values.email}`);
       setSuccessMessage("The reset password link has been sent to your email.");
     } catch (error) {
       setErrorMessage( error.response?.data?.message || "An error occurred. Please try again later.");
@@ -69,7 +69,7 @@ const ForgotPassword = () => {
   return (
     <ForgotPasswordContainer>
       <ForgotPasswordBox>
-        <Title level={2} style={{ color: '#1890ff' }}>Forgot your password?</Title>
+        <Title level={2} style={{ color: '#1976d2' }}>Forgot your password?</Title>
         <p>We'll send you an email to help you reset your password.</p>
 
         {successMessage && (

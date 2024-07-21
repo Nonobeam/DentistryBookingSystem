@@ -94,12 +94,12 @@ const BossSidebar = () => {
           <Menu.Item
             key={item.key}
             icon={React.cloneElement(item.icon, {
-              style: { fontSize: '18px', color: '#1890ff' }
+              style: { fontSize: '18px', color: '#1976d2' }
             })}
             onClick={item.onClick}
             style={{
               margin: '10px 0',
-              borderRadius: '0 20px 20px 0',
+              borderRadius: '0 10px 10px 0',
               transition: 'all 0.3s',
             }}
           >

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Layout, Table, Button, message, Spin } from "antd";
+import { Layout, Table, message, Spin } from "antd";
 import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
@@ -12,9 +12,11 @@ const PatientInfo = () => {
   const [patientInfo, setPatientInfo] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
+  const [clinicInfo, setClinicInfo] = useState("");
 
-  const fetchClinicInfo = async () => {
+
+
+  const fetchClinicInfo = useCallback ( async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
@@ -27,14 +29,10 @@ const PatientInfo = () => {
       message.error(error.response?.data || "An error occurred while fetching clinic information");
       console.error(error);
     }
-  };
-  useEffect(() => {
-    fetchPatientInfo();
-    fetchClinicInfo(); // Fetch clinic info on component mount
-
   }, []);
 
-  const fetchPatientInfo = async () => {
+
+  const fetchPatientInfo = useCallback ( async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -52,8 +50,13 @@ const PatientInfo = () => {
       message.error(error.response?.data || "An error occurred");
     }
     setLoading(false);
-  };
+  } , [customerID]);
 
+  useEffect(() => {
+    fetchPatientInfo();
+    fetchClinicInfo(); 
+
+  }, [fetchPatientInfo, fetchClinicInfo]);
 
   const columns = [
     {
@@ -110,13 +113,12 @@ const PatientInfo = () => {
           statusColor = "green";
         } else if (status === 1) {
           statusText = "Upcoming";
-          statusColor = "yellow";
+          statusColor = "chocolate";
         }
         return (
           <span
             style={{
-              backgroundColor: statusColor,
-              color: "black",
+              color: statusColor,
               padding: "4px 8px",
               borderRadius: "18px",
               display: "inline-block",
@@ -143,7 +145,7 @@ const PatientInfo = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' // Default Ant Design Header height
+            height: '64px' 
           }}
         >
           <div style={{ 
@@ -168,7 +170,7 @@ const PatientInfo = () => {
                   <p><b>Phone:</b> {patientInfo?.phone}</p>
                   <p><b>Email:</b> {patientInfo?.mail}</p>
                   <p><b>Birthday:</b> {dayjs(patientInfo?.birthday).format("DD-MM-YYYY")}</p>
-                  <p><b>Status:</b> {patientInfo?.status === 0 ? "Inactive" : "Active"}</p>
+                  {/* <p><b>Status:</b> {patientInfo?.status === 0 ? "Inactive" : "Active"}</p> */}
                 </div>
 
                 <h2>Appointment History</h2>

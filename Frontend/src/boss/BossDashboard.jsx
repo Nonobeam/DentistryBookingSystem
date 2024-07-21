@@ -130,7 +130,7 @@ const BossDashboard = () => {
           <h1>Dashboard</h1>
           <Row gutter={16} style={{ marginBottom: 16 }}>
             <Col span={9}>
-              <Card style={{ borderLeft: "5px solid #1890ff" }}>
+              <Card style={{ borderLeft: "5px solid #1976d2" }}>
                 <h3>Total appointments of the month</h3>
                 <p style={{ fontSize: "24px", fontWeight: "bold" }}>
                   {dashboardData?.totalAppointmentsInMonthNow || 0}
