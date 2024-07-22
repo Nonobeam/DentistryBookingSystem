@@ -9,11 +9,5 @@ COPY target/DentistryManagement.jar /app/DentistryManagement.jar
 
 # Expose the port on which the Spring Boot application will run
 EXPOSE 8080
-
-# Set environment variables
-ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/DentistryManagementSystem
-ENV SPRING_DATASOURCE_USERNAME=product_user
-ENV SPRING_DATASOURCE_PASSWORD=product_user_password
-
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/DentistryManagement.jar"]
