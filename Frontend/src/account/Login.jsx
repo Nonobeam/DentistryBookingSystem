@@ -57,6 +57,16 @@ const Login = () => {
   const location = useLocation();
 
   useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role === 'CUSTOMER') navigate('/');
+    else if (role === 'STAFF') navigate('/staff');
+    else if (role === 'ADMIN') navigate('/admin');
+    else if (role === 'DENTIST') navigate('/dentist');
+    else if (role === 'MANAGER') navigate('/manager');
+    else if (role === 'BOSS') navigate('/boss');
+  });
+
+  useEffect(() => {
     if (location.state && location.state.message) {
       setSuccessMessage(location.state.message);
     }

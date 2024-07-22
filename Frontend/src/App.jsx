@@ -64,7 +64,7 @@ const App = () => {
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/forgot' element={<ForgotPassword />} />
-        <Route path='/confirm' element={<ConfirmAccount />} />
+        <Route path='/api/v1/auth/confirm' element={<ConfirmAccount />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
 
         {/* CUSTOMER'S PAGES */}

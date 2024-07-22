@@ -149,7 +149,7 @@ const Signup = () => {
             <DatePicker
               placeholder="Select Date"
               style={{ width: "100%" }}
-              format="YYYY-MM-DD"
+              format="DD-MM-YYYY"
               disabledDate={disabledDate}
             />
           </Form.Item>
