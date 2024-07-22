@@ -64,7 +64,7 @@ const PatientInfo = () => {
         dataIndex: "user",
         key: "user",
         render: (_, record) => {
-          const patientName = record.dependent ? `Customer: ${record.user}, Dependent: ${record.dependent}` : `Customer: ${record.user}`;
+          const patientName = record.dependent ? `${record.user} (Dependent: ${record.dependent})` : `${record.user}`;
           return (
             <>{patientName}</> 
           );

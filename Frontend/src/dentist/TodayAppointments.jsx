@@ -10,6 +10,7 @@ const { Title, Text } = Typography;
 const TodayAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reminderLoading, setReminderLoading] = useState(false);
   const [reminderModalVisible, setReminderModalVisible] = useState(false);
   const [reminderMessage, setReminderMessage] = useState("");
   const [clinicInfo, setClinicInfo] = useState("");
@@ -30,7 +31,7 @@ const TodayAppointments = () => {
   };
 
   const handleSendReminder = async () => {
-    setLoading(true);
+    setReminderLoading(true);
     try {
       const token = localStorage.getItem("token");
       await axios.post(
@@ -46,10 +47,11 @@ const TodayAppointments = () => {
       );
       message.success("Reminder sent successfully");
       setReminderModalVisible(false);
+      setReminderMessage("");
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
     } finally {
-      setLoading(false);
+      setReminderLoading(false);
     }
   };
 
@@ -149,10 +151,10 @@ const TodayAppointments = () => {
 
             <Modal
         title={<><BellOutlined /> Send Reminder</>}
-        visible={reminderModalVisible}
+        open={reminderModalVisible}
               onOk={handleSendReminder}
               onCancel={() => setReminderModalVisible(false)}
-              confirmLoading={loading}
+              confirmLoading={reminderLoading}
             >
               <Input.TextArea
                 rows={4}
