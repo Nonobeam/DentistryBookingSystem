@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 
 public class DashboardBoss {
-    private Map<String, List<Appointment>> dailyAppointments;
+    private Map<String, Integer> dailyAppointments;
     private Map<String, Map<Integer, Long>>  monthlyAppointments;
     private int totalAppointmentsInMonthNow;
     private int totalAppointmentsInYearNow;

@@ -191,6 +191,8 @@ public class StaffController {
             List<AppointmentDTO> appointmentDTOList = appointmentService.appointmentDTOList(appointmentList);
             UserAppointDTO userAppointDTO = new UserAppointDTO();
             userAppointDTO.setUserDTO(userDTO);
+            List<String> services = client.getDentist().getServicesList().stream().map(Services::getName).toList();
+            userAppointDTO.setServices(services.toString());
             userAppointDTO.setStar(appointmentAnalyticService.totalStarByDentist(client));
             userAppointDTO.setAppointment(appointmentDTOList);
             return ResponseEntity.ok(userAppointDTO);
@@ -271,7 +273,7 @@ public class StaffController {
             for (TimeSlot timeSlot : timeSlotList) {
                 for (TimeSlot timeSlotDTO : timeSlotList) {
                     if (timeSlotDTO.getDate().isAfter(timeSlot.getDate())) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before" + timeSlot.getDate() + " or after " + timeSlotDTO.getDate());
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("You have to set schedule  for dentist specific before " + timeSlot.getDate() + " or after " + timeSlotDTO.getDate());
                     }
                 }
             }

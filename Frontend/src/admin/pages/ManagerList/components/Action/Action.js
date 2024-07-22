@@ -1,14 +1,14 @@
 import React from 'react';
-import { MdOutlineRemoveRedEye } from 'react-icons/md';
+
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FiTrash2 } from 'react-icons/fi';
 import { Flex } from 'antd';
 import { ModalInfo } from '../ModalInfo/ModalInfo';
-import { useNavigate } from 'react-router-dom';
+
 import { CustomerServices } from '../../../../services/CustomerServer/CustomerServer';
 
 export const Action = ({ record }) => {
-  const navigator = useNavigate();
+  
   const [info, setInfo] = React.useState(record);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -18,6 +18,7 @@ export const Action = ({ record }) => {
       try {
         const response = await CustomerServices.getById(record.mail);
         setLoading(false);
+        setInfo(response);
       } catch (error) {
         console.log(error);
       }

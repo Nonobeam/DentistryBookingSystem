@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout, Row, Col, Typography } from 'antd';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 export const AppFooter=()=> {
     return (

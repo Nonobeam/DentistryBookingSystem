@@ -42,16 +42,17 @@ const BossDashboard = () => {
     }
   };
 
+
   const generateYearOptions = () => {
     const currentYear = dayjs().year();
     return Array.from({ length: 10 }, (_, index) => currentYear - index);
   };
 
   const renderPieChart = () => {
-    if (!selectedDate){
+    if (!selectedDate) {
       return <Empty description="Choose a date to see daily appointments" />;
     }
-    if (!dashboardData || Object.keys(dashboardData.dailyAppointments).length === 0) {
+    if (!dashboardData || !dashboardData.dailyAppointments || Object.keys(dashboardData.dailyAppointments).length === 0) {
       return <Empty description="No daily appointments data available" />;
     }
 
@@ -69,23 +70,14 @@ const BossDashboard = () => {
     const config = {
       appendPadding: 10,
       data,
-      angleField: 'value',
+      angleField: 'total',
       colorField: 'type',
       radius: 0.8,
-      label: {
-        offset: "-30%",
-        content: ({ percent }) => `${(percent * 100).toFixed(0)}%`,
-        style: {
-          fontSize: 14,
-          textAlign: 'center',
-        },
-      },
       interactions: [{ type: "element-active" }],
     };
 
     return <Pie {...config} />;
   };
-
   const renderBarChart = () => {
     if (!dashboardData || Object.keys(dashboardData.monthlyAppointments).length === 0) {
       return <Empty description="No monthly appointments data available" />;

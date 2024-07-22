@@ -31,10 +31,12 @@ public interface DentistScheduleRepository extends JpaRepository<DentistSchedule
 
     List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentist(LocalDate startDate, LocalDate endDate, int available, Dentist dentist);
 
-    List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(LocalDate date, LocalDate localDate, int i, Staff staff);
+    List<DentistSchedule> findDentistScheduleByWorkDateBetweenAndAvailableAndDentistStaff(LocalDate date, LocalDate localDate, int available, Staff staff);
 
     @Transactional
     void deleteDentistSchedulesByWorkDateAfterAndClinic_ClinicID(LocalDate workDate, String clinicId);
+
+    List<DentistSchedule> findByWorkDateAndAvailableAndClinic_ClinicID(LocalDate workDate, int available, String clinicId);
 
     List<DentistSchedule> findDentistSchedulesByAvailableAndWorkDateIsBeforeAndTimeslot_StartTimeBefore(int available, LocalDate workDate, LocalTime timeslot_startTime);
 

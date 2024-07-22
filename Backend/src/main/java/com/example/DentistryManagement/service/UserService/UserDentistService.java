@@ -117,10 +117,10 @@ public class UserDentistService {
     }
 
     public List<Dentist> findDentistListByStaff(Staff staff) {
-        List<Dentist> dentists;
+        List<Dentist> dentistList;
         try {
-            dentists = dentistRepository.findAllByStaff_StaffID(staff.getStaffID());
-            return dentists;
+            dentistList = dentistRepository.findAllByStaff_StaffID(staff.getStaffID());
+            return dentistList;
         } catch (Error error) {
             throw error;
         }

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { Card, Table, Spin } from 'antd';
 import { CustomerServices } from '../../services/CustomerServer/CustomerServer';
 import { Action } from './components/Action/Action';
 
 export const CustomerList = () => {
   const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const columns = [
     {
@@ -37,9 +38,7 @@ export const CustomerList = () => {
       title: 'Action',
       dataIndex: 'x',
       key: 'x',
-      render: (_, record) => (
-        <Action data={apiData} setApiData={setApiData} record={record} />
-      ),
+      render: (_, record) => <Action data={apiData} setApiData={setApiData} record={record} />,
     },
   ];
 
@@ -54,10 +53,13 @@ export const CustomerList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await CustomerServices.getAll();
         setApiData(response);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -65,16 +67,27 @@ export const CustomerList = () => {
 
   return (
     <div>
-      <Card title='Customer List' style={cardStyle}>
-        <Table
-          dataSource={apiData}
-          columns={columns}
-          pagination={false}
-          bordered
-          size='small'
-          style={{ backgroundColor: 'white' }} // Background color for the table
-        />
+      <Card title="Customer List" style={cardStyle}>
+        {loading ? ( // Hiển thị Spin khi đang loading
+          <div style={{ textAlign: 'center' }}>
+            <Spin size="large" />
+          </div>
+        ) : apiData.length > 0 ? ( // Hiển thị Table khi có dữ liệu và không đang loading
+          <Table
+            dataSource={apiData}
+            columns={columns}
+            pagination={false}
+            bordered
+            size="small"
+            style={{ backgroundColor: 'white' }}
+          />
+        ) : ( // Hiển thị thông báo khi không có dữ liệu
+          <div style={{ textAlign: 'center', padding: '20px' }}>
+            No data available
+          </div>
+        )}
       </Card>
     </div>
   );
 };
+  

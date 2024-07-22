@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { Card, Table, Spin } from 'antd';
 import { staffListServices } from '../../services/StaffSever/StaffSever';
 import { Action } from './components/Action/Action';
 
 const AppointmentHistory = () => {
   const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true); // State for loading indicator
 
   const columns = [
     {
@@ -58,6 +59,8 @@ const AppointmentHistory = () => {
         setApiData(response);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Turn off loading indicator regardless of success or failure
       }
     };
     fetchData();
@@ -66,14 +69,20 @@ const AppointmentHistory = () => {
   return (
     <div>
       <Card title="Staff List" style={cardStyle}>
-        <Table
-          dataSource={apiData}
-          columns={columns}
-          pagination={false}
-          bordered
-          size="small"
-          style={{ backgroundColor: 'white' }} // Background color for the table
-        />
+        {loading ? ( // Show Spin component when loading is true
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Table
+            dataSource={apiData}
+            columns={columns}
+            pagination={false}
+            bordered
+            size="small"
+            style={{ backgroundColor: 'white' }} // Background color for the table
+          />
+        )}
       </Card>
     </div>
   );
