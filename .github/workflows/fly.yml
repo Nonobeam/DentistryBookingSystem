@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
@@ -22,8 +22,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package
-        working-directory: /Backend 
-
+        working-directory: ./Backend 
 
       - name: Set up Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
