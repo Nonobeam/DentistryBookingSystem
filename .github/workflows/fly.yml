@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy DAS
+    name: Deploy Dentistry
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
@@ -22,6 +22,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package
+        working-directory: /Backend 
 
       - name: Set up Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
