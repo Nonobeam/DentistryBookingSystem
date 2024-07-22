@@ -3,9 +3,11 @@ import "antd/dist/reset.css";
 import axios from "axios";
 import { Table, Button, Modal, Form, DatePicker, Select, message, Input, Rate } from "antd";
 import { useNavigate } from "react-router-dom";
+import { DeleteOutlined, CommentOutlined, ExclamationCircleOutlined, StarOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
 import NavBar from "./Nav";
-import { set } from "@ant-design/plots/es/core/utils";
+import './Histyle.css';
+import { Tag } from 'antd';
 
 const { Option } = Select;
 
@@ -27,15 +29,14 @@ const History = () => {
 
 
 
-  const fetchAppointments = useCallback ( async () => {
+  const fetchAppointments = useCallback(async () => {
     setLoading(true);
     try {
       let url = `http://localhost:8080/user/appointment-history`;
 
       if (filterDate || filterStatus !== null) {
-        url += `?${filterDate ? `workDate=${filterDate.format("YYYY-MM-DD")}` : ""}${
-          filterDate && filterStatus !== null ? "&" : ""
-        }${filterStatus !== null && filterStatus !== undefined ? `status=${filterStatus}` : ""}`;
+        url += `?${filterDate ? `workDate=${filterDate.format("YYYY-MM-DD")}` : ""}${filterDate && filterStatus !== null ? "&" : ""
+          }${filterStatus !== null && filterStatus !== undefined ? `status=${filterStatus}` : ""}`;
       }
       const token = localStorage.getItem("token");
       const response = await axios.get(url, {
@@ -88,9 +89,9 @@ const History = () => {
 
     try {
       setFeedbackLoading(true);
-      await axios.put(`http://localhost:8080/user/appointment-feedback/${selectedAppointmentId}`, { 
+      await axios.put(`http://localhost:8080/user/appointment-feedback/${selectedAppointmentId}`, {
         feedback,
-        starAppointment: starRating 
+        starAppointment: starRating
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -158,34 +159,20 @@ const History = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status, record) => {
-        let statusText = "";
-        let statusColor = "";
+      render: (status) => {
+        let color = 'default';
+        let text = '';
         if (status === 0) {
-          statusText = "Cancelled";
-          statusColor = "red";
-        } else if (status === 2 ) {
-            statusText = "Finished";
-            statusColor = "green";
-          } else {
-            statusText = "Upcoming";
-            statusColor = "chocolate";
-          }
-        
-        return (
-          <span
-            style={{
-              color: statusColor,
-              padding: "4px 8px",
-              borderRadius: "10px",
-              display: "inline-block",
-              minWidth: "70px",
-              textAlign: "center"
-            }}
-          >
-            {statusText}
-          </span>
-        );
+          color = 'red';
+          text = 'Cancelled';
+        } else if (status === 1) {
+          color = 'orange';
+          text = 'Upcoming';
+        } else if (status === 2) {
+          color = 'green';
+          text = 'Finished';
+        }
+        return <Tag color={color}>{text}</Tag>;
       },
     },
     {
@@ -200,6 +187,7 @@ const History = () => {
               <Button
                 type="primary"
                 danger
+                icon={<DeleteOutlined />}
                 onClick={() => {
                   setSelectedAppointmentId(record.appointmentID);
                   setCancelModalVisible(true);
@@ -208,24 +196,38 @@ const History = () => {
               >
                 Cancel
               </Button>
-            
+
             </>
           );
-        } else if (record.status === 2 && record.starAppointment !==0) {
-          return (
-            <Button
-              type="primary"
-              onClick={() => handleFeedbackButtonClick(record)}
-              style={{ marginRight: 8, backgroundColor: "green" }}
-            >
-              Feedback
-            </Button>
-          );
+        } else if (record.status === 2) {
+          if (record.starAppointment === 0) {
+            return (
+              <Button
+                type="primary"
+                icon={<CommentOutlined />}
+                onClick={() => history("/appointment-feedback")}
+                style={{ marginRight: 8, backgroundColor: "chocolate", borderColor: "chocolate" }}
+              >
+                Give Feedback
+              </Button>
+            );
+          } else {
+            return (
+              <Button
+                type="primary"
+                icon={<CommentOutlined />}
+                onClick={() => handleFeedbackButtonClick(record)}
+                style={{ marginRight: 8, backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+              >
+                Update Feedback
+              </Button>
+            );
+          }
         }
         return null;
       },
     },
-    
+
   ];
 
   const locale = {
@@ -233,28 +235,45 @@ const History = () => {
   };
 
   return (
-    <div>
+    <div style={{
+      backgroundColor: "#f0f2f5",
+      minHeight: "100vh",
+      
+    }}>
       <NavBar />
       <div style={{ maxWidth: '90%', margin: "0 auto", padding: "20px", paddingTop: "100px" }}>
-        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Appointment History</h1>
-        <Form layout="inline" style={{ justifyContent: "center", marginBottom: "20px" }}>
-          <Form.Item label="Filter by Date">
-            <DatePicker onChange={(date) => setFilterDate(date)} />
-          </Form.Item>
-          <Form.Item label="Filter by Status">
-            <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
-              <Option value={0}>Cancelled</Option>
-              <Option value={1}>Upcoming</Option>
-              <Option value={2}>Finished</Option>
+        <h1 style={{
+          textAlign: "center",
+          marginBottom: "30px",
+          fontSize: "2.5rem",
+          fontWeight: "bold"
+        }}>Appointment History</h1>
+        <div style={{
+          background: "white",
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          marginBottom: "20px"
+        }}>
+          <Form layout="inline" style={{ justifyContent: "center", marginBottom: "20px" }}>
+            <Form.Item label="Filter by Date">
+              <DatePicker onChange={(date) => setFilterDate(date)} />
+            </Form.Item>
+            <Form.Item label="Filter by Status">
+              <Select style={{ width: 150 }} onChange={(value) => setFilterStatus(value)} allowClear>
+                <Option value={0}>Cancelled</Option>
+                <Option value={1}>Upcoming</Option>
+                <Option value={2}>Finished</Option>
 
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" style={{ marginLeft: "10px" }} onClick={() => history("/booking")}>
-              New Appointment
-            </Button>
-          </Form.Item>
-        </Form>
+              </Select>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" style={{ marginLeft: "10px" }} onClick={() => history("/booking")}>
+                New Appointment
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
 
         <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
           <Table
@@ -264,11 +283,12 @@ const History = () => {
             pagination={{ pageSize: 10 }}
             locale={locale}
             loading={loading}
+            rowClassName={(record, index) => index % 2 === 0 ? 'even-row' : 'odd-row'}
           />
         </div>
 
         <Modal
-          title="Cancel Appointment"
+          title={<><ExclamationCircleOutlined style={{ color: '#faad14' }} /> Cancel Appointment</>}
           open={cancelModalVisible}
           confirmLoading={cancelLoading}
           onOk={handleCancel}
@@ -276,11 +296,11 @@ const History = () => {
           okText="Yes, Cancel"
           cancelText="No"
         >
-          <p>Are you sure you want to cancel this appointment? This action cannot be undone.</p>
-        </Modal>
+  <p style={{ fontSize: '16px' }}>Are you sure you want to cancel this appointment? This action cannot be undone.</p>
+  </Modal>
 
         <Modal
-          title="View your feedback"
+          title={<><StarOutlined style={{ color: '#1890ff' }} /> View your feedback</>}
           confirmLoading={feedbackLoading}
           open={feedbackModalVisible}
           onCancel={() => {

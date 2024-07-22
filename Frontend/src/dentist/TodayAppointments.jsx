@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Card, Col, Row, message, Empty, Button, Modal, Input } from 'antd';
+import { Layout, Card, Col, Row, message, Empty, Button, Modal, Input, Typography, Spin, Statistic } from 'antd';
+import { CalendarOutlined, UserOutlined, MedicineBoxOutlined, TeamOutlined, BellOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 
 const { Header, Content } = Layout;
+const { Title, Text } = Typography;
 
 const TodayAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reminderModalVisible, setReminderModalVisible] = useState(false);
   const [reminderMessage, setReminderMessage] = useState("");
-  const [clinicInfo, setClinicInfo] = useState(""); // Add state for clinic info
+  const [clinicInfo, setClinicInfo] = useState("");
 
   const fetchClinicInfo = async () => {
     try {
@@ -26,6 +28,7 @@ const TodayAppointments = () => {
       console.error(error);
     }
   };
+
   const handleSendReminder = async () => {
     setLoading(true);
     try {
@@ -51,7 +54,7 @@ const TodayAppointments = () => {
   };
 
   useEffect(() => {
-    fetchClinicInfo(); // Fetch clinic info on component mount
+    fetchClinicInfo();
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -82,38 +85,71 @@ const TodayAppointments = () => {
       <Sidebar />
       <Layout>
       <Header
-          className="site-layout-sub-header-background"
           style={{ 
             padding: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' // Default Ant Design Header height
           }}
         >
-          <div style={{ 
-            color: 'white', 
-            fontFamily: 'Georgia', 
-            fontSize: '22px', 
-            textAlign: 'center' 
-          }}>
+          <Title level={3} style={{ color: 'white', margin: 0 }}>
             {clinicInfo}
-          </div>
-        </Header>        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-            <h1>DENTIST</h1>
-            <h2>Today's Appointment</h2>
+          </Title>
+        </Header>
+        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+          <Card>
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={12}>
+                <Title level={2}>
+                  <CalendarOutlined /> Today's Appointments
+                </Title>
+              </Col>
+              <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+                <Statistic title="Total Appointments" value={appointments.length} />
             <Button
               type="primary"
-              onClick={() => {
-                setReminderModalVisible(true);
-              }}
+                  icon={<BellOutlined />}
+                  onClick={() => setReminderModalVisible(true)}
+                  style={{ marginTop: '16px' }}
             >
               Send Reminder
             </Button>
+              </Col>
+            </Row>
+
+            {loading ? (
+              <div style={{ textAlign: 'center', margin: '50px 0' }}>
+                <Spin size="large" />
+              </div>
+            ) : appointments.length === 0 ? (
+              <Empty description="No appointments today" />
+            ) : (
+              <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
+                {appointments.map((appointment) => (
+                  <Col xs={24} sm={12} md={8} lg={6} key={appointment.appointmentId}>
+                    <Card
+                      hoverable
+                      title={
+                        <Text strong>
+                          <CalendarOutlined /> {appointment.timeSlot}
+                        </Text>
+                      }
+                    >
+                      <p><UserOutlined /> Patient: {appointment.user}</p>
+                      <p><MedicineBoxOutlined /> Service: {appointment.services}</p>
+                      <p><TeamOutlined /> Staff: {appointment.staff}</p>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </Card>
+        </Content>
+      </Layout>
+
             <Modal
-              title="Send Reminder"
-              open={reminderModalVisible}
+        title={<><BellOutlined /> Send Reminder</>}
+        visible={reminderModalVisible}
               onOk={handleSendReminder}
               onCancel={() => setReminderModalVisible(false)}
               confirmLoading={loading}
@@ -125,26 +161,6 @@ const TodayAppointments = () => {
                 placeholder="Type your reminder message here..."
               />
             </Modal>
-            {loading ? (
-              <p>Loading...</p>
-            ) : appointments.length === 0 ? (
-              <Empty description="No appointments today" />
-            ) : (
-              <Row gutter={16}>
-                {appointments.map((appointment) => (
-                  <Col span={6} key={appointment.appointmentId}>
-                    <Card title={`${appointment.timeSlot}`}>
-                      <p>Patient: {appointment.user}</p>
-                      <p>Service: {appointment.services}</p>
-                      <p>Staff: {appointment.staff}</p>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </div>
-        </Content>
-      </Layout>
     </Layout>
   );
 };

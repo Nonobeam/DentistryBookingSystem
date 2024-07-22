@@ -1,0 +1,9 @@
+.even-row {
+    background-color: #fafafa;
+  }
+  .odd-row {
+    background-color: #ffffff;
+  }
+  .ant-table-tbody > tr:hover > td {
+    background-color: #e6f7ff !important;
+  }

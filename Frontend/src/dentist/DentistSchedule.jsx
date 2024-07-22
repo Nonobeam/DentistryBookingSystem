@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Layout, Calendar, DatePicker, Spin, message, Badge } from "antd";
+import { Layout, Calendar, DatePicker, Spin, message, Badge, Card, Typography, Row, Col, Statistic } from "antd";
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
 import Sidebar from "./Sidebar";
 import "./style.css";
 
 const { Header, Content } = Layout;
 const { RangePicker } = DatePicker;
+const { Title, Text } = Typography;
 
 const DentistSchedule = () => {
   const initialStartDate = dayjs();
@@ -17,9 +19,9 @@ const DentistSchedule = () => {
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [clinicInfo, setClinicInfo] = useState("");
+  const [totalAppointments, setTotalAppointments] = useState(0);
   
-
-  const fetchClinicInfo = useCallback ( async () => {
+  const fetchClinicInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get('http://localhost:8080/api/v1/dentist/clinic', {
@@ -32,12 +34,9 @@ const DentistSchedule = () => {
       message.error(error.response?.data || "An error occurred while fetching clinic information");
       console.error(error);
     }
-  },[]);
+  }, []);
 
-
-
-  const fetchSchedule = useCallback ( async (start, end) => {
-
+  const fetchSchedule = useCallback(async (start, end) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -48,33 +47,23 @@ const DentistSchedule = () => {
         }
       });
       setScheduleData(response.data);
+      setTotalAppointments(Object.values(response.data).flat().length);
       setLoading(false);
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
     }
-    
-  },[]);
+  }, []);
 
   useEffect(() => {
     fetchSchedule(initialStartDate, initialEndDate);
     fetchClinicInfo(); 
-  },[fetchClinicInfo, fetchSchedule]);
+  }, [fetchClinicInfo, fetchSchedule]);
 
   const onRangeChange = (dates) => {
     setStartDate(dates[0]);
     setEndDate(dates[1].add(1, "days"));
     fetchSchedule(dates[0], dates[1]);
   };
-
-  // const headerRender = ({ value, type, onChange, onTypeChange }) => {
-  //   const current = value.format('YYYY-MM');
-  //   return (
-  //     <div style={{ padding: 8 }}>
-  //       <div>{current}</div>
-  //     </div>
-  //   );
-  // };
-  
 
   const dateCellRender = (value) => {
     const formattedDate = value.format("YYYY-MM-DD");
@@ -92,8 +81,9 @@ const DentistSchedule = () => {
                   : 'error'
             } 
             text={
-             <> <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"}) </>
-
+                <Text ellipsis={true} style={{ width: '100%' }}>
+                  <ClockCircleOutlined /> {dayjs(item.time, "HH:mm:ss").format("h:mm A")} - <UserOutlined /> {item.customerName || "N/A"} <MedicineBoxOutlined /> {item.serviceName || "N/A"}
+                </Text>
             } 
           />
         </li>
@@ -101,8 +91,6 @@ const DentistSchedule = () => {
       </ul>
     );
   };
-              {/* <span>{dayjs(item.time, "HH:mm:ss").format("h:mm A")}</span> - <span>{item.customerName || "N/A"}</span> ({item.serviceName || "N/A"}) */}
-
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -115,39 +103,49 @@ const DentistSchedule = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' 
+            height: '64px',
           }}
         >
-          <div style={{ 
-            color: 'white', 
-            fontFamily: 'Georgia', 
-            fontSize: '22px', 
-            textAlign: 'center' 
-          }}>
+          <Title level={3} style={{ color: 'white', margin: 0 }}>
             {clinicInfo}
-          </div>
+          </Title>
         </Header>
-        <Content style={{ margin: "0 16px" }}>
-          <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
-            <h1>Dentist Schedule</h1>
+        <Content style={{ margin: "24px 16px" }}>
+          <Card>
+            <Row gutter={16} style={{ marginBottom: 24 }}>
+              <Col span={12}>
+                <Title level={2}>
+                  <CalendarOutlined /> Dentist Schedule
+                </Title>
+              </Col>
+              <Col span={12} style={{ textAlign: 'right' }}>
+                <Statistic 
+                  title="Total Appointments" 
+                  value={totalAppointments} 
+                  style={{ float: 'right' }}
+                />
+              </Col>
+            </Row>
             <RangePicker
               onChange={onRangeChange}
+              format={"DD-MM-YYYY"}
               defaultValue={[initialStartDate, initialEndDate]}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: 16, width: '100%' }}
             />
             {loading ? (
-              <Spin />
+              <div style={{ textAlign: 'center', margin: '50px 0' }}>
+                <Spin size="large" />
+              </div>
             ) : (
               <Calendar
                 cellRender={dateCellRender}
-                // headerRender={headerRender}
                 disabledDate={(current) => {
                   return current && (current < startDate || current > endDate);
                 }}
                 validRange={[startDate, endDate]}
               />
             )}
-          </div>
+          </Card>
         </Content>
       </Layout>
     </Layout>

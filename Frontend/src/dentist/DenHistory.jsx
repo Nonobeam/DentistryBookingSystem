@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Button, Input, Layout, Modal, Select, Table, message } from "antd";
+import { Button, Input, Layout, Modal, Select, Table, message, Typography, Card, Row, Col, Statistic, Tag } from "antd";
+import { HistoryOutlined, UserOutlined, CalendarOutlined, ClockCircleOutlined, MedicineBoxOutlined, TeamOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const { Option } = Select;
 const { Header, Content } = Layout;
+const { Title, Text } = Typography;
+const { Search } = Input;
 
 const DenHistory = () => {
   const [appointments, setAppointments] = useState([]);
@@ -109,11 +112,11 @@ const DenHistory = () => {
       dataIndex: "user",
       key: "user",
       render: (_, record) => {
-        const patientName = record.dependent ? `Customer: ${record.user}, Dependent: ${record.dependent}` : `Customer: ${record.user}`;
+        const patientName = record.dependent ? `${record.user} (${record.dependent})` : record.user;
         return (
-          <button onClick={() => navigate(`/dentist/patient/${record.customerID}`)} style={{ background: 'none', border: 'none', padding: 0, color: '#1976d2', cursor: 'pointer' }}>
-            {patientName}
-          </button>
+          <Button type="link" onClick={() => navigate(`/dentist/patient/${record.customerID}`)}>
+            <UserOutlined /> {patientName}
+          </Button>
         );
       },
     },
@@ -121,7 +124,11 @@ const DenHistory = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => dayjs(date).format("DD-MM-YYYY"),
+      render: (date) => (
+        <span>
+          <CalendarOutlined /> {dayjs(date).format("DD-MM-YYYY")}
+        </span>
+      ),
       sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       defaultSortOrder: "ascend",
     },
@@ -129,7 +136,11 @@ const DenHistory = () => {
       title: "Time",
       dataIndex: "timeSlot",
       key: "timeSlot",
-      render: (timeSlot) => timeSlot,
+      render: (timeSlot) => (
+        <span>
+          <ClockCircleOutlined /> {timeSlot}
+        </span>
+      ),
       sorter: (a, b) => dayjs(a.timeSlot, "HH:mm:ss").unix() - dayjs(b.timeSlot, "HH:mm:ss").unix(),
       defaultSortOrder: "descend",
     },
@@ -137,60 +148,51 @@ const DenHistory = () => {
       title: "Service",
       dataIndex: "services",
       key: "services",
-      render: (services) => services,
+      render: (services) => (
+        <span>
+          <MedicineBoxOutlined /> {services}
+        </span>
+      ),
     },
     {
       title: "Dentist",
       dataIndex: "dentist",
       key: "dentist",
-      render: (dentist) => dentist,
+      render: (dentist) => (
+        <span>
+          <TeamOutlined /> {dentist}
+        </span>
+      ),
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status, record) => {
-        let statusText = "";
-        let statusColor = "";
+      render: (status) => {
+        let color = 'default';
+        let text = 'Unknown';
         if (status === 0) {
-          statusText = "Cancelled";
-          statusColor = "red";
-        } else {
-          if (status === 2) {
-            statusText = "Completed";
-            statusColor = "green";
+          color = 'red';
+          text = 'Cancelled';
           } else if (status === 1) {
-            statusText = "Upcoming";
-            statusColor = 'chocolate';
-          } else if (status === 0){
-            statusText = "Cancelled";
-            statusColor = "red";
-          }
+          color = 'orange';
+          text = 'Upcoming';
+        } else if (status === 2) {
+          color = 'green';
+          text = 'Completed';
         }
-        return (
-          <span
-            style={{
-              color: statusColor,
-              padding: "4px 8px",
-              borderRadius: "18px",
-              display: "inline-block",
-              minWidth: "70px",
-              textAlign: "center"
-            }}
-          >
-            {statusText}
-          </span>
-        );
+        return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: "",
+      title: "Action",
       key: "action",
       render: (_, record) => {
         if (record.status !== 0) {
           return (
             <Button
               type="primary"
+              size="small"
               onClick={() => {
                 setSelectedAppointment(record);
                 setStatusModalVisible(true);
@@ -210,44 +212,48 @@ const DenHistory = () => {
       <Sidebar />
       <Layout className="site-layout">
         <Header
-          className="site-layout-sub-header-background"
           style={{ 
             padding: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '64px' 
           }}
         >
-          <div style={{ 
-            color: 'white', 
-            fontFamily: 'Georgia', 
-            fontSize: '22px', 
-            textAlign: 'center' 
-          }}>
+          <Title level={3} style={{ color: 'white', margin: 0 }}>
             {clinicInfo}
-          </div>
+          </Title>
         </Header>
 
-        <Content style={{ margin: "0 16px" }}>
-          <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
-            <h1>Appointment History</h1>
+        <Content style={{ margin: "24px 16px" }}>
+          <Card>
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={12}>
+                <Title level={2}>
+                  <HistoryOutlined /> Appointment History
+                </Title>
+              </Col>
+              <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+                <Statistic title="Total Appointments" value={appointments.length} />
+              </Col>
+            </Row>
 
-            <div style={{ marginBottom: 16 }}>
-              <Input 
-                placeholder="Patient Name" 
-                value={filterName} 
-                onChange={handleNameChange} 
-                style={{ marginLeft: 10, width: 200 }} 
-              />
-            </div>
+            {/* <Row gutter={[16, 16]} style={{ marginTop: 16, marginBottom: 16 }}>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Search
+                  placeholder="Search by patient name"
+                  allowClear
+                  enterButton="Search"
+                  size="large"
+                  onSearch={handleNameChange}
+                />
+              </Col>
+            </Row> */}
 
             <Table
               columns={columns}
               dataSource={appointments}
               rowKey="appointmentId"
               pagination={{ pageSize: 10 }}
-              style={{ marginBottom: 20 }}
               loading={loading}
             />
 
@@ -268,9 +274,8 @@ const DenHistory = () => {
                 <Option value={2}>Completed</Option>
               </Select>
             </Modal>
-          </div>
+          </Card>
         </Content>
-        
       </Layout>
     </Layout>
   );
