@@ -26,6 +26,10 @@ jobs:
 
       - name: Set up Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
+        
+      - name: Build Docker image
+        run: docker build -t myapp:latest .
+        working-directory: ./Backend
 
       - name: Deploy to Fly.io
         run: flyctl deploy --remote-only
