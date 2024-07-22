@@ -4,6 +4,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import ManagerSidebar from './ManagerSidebar';
 import { DownOutlined } from '@ant-design/icons';
+import { set } from '@ant-design/plots/es/core/utils';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -11,6 +12,7 @@ const { Option } = Select;
 const ManagerClinicList = () => {
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [editingClinic, setEditingClinic] = useState(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddStaffModalVisible, setIsAddStaffModalVisible] = useState(false);
@@ -20,6 +22,7 @@ const ManagerClinicList = () => {
   const [dentistList, setDentistList] = useState([]);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
   const [createForm] = Form.useForm();
   const [form] = Form.useForm();
   const [staffForm] = Form.useForm();
@@ -139,6 +142,22 @@ const ManagerClinicList = () => {
   };
 
   const handleSave = async () => {
+    form.validateFields().then((values) => {
+      const timeFieldsChanged = ['slotDuration', 'openTime', 'closeTime', 'breakStartTime', 'breakEndTime'].some(
+        field => !dayjs(editingClinic[field], 'HH:mm:ss').isSame(values[field])
+      );
+  
+      if (timeFieldsChanged) {
+        setIsConfirmModalVisible(true);
+      } else {
+        saveClinicChanges();
+      }
+    });
+    
+  };
+
+  const saveClinicChanges =  async () => {
+
     try {
       const values = form.getFieldsValue();
       const token = localStorage.getItem("token");
@@ -155,18 +174,23 @@ const ManagerClinicList = () => {
         breakEndTime: values.breakEndTime.format('HH:mm:ss'),
         status: values.status ? 1 : 0
       };
-      await axios.put(`http://localhost:8080/api/v1/manager/editClinic`, payload, {
+      setEditLoading(true);
+      const response = await axios.put(`http://localhost:8080/api/v1/manager/editClinic`, payload, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
       fetchClinics();
+      setEditLoading(false);
       handleCancel();
-      message.success('Clinic updated successfully');
+      message.success('Clinic updated successfully' || response.data);
     } catch (error) {
       message.error(error.response?.data || "An error occurred");
     }
+  
+    setIsEditModalVisible(false);
+    setIsConfirmModalVisible(false);
   };
 
   const handleAddStaff = (clinic) => {
@@ -354,6 +378,7 @@ const ManagerClinicList = () => {
       ),
     },
   ];
+  
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -404,7 +429,7 @@ const ManagerClinicList = () => {
             </Form>
           </Modal>
 
-          <Modal title="Edit Clinic" open={isEditModalVisible} onCancel={handleCancel} onOk={handleSave}>
+          <Modal title="Edit Clinic" open={isEditModalVisible} onCancel={handleCancel} onOk={handleSave} confirmLoading={editLoading}>
             <Form form={form}>
               <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please enter clinic name' }]}>
                 <Input />
@@ -435,6 +460,18 @@ const ManagerClinicList = () => {
               </Form.Item>
             </Form>
           </Modal>
+          <Modal
+              title="Confirm Time Changes"
+              open={isConfirmModalVisible}
+              onOk={() => form.validateFields().then(saveClinicChanges)}
+              onCancel={() => setIsConfirmModalVisible(false)}
+              confirmLoading={editLoading}
+            >
+              <p>
+                If you change the clinic's timing, the changes will affect after the latest day of your clinic's active appointment. 
+                And all existing dentist's schedules after that will be removed. Are you sure you want to edit?
+              </p>
+            </Modal>
 
           <Modal title="Add Staff" open={isAddStaffModalVisible} onCancel={handleCancel} onOk={handleSaveStaff}>
             <Form form={staffForm}>
