@@ -85,7 +85,7 @@ const Login = () => {
       );
 
       const { access_token, refresh_token, role } = response.data;
-      const expirationTime = new Date().getTime() + 45 * 60 * 1000; // 45 mins
+      const expirationTime = new Date().getTime() + 120 * 60 * 1000; // 45 mins
 
       localStorage.setItem('token', access_token);
       localStorage.setItem('refreshToken', refresh_token);

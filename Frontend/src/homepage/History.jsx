@@ -5,6 +5,7 @@ import { Table, Button, Modal, Form, DatePicker, Select, message, Input, Rate } 
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import NavBar from "./Nav";
+import { set } from "@ant-design/plots/es/core/utils";
 
 const { Option } = Select;
 
@@ -12,6 +13,8 @@ const { Option } = Select;
 const History = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [filterDate, setFilterDate] = useState(null);
   const [filterStatus, setFilterStatus] = useState(null);
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
@@ -53,6 +56,7 @@ const History = () => {
 
   const handleCancel = async () => {
     try {
+      setCancelLoading(true);
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -65,6 +69,7 @@ const History = () => {
         }
       );
       message.success("Appointment cancelled successfully");
+      setCancelLoading(false);
       fetchAppointments();
       setCancelModalVisible(false);
     } catch (error) {
@@ -77,10 +82,12 @@ const History = () => {
 
     if (starRating === 0) {
       message.error("Please rate the appointment.");
+      setFeedbackLoading(false);
       return;
     }
 
     try {
+      setFeedbackLoading(true);
       await axios.put(`http://localhost:8080/user/appointment-feedback/${selectedAppointmentId}`, { 
         feedback,
         starAppointment: starRating 
@@ -90,6 +97,7 @@ const History = () => {
         }
       });
       message.success("Feedback updated successfully");
+      setFeedbackLoading(false);
       setFeedbackModalVisible(false);
       setFeedback("");
       setStarRating(0);
@@ -161,14 +169,13 @@ const History = () => {
             statusColor = "green";
           } else {
             statusText = "Upcoming";
-            statusColor = "yellow";
+            statusColor = "chocolate";
           }
         
         return (
           <span
             style={{
-              backgroundColor: statusColor,
-              color: "black",
+              color: statusColor,
               padding: "4px 8px",
               borderRadius: "10px",
               display: "inline-block",
@@ -209,9 +216,9 @@ const History = () => {
             <Button
               type="primary"
               onClick={() => handleFeedbackButtonClick(record)}
-              style={{ marginRight: 8 }}
+              style={{ marginRight: 8, backgroundColor: "green" }}
             >
-              View your feedback
+              Feedback
             </Button>
           );
         }
@@ -262,7 +269,8 @@ const History = () => {
 
         <Modal
           title="Cancel Appointment"
-          visible={cancelModalVisible}
+          open={cancelModalVisible}
+          confirmLoading={cancelLoading}
           onOk={handleCancel}
           onCancel={() => setCancelModalVisible(false)}
           okText="Yes, Cancel"
@@ -273,7 +281,8 @@ const History = () => {
 
         <Modal
           title="View your feedback"
-          visible={feedbackModalVisible}
+          confirmLoading={feedbackLoading}
+          open={feedbackModalVisible}
           onCancel={() => {
             setFeedbackModalVisible(false);
             setSelectedAppointmentId(null);
